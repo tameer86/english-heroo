@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق الحفظ الذكي للأبطال</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>تطبيق الحفظ الذكي للأبطال - لوحة التحكم</title>
     <style>
         :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f7; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 550px; text-align: center; position: relative; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 600px; text-align: center; position: relative; }
         h1 { color: var(--primary); margin-bottom: 10px; font-size: 26px; }
         p { color: var(--dark); font-size: 16px; margin-bottom: 20px; }
         .hidden { display: none !important; }
@@ -20,20 +19,40 @@
         .dashboard-btn span { font-size: 30px; } 
         
         .profile-container { margin: 20px 0; padding: 15px; background: var(--light); border-radius: 15px; border: 2px solid #e3e6f0; }
-        .profile-pic { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--success); margin-bottom: 10px; object-fit: cover; }
-        .profile-name { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 5px; }
-        .profile-status { color: var(--success); font-weight: bold; font-size: 14px; margin-bottom: 15px; }
+        .profile-container img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; }
         
-        .level-card { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #856404; text-align: right; }
-        .stars { font-size: 24px; color: #ccc; letter-spacing: 5px; text-align: center; margin: 5px 0; }
+        .levels-container { margin-top: 20px; text-align: right; max-height: 250px; overflow-y: auto; padding: 5px; }
+        .level-card { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 10px; margin-bottom: 10px; color: #856404; }
+        .stars { font-size: 22px; color: #ccc; letter-spacing: 5px; text-align: center; margin: 3px 0; }
         .stars .active { color: #f6c23e; }
-        .progress-text { font-size: 14px; font-weight: bold; margin-top: 5px; text-align: center; }
+        .progress-text { font-size: 13px; font-weight: bold; text-align: center; }
         
         .settings-field { margin: 15px 0; text-align: right; }
         .settings-field label { font-weight: bold; display: block; margin-bottom: 5px; }
         .settings-field select, .settings-field input[type="range"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
+        .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
     </style>
+    <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
+    <script src="C1.js"></script><script src="C3.js"></script>
+    <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
+    <script src="CLASS4.js"></script><script src="CLASS5.js"></script><script src="CLASS6.js"></script>
+    <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
+    <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
+    <script>
+        // تجميع قواعد البيانات في كائن موحد لسهولة الفحص والديناميكية
+        const allLevelsData = {
+            "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
+            "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
+            "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C3": typeof levelC3_Words !== 'undefined' ? levelC3_Words : [],
+            "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
+            "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
+            "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
+            "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
+            "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
+            "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
+        };
+    </script>
 </head>
 <body>
 
@@ -42,21 +61,22 @@
         <h1>تطبيق الحفظ الذكي 🌟</h1>
         <p>تعلم الإنجليزية بذكاء ومرح مع التقنيات التفاعلية</p>
 
-        <div id="login-section">
-            <div id="buttonDiv" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
-        </div>
-
-        <div id="profile-section" class="profile-container hidden">
-            <img id="user-pic" class="profile-pic" src="" alt="صورة المستخدم">
-            <div id="user-name" class="profile-name">مرحباً بك</div>
-            <div class="profile-status">✨ أنت مسجل الدخول وجاهز للتعلم!</div>
-            <button style="background: var(--success);" onclick="showDashboard()">🚀 الدخول إلى لوحة التحكم</button>
+        <div id="profile-section" class="profile-container">
+            <img id="user-pic" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="صورة المستخدم">
+            <div id="user-name" class="profile-name">مرحباً بك يا بطل وجاهز للتعلم!</div>
+            <button style="background: var(--success); width:90%;" onclick="showDashboard()">🚀 الدخول إلى لوحة التحكم</button>
         </div>
         
-        <hr style="border: 1px solid #eee; margin: 20px 0;">
+        <div class="sync-box">
+            <h4 style="margin:0 0 10px 0; color:#0d47a1;">🔄 نقل البيانات بين الأجهزة (تجنب الفرمتة)</h4>
+            <button style="background:var(--info); font-size:14px; padding:8px; width:45%; margin:2px;" onclick="exportProgress()">📤 تصدير نسخة</button>
+            <button style="background:var(--warning); font-size:14px; padding:8px; width:45%; margin:2px;" onclick="document.getElementById('import-file').click()">📥 استيراد نسخة</button>
+            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importProgress(event)">
+        </div>
+
+        <hr style="border: 1px solid #eee; margin: 15px 0;">
         <div class="btn-group">
             <button style="background: var(--info);" onclick="showAbout()">ℹ️ حول التطبيق</button>
-            <button id="logout-btn" style="background: var(--dark);" class="hidden" onclick="logoutUser()">🚪 تسجيل الخروج</button>
             <button style="background: var(--danger);" onclick="clearAllData()">🗑️ مسح البيانات بالكامل</button>
         </div>
     </div>
@@ -64,12 +84,9 @@
     <div id="dashboard-screen" class="hidden">
         <h1>لوحة التحكم الإستراتيجية 🎯</h1>
         
-        <div class="level-card">
-            <h3 style="margin: 0; text-align: center;" id="current-level-display">المستوى الحالي: A1</h3>
-            <div class="stars" id="level-stars">★ ★ ★</div>
-            <div class="progress-text" id="words-remaining">المتبقي لإنهاء المستوى: 0 كلمة</div>
-            <div class="progress-text" id="cumulative-score-display" style="color: var(--primary); margin-top: 5px;">النقاط التراكمية المشتركة: 0 🏆</div>
-        </div>
+        <h3 id="cumulative-score-display" style="color: var(--primary); margin: 10px 0;">النقاط التراكمية المشتركة: 0 🏆</h3>
+        <h4 style="text-align:right; margin:10px 0 5px 0;">📈 تقدمك في المستويات المفتوحة:</h4>
+        <div class="levels-container" id="levels-progress-area"></div>
 
         <div class="dashboard-grid">
             <button class="dashboard-btn" style="background: var(--primary);" onclick="window.location.href='save.html'">
@@ -85,7 +102,7 @@
                 <span>⚙️</span> الإعدادات الصوتية
             </button>
         </div>
-        <button style="background: var(--dark); margin-top: 20px; width: 50%;" onclick="goHome()">🔙 العودة للشاشة الرئيسية</button>
+        <button style="background: var(--dark); margin-top: 20px; width: 60%;" onclick="goHome()">🔙 العودة للشاشة الرئيسية</button>
     </div>
 
     <div id="about-screen" class="hidden">
@@ -96,18 +113,8 @@
 
     <div id="settings-screen" class="hidden">
         <h1>الإعدادات الصوتية ⚙️</h1>
-        
-        <div class="settings-field">
-            <label>سرعة القراءة والصوت:</label>
-            <input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1" onchange="saveSettings()">
-        </div>
-
-        <div class="settings-field">
-            <label>جنس القارئ والصوت المتاح:</label>
-            <select id="voice-gender" onchange="saveSettings()">
-                </select>
-        </div>
-
+        <div class="settings-field"><label>سرعة القراءة والصوت:</label><input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1" onchange="saveSettings()"></div>
+        <div class="settings-field"><label>جنس القارئ والصوت المتاح:</label><select id="voice-gender" onchange="saveSettings()"></select></div>
         <div class="settings-field">
             <label>نص تجريبي لاختبار تنظيم القراءة وعلامات الترقيم:</label>
             <textarea class="test-textarea" id="test-text" readonly>Hello my friend! Welcome to your smart app, where you can learn English perfectly.</textarea>
@@ -118,185 +125,127 @@
 </div>
 
 <script>
-    // تهيئة ذاكرة التطبيق الأساسية إذا لم تكن موجودة
-    if(!localStorage.getItem('appProgress')) {
-        localStorage.setItem('appProgress', JSON.stringify({
-            mainIndex: 0, 
-            activeList: [0,1,2,3,4,5,6,7,8,9], 
-            savedWords: [],
-            pagesCompleted: 0,
-            currentLevel: "A1",
-            cumulativeScore: 0,
-            lastPartialIndex: 0
-        }));
+    const availableKeys = ["A1","A2","B1","B2","C1","C3","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
+
+    function getCleanProgress() {
+        let structure = { cumulativeScore: 0, levels: {} };
+        availableKeys.forEach(k => {
+            structure.levels[k] = { mainIndex: 0, activeList: [0,1,2,3,4,5,6,7,8,9], savedWords: [], pagesCompleted: 0 };
+        });
+        return structure;
     }
 
-    // تهيئة الإعدادات الافتراضية للصوت
+    if(!localStorage.getItem('appProgress')) {
+        localStorage.setItem('appProgress', JSON.stringify(getCleanProgress()));
+    }
     if(!localStorage.getItem('audioSettings')) {
         localStorage.setItem('audioSettings', JSON.stringify({ speed: 1, voiceName: "" }));
     }
 
     window.onload = function () {
-        // التحقق من وجود شاشة محددة عند العودة من الصفحات الأخرى
         const urlParams = new URLSearchParams(window.location.search);
-        const screenParam = urlParams.get('screen');
-
-        const savedUser = localStorage.getItem('smartAppUser');
-        if (savedUser) {
-            const userData = JSON.parse(savedUser);
-            showProfile(userData.name, userData.picture);
-            updateLevelStats();
-            if (screenParam === 'dashboard') {
-                showDashboard();
-            }
-        } else {
-            initGoogleAuth();
-        }
+        if (urlParams.get('screen') === 'dashboard') { showDashboard(); }
         loadVoiceOptions();
-        if (window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = loadVoiceOptions;
-        }
-    };
-
-    function initGoogleAuth() {
-        google.accounts.id.initialize({
-            client_id: "691032994394-k3d0bbdomgeedituat06mdp184eppqkp.apps.googleusercontent.com",
-            callback: handleCredentialResponse
-        });
-        google.accounts.id.renderButton(document.getElementById("buttonDiv"), { theme: "outline", size: "large", text: "signin_with" });
-    }
-
-    function handleCredentialResponse(response) {
-        const responsePayload = decodeJwtResponse(response.credential);
-        const userData = { name: responsePayload.name, picture: responsePayload.picture };
-        localStorage.setItem('smartAppUser', JSON.stringify(userData));
-        showProfile(userData.name, userData.picture);
+        if (window.speechSynthesis.onvoiceschanged !== undefined) { window.speechSynthesis.onvoiceschanged = loadVoiceOptions; }
         updateLevelStats();
-        showDashboard();
-    }
-
-    function decodeJwtResponse(token) {
-        let base64Url = token.split('.')[1];
-        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-    }
-
-    function showProfile(name, pictureUrl) {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('profile-section').classList.remove('hidden');
-        document.getElementById('logout-btn').classList.remove('hidden');
-        document.getElementById('user-pic').src = pictureUrl;
-        document.getElementById('user-name').innerText = `مرحباً بك يا بطل: ${name}`;
-    }
+    };
 
     function updateLevelStats() {
         let progress = JSON.parse(localStorage.getItem('appProgress'));
-        let totalWords = 872; 
-        let savedCount = progress.savedWords ? progress.savedWords.length : 0;
-        let remaining = totalWords - savedCount;
-        if(remaining < 0) remaining = 0;
-        
-        document.getElementById('current-level-display').innerText = `المستوى الحالي: ${progress.currentLevel || 'A1'}`;
-        document.getElementById('words-remaining').innerText = `المتبقي لإنهاء المستوى: ${remaining} كلمة`;
         document.getElementById('cumulative-score-display').innerText = `النقاط التراكمية المشتركة: ${Math.round(progress.cumulativeScore || 0)} 🏆`;
-
-        let starsHtml = "";
-        let percentage = savedCount / totalWords;
-        if (percentage >= 0.66) { starsHtml = "<span class='active'>★</span> <span class='active'>★</span> <span class='active'>★</span>"; }
-        else if (percentage >= 0.33) { starsHtml = "<span class='active'>★</span> <span class='active'>★</span> ★"; }
-        else if (percentage > 0) { starsHtml = "<span class='active'>★</span> ★ ★"; }
-        else { starsHtml = "★ ★ ★"; }
-        document.getElementById('level-stars').innerHTML = starsHtml;
+        
+        let area = document.getElementById('levels-progress-area');
+        area.innerHTML = "";
+        
+        let startedAny = false;
+        for(let lvl in progress.levels) {
+            let lData = progress.levels[lvl];
+            let totalWords = allLevelsData[lvl] ? allLevelsData[lvl].length : 0;
+            let savedCount = lData.savedWords ? lData.savedWords.length : 0;
+            
+            if(savedCount > 0 || lData.mainIndex > 0) {
+                startedAny = true;
+                let remaining = totalWords - savedCount;
+                if(remaining < 0) remaining = 0;
+                let percentage = totalWords === 0 ? 0 : (savedCount / totalWords);
+                
+                let stars = "★ ★ ★";
+                if(percentage >= 0.66) stars = "<span class='active'>★</span> <span class='active'>★</span> <span class='active'>★</span>";
+                else if(percentage >= 0.33) stars = "<span class='active'>★</span> <span class='active'>★</span> ★";
+                else if(percentage > 0) stars = "<span class='active'>★</span> ★ ★";
+                
+                area.innerHTML += `
+                    <div class="level-card">
+                        <strong style="font-size:16px;">المستوى/الصف: ${lvl}</strong>
+                        <div class="stars">${stars}</div>
+                        <div class="progress-text">المحفوظ: ${savedCount} | المتبقي لإنهاء المستوى: ${remaining} كلمة</div>
+                    </div>`;
+            }
+        }
+        if(!startedAny) {
+            area.innerHTML = `<p style="text-align:center; color:var(--dark); font-style:italic;">لا تملك مستوى تقدم حالياً لأنك لم تبدأ بالحفظ بعد. ابدأ رحلتك الآن ولتضيء النجوم! 🌟</p>`;
+        }
     }
 
-    function showDashboard() {
-        hideAllScreens();
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-    }
-    function goHome() {
-        hideAllScreens();
-        document.getElementById('home-screen').classList.remove('hidden');
-    }
-    function showAbout() {
-        hideAllScreens();
-        document.getElementById('about-screen').classList.remove('hidden');
-    }
+    function showDashboard() { hideAllScreens(); updateLevelStats(); document.getElementById('dashboard-screen').classList.remove('hidden'); }
+    function goHome() { hideAllScreens(); document.getElementById('home-screen').classList.remove('hidden'); }
+    function showAbout() { hideAllScreens(); document.getElementById('about-screen').classList.remove('hidden'); }
     function showSettings() {
-        hideAllScreens();
-        document.getElementById('settings-screen').classList.remove('hidden');
-        // جلب الإعدادات المحفوظة وتطبيقها على الشاشة
+        hideAllScreens(); document.getElementById('settings-screen').classList.remove('hidden');
         let settings = JSON.parse(localStorage.getItem('audioSettings'));
         document.getElementById('voice-speed').value = settings.speed || 1;
         document.getElementById('voice-gender').value = settings.voiceName || "";
     }
-    function hideAllScreens() {
-        document.getElementById('home-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.add('hidden');
-        document.getElementById('about-screen').classList.add('hidden');
-        document.getElementById('settings-screen').classList.add('hidden');
+    function hideAllScreens() { document.getElementById('home-screen').classList.add('hidden'); document.getElementById('dashboard-screen').classList.add('hidden'); document.getElementById('about-screen').classList.add('hidden'); document.getElementById('settings-screen').classList.add('hidden'); }
+
+    function clearAllData() { if (confirm("هل أنت متأكد من مسح وتصفير كافة بيانات الحفظ تماماً؟")) { localStorage.clear(); alert("تم تصفير النظام."); location.reload(); } }
+
+    function exportProgress() {
+        let progress = localStorage.getItem('appProgress');
+        let audio = localStorage.getItem('audioSettings');
+        let backup = { appProgress: progress, audioSettings: audio };
+        let blob = new Blob([JSON.stringify(backup)], {type: "application/json"});
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `smart_app_progress_backup.json`;
+        a.click();
     }
 
-    // دالة تسجيل الخروج فقط (تحفظ البيانات وتخفي الجلسة الحالية)
-    function logoutUser() {
-        localStorage.removeItem('smartAppUser');
-        alert("تم تسجيل الخروج بنجاح، بيانات تقدمك محفوظة في النظام.");
-        location.href = "index.html";
+    function importProgress(e) {
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                let parsed = JSON.parse(event.target.result);
+                if(parsed.appProgress) {
+                    localStorage.setItem('appProgress', parsed.appProgress);
+                    if(parsed.audioSettings) localStorage.setItem('audioSettings', parsed.audioSettings);
+                    alert("🎉 تم استيراد نسخة تقدمك بنجاح التام! يمكنك المتابعة من حيث توقفت الآن.");
+                    location.reload();
+                } else { alert("الملف غير صالح."); }
+            } catch(err) { alert("خطأ في قراءة ملف النسخة الاحتياطية."); }
+        };
+        reader.readAsText(e.target.files[0]);
     }
 
-    // دالة مسح البيانات بالكامل وتصفير العدادات
-    function clearAllData() {
-        if (confirm("هل أنت متأكد تماماً من تصفير ومسح جميع بيانات الحفظ والتقدم وتسجيل الخروج؟")) {
-            localStorage.clear();
-            alert("تم مسح كافة البيانات بنجاح.");
-            location.href = "index.html";
-        }
-    }
-
-    // إدارة الإعدادات الصوتية المتطورة
     function loadVoiceOptions() {
-        const select = document.getElementById('voice-gender');
-        if(!select) return;
-        select.innerHTML = "";
-        let voices = window.speechSynthesis.getVoices();
-        
-        // تصفية وتجهيز الأصوات الإنجليزية المتاحة بالمتصفح
-        let engVoices = voices.filter(v => v.lang.startsWith('en'));
-        
-        if(engVoices.length === 0) {
+        const select = document.getElementById('voice-gender'); if(!select) return; select.innerHTML = "";
+        let voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+        if(voices.length === 0) { select.innerHTML = "<option value=''>الصوت الافتراضي</option>"; return; }
+        voices.forEach(v => {
             let opt = document.createElement('option');
-            opt.text = "الصوت الافتراضي للمتصفح";
-            opt.value = "";
-            select.appendChild(opt);
-            return;
-        }
-
-        engVoices.forEach(v => {
-            let opt = document.createElement('option');
-            let genderText = (v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('hazel') || v.name.toLowerCase().includes('susan')) ? "أنثى" : "ذكر";
-            opt.text = `${v.name} (${genderText})`;
-            opt.value = v.name;
-            select.appendChild(opt);
+            let gender = (v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('hazel')) ? "أنثى" : "ذكر";
+            opt.text = `${v.name} (${gender})`; opt.value = v.name; select.appendChild(opt);
         });
     }
-
     function saveSettings() {
-        let speed = document.getElementById('voice-speed').value;
-        let voiceName = document.getElementById('voice-gender').value;
-        localStorage.setItem('audioSettings', JSON.stringify({ speed: parseFloat(speed), voiceName: voiceName }));
+        localStorage.setItem('audioSettings', JSON.stringify({ speed: parseFloat(document.getElementById('voice-speed').value), voiceName: document.getElementById('voice-gender').value }));
     }
-
     function testVoiceOutput() {
-        let text = document.getElementById('test-text').value;
         let settings = JSON.parse(localStorage.getItem('audioSettings'));
-        let utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = settings.speed || 1;
-        
-        let voices = window.speechSynthesis.getVoices();
-        let selectedVoice = voices.find(v => v.name === settings.voiceName);
-        if(selectedVoice) utterance.voice = selectedVoice;
-        
-        window.speechSynthesis.speak(utterance);
+        let ut = new SpeechSynthesisUtterance(document.getElementById('test-text').value);
+        ut.lang = 'en-US'; ut.rate = settings.speed || 1;
+        let v = window.speechSynthesis.getVoices().find(v => v.name === settings.voiceName);
+        if(v) ut.voice = v; window.speechSynthesis.speak(ut);
     }
 </script>
 </body>

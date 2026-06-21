@@ -9,250 +9,223 @@
         h1 { color: #4e73df; }
         .section-box { border: 2px solid #e3e6f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: right; background: #f8f9fc; }
         .section-title { font-size: 18px; font-weight: bold; color: #4e73df; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #4e73df; padding-bottom: 5px; }
-        .form-group { margin-bottom: 15px; }
         label { font-weight: bold; margin-left: 10px; }
-        select, input[type="number"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 15px; }
-        .radio-group { display: inline-block; margin-left: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        thead { background: #36b9cc; color: white; }
-        button { cursor: pointer; padding: 10px 20px; font-size: 16px; border: none; border-radius: 6px; font-weight: bold; margin: 5px; }
-        .btn-action { background: #4e73df; color: white; }
-        .btn-mic { background: #e74a3b; color: white; }
-        .btn-audio { background: #f6c23e; color: #333; }
-        .feedback-cell { background: #f1f3f9; padding: 10px; font-weight: bold; text-align: right; }
-        .correct-ans { color: #1cc88a; font-weight: bold; background: #e8f9f2; padding: 5px; border-radius: 5px; display: inline-block; margin-top: 5px; border: 1px dashed #1cc88a; }
-        .report-box { background: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 20px; border-radius: 10px; text-align: right; margin-top: 20px; }
+        select, input[type="number"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { border: 1px solid #e3e6f0; padding: 12px; text-align: center; }
+        thead { background: #4e73df; color: white; }
+        .feedback-cell { background: #f8f9fc; text-align: right; padding: 10px; }
+        .editable-input { width: 90%; padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1; margin: 4px 0; font-weight: bold; }
+        .btn-action { background: #1cc88a; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 10px; }
+        .btn-back { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 10px; }
         .hidden { display: none !important; }
-        .nav-btns { margin-top: 20px; display: flex; justify-content: center; gap: 15px; }
     </style>
+    <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
+    <script src="C1.js"></script><script src="C3.js"></script>
+    <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
+    <script src="CLASS4.js"></script><script src="CLASS5.js"></script><script src="CLASS6.js"></script>
+    <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
+    <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <h1>لوحة المراجعة والاختبار الذكي 🧠</h1>
+    <h1>🧠 منصة المراجعة والاختبارات الذكية للتميز</h1>
     
-    <div id="setup-area">
-        <div class="section-box">
-            <div class="section-title">أولاً: إعدادات المراجعة وتخصيص العرض</div>
-            <div class="form-group">
-                <label>اختر المستوى المراد مراجعته:</label>
-                <select id="review-level">
-                    <option value="A1">مستوى A1</option>
-                </select>
+    <div id="setup-area" class="section-box">
+        <div class="section-title">⚙️ أولاً: إعدادات وتخصيص جلسة المراجعة</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div>
+                <label>تحديد المستوى للمراجعة:</label>
+                <select id="review-level-select" style="width:60%;"></select>
             </div>
-            <div class="form-group">
-                <label>طريقة المراجعة المفضلة:</label>
-                <div class="radio-group">
-                    <input type="radio" id="mode-ar-en" name="review-mode" value="ar-en" checked>
-                    <label for="mode-ar-en">عربي ➔ إنجليزي (استذكار الإنجليزية)</label>
-                </div>
-                <div class="radio-group">
-                    <input type="radio" id="mode-en-ar" name="review-mode" value="en-ar">
-                    <label for="mode-en-ar">إنجليزي ➔ عربي (استذكار العربية)</label>
-                </div>
+            <div>
+                <label>طريقة العرض والتحكم:</label>
+                <input type="radio" id="mode-ar-en" name="view-mode" checked> <label for="mode-ar-en">عربي ➔ إنجليزي</label>
+                <input type="radio" id="mode-en-ar" name="view-mode"> <label for="mode-en-ar">إنجليزي ➔ عربي</label>
             </div>
         </div>
 
-        <div class="section-box">
-            <div class="section-title">ثانياً: أنواع المراجعة المتوفرة واختيار الاختبار</div>
+        <div class="section-title" style="margin-top:25px;">🎯 ثانياً: اختيار نوع المراجعة الاستراتيجية</div>
+        <div>
+            <input type="radio" id="type-all" name="rev-type" checked onclick="toggleTypeInputs()"> <label for="type-all">1. المراجعة الشاملة (من البداية حتى آخر كلمة محفوظة في المستوى)</label><br><br>
+            <input type="radio" id="type-part" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-part">2. المراجعة الجزئية التتابعية غير العشوائية</label>
+            <span id="part-inputs" class="hidden" style="margin-right:20px;">
+                <label>عدد الصفحات المطلوبة:</label> <input type="number" id="part-pages" min="1" value="1" style="width:70px;">
+            </span><br><br>
             
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                <button class="btn-action" style="background: #1cc88a;" onclick="startReview(1)">1. المراجعة الشاملة (لكل الكلمات)</button>
-                <button class="btn-action" style="background: #36b9cc;" onclick="startReview(2)">2. المراجعة الجزئية التتابعية</button>
-                <button class="btn-action" style="background: #f6c23e; color: #333;" onclick="startReview(3)">3. المراجعة العشوائية المحددة</button>
+            <input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-random">3. المراجعة الجزئية العشوائية المتقدمة (ضمن فترة محددة)</label>
+            <div id="random-inputs" class="hidden" style="margin-right:40px; margin-top:10px;">
+                <label>من صفحة:</label> <input type="number" id="rand-start" min="1" value="1" style="width:60px;">
+                <label>إلى صفحة:</label> <input type="number" id="rand-end" min="1" value="2" style="width:60px;">
+                <label>بعدد صفحات عشوائية:</label> <input type="number" id="rand-count" min="1" value="1" style="width:60px;">
             </div>
-
-            <div class="form-group" style="border: 1px dashed #ccc; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
-                <label>عدد الصفحات للمراجعة الجزئية:</label>
-                <input type="number" id="partial-pages" min="1" value="1" style="width: 70px;">
-                <button class="btn-action" style="padding: 5px 10px; font-size:14px; background: #e74a3b;" onclick="resetPartialIndex()">إعادة البدء 🔄</button>
-                <span id="remaining-pages-info" style="margin-right: 15px; font-weight: bold; color: #5a5c69;">المتبقي للمراجعة التتابعية: 0 صفحة</span>
-            </div>
-
-            <div class="form-group" style="border: 1px dashed #ccc; padding: 10px; border-radius: 6px;">
-                <label>المراجعة العشوائية - من صفحة:</label>
-                <input type="number" id="rand-from" min="1" value="1" style="width: 60px;">
-                <label>إلى صفحة:</label>
-                <input type="number" id="rand-to" min="1" value="2" style="width: 60px;">
-                <label>عدد الصفحات المطلوبة:</label>
-                <input type="number" id="rand-count" min="1" value="1" style="width: 60px;">
-            </div>
+        </div>
+        
+        <div style="text-align:center; margin-top:25px;">
+            <button class="btn-action" onclick="startReviewSession()">🚀 ابدأ مراجعة الاختبار الآن</button>
+            <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
         </div>
     </div>
 
     <div id="test-area" class="hidden">
-        <h2 id="test-title" style="color: #36b9cc;">اسم الاختبار النشط</h2>
-        <h3 id="page-indicator" style="color: #5a5c69;">الصفحة 1 من X</h3>
-        
-        <table id="reviewTable">
+        <h2 id="test-page-title" style="color:#36b9cc;">الصفحة الاختبارية الحالية</h2>
+        <table>
             <thead>
-                <tr id="table-headers"></tr>
+                <tr>
+                    <th width="10%">استماع المكتوب</th>
+                    <th width="45%">الكلمة والمثال الإرشادي للمعطيات</th>
+                    <th width="45%">حقول تسجيل صوت الطالب والكتابة اليدوية للتعديل والتحكم</th>
+                </tr>
             </thead>
-            <tbody id="review-body"></tbody>
+            <tbody id="test-table-body"></tbody>
         </table>
         
-        <div class="nav-btns">
-            <button id="btn-check" class="btn-action" style="background: #4e73df; padding: 15px 40px;" onclick="checkPageResult()">📊 تحقق من الإجابات</button>
-            <button id="btn-retry" class="btn-action hidden" style="background: #e74a3b; padding: 15px 40px;" onclick="retryPage()">🔄 إعادة المحاولة</button>
-            <button id="btn-next" class="btn-action hidden" style="background: #1cc88a; padding: 15px 40px;" onclick="nextPage()">▶️ الصفحة التالية</button>
-            <button id="btn-finish" class="btn-action hidden" style="background: #f6c23e; color:#333; padding: 15px 40px;" onclick="finishTest()">🏆 إنهاء ومعرفة النتيجة</button>
+        <div id="action-controls" style="margin-top:20px;">
+            <button id="btn-check" class="btn-action" onclick="evaluateCurrentPageAnswers()">📊 التحقق ومعرفة النتيجة المعتمدة</button>
+            <button id="btn-retry" class="btn-action style-retry hidden" style="background:#f6c23e;" onclick="retryCurrentPage()">🔄 إعادة المحاولة لتعديل الأخطاء</button>
+            <button id="btn-next" class="btn-action hidden" style="background:#4e73df;" onclick="moveToNextTestPage()">الصفحة التالية ➔</button>
+            <button id="btn-finish" class="btn-action hidden" style="background:#1cc88a;" onclick="finishSessionReport()">🏆 إنهاء واستخراج التقرير النهائي</button>
         </div>
     </div>
-
-    <div id="report-output" class="report-box hidden"></div>
-
-    <button style="background: #5a5c69; color:white; margin-top: 30px;" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+    
+    <div id="report-output" class="section-box hidden" style="margin-top:20px; background:#e8f5e9; border-color:#c8e6c9;"></div>
 </div>
 
 <script>
-    let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { savedWords: [], cumulativeScore: 0, lastPartialIndex: 0 };
-    let testPages = []; 
-    let currentPageIndex = 0;
-    let currentReviewType = 1;
-    let pageAttempts = []; 
-    let studentAnswers = {}; 
-    let firstAttemptDone = false; 
-
-    window.onload = function() {
-        updateRemainingPagesInfo();
+    const allLevelsData = {
+        "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
+        "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
+        "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C3": typeof levelC3_Words !== 'undefined' ? levelC3_Words : [],
+        "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
+        "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
+        "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
+        "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
+        "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
+        "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
     };
 
-    function updateRemainingPagesInfo() {
-        let totalSaved = appProgress.savedWords.length;
-        let totalSavedPages = Math.ceil(totalSaved / 10);
-        let currentPartIdx = Math.ceil((appProgress.lastPartialIndex || 0) / 10);
-        let remaining = totalSavedPages - currentPartIdx;
-        if(remaining < 0) remaining = 0;
-        document.getElementById('remaining-pages-info').innerText = `المتبقي للمراجعة التتابعية: ${remaining} صفحة`;
+    let appProgress = JSON.parse(localStorage.getItem('appProgress'));
+    let selectedLevel = "A1";
+    let testWordsChunks = [];
+    let currentChunkIdx = 0;
+    let currentAnswers = [];
+    let sessionFirstAttemptScores = [];
+    let isFirstAttemptOfThisPage = true;
+
+    window.onload = function() {
+        let sel = document.getElementById('review-level-select');
+        for(let l in appProgress.levels) {
+            let opt = document.createElement('option'); opt.value = l; opt.text = "مستوى " + l; sel.appendChild(opt);
+        }
+        toggleTypeInputs();
+    };
+
+    function toggleTypeInputs() {
+        document.getElementById('part-inputs').classList.add('hidden');
+        document.getElementById('random-inputs').classList.add('hidden');
+        if(document.getElementById('type-part').checked) document.getElementById('part-inputs').classList.remove('hidden');
+        if(document.getElementById('type-random').checked) document.getElementById('random-inputs').classList.remove('hidden');
     }
 
-    function resetPartialIndex() {
-        appProgress.lastPartialIndex = 0;
-        localStorage.setItem('appProgress', JSON.stringify(appProgress));
-        updateRemainingPagesInfo();
-        alert("تم إعادة مؤشر المراجعة التتابعية إلى البداية بنجاح.");
+    function cleanString(str) {
+        if(!str) return "";
+        return str.toLowerCase()
+            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"")
+            .replace(/ة/g, "ه") // شرط الدمج والمطابقة التامة لحرف الهاء والتاء المربوطة
+            .replace(/\s+/g," ").trim();
     }
 
-    function playAudio(text, langCode) {
-        let utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = langCode; 
-        window.speechSynthesis.speak(utterance);
-    }
-
-    function startReview(type) {
-        let words = appProgress.savedWords || [];
-        if(words.length === 0) { alert("سجل كلماتك فارغ! يجب عليك حفظ بعض الكلمات أولاً."); return; }
-        
-        let totalSavedPages = Math.ceil(words.length / 10);
-        let selectedWords = [];
-
-        if (type === 1) { 
-            selectedWords = [...words];
-            document.getElementById('test-title').innerText = "المراجعة الشاملة";
-        } 
-        else if (type === 2) { 
-            let pagesReq = parseInt(document.getElementById('partial-pages').value) || 1;
-            let currentPartIdx = Math.ceil((appProgress.lastPartialIndex || 0) / 10);
-            let remaining = totalSavedPages - currentPartIdx;
-            
-            if (pagesReq > remaining) {
-                alert(`⚠️ خطأ منطقي: طلبت ${pagesReq} صفحة، لكن المتبقي لك للمراجعة التتابعية هو ${remaining} صفحات فقط!`);
-                return;
-            }
-            
-            let startIdx = appProgress.lastPartialIndex || 0;
-            selectedWords = words.slice(startIdx, startIdx + (pagesReq * 10));
-            document.getElementById('test-title').innerText = "المراجعة الجزئية التتابعية";
-        } 
-        else if (type === 3) { 
-            let fromPage = parseInt(document.getElementById('rand-from').value);
-            let toPage = parseInt(document.getElementById('rand-to').value);
-            let count = parseInt(document.getElementById('rand-count').value);
-
-            if (fromPage > toPage) { alert("⚠️ خطأ منطقي: صفحة البداية يجب أن تكون أقل من أو تساوي صفحة النهاية!"); return; }
-            if (fromPage < 1 || toPage > totalSavedPages) { alert(`⚠️ خطأ منطقي: المدى المسموح به من 1 إلى ${totalSavedPages} صفحة محفوظة فقط!`); return; }
-            if (count > (toPage - fromPage + 1)) { alert("⚠️ خطأ منطقي: عدد الصفحات العشوائية المطلوبة أكبر من المدى المتوفر في الفترة!"); return; }
-
-            let startIdx = (fromPage - 1) * 10;
-            let endIdx = toPage * 10;
-            let sliceOfWords = words.slice(startIdx, endIdx);
-            
-            let shuffled = sliceOfWords.sort(() => 0.5 - Math.random());
-            selectedWords = shuffled.slice(0, count * 10);
-            document.getElementById('test-title').innerText = `المراجعة العشوائية المحددة (${count} صفحات)`;
+    function startReviewSession() {
+        selectedLevel = document.getElementById('review-level-select').value;
+        let lData = appProgress.levels[selectedLevel];
+        if(!lData || !lData.savedWords || lData.savedWords.length === 0) {
+            alert("⚠️ تنبيه: لا توجد كلمات محفوظة في هذا المستوى لمراجعتها حتى الآن!"); return;
         }
 
-        currentReviewType = type;
-        testPages = [];
-        pageAttempts = [];
-        
-        for (let i = 0; i < selectedWords.length; i += 10) {
-            testPages.push(selectedWords.slice(i, i + 10));
+        let savedIds = lData.savedWords.map(w => w.id);
+        let fullDb = allLevelsData[selectedLevel] || [];
+        let savedDbWords = fullDb.filter(w => savedIds.includes(w.id));
+
+        testWordsChunks = [];
+        currentChunkIdx = 0;
+        sessionFirstAttemptScores = [];
+
+        // 1. الشاملة
+        if(document.getElementById('type-all').checked) {
+            for(let i=0; i<savedDbWords.length; i+=10) { testWordsChunks.push(savedDbWords.slice(i, i+10)); }
+        }
+        // 2. الجزئية التتابعية
+        else if(document.getElementById('type-part').checked) {
+            let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
+            let totalSavedPages = Math.ceil(savedDbWords.length / 10);
+            if(reqPages > totalSavedPages) { alert("⚠️ خطأ منطقي: عدد الصفحات المطلوبة أكبر من عدد الصفحات المحفوظة حالياً!"); return; }
+            
+            let startW = (lData.lastPartialIndex || 0);
+            if(startW >= savedDbWords.length) startW = 0; // إعادة من البداية عند النفاد
+            
+            let sliced = savedDbWords.slice(startW, startW + (reqPages * 10));
+            for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
+            lData.lastPartialIndex = startW + (reqPages * 10);
+        }
+        // 3. العشوائية
+        else if(document.getElementById('type-random').checked) {
+            let sP = parseInt(document.getElementById('rand-start').value) || 1;
+            let eP = parseInt(document.getElementById('rand-end').value) || 1;
+            let rC = parseInt(document.getElementById('rand-count').value) || 1;
+
+            if(sP > eP || rC > (eP - sP + 1)) { alert("⚠️ خطأ منطقي: تعارض في أرقام الفترة أو الصفحات العشوائية المطلوبة!"); return; }
+            let pool = savedDbWords.slice((sP-1)*10, eP*10);
+            if(pool.length === 0) { alert("⚠️ الفترة المدخلة خارج مدى الكلمات المحفوظة!"); return; }
+            
+            // خلط واختيار عشوائي
+            pool.sort(() => 0.5 - Math.random());
+            let sliced = pool.slice(0, rC * 10);
+            for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
         }
 
         document.getElementById('setup-area').classList.add('hidden');
         document.getElementById('test-area').classList.remove('hidden');
-        currentPageIndex = 0;
-        renderPage();
+        renderTestPage();
     }
 
-    function renderPage() {
-        firstAttemptDone = false;
-        studentAnswers = {};
-        let pageWords = testPages[currentPageIndex];
-        const isArEn = document.getElementById('mode-ar-en').checked;
+    function renderTestPage() {
+        isFirstAttemptOfThisPage = true;
+        document.getElementById('test-page-title').innerText = `المجموعة الاختبارية الحالية (صفحة ${currentChunkIdx + 1} من أصل ${testWordsChunks.length})`;
         
-        document.getElementById('page-indicator').innerText = `الصفحة ${currentPageIndex + 1} من ${testPages.length}`;
-        
-        const headers = document.getElementById('table-headers');
-        const tbody = document.getElementById('review-body');
+        const tbody = document.getElementById('test-table-body');
         tbody.innerHTML = "";
         
-        headers.innerHTML = `
-            <th>الرقم</th>
-            <th>تسجيل الإجابة 🎙️</th>
-            ${isArEn ? '<th>المكتوب بالعربية</th>' : '<th>المكتوب بالإنجليزية</th>'}
-            <th>الاستماع للمساعدة 🔊</th>
-        `;
+        let words = testWordsChunks[currentChunkIdx];
+        let isArEn = document.getElementById('mode-ar-en').checked;
+        currentAnswers = [];
 
-        pageWords.forEach((word, idx) => {
-            studentAnswers[idx] = { spokenWord: "", spokenExample: "" };
-            let row = document.createElement('tr');
-            
-            let contentTd = "";
-            let wordAudioBtn = "";
-            let exAudioBtn = "";
+        words.forEach((w, i) => {
+            currentAnswers.push({ wordId: w.id, typedWord: "", typedEx: "" });
+            let displayTxt = isArEn ? `الرئيسية بالعربي: ${w.ar}` : `الرئيسية بالإنجليزي: ${w.en}`;
+            let displayEx = isArEn ? `المثال بالعربي: ${w.ar_ex}` : `المثال بالإنجليزي: ${w.ex_en}`;
+            let listenTarget = isArEn ? w.ar : w.en;
 
-            if(isArEn) {
-                contentTd = `<strong>الكلمة:</strong> ${word.ar}<br><small style="color: #777;"><strong>المثال (للتدريب فقط):</strong> ${word.ar_ex || ''}</small>`;
-                wordAudioBtn = `<button class="btn-audio" onclick="playAudio('${word.ar}', 'ar-SA')">🔊 الكلمة</button>`;
-                exAudioBtn = `<button class="btn-audio" style="background:#1cc88a; color:white;" onclick="playAudio('${word.ar_ex || ''}', 'ar-SA')">🔊 المثال</button>`;
-            } else {
-                contentTd = `<strong>Word:</strong> ${word.en}<br><small style="color: #777;"><strong>Example (For practice only):</strong> ${word.ex_en || ''}</small>`;
-                wordAudioBtn = `<button class="btn-audio" onclick="playAudio('${word.en}', 'en-US')">🔊 الكلمة</button>`;
-                exAudioBtn = `<button class="btn-audio" style="background:#1cc88a; color:white;" onclick="playAudio('${word.ex_en || ''}', 'en-US')">🔊 المثال</button>`;
-            }
-            
-            row.innerHTML = `
-                <td>${idx + 1}</td>
-                <td>
-                    <button class="btn-mic" id="mic-word-${idx}" onclick="recordAnswer(${idx}, 'word')">🎤 نطق الكلمة</button>
-                    <button class="btn-mic" style="background:#858796;" id="mic-ex-${idx}" onclick="recordAnswer(${idx}, 'ex')">🎤 نطق المثال (اختياري)</button>
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><button style="background:#f6c23e; border:none; padding:8px; border-radius:5px; color:white; font-weight:bold; cursor:pointer;" onclick="playReviewAudio('${listenTarget}')">🔊</button></td>
+                <td style="text-align:right; font-weight:bold;">
+                    <div>• ${displayTxt}</div>
+                    <div style="margin-top:8px; color:#5a5c69; font-size:13px;">• ${displayEx}</div>
                 </td>
-                <td style="text-align:right;">
-                    ${contentTd}
-                    <div id="correct-ans-${idx}" class="correct-ans hidden">
-                        <strong>الإجابة المتوقعة للكلمة:</strong> ${isArEn ? word.en : word.ar}
+                <td class="feedback-cell">
+                    <label style="font-size:12px; color:blue;">إجابة الكلمة:</label>
+                    <input type="text" id="input-word-${i}" class="editable-input" placeholder="سجل بصوتك أو اكتب باللوحة هنا" oninput="currentAnswers[i].typedWord=this.value"><br>
+                    <label style="font-size:12px; color:blue;">إجابة المثال:</label>
+                    <input type="text" id="input-ex-${i}" class="editable-input" placeholder="سجل بصوتك أو اكتب باللوحة هنا" oninput="currentAnswers[i].typedEx=this.value">
+                    <div style="margin-top:5px;">
+                        <button id="mic-w-${i}" style="background:#e74a3b; border:none; color:white; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;" onclick="triggerMicCapture(${i}, 'word')">🎙️ مايك الكلمة</button>
+                        <button id="mic-e-${i}" style="background:#e74a3b; border:none; color:white; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;" onclick="triggerMicCapture(${i}, 'ex')">🎙️ مايك المثال</button>
                     </div>
+                    <div id="live-box-${i}" style="color:#36b9cc; font-size:12px; font-weight:bold;"></div>
                 </td>
-                <td>${wordAudioBtn} ${exAudioBtn}</td>
             `;
-            tbody.appendChild(row);
-            
-            let feedbackRow = document.createElement('tr');
-            feedbackRow.innerHTML = `<td colspan="4" class="feedback-cell" id="rev-feedback-${idx}">📝 المسجل: <span id="ans-txt-${idx}" style="color:#4e73df;">بانتظار نطق الكلمة...</span></td>`;
-            tbody.appendChild(feedbackRow);
+            tbody.appendChild(tr);
         });
 
         document.getElementById('btn-check').classList.remove('hidden');
@@ -261,115 +234,141 @@
         document.getElementById('btn-finish').classList.add('hidden');
     }
 
-    function recordAnswer(idx, type) {
-        const isArEn = document.getElementById('mode-ar-en').checked;
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if(!SpeechRecognition) return;
-        
-        const recognition = new SpeechRecognition();
-        recognition.lang = isArEn ? 'en-US' : 'ar-SA'; 
-        
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            if(type === 'word') {
-                studentAnswers[idx].spokenWord = transcript;
-                document.getElementById(`ans-txt-${idx}`).innerHTML = `<strong>الكلمة المنطوقة:</strong> "${studentAnswers[idx].spokenWord}"`;
-            }
-            if(type === 'ex') {
-                studentAnswers[idx].spokenExample = transcript;
-                document.getElementById(`ans-txt-${idx}`).innerHTML = `<strong>الكلمة:</strong> "${studentAnswers[idx].spokenWord}" | <strong>المثال الممارس:</strong> "${studentAnswers[idx].spokenExample}"`;
-            }
-        };
-        recognition.start();
+    function playReviewAudio(t) {
+        let isArEn = document.getElementById('mode-ar-en').checked;
+        let ut = new SpeechSynthesisUtterance(t);
+        ut.lang = isArEn ? "ar-SA" : "en-US"; // نطق المكتوب حسب الحالة شرط 4-d
+        window.speechSynthesis.speak(ut);
     }
 
-    function clean(str) { return str ? str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").replace(/\s+/g," ").trim() : ""; }
+    function triggerMicCapture(i, targetType) {
+        let isArEn = document.getElementById('mode-ar-en').checked;
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SpeechRec) return;
+        
+        let rec = new SpeechRec();
+        rec.lang = isArEn ? "en-US" : "ar-SA"; // إذا كان السؤال عربي يبحث عن إجابة إنجليزي والعكس
+        rec.interimResults = true;
 
-    function checkPageResult() {
-        const isArEn = document.getElementById('mode-ar-en').checked;
-        let pageWords = testPages[currentPageIndex];
-        let correctWords = 0; 
+        rec.onresult = function(e) {
+            let live = ""; for (let j = e.resultIndex; j < e.results.length; j++) { live += e.results[j][0].transcript; }
+            document.getElementById(`live-box-${i}`).innerText = `🎙️ ملتقط: ${live}`;
+            
+            if(e.results[0].isFinal) {
+                if(targetType === 'word') {
+                    document.getElementById(`input-word-${i}`).value = live; currentAnswers[i].typedWord = live;
+                } else {
+                    document.getElementById(`input-ex-${i}`).value = live; currentAnswers[i].typedEx = live;
+                }
+            }
+        };
+        rec.start();
+    }
 
-        pageWords.forEach((word, idx) => {
-            let ans = studentAnswers[idx];
-            let targetWord = isArEn ? word.en : word.ar;
-            let wordMatch = clean(targetWord) === clean(ans.spokenWord);
+    function evaluateCurrentPageAnswers() {
+        let words = testWordsChunks[currentChunkIdx];
+        let isArEn = document.getElementById('mode-ar-en').checked;
 
-            if (wordMatch) correctWords++;
+        let correctWordsCount = 0;
+        let correctExCount = 0;
+
+        words.forEach((w, i) => {
+            let targetWordClean = cleanString(isArEn ? w.en : w.ar);
+            let targetExClean = cleanString(isArEn ? w.ex_en : w.ar_ex);
+
+            let userWordClean = cleanString(currentAnswers[i].typedWord);
+            let userExClean = cleanString(currentAnswers[i].typedEx);
+
+            let wordIsPerfect = (userWordClean === targetWordClean);
+            // احتساب علامة المثال فوق الـ 70% كمطابقة صحيحة حسب شرط المرحلة الثالثة والرابعة
+            let exIsPerfect = (userExClean === targetExClean || targetExClean.includes(userExClean) && userExClean.length > 0);
+
+            if(wordIsPerfect) correctWordsCount++;
+            if(exIsPerfect) correctExCount++;
+
+            // إظهار الإجابات المقفلة النموذجية بجانبها للتصحيح والمساعدة
+            let infoBox = document.createElement('div');
+            infoBox.style.fontSize = "12px"; infoBox.style.marginTop = "5px";
+            infoBox.innerHTML = `<span style="color:green;">✓ النموذج الصحيح:</span> [${isArEn ? w.en : w.ar}] | المثال: [${isArEn ? w.ex_en : w.ar_ex}]`;
+            document.getElementById(`live-box-${i}`).appendChild(infoBox);
+            
+            // قفل الحقول مؤقتاً
+            document.getElementById(`input-word-${i}`).disabled = true;
+            document.getElementById(`input-ex-${i}`).disabled = true;
+            document.getElementById(`mic-w-${i}`).disabled = true;
+            document.getElementById(`mic-e-${i}`).disabled = true;
         });
 
-        let wordScore = (correctWords / pageWords.length) * 100;
+        let wordScore = (correctWordsCount / words.length) * 100;
+        let exScore = (correctExCount / words.length) * 100;
 
-        // حفظ نتيجة أول محاولة للعلامة التراكمية (للكلمات فقط)
-        if (!firstAttemptDone) {
-            pageAttempts.push({ wordAvg: wordScore });
-            firstAttemptDone = true;
+        if(isFirstAttemptOfThisPage) {
+            sessionFirstAttemptScores.push({ wScore: wordScore, eScore: exScore });
+            isFirstAttemptOfThisPage = false;
         }
 
-        // شرط التجاوز يعتمد تماماً وبشكل حصري على إتقان الكلمات بنسبة 100%
-        if (wordScore === 100) {
-            alert("🎉 ممتاز! لقد أتقنت نطق كلمات هذه الصفحة بنسبة 100% ويحق لك العبور.");
+        // شرط الانتقال الصارم للكلمات 100% والأمثلة >= 70%
+        if(wordScore === 100 && exScore >= 70) {
             document.getElementById('btn-check').classList.add('hidden');
-            
-            if (currentReviewType === 2) {
-                appProgress.lastPartialIndex = Math.min(appProgress.savedWords.length, appProgress.lastPartialIndex + 10);
-                localStorage.setItem('appProgress', JSON.stringify(appProgress));
-                updateRemainingPagesInfo();
-            }
-
-            if (currentPageIndex < testPages.length - 1) {
+            document.getElementById('btn-retry').classList.add('hidden');
+            if(currentChunkIdx < testWordsChunks.length - 1) {
                 document.getElementById('btn-next').classList.remove('hidden');
             } else {
                 document.getElementById('btn-finish').classList.remove('hidden');
             }
         } else {
-            alert(`⚠️ نتيجتك: ${wordScore}% للكلمات. يجب أن تحصل على 100% في الكلمات للانتقال للصفحة التالية!`);
-            document.querySelectorAll('.btn-mic').forEach(btn => btn.disabled = true);
-            pageWords.forEach((w, idx) => { document.getElementById(`correct-ans-${idx}`).classList.remove('hidden'); });
-            
+            // تفعيل كبسة إعادة المحاولة الإجبارية
             document.getElementById('btn-check').classList.add('hidden');
             document.getElementById('btn-retry').classList.remove('hidden');
         }
     }
 
-    function retryPage() {
-        document.querySelectorAll('.btn-mic').forEach(btn => btn.disabled = false);
-        testPages[currentPageIndex].forEach((w, idx) => { 
-            document.getElementById(`correct-ans-${idx}`).classList.add('hidden'); 
-            studentAnswers[idx] = { spokenWord: "", spokenExample: "" };
-            document.getElementById(`ans-txt-${idx}`).innerHTML = "بانتظار نطق الكلمة...";
+    function retryCurrentPage() {
+        let words = testWordsChunks[currentChunkIdx];
+        words.forEach((w, i) => {
+            // فك قفل الحقول لإعطاء فرصة للتعديل اليدوي أو المايك حسب شرط 6
+            document.getElementById(`input-word-${i}`).disabled = false;
+            document.getElementById(`input-ex-${i}`).disabled = false;
+            document.getElementById(`mic-w-${i}`).disabled = false;
+            document.getElementById(`mic-e-${i}`).disabled = false;
+            document.getElementById(`live-box-${i}`).innerHTML = "";
         });
-        document.getElementById('btn-retry').classList.add('hidden');
         document.getElementById('btn-check').classList.remove('hidden');
+        document.getElementById('btn-retry').classList.add('hidden');
     }
 
-    function nextPage() {
-        currentPageIndex++;
-        renderPage();
+    function moveToNextTestPage() {
+        currentChunkIdx++;
+        renderTestPage();
     }
 
-    function finishTest() {
-        let totalWordScoreFirstAttempts = 0;
-        let htmlReport = `<h3>📊 التقرير النهائي المعتمد للاختبار (أول محاولة للكلمات):</h3>`;
+    function finishSessionReport() {
+        let totalWAvg = 0; let totalEAvg = 0;
+        let html = `<h2>🏆 التقرير الاستراتيجي المعتمد لنتائج الاختبار النهائي</h2>`;
         
-        pageAttempts.forEach((attempt, index) => {
-            totalWordScoreFirstAttempts += attempt.wordAvg;
-            htmlReport += `<p>• <strong>الصفحة (${index + 1}):</strong> معدل دقة الكلمات: ${attempt.wordAvg}%</p>`;
+        sessionFirstAttemptScores.forEach((s, idx) => {
+            totalWAvg += s.wScore; totalEAvg += s.eScore;
+            html += `<p>• <strong>المجموعة الرابعة (${idx+1}):</strong> دقة الكلمات: ${s.wScore}% | دقة الأمثلة: ${s.eScore}%</p>`;
         });
 
-        let testFinalScore = totalWordScoreFirstAttempts; 
+        let finalWScore = totalWAvg / sessionFirstAttemptScores.length;
+        let finalEScore = totalEAvg / sessionFirstAttemptScores.length;
         
-        appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + testFinalScore;
+        // تطبيق معادلة احتساب علامة المراجعة الصارمة للمرحلة الرابعة (f)
+        let addedScore = ((finalWScore + finalEScore) / 2) * (testWordsChunks.length / 87) * 100;
+        if(isNaN(addedScore)) addedScore = 0;
+
+        appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + addedScore;
         localStorage.setItem('appProgress', JSON.stringify(appProgress));
 
-        htmlReport += `<hr style="border:1px solid #badbcc;">`;
-        htmlReport += `<h2 style="color: #0f5132;">🏆 النقاط المضافة للرصيد التراكمي: +${testFinalScore} نقطة</h2>`;
-        htmlReport += `<p style="font-weight:bold; color:#4e73df;">🌟 رصيدك التراكمي الإجمالي أصبح: ${Math.round(appProgress.cumulativeScore)} نقطة.</p>`;
+        html += `<hr><h3 style="color:#2e7d32;">🌟 النقاط التراكمية الجديدة المضافة للرصيد المشترك: +${Math.round(addedScore)} نقطة!</h3>`;
+        html += `<p>إجمالي الرصيد الحالي التراكمي في لوحة التحكم: ${Math.round(appProgress.cumulativeScore)} نقطة 🏆</p>`;
+        html += `<br><button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم الذكية</button>`;
         
         document.getElementById('test-area').classList.add('hidden');
-        let reportDiv = document.getElementById('report-output');
-        reportDiv.innerHTML = htmlReport;
-        reportDiv.classList.remove('hidden');
+        const rep = document.getElementById('report-output');
+        rep.innerHTML = html;
+        rep.classList.remove('hidden');
     }
 </script>
 </body>
