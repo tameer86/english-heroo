@@ -5,69 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم الرئيسية</title>
     <style>
-        :root { --primary: #4e73df; --success: #1cc88a; --danger: #e74a3b; --dark: #5a5c69; --light: #f8f9fc; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--light); margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1, h2, h3 { text-align: center; color: var(--primary); }
+        :root {
+            --primary: #4e73df;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+            --warning: #f6c23e;
+            --dark: #5a5c69;
+            --light: #f8f9fc;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light);
+            color: var(--dark);
+        }
         .hidden { display: none !important; }
-        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; margin: 5px; text-decoration: none; display: inline-block; text-align: center; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-dark { background: var(--dark); color: white; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 30px; }
-        .profile-card { text-align: center; padding: 20px; border: 1px solid #e3e6f0; border-radius: 10px; margin-bottom: 20px; background: #fff; }
-        .profile-card img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin-bottom: 10px; }
-        .stats-box { background: #f1f3f9; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 15px; border-right: 5px solid var(--primary); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-warning { background-color: var(--warning); color: #333; }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin: 10px auto; display: block; }
+        .nav-links { display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+    </style>
+    <script>
+        // منع وميض شاشة الدخول عند العودة الفورية عبر الرابط
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('screen') === 'dashboard' && localStorage.getItem('smartAppUser')) {
+                document.documentElement.classList.add('direct-dashboard');
+            }
+        })();
+    </script>
+    <style>
+        .direct-dashboard #home-screen { display: none !important; }
+        .direct-dashboard #dashboard-screen { display: block !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- شاشة الدخول والتسجيل -->
-    <div id="home-screen">
-        <h1>👋 أهلاً بك في تطبيق التعليم الذكي</h1>
-        <p style="text-align: center; color: #666;">الرجاء تسجيل الدخول لحفظ تقدمك ومراجعة كلماتك</p>
+    <!-- شاشة الدخول وتوثيق الحساب -->
+    <div id="home-screen" class="card">
+        <h2>👋 مرحباً بك في برنامج التدريب الذكي</h2>
+        <p>الرجاء تسجيل الدخول لحفظ تقدمك التعليمي ومراجعة حصيلتك اللغوية.</p>
         
-        <div id="login-section" style="text-align: center; padding: 40px 0;">
-            <button class="btn btn-primary" onclick="simulateGoogleLogin()">🔐 تسجيل الدخول بواسطة Google</button>
+        <div id="login-section">
+            <button class="btn btn-success" onclick="mockGoogleLogin()">🔐 تسجيل الدخول بواسطة حساب Google</button>
         </div>
+
+        <div id="profile-section" class="hidden">
+            <img id="user-pic" class="profile-img hidden" src="" alt="صورة المستخدم">
+            <h3 id="user-name"></h3>
+            <button id="logout-btn" class="btn btn-danger hidden" onclick="logoutUser()">🚪 تسجيل الخروج ومسح التقدم</button>
+        </div>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+        <button class="btn btn-warning" onclick="clearAllDataOnly()">🗑️ مسح البيانات الحالية (دون تسجيل خروج)</button>
     </div>
 
-    <!-- شاشة التحكم ولوحة البيانات (Dashboard) -->
-    <div id="dashboard-screen" class="hidden">
-        <div class="profile-card">
-            <img id="user-pic" src="" alt="صورة المستخدم" class="hidden">
-            <h2 id="user-name">مرحباً بك</h2>
-            <button id="logout-btn" class="btn btn-danger hidden" onclick="logoutUser()">🚪 تسجيل الخروج</button>
-            <button class="btn btn-dark" onclick="clearAllData()">🗑️ مسح البيانات فقط</button>
-        </div>
-
-        <h3>🎛️ لوحة التحكم وإدارة المراحل</h3>
+    <!-- لوحة التحكم الرئيسية للبرنامج -->
+    <div id="dashboard-screen" class="card hidden">
+        <h2>🎛️ لوحة التحكم وإدارة المراحل التعليمية</h2>
+        <div id="dashboard-profile-node"></div>
         
-        <div class="stats-box" id="global-stats">
-            📊 إجمالي الكلمات المحفوظة في حسابك الحالي: 0 كلمة
-        </div>
-
         <div class="grid">
-            <a href="save.html" class="btn btn-primary">💾 صفحة حفظ الكلمات</a>
-            <a href="review.html" class="btn btn-success">🏁 صفحة المراجعة والاختبارات</a>
-            <a href="memorized.html" class="btn btn-dark">📚 صفحة الكلمات المحفوظة سابقاً</a>
+            <div class="card" style="border-top: 4px solid var(--primary);">
+                <h3>📥 صفحة الحفظ والتدريب</h3>
+                <p>قم بالتدريب على نطق الكلمات وحفظ المجموعات اللغوية الجديدة.</p>
+                <a href="save.html" class="btn btn-primary">دخول قسم الحفظ</a>
+            </div>
+            <div class="card" style="border-top: 4px solid var(--success);">
+                <h3>🔄 المراجعة والاختبارات</h3>
+                <p>راجع كلماتك المحفوظة عبر المسارات الحرة أو الموجهة بالاختبارات.</p>
+                <a href="review.html" class="btn btn-success">دخول المراجعة والاختبار</a>
+            </div>
+            <div class="card" style="border-top: 4px solid var(--warning);">
+                <h3>📚 الكلمات المحفوظة سابقا</h3>
+                <p>عرض تفصيلي وسجل كامل لجميع الكلمات والصفوف التي أتممتها.</p>
+                <a href="memorized.html" class="btn btn-warning">سجل الحفظ للطلاب</a>
+            </div>
         </div>
     </div>
 </div>
 
+<script src="C2.js"></script>
 <script>
-    // منع الوميض عند العودة من الصفحات الفرعية بشكل فوري متزامن
-    (function checkScreenFlicker() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const screenParam = urlParams.get('screen');
-        const savedUser = localStorage.getItem('smartAppUser');
-        if (savedUser && screenParam === 'dashboard') {
-            document.write('<style>#home-screen { display: none !important; } #dashboard-screen { display: block !important; }</style>');
-        }
-    })();
-
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const screenParam = urlParams.get('screen');
@@ -76,66 +103,68 @@
         if (savedUser) {
             const userData = JSON.parse(savedUser);
             showProfile(userData.name, userData.picture);
+            
+            // التوجيه الفوري المباشر دون وميض الشاشة الأولى
             document.getElementById('home-screen').classList.add('hidden');
             document.getElementById('dashboard-screen').classList.remove('hidden');
-            updateGlobalStats();
         } else {
+            document.documentElement.classList.remove('direct-dashboard');
             document.getElementById('home-screen').classList.remove('hidden');
             document.getElementById('dashboard-screen').classList.add('hidden');
         }
     };
 
-    function simulateGoogleLogin() {
-        // محاكاة جلب البيانات من حساب جوجل متضمنة البريد والصورة الشخصية
+    function mockGoogleLogin() {
+        // محاكاة جلب البيانات وصورة الإيميل من جوجل بنجاح
         const mockUser = {
-            name: "أحمد علي",
-            email: "ahmed.ali@gmail.com",
-            picture: "https://picsum.photos/200" // صورة ديناميكية من الإيميل
+            name: "الطالب المتفوق",
+            picture: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"
         };
         localStorage.setItem('smartAppUser', JSON.stringify(mockUser));
         showProfile(mockUser.name, mockUser.picture);
+        
+        // الانتقال الفوري للوحة التحكم بعد نجاح تسجيل الدخول
         document.getElementById('home-screen').classList.add('hidden');
         document.getElementById('dashboard-screen').classList.remove('hidden');
-        updateGlobalStats();
     }
 
     function showProfile(name, picture) {
         document.getElementById('login-section').classList.add('hidden');
+        const profileSection = document.getElementById('profile-section');
+        profileSection.classList.remove('hidden');
+        
         const userPic = document.getElementById('user-pic');
         if (picture) {
             userPic.src = picture;
             userPic.classList.remove('hidden');
+        } else {
+            userPic.classList.add('hidden');
         }
         document.getElementById('user-name').innerText = `مرحباً بك يا ${name} 👋`;
         document.getElementById('logout-btn').classList.remove('hidden');
     }
 
     function logoutUser() {
-        let confirmLogout = confirm("⚠️ تحذير شديد: تسجيل الخروج سيقوم بمسح كافة بيانات التقدم الحالية للطالب بشكل نهائي! تأكد من استخدام ميزة 'تصدير البيانات' أولاً للحفاظ على تقدمك. هل تريد تسجيل الخروج والمسح الفعلي؟");
+        let confirmLogout = confirm("⚠️ تحذير شديد: تسجيل الخروج سيقوم بمسح كافة بيانات تقدم الطالب الحالية بشكل نهائي! تأكد من وجود الية تصدير البيانات واستخدامها أولاً لحفظ نسختك. هل تريد تسجيل الخروج والمسح الفعلي؟");
         if (confirmLogout) {
             localStorage.removeItem('smartAppUser');
             localStorage.removeItem('appProgress');
+            document.getElementById('user-pic').src = "";
+            document.getElementById('user-pic').classList.add('hidden');
             location.href = "index.html";
         }
     }
 
-    function clearAllData() {
-        let confirmClear = confirm("⚠️ تنبيه: سيتم مسح كافة الكلمات المحفوظة والنقاط التراكمية الخاصة بالطالب بالكامل، دون تسجيل خروجك من الحساب الإيرادي. يمكنك تصدير بياناتك أولاً لضمان عدم ضياعها. هل أنت متأكد؟");
+    function clearAllDataOnly() {
+        let confirmClear = confirm("⚠️ تحذير: سيتم مسح كافة الكلمات والتقدم المحفوظ دون تسجيل الخروج من حسابك الفعلي وتذكر دائما وجود آلية لتصدير البيانات لمنع ضياعها. هل تود المتابعة ومسح الشاشة والبيانات دون الانتقال للوحة التحكم؟");
         if (confirmClear) {
             let savedUser = localStorage.getItem('smartAppUser');
             localStorage.clear();
             if (savedUser) {
                 localStorage.setItem('smartAppUser', savedUser);
             }
-            alert("🗑️ تم مسح بيانات التقدم بنجاح وبقيت في نفس الشاشة دون خروج.");
-            updateGlobalStats();
+            alert("🗑️ تم مسح كافة بيانات الحفظ والتقدم بنجاح، وتم الإبقاء على شاشتك الحالية كما هي.");
         }
-    }
-
-    function updateGlobalStats() {
-        let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { savedWords: [] };
-        let count = appProgress.savedWords ? appProgress.savedWords.length : 0;
-        document.getElementById('global-stats').innerText = `📊 إجمالي الكلمات المحفوظة في حسابك الحالي: ${count} كلمة`;
     }
 </script>
 </body>
