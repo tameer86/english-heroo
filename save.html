@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>صفحة الحفظ اليومي الذكي</title>
+    <script src="words.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 20px; text-align: center; margin: 0; }
+        .top-stats { background: #4e73df; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-around; font-size: 18px; font-weight: bold; max-width: 1000px; margin: 0 auto 20px auto; }
+        table { width: 100%; max-width: 1100px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        thead { background: #36b9cc; color: white; }
+        .feedback-cell { background: #f1f3f9; padding: 12px; font-weight: bold; height: 70px; font-size: 15px; color: #333; }
+        button { cursor: pointer; padding: 8px 12px; font-size: 16px; border: none; border-radius: 5px; font-weight: bold; }
+        .btn-audio { background: #f6c23e; color: #333; }
+        .btn-mic { background: #e74a3b; color: white; }
+        .control-btns { margin-top: 20px; display: flex; justify-content: center; gap: 20px; }
+        .btn-update { background: #5a5c69; color: white; padding: 15px 30px; font-size: 18px; border-radius: 8px; }
+        .btn-save { background: #1cc88a; color: white; padding: 15px 30px; font-size: 18px; border-radius: 8px; }
+        input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
+        .wrong-word { color: #e74a3b; text-decoration: line-through; margin: 0 3px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="top-stats">
+        <span id="pages-count">الصفحات المحفوظة: 0</span>
+        <span id="words-count">إجمالي الكلمات المحفوظة: 0</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>محفوظة</th>
+                <th>استماع للكلمة</th>
+                <th>تسجيل الكلمة</th>
+                <th>الكلمة والترجمة</th> <th>النطق التقريبي</th>
+                <th>استماع للمثال</th>
+                <th>تسجيل المثال</th>
+                <th>المثال والترجمة</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+
+    <div class="control-btns">
+        <button class="btn-update" onclick="updateKnownWords()">🔄 تحديث (استبدال الكلمات المحددة)</button>
+        <button class="btn-save" onclick="saveWholePage()">✅ حفظ الصفحة والانتقال للتالي</button>
+        <button class="btn-update" style="background: var(--dark);" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+    </div>
+
+    <script>
+        let appProgress = JSON.parse(localStorage.getItem('appProgress'));
+        
+        function updateTopStats() {
+            document.getElementById('pages-count').innerText = `الصفحات المحفوظة: ${appProgress.pagesCompleted || 0}`;
+            document.getElementById('words-count').innerText = `إجمالي الكلمات المحفوظة: ${(appProgress.pagesCompleted || 0) * 10}`;
+        }
+
+        function playAudio(text) {
+            let settings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1, voiceName: "" };
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = settings.speed || 1;
+            
+            let voices = window.speechSynthesis.getVoices();
+            let selectedVoice = voices.find(v => v.name === settings.voiceName);
+            if(selectedVoice) utterance.voice = selectedVoice;
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // دالة التقييم والتصليح الداخلية البديلة لـ Gemini بالكامل
+        function evaluatePronunciation(wordId, spokenText, targetText) {
+            const feedbackCell = document.getElementById(`feedback-${wordId}`);
+            
+            let cleanTarget = targetText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").replace(/\s+/g," ").trim();
+            let cleanSpoken = spokenText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").replace(/\s+/g," ").trim();
+            
+            let targetWords = cleanTarget.split(" ");
+            let spokenWords = cleanSpoken.split(" ");
+            
+            let matchCount = 0;
+            let wrongWords = [];
+            
+            targetWords.forEach(w => {
+                if (spokenWords.includes(w)) {
+                    matchCount++;
+                } else {
+                    wrongWords.push(w);
+                }
+            });
+            
+            let similarityPercent = Math.round((matchCount / Math.max(targetWords.length, spokenWords.length)) * 100);
+            
+            let grade = "";
+            let phrase = "";
+            let color = "#333";
+            
+            if (similarityPercent === 100) { grade = "متميز"; phrase = "متميز! نطق متقن وخالٍ من أي أخطاء، كالعادة بطل حقيقي."; color = "#1cc88a"; }
+            else if (similarityPercent >= 90) { grade = "ممتاز"; phrase = "ممتاز! نطقك رائع وصحيح تماماً، تابع تقدمك الرائع."; color = "#4e73df"; }
+            else if (similarityPercent >= 80) { grade = "جيد جداً"; phrase = "جيد جداً! نطقك قريب ليكون ممتازاً، ركز قليلاً."; color = "#36b9cc"; }
+            else if (similarityPercent >= 70) { grade = "جيد"; phrase = "أداء جيد جداً! استمر في صقل مهاراتك لتحقيق الأفضل."; color = "#f6c23e"; }
+            else if (similarityPercent >= 60) { grade = "متوسط"; phrase = "جيد، قراءتك مفهومة وتحتاج لبعض التركيز والمتابعة."; color = "#e74a3b"; }
+            else if (similarityPercent >= 50) { grade = "مقبول"; phrase = "أداء مقبول، لكن يمكنك تحسينه بالتأكيد بالتدرب المستمر."; color = "#e74a3b"; }
+            else { grade = "غير مرضي"; phrase = "بحاجة إلى مزيد من التدريب والمحاولة الجادة! لا تستسلم يا بطل."; color = "#e74a3b"; }
+            
+            let resultHtml = `<span style="color: ${color}">🎯 التقدير: ${grade} (${similarityPercent}%)</span><br><span>✨ ${phrase}</span>`;
+            
+            if (wrongWords.length > 0 && similarityPercent < 100) {
+                resultHtml += `<br><span style="color: #5a5c69;">الكلمات غير الواضحة في نطقك: </span>`;
+                wrongWords.forEach(w => {
+                    resultHtml += `<span class="wrong-word">${w}</span> `;
+                });
+            }
+            
+            if (similarityPercent < 90) {
+                resultHtml += `<br><strong style="color: #e74a3b;">🔔 يرجى إعادة النطق والمحاولة مرة أخرى لتطوير أدائك المتميز!</strong>`;
+            }
+            
+            feedbackCell.innerHTML = resultHtml;
+        }
+
+        function startMic(wordId, correctText) {
+            const feedbackCell = document.getElementById(`feedback-${wordId}`);
+            feedbackCell.innerHTML = `🎙️ جاري الاستماع لنطقك بعناية...`;
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition) {
+                feedbackCell.innerHTML = "❌ متصفحك الحالي لا يدعم ميزة التعرف على الصوت المباشر.";
+                return;
+            }
+            
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                evaluatePronunciation(wordId, transcript, correctText);
+            };
+            
+            recognition.onerror = function() {
+                feedbackCell.innerHTML = "⚠️ لم أسمع صوتك بوضوح، اضغط على المايك وحاول النطق مجدداً.";
+            };
+            recognition.start();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = "";
+            
+            appProgress.activeList.forEach(index => {
+                if(index >= levelA1_Words.length) return;
+                let word = levelA1_Words[index];
+                
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="word-checkbox" value="${index}"></td>
+                    <td><button class="btn-audio" onclick="playAudio('${word.en}')">🔊</button></td>
+                    <td><button class="btn-mic" onclick="startMic(${word.id}, '${word.en}')">🎤</button></td>
+                    <td style="font-weight:bold; font-size:18px; color: #4e73df; line-height: 1.5;">
+                        ${word.en}<br>
+                        <small style="color:#1cc88a; font-size: 15px;">${word.ar}</small>
+                    </td>
+                    <td style="color: #5a5c69; font-size: 14px;">${word.pronounce}</td>
+                    <td><button class="btn-audio" onclick="playAudio('${word.ex_en}')">🔊</button></td>
+                    <td><button class="btn-mic" onclick="startMic(${word.id}, '${word.ex_en}')">🎤</button></td>
+                    <td dir="ltr" style="text-align: right;"><strong>${word.ex_en}</strong><br><small dir="rtl" style="color:#1cc88a;">${word.ar_ex}</small></td>
+                `;
+                tbody.appendChild(row);
+                
+                let feedbackRow = document.createElement('tr');
+                // تعديل عرض عمود التقييم ليصبح 8 بدلاً من 9 بسبب دمج العمودين
+                feedbackRow.innerHTML = `<td colspan="8" class="feedback-cell" id="feedback-${word.id}">ℹ️ اضغط على أيقونة المايك وابدأ التدريب ونطق الكلمات</td>`;
+                tbody.appendChild(feedbackRow);
+            });
+            updateTopStats();
+        }
+
+        function updateKnownWords() {
+            let checkboxes = document.querySelectorAll('.word-checkbox:checked');
+            if(checkboxes.length === 0) return;
+
+            checkboxes.forEach(cb => {
+                let wordIndex = parseInt(cb.value);
+                let wordObj = levelA1_Words[wordIndex];
+                
+                appProgress.savedWords.push({
+                    id: wordObj.id, en: wordObj.en, ar: wordObj.ar, date: "تم حفظها قديماً", ex_en: wordObj.ex_en, ar_ex: wordObj.ar_ex
+                });
+                appProgress.activeList = appProgress.activeList.filter(idx => idx !== wordIndex);
+            });
+
+            while(appProgress.activeList.length < 10 && appProgress.mainIndex < levelA1_Words.length) {
+                let nextWordId = levelA1_Words[appProgress.mainIndex].id;
+                let isAlreadySaved = appProgress.savedWords.some(sw => sw.id === nextWordId);
+                if(!isAlreadySaved && !appProgress.activeList.includes(appProgress.mainIndex)) {
+                    appProgress.activeList.push(appProgress.mainIndex);
+                }
+                appProgress.mainIndex++;
+            }
+            localStorage.setItem('appProgress', JSON.stringify(appProgress));
+            renderTable();
+        }
+
+        function saveWholePage() {
+            let today = new Date().toLocaleDateString('ar-EG');
+            appProgress.activeList.forEach(index => {
+                let wordObj = levelA1_Words[index];
+                appProgress.savedWords.push({
+                    id: wordObj.id, en: wordObj.en, ar: wordObj.ar, date: today, ex_en: wordObj.ex_en, ar_ex: wordObj.ar_ex
+                });
+            });
+
+            appProgress.pagesCompleted++;
+            appProgress.activeList = [];
+            while(appProgress.activeList.length < 10 && appProgress.mainIndex < levelA1_Words.length) {
+                let nextWordId = levelA1_Words[appProgress.mainIndex].id;
+                let isAlreadySaved = appProgress.savedWords.some(sw => sw.id === nextWordId);
+                if(!isAlreadySaved) {
+                    appProgress.activeList.push(appProgress.mainIndex);
+                }
+                appProgress.mainIndex++;
+            }
+            localStorage.setItem('appProgress', JSON.stringify(appProgress));
+            alert("تم إتمام حفظ الصفحة وتخزين الكلمات بنجاح في سجل الطالب الانتقال للمجموعة التالية.");
+            renderTable();
+        }
+
+        window.onload = function() {
+            if(!appProgress) {
+                appProgress = { mainIndex: 0, activeList: [0,1,2,3,4,5,6,7,8,9], savedWords: [], pagesCompleted: 0 };
+            }
+            if(appProgress.mainIndex === 0 && appProgress.activeList[appProgress.activeList.length-1] === 9) {
+                appProgress.mainIndex = 10;
+                localStorage.setItem('appProgress', JSON.stringify(appProgress));
+            }
+            renderTable();
+        };
+    </script>
+</body>
+</html>
