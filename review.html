@@ -376,7 +376,7 @@
         }));
 
         const apiKey = "AQ.Ab8RN6IAyEi5hNUAQJoZffWsH0duwwB012vv_Ix7KDYRLAlC7w";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
         const promptText = `
         أنت معلم لغة إنجليزية.
         قم بتقييم نطق الطالب للكلمات والأمثلة. اعتبر الهمزات (أ،إ،آ،ا) متطابقة تماماً، وحرفي (ة،ه) متطابقين تماماً.
@@ -396,7 +396,10 @@
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-goog-api-key': apiKey
+                },
                 body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
             });
             const data = await response.json();

@@ -161,7 +161,7 @@
         let lData = appProgress.levels[currentLvl];
         let db = allLevelsData[currentLvl];
 
-        pageSpokenData = {}; // إعادة ضبط الكلمات المنطوقة
+        pageSpokenData = {}; 
 
         if(!lData.activeList || lData.activeList.length === 0) {
             tbody.innerHTML = "<tr><td colspan='8' style='padding:30px; font-size:18px; color:red; font-weight:bold;'>🎉 انتهت جميع كلمات هذا المستوى بالكامل! تم قفل الحفظ.</td></tr>";
@@ -284,7 +284,7 @@
         }));
 
         const apiKey = "AQ.Ab8RN6IAyEi5hNUAQJoZffWsH0duwwB012vv_Ix7KDYRLAlC7w";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
         const promptText = `
         أنت معلم لغة إنجليزية تقيم نطق طالب.
         البيانات المدخلة:
@@ -303,7 +303,10 @@
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-goog-api-key': apiKey
+                },
                 body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
             });
             const data = await response.json();
