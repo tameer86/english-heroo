@@ -24,20 +24,5 @@ const levelA1_Words = [
     { id: 22, en: "also", ar: "أيضاً", pronounce: "أولسو", ex_en: "I also like coffee", ar_ex: "أنا أيضاً أحب القهوة" },
     { id: 23, en: "always", ar: "دائماً", pronounce: "أولويز", ex_en: "I always wake up early", ar_ex: "أنا دائماً أستيقظ مبكراً" },
     { id: 24, en: "amazing", ar: "مذهل", pronounce: "أَميزنغ", ex_en: "This is amazing", ar_ex: "هذا رائع جداً" },
-    { id: 25, en: "and", ar: "و", pronounce: "أند", ex_en: "You and I are friends", ar_ex: "أنا وأنت أصدقاء" },
-    { id: 26, en: "angry", ar: "غاضب", pronounce: "أنغري", ex_en: "He is angry today", ar_ex: "هو غاضب اليوم" },
-    { id: 27, en: "animal", ar: "حيوان", pronounce: "أنيمَل", ex_en: "I have an animal", ar_ex: "لدي حيوان أليف" },
-    { id: 28, en: "another", ar: "آخر", pronounce: "أنذر", ex_en: "I want another cup", ar_ex: "أريد كوباً آخر" },
-    { id: 29, en: "answer (v)", ar: "يجيب", pronounce: "آنسر", ex_en: "I answer the question", ar_ex: "أجيب على السؤال" },
-    { id: 30, en: "answer (n)", ar: "جواب", pronounce: "آنسر", ex_en: "This is the answer", ar_ex: "هذا هو الجواب" },
-    { id: 31, en: "any", ar: "أي", pronounce: "إني", ex_en: "Do you have any question?", ar_ex: "هل لديك أي سؤال؟" },
-    { id: 32, en: "anyone", ar: "أي شخص", pronounce: "إني ون", ex_en: "Is anyone here?", ar_ex: "هل هناك أي شخص؟" },
-    { id: 33, en: "anything", ar: "أي شيء", pronounce: "إني ثنغ", ex_en: "Do you want anything?", ar_ex: "هل تريد أي شيء؟" },
-    { id: 34, en: "apartment", ar: "شقة", pronounce: "أبارتمنت", ex_en: "I live in an apartment", ar_ex: "أعيش في شقة" },
-    { id: 35, en: "apple", ar: "تفاح", pronounce: "أبل", ex_en: "I eat an apple", ar_ex: "أكل تفاحة" },
-    { id: 36, en: "April", ar: "أبريل", pronounce: "إيبرل", ex_en: "We meet in April", ar_ex: "نلتقي في أبريل" },
-    { id: 37, en: "area", ar: "منطقة", pronounce: "إيريا", ex_en: "This is a nice area", ar_ex: "هذه منطقة جميلة" },
-    { id: 38, en: "arm", ar: "ذراع", pronounce: "آرم", ex_en: "My arm hurts", ar_ex: "ذراعي يؤلمني" },
-
-    
+    { id: 25, en: "and", ar: "و", pronounce: "أند", ex_en: "You and I are friends", ar_ex: "أنا وأنت أصدقاء" }
 ];
