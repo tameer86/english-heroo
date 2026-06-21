@@ -37,15 +37,6 @@
             return 'مستوى ' + code;
         }
 
-        function normalizeArabic(text) {
-            return text.replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه');
-        }
-
-        function cleanString(str) {
-            if(!str) return "";
-            return normalizeArabic(str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").replace(/\s+/g," ").trim());
-        }
-
         function formatForSpeech(text, lang) {
             if(!text) return "";
             if(lang === 'ar-SA') return text.replace(/[-\\\/]/g, ' او ');
@@ -86,6 +77,7 @@
             <span id="part-inputs" class="hidden" style="margin-right:20px;">
                 <label>عدد الصفحات المطلوبة:</label> <input type="number" id="part-pages" min="1" value="1" style="width:70px;">
                 <span id="remaining-pages-info" style="margin-right: 15px; color: #5a5c69; font-weight:normal;"></span>
+                <button class="btn-action" style="padding: 5px 10px; font-size:14px; background: #e74a3b;" onclick="resetPartialIndex()">إعادة البدء 🔄</button>
             </span><br><br>
             
             <input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-random">3. المراجعة الجزئية العشوائية</label>
@@ -150,6 +142,7 @@
     let sessionFirstAttemptScores = [];
     let isFirstAttemptOfThisPage = true;
     let currentSysMode = 'free';
+    let currentReviewType = 1;
 
     window.onload = function() {
         let sel = document.getElementById('review-level-select');
@@ -169,6 +162,15 @@
         let lData = appProgress.levels[lvl];
         let startPage = Math.floor((lData.lastPartialIndex || 0) / 10) + 1;
         document.getElementById('remaining-pages-info').innerText = `وصلت سابقاً إلى صفحة: ${startPage}`;
+    }
+
+    function resetPartialIndex() {
+        let lvl = document.getElementById('review-level-select').value;
+        if(!lvl) { alert("يرجى اختيار المستوى أولاً."); return; }
+        appProgress.levels[lvl].lastPartialIndex = 0;
+        localStorage.setItem('appProgress', JSON.stringify(appProgress));
+        updateSeqInfo();
+        alert("تم إرجاع العداد التتابعي إلى البداية بنجاح.");
     }
 
     function toggleTypeInputs() {
@@ -194,9 +196,11 @@
         sessionFirstAttemptScores = [];
 
         if(document.getElementById('type-all').checked) {
+            currentReviewType = 1;
             for(let i=0; i<savedDbWords.length; i+=10) { testWordsChunks.push(savedDbWords.slice(i, i+10)); }
         }
         else if(document.getElementById('type-part').checked) {
+            currentReviewType = 2;
             let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
             let totalSavedPages = Math.ceil(savedDbWords.length / 10);
             if(reqPages > totalSavedPages) { alert("⚠️ خطأ منطقي: عدد الصفحات المطلوبة أكبر من المحفوظة!"); return; }
@@ -206,9 +210,9 @@
             
             let sliced = savedDbWords.slice(startW, startW + (reqPages * 10));
             for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
-            if (currentSysMode === 'test') { lData.lastPartialIndex = startW + (reqPages * 10); }
         }
         else if(document.getElementById('type-random').checked) {
+            currentReviewType = 3;
             let sP = parseInt(document.getElementById('rand-start').value) || 1;
             let eP = parseInt(document.getElementById('rand-end').value) || 1;
             let rC = parseInt(document.getElementById('rand-count').value) || 1;
@@ -355,65 +359,109 @@
         rec.start();
     }
 
-    function evaluateCurrentPageAnswers() {
+    async function evaluateCurrentPageAnswers() {
         let words = testWordsChunks[currentChunkIdx];
         let isArEn = document.getElementById('mode-ar-en').checked;
 
-        let correctWordsCount = 0;
-        let correctExCount = 0;
+        let checkBtn = document.getElementById('btn-check');
+        checkBtn.innerText = "⏳ جاري التحليل الذكي عبر AI...";
+        checkBtn.disabled = true;
 
-        words.forEach((w, i) => {
-            let targetWordClean = cleanString(isArEn ? w.en : w.ar);
-            let targetExClean = cleanString(isArEn ? w.ex_en : w.ar_ex);
+        let payload = words.map((w, i) => ({
+            id: i,
+            targetWord: isArEn ? w.en : w.ar,
+            spokenWord: currentAnswers[i].typedWord,
+            targetEx: isArEn ? w.ex_en : w.ar_ex,
+            spokenEx: currentAnswers[i].typedEx
+        }));
 
-            let userWordClean = cleanString(currentAnswers[i].typedWord);
-            let userExClean = cleanString(currentAnswers[i].typedEx);
+        const apiKey = "AQ.Ab8RN6IAyEi5hNUAQJoZffWsH0duwwB012vv_Ix7KDYRLAlC7w";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const promptText = `
+        أنت معلم لغة إنجليزية.
+        قم بتقييم نطق الطالب للكلمات والأمثلة. اعتبر الهمزات (أ،إ،آ،ا) متطابقة تماماً، وحرفي (ة،ه) متطابقين تماماً.
+        البيانات المدخلة:
+        ${JSON.stringify(payload)}
 
-            let wordIsPerfect = (userWordClean === targetWordClean);
-            let exIsPerfect = (userExClean === targetExClean || (targetExClean.includes(userExClean) && userExClean.length > 0));
+        قم بإرجاع النتيجة كمصفوفة JSON فقط بالشكل التالي بدقة وبدون أي نصوص إضافية أو علامات Markdown:
+        [
+          {
+            "id": "يجب وضع نفس قيمة id المعطاة",
+            "wordScore": (رقم من 0 إلى 100 يمثل نسبة تطابق الكلمة المنطوقة مع الكلمة المستهدفة),
+            "wordComment": "تعليقك التشجيعي بالعربية على النطق",
+            "exComment": "تعليقك التشجيعي بالعربية للمثال"
+          }
+        ]`;
 
-            if(wordIsPerfect) correctWordsCount++;
-            if(exIsPerfect) correctExCount++;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+            });
+            const data = await response.json();
+            let text = data.candidates[0].content.parts[0].text.replace(/```json/gi, '').replace(/```/g, '').trim();
+            let results = JSON.parse(text);
 
-            let infoBox = document.createElement('div');
-            infoBox.style.fontSize = "12px"; infoBox.style.marginTop = "5px";
-            infoBox.innerHTML = `<span style="color:green;">✓ الصحيح:</span> [${isArEn ? w.en : w.ar}] | المثال: [${isArEn ? w.ex_en : w.ar_ex}]`;
-            document.getElementById(`live-box-${i}`).appendChild(infoBox);
-            
-            document.getElementById(`input-word-${i}`).disabled = true;
-            document.getElementById(`input-ex-${i}`).disabled = true;
-            document.getElementById(`mic-w-${i}`).disabled = true;
-            document.getElementById(`mic-e-${i}`).disabled = true;
-        });
+            let totalWordScore = 0;
 
-        let wordScore = (correctWordsCount / words.length) * 100;
-        let exScore = (correctExCount / words.length) * 100;
+            results.forEach(res => {
+                let i = res.id;
+                let w = words[i];
+                totalWordScore += res.wordScore;
 
-        let scoreMsg = `العلامة الكلية للصفحة: الكلمات (${Math.round(wordScore)}%) - الأمثلة (${Math.round(exScore)}%). `;
+                let infoBox = document.createElement('div');
+                infoBox.style.fontSize = "12px"; infoBox.style.marginTop = "5px";
+                infoBox.innerHTML = `
+                    <span style="color:green;">✓ الصحيح:</span> [${isArEn ? w.en : w.ar}] | المثال: [${isArEn ? w.ex_en : w.ar_ex}]<br>
+                    <span style="color:#4e73df;">🎯 دقة النطق للكلمة: ${res.wordScore}%</span><br>
+                    <span style="color:#f6c23e;">💬 الكلمة: ${res.wordComment}</span><br>
+                    <span style="color:#f6c23e;">💬 المثال: ${res.exComment}</span>
+                `;
+                document.getElementById(`live-box-${i}`).appendChild(infoBox);
 
-        if(isFirstAttemptOfThisPage) {
-            sessionFirstAttemptScores.push({ wScore: wordScore, eScore: exScore });
-            scoreMsg += "هذه المحاولة الأولى (محتسبة).";
-            isFirstAttemptOfThisPage = false;
-        } else {
-            scoreMsg += "هذه محاولة إعادة (غير محتسبة).";
-        }
+                document.getElementById(`input-word-${i}`).disabled = true;
+                document.getElementById(`input-ex-${i}`).disabled = true;
+                document.getElementById(`mic-w-${i}`).disabled = true;
+                document.getElementById(`mic-e-${i}`).disabled = true;
+            });
 
-        let scoreDisp = document.getElementById('page-score-display');
-        scoreDisp.innerText = scoreMsg;
-        scoreDisp.style.display = 'block';
+            let pagePercentage = totalWordScore / words.length;
+            let scoreOutOf10 = (pagePercentage / 100) * 10;
 
-        if(wordScore === 100 && exScore >= 70) {
-            document.getElementById('btn-check').classList.add('hidden');
-            document.getElementById('btn-retry').classList.add('hidden');
-            if(currentChunkIdx < testWordsChunks.length - 1) {
-                document.getElementById('btn-next').classList.remove('hidden');
+            let scoreMsg = `العلامة الكلية للصفحة: ${scoreOutOf10.toFixed(1)} من 10 (${Math.round(pagePercentage)}%). `;
+
+            if(isFirstAttemptOfThisPage) {
+                sessionFirstAttemptScores.push({ wScore: pagePercentage, eScore: 100 });
+                scoreMsg += "هذه المحاولة الأولى (محتسبة).";
+                isFirstAttemptOfThisPage = false;
             } else {
-                document.getElementById('btn-finish').classList.remove('hidden');
+                scoreMsg += "هذه محاولة إعادة (غير محتسبة).";
             }
-        } else {
-            document.getElementById('btn-check').classList.add('hidden');
-            document.getElementById('btn-retry').classList.remove('hidden');
+
+            let scoreDisp = document.getElementById('page-score-display');
+            scoreDisp.innerText = scoreMsg;
+            scoreDisp.style.display = 'block';
+
+            checkBtn.innerText = "📊 التحقق ومعرفة النتيجة المعتمدة";
+            checkBtn.disabled = false;
+            checkBtn.classList.add('hidden');
+
+            if(pagePercentage >= 70) {
+                document.getElementById('btn-retry').classList.add('hidden');
+                if(currentChunkIdx < testWordsChunks.length - 1) {
+                    document.getElementById('btn-next').classList.remove('hidden');
+                } else {
+                    document.getElementById('btn-finish').classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('btn-retry').classList.remove('hidden');
+            }
+
+        } catch (err) {
+            alert("حدث خطأ أثناء الاتصال بالذكاء الاصطناعي لتحليل البيانات. الرجاء المحاولة مرة أخرى.");
+            checkBtn.innerText = "📊 التحقق ومعرفة النتيجة المعتمدة";
+            checkBtn.disabled = false;
         }
     }
 
@@ -437,23 +485,32 @@
     }
 
     function finishSessionReport() {
+        if (currentReviewType === 2) {
+            let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
+            let lData = appProgress.levels[selectedLevel];
+            let startW = (lData.lastPartialIndex || 0);
+            if(startW >= allLevelsData[selectedLevel].length) startW = 0;
+            lData.lastPartialIndex = startW + (reqPages * 10);
+            localStorage.setItem('appProgress', JSON.stringify(appProgress));
+            updateSeqInfo();
+        }
+
         if (currentSysMode === 'free') {
             window.location.href = "index.html?screen=dashboard";
             return;
         }
 
-        let totalWAvg = 0; let totalEAvg = 0;
+        let totalWAvg = 0;
         let html = `<h2>🏆 التقرير الاستراتيجي لنتائج الاختبار</h2>`;
         
         sessionFirstAttemptScores.forEach((s, idx) => {
-            totalWAvg += s.wScore; totalEAvg += s.eScore;
-            html += `<p>• <strong>الصفحة (${idx+1}):</strong> الكلمات: ${Math.round(s.wScore)}% | الأمثلة: ${Math.round(s.eScore)}%</p>`;
+            totalWAvg += s.wScore;
+            html += `<p>• <strong>الصفحة (${idx+1}):</strong> دقة نطق الكلمات: ${Math.round(s.wScore)}%</p>`;
         });
 
         let finalWScore = totalWAvg / sessionFirstAttemptScores.length;
-        let finalEScore = totalEAvg / sessionFirstAttemptScores.length;
         
-        let addedScore = ((finalWScore + finalEScore) / 2) * (testWordsChunks.length / 87) * 100;
+        let addedScore = (finalWScore / 100) * 10 * (testWordsChunks.length);
         if(isNaN(addedScore)) addedScore = 0;
 
         appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + addedScore;
@@ -470,7 +527,7 @@
 
     function returnToMenu() {
         if (currentSysMode === 'test') {
-            if(confirm("تنبيه: إذا عدت الآن، الصفحات التي لم تنهها أو المحاولات غير المكتملة لن تُحتسب وسوف تضيع عليك ولن تدخل في العلامة التراكمية. هل تريد العودة؟")) {
+            if(confirm("تنبيه: إذا عدت الآن، الصفحات التي لم تنهها أو المحاولات غير المكتملة لن تُحتسب ولن يتم تغيير العداد التتابعي ولن تدخل في علامتك التراكمية. هل تريد العودة؟")) {
                 window.location.href = "index.html?screen=dashboard";
             }
         } else {

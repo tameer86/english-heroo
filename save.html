@@ -20,6 +20,7 @@
         .btn-mic { background: #e74a3b; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-speaker { background: #f6c23e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-action { background: #1cc88a; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .btn-analyze { background: #36b9cc; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-left: 10px; }
         .btn-back { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-right: 10px; }
         .btn-clear { background: #e74a3b; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-right: 10px; }
         input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
@@ -45,10 +46,6 @@
                 return 'الصف ' + (ordinals[num] || num);
             }
             return 'مستوى ' + code;
-        }
-
-        function normalizeArabic(text) {
-            return text.replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه');
         }
 
         function formatForSpeech(text, lang) {
@@ -101,6 +98,7 @@
 
 <div style="margin-bottom: 40px;">
     <button id="save-btn" class="btn-action" onclick="commitPageCompletion()">💾 حفظ الصفحة والانتقال للتالي</button>
+    <button id="analyze-btn" class="btn-analyze" onclick="analyzeSavePage()">🤖 تحليل النطق والتطابق</button>
     <button class="btn-clear" onclick="resetSaveScreen()">🧹 مسح الشاشة</button>
     <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
 </div>
@@ -108,6 +106,7 @@
 <script>
     let appProgress = JSON.parse(localStorage.getItem('appProgress'));
     let currentLvl = "A1";
+    let pageSpokenData = {};
 
     window.onload = function() {
         if(typeof levelA1_Words === 'undefined') {
@@ -162,19 +161,25 @@
         let lData = appProgress.levels[currentLvl];
         let db = allLevelsData[currentLvl];
 
+        pageSpokenData = {}; // إعادة ضبط الكلمات المنطوقة
+
         if(!lData.activeList || lData.activeList.length === 0) {
             tbody.innerHTML = "<tr><td colspan='8' style='padding:30px; font-size:18px; color:red; font-weight:bold;'>🎉 انتهت جميع كلمات هذا المستوى بالكامل! تم قفل الحفظ.</td></tr>";
             document.getElementById('save-btn').disabled = true;
             document.getElementById('save-btn').style.opacity = "0.4";
+            document.getElementById('analyze-btn').classList.add('hidden');
             return;
         } else {
             document.getElementById('save-btn').disabled = false;
             document.getElementById('save-btn').style.opacity = "1";
+            document.getElementById('analyze-btn').classList.remove('hidden');
         }
 
         lData.activeList.forEach((wordIdx) => {
             let word = db[wordIdx];
             if(!word) return;
+
+            pageSpokenData[word.id] = { targetWord: word.en, targetEx: word.ex_en, spokenWord: "", spokenEx: "" };
 
             let r1 = document.createElement('tr');
             r1.innerHTML = `
@@ -198,7 +203,7 @@
             `;
 
             let rFeedback = document.createElement('tr');
-            rFeedback.innerHTML = `<td colspan="8" class="feedback-cell" id="feedback-row-${word.id}">انتظار تسجيل النطق للاختبار التفاعلي...</td>`;
+            rFeedback.innerHTML = `<td colspan="8" class="feedback-cell" id="feedback-row-${word.id}">انتظار تسجيل النطق للتحليل والتطابق...</td>`;
 
             tbody.appendChild(r1);
             tbody.appendChild(r2);
@@ -253,7 +258,11 @@
         
         rec.onresult = function(e) {
             let liveText = e.results[0][0].transcript;
-            processEvaluation(wordId, liveText, targetText);
+            
+            if(mode === 'word') pageSpokenData[wordId].spokenWord = liveText;
+            else pageSpokenData[wordId].spokenEx = liveText;
+
+            box.innerHTML = `🎙️ <span style="color:#5a5c69;">المسجل للكلمة:</span> <strong style="color:#4e73df;">${pageSpokenData[wordId].spokenWord}</strong> | <span style="color:#5a5c69;">المسجل للمثال:</span> <strong style="color:#4e73df;">${pageSpokenData[wordId].spokenEx}</strong>`;
         };
         rec.onerror = function() {
             box.innerHTML = "⚠️ لم أسمع صوتك بوضوح، اضغط على المايك وحاول مجدداً.";
@@ -261,26 +270,64 @@
         rec.start();
     }
 
-    function processEvaluation(wordId, spoken, target) {
-        let cleanSpoken = normalizeArabic(spoken.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").trim());
-        let cleanTarget = normalizeArabic(target.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").trim());
-        
-        let score = 0;
-        if(cleanSpoken === cleanTarget) score = 100;
-        else if(cleanTarget.includes(cleanSpoken) && cleanSpoken.length > 0) score = 70;
-        else score = 40;
+    async function analyzeSavePage() {
+        let analyzeBtn = document.getElementById('analyze-btn');
+        analyzeBtn.innerText = "⏳ جاري التحليل الذكي...";
+        analyzeBtn.disabled = true;
 
-        let rating = "غير مرضي 😢"; let color = "#e74a3b";
-        if(score >= 100) { rating = "متميز 💎 نطق ممتاز متطابق!"; color = "#1cc88a"; }
-        else if(score >= 85) { rating = "ممتاز ⭐ رائع جداً!"; color = "#36b9cc"; }
-        else if(score >= 70) { rating = "جيد جداً 👍 أداء ممتاز"; color = "#f6c23e"; }
-        
-        document.getElementById(`feedback-row-${wordId}`).innerHTML = `
-            <div style="color:${color}; font-weight:bold;">
-                النتيجة التقديرية: ${rating} (نسبة التطابق التقريبي: ${score}%) <br>
-                النص المكتوب الملتقط: "${spoken}"
-            </div>
+        let payload = Object.keys(pageSpokenData).map(id => ({
+            id: id,
+            targetWord: pageSpokenData[id].targetWord,
+            spokenWord: pageSpokenData[id].spokenWord,
+            targetEx: pageSpokenData[id].targetEx,
+            spokenEx: pageSpokenData[id].spokenEx
+        }));
+
+        const apiKey = "AQ.Ab8RN6IAyEi5hNUAQJoZffWsH0duwwB012vv_Ix7KDYRLAlC7w";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const promptText = `
+        أنت معلم لغة إنجليزية تقيم نطق طالب.
+        البيانات المدخلة:
+        ${JSON.stringify(payload)}
+        قم بإرجاع مصفوفة JSON فقط تحتوي على كائنات بالصيغة التالية (بدقة تامة وبدون تعليقات أو تنسيقات Markdown):
+        [
+          {
+            "id": "الرقم التعريفي (id) للكلمة",
+            "wordScore": (رقم صحيح من 0 إلى 100 يعبر عن دقة نطق الكلمة المستهدفة بناء على ما قاله الطالب، مع اعتبار الهمزات (أ،إ،آ،ا) متطابقة وحرفي (ة،ه) متطابقين),
+            "wordComment": "تعليق تشجيعي قصير جداً بالعربية عن نطق الكلمة",
+            "exComment": "تعليق تشجيعي قصير جداً بالعربية عن نطق المثال"
+          }
+        ]
         `;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+            });
+            const data = await response.json();
+            let text = data.candidates[0].content.parts[0].text.replace(/```json/gi, '').replace(/```/g, '').trim();
+            let results = JSON.parse(text);
+
+            results.forEach(res => {
+                let box = document.getElementById(`feedback-row-${res.id}`);
+                if (box) {
+                    box.innerHTML = `
+                        <div style="color:#1cc88a; font-weight:bold;">
+                            <span style="color:#4e73df;">🎯 نتيجة نطق الكلمة التقريبية: ${res.wordScore}%</span> | 
+                            💬 <span style="color:#f6c23e;">الكلمة:</span> ${res.wordComment} | 
+                            💬 <span style="color:#f6c23e;">المثال:</span> ${res.exComment}
+                        </div>
+                    `;
+                }
+            });
+        } catch (error) {
+            alert("حدث خطأ أثناء الاتصال وتحليل البيانات عبر الذكاء الاصطناعي. الرجاء المحاولة مجدداً.");
+        }
+
+        analyzeBtn.innerText = "🤖 تحليل النطق والتطابق";
+        analyzeBtn.disabled = false;
     }
 
     function updateKnownWords() {
@@ -314,7 +361,10 @@
         let lData = appProgress.levels[currentLvl];
         lData.activeList.forEach(idx => {
             let w = allLevelsData[currentLvl][idx];
-            if(w) document.getElementById(`feedback-row-${w.id}`).innerHTML = "انتظار تسجيل النطق للاختبار التفاعلي...";
+            if(w) {
+                pageSpokenData[w.id] = { targetWord: w.en, targetEx: w.ex_en, spokenWord: "", spokenEx: "" };
+                document.getElementById(`feedback-row-${w.id}`).innerHTML = "انتظار تسجيل النطق للتحليل والتطابق...";
+            }
         });
     }
 
