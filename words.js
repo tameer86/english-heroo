@@ -98,6 +98,6 @@ const levelA1_Words = [
     { id: 96, en: "both", ar: "كلاهما", pronounce: "بوث", ex_en: "Both are here", ar_ex: "كلاهما هنا" },
     { id: 97, en: "bottle", ar: "زجاجة", pronounce: "بوتل", ex_en: "I drink from a bottle", ar_ex: "أشرب من زجاجة" },
     { id: 98, en: "bottom", ar: "أسفل / قاع", pronounce: "بوتم", ex_en: "At the bottom", ar_ex: "في الأسفل" },
-    { id: 99, en: "box", ar: "صندوق", pronounce: "بوكس", ex_en: "Put it in the box", ar_ex: "ضعها في الصندوق" },
+    { id: 99, en: "box", ar: "صندوق", pronounce: "بوكس", ex_en: "Put it in the box", ar_ex: "ضعها في الصندوق" }
 
 ];
