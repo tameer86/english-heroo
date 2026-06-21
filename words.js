@@ -48,17 +48,5 @@ const levelA1_Words = [
     { id: 46, en: "at", ar: "في", pronounce: "آت", ex_en: "I am at school", ar_ex: "أنا في المدرسة" },
     { id: 47, en: "August", ar: "أغسطس", pronounce: "أوغست", ex_en: "I travel in August", ar_ex: "أسافر في أغسطس" },
     { id: 48, en: "aunt", ar: "عمة / خالة", pronounce: "آنت", ex_en: "This is my aunt", ar_ex: "هذه عمتي" },
-    { id: 49, en: "autumn", ar: "خريف", pronounce: "أوتم", ex_en: "I like autumn", ar_ex: "أحب الخريف" },
-    { id: 50, en: "away", ar: "بعيد", pronounce: "أوي", ex_en: "He is away", ar_ex: "هو بعيد" },
-    { id: 51, en: "baby", ar: "طفل رضيع", pronounce: "بيبي", ex_en: "The baby sleeps", ar_ex: "الطفل ينام" },
-    { id: 52, en: "back", ar: "إلى الخلف / ظهر", pronounce: "باك", ex_en: "Go back", ar_ex: "عد إلى الخلف" },
-    { id: 53, en: "bad", ar: "سيئ", pronounce: "باد", ex_en: "This is bad", ar_ex: "هذا سيئ" },
-    { id: 54, en: "bag", ar: "حقيبة", pronounce: "باغ", ex_en: "I have a bag", ar_ex: "لدي حقيبة" },
-    { id: 55, en: "ball", ar: "كرة", pronounce: "بول", ex_en: "I play with a ball", ar_ex: "ألعب بالكرة" },
-    { id: 56, en: "banana", ar: "موز", pronounce: "بنانا", ex_en: "I eat a banana", ar_ex: "أكل موزة" },
-    { id: 57, en: "band", ar: "فرقة", pronounce: "باند", ex_en: "I have a band", ar_ex: "لدي فرقة موسيقية" },
-    { id: 58, en: "bank", ar: "بنك", pronounce: "بانك", ex_en: "I go to the bank", ar_ex: "أذهب إلى البنك" },
-    { id: 59, en: "bar", ar: "حانة / لوح", pronounce: "بار", ex_en: "We sit in a bar", ar_ex: "نجلس في الحانة" },
-    { id: 60, en: "bath", ar: "حمام", pronounce: "باث", ex_en: "I take a bath", ar_ex: "آخذ حماماً" },
     
 ];
