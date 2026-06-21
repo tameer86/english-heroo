@@ -38,15 +38,6 @@ const levelA1_Words = [
     { id: 36, en: "April", ar: "أبريل", pronounce: "إيبرل", ex_en: "We meet in April", ar_ex: "نلتقي في أبريل" },
     { id: 37, en: "area", ar: "منطقة", pronounce: "إيريا", ex_en: "This is a nice area", ar_ex: "هذه منطقة جميلة" },
     { id: 38, en: "arm", ar: "ذراع", pronounce: "آرم", ex_en: "My arm hurts", ar_ex: "ذراعي يؤلمني" },
-    { id: 39, en: "around", ar: "حول", pronounce: "أراوند", ex_en: "I walk around the house", ar_ex: "أمشي حول البيت" },
-    { id: 40, en: "arrive", ar: "يصل", pronounce: "أرايف", ex_en: "I arrive early", ar_ex: "أصل مبكراً" },
-    { id: 41, en: "art", ar: "فن", pronounce: "آرت", ex_en: "I like art", ar_ex: "أحب الفن" },
-    { id: 42, en: "article", ar: "مقال", pronounce: "آرتكل", ex_en: "I read an article", ar_ex: "أقرأ مقالاً" },
-    { id: 43, en: "artist", ar: "فنان", pronounce: "آرتست", ex_en: "He is an artist", ar_ex: "هو فنان" },
-    { id: 44, en: "as", ar: "كـ / مثل", pronounce: "آز", ex_en: "He works as a teacher", ar_ex: "هو يعمل كمعلم" },
-    { id: 45, en: "ask", ar: "يسأل", pronounce: "آسك", ex_en: "I ask a question", ar_ex: "أسأل سؤالاً" },
-    { id: 46, en: "at", ar: "في", pronounce: "آت", ex_en: "I am at school", ar_ex: "أنا في المدرسة" },
-    { id: 47, en: "August", ar: "أغسطس", pronounce: "أوغست", ex_en: "I travel in August", ar_ex: "أسافر في أغسطس" },
-    { id: 48, en: "aunt", ar: "عمة / خالة", pronounce: "آنت", ex_en: "This is my aunt", ar_ex: "هذه عمتي" },
+
     
 ];
