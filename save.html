@@ -2,280 +2,347 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحة الحفظ والتدريب اللغوي</title>
+    <title>صفحة الحفظ اليومي الذكي</title>
+    <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
+    <script src="C1.js"></script><script src="C2.js"></script>
+    <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
+    <script src="CLASS4.js"></script><script src="CLASS5.js"></script><script src="CLASS6.js"></script>
+    <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
+    <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     <style>
-        :root { --primary: #4e73df; --success: #1cc88a; --danger: #e74a3b; --light: #f8f9fc; }
-        body { font-family: sans-serif; background: var(--light); margin: 0; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .stats-bar { display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; color: var(--primary); margin-bottom: 20px; background: #eef2fa; padding: 15px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #e3e6f0; padding: 12px; text-align: center; }
-        th { background-color: var(--primary); color: white; }
-        .btn-mic { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
-        .btn-audio { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
-        .feedback-row { background: #fdfffe; font-size: 14px; color: #555; }
-        .controls { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-        .btn-action { padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
-        select { padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-size: 15px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 20px; text-align: center; margin: 0; }
+        .top-stats { background: #4e73df; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-around; font-size: 17px; font-weight: bold; max-width: 1100px; margin: 0 auto 20px auto; }
+        .selector-box { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; justify-content: center; gap: 25px; align-items: center; }
+        table { width: 100%; max-width: 1100px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 15px; }
+        thead { background: #36b9cc; color: white; }
+        .feedback-cell { background: #f1f3f9; padding: 10px; font-weight: bold; height: 50px; font-size: 14px; color: #333; }
+        .btn-mic { background: #e74a3b; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-speaker { background: #f6c23e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-action { background: #1cc88a; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .btn-back { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-right: 10px; }
+        .btn-clear { background: #e74a3b; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-right: 10px; }
+        input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
     </style>
+    <script>
+        const availableLevels = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
+        const allLevelsData = {
+            "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
+            "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
+            "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C2": typeof levelC2_Words !== 'undefined' ? levelC2_Words : [],
+            "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
+            "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
+            "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
+            "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
+            "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
+            "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
+        };
+
+        function getLevelName(code) {
+            if(code.startsWith('CLASS')) {
+                let num = code.replace('CLASS', '');
+                let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'};
+                return 'الصف ' + (ordinals[num] || num);
+            }
+            return 'مستوى ' + code;
+        }
+
+        function normalizeArabic(text) {
+            return text.replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه');
+        }
+
+        function formatForSpeech(text, lang) {
+            if(!text) return "";
+            if(lang === 'ar-SA') {
+                return text.replace(/[-\\\/]/g, ' او ');
+            } else {
+                return text.replace(/[-\\\/]/g, ' or ');
+            }
+        }
+    </script>
 </head>
 <body>
 
-<div class="card">
-    <a href="index.html?screen=dashboard" style="text-decoration: none; font-weight: bold; color: var(--primary);">🔙 العودة للوحة التحكم الرئيسية</a>
-    
-    <!-- تحديث نص الإحصائيات العلوي حسب الطلب تماماً -->
-    <div class="stats-bar">
-        <span id="pages-count">الصفحات المحفوظة: 0 صفحة</span>
-        <span id="words-count">إجمالي الكلمات المحفوظة: 0 كلمة</span>
+<div class="top-stats">
+    <div id="stat-level-title">المستوى الحالي: A1</div>
+    <div id="stat-pages">الصفحات المحفوظة: 0 صفحة</div>
+    <div id="stat-words">إجمالي الكلمات المحفوظة: 0 كلمة</div>
+</div>
+
+<div class="selector-box">
+    <div>
+        <label style="font-weight:bold;">📚 اختر مستوى أو صف الحفظ: </label>
+        <select id="level-selector" onchange="onLevelChanged()" style="padding: 8px; border-radius: 6px; font-weight:bold;"></select>
     </div>
-
-    <h3>⚙️ إعدادات عرض واجهة الحفظ الحالية</h3>
-    <div class="controls">
-        <label>اختر لغة الواجهة والتدريب:</label>
-        <select id="display-mode-select" onchange="renderTable()">
-            <option value="both" selected>عربي وإنجليزي معاً</option>
-            <option value="ar">عربي فقط</option>
-            <option value="en">إنجليزي فقط</option>
-        </select>
-        
-        <label>المستوى الدراسي الحالي:</label>
-        <select id="level-select" onchange="changeLevel()">
-            <option value="A1">مستوى A1</option>
-            <option value="A2">مستوى A2</option>
-            <option value="B1">مستوى B1</option>
-            <option value="B2">مستوى B2</option>
-            <option value="C1">مستوى C1</option>
-            <option value="C2">مستوى C2</option>
-            <option value="CLASS1">الصف الأول</option>
-            <option value="CLASS2">الصف الثاني</option>
-        </select>
-
-        <button class="btn-action" style="background: #e74a3b;" onclick="resetSaveScreen()">🧹 مسح الشاشة (الوضع الافتراضي)</button>
+    <div style="border-right: 2px solid #ccc; padding-right: 20px;">
+        <label style="font-weight:bold; margin-left:10px;"><input type="checkbox" id="chk-show-ar" checked onchange="applyColumnVisibility()"> عرض العربي</label>
+        <label style="font-weight:bold;"><input type="checkbox" id="chk-show-en" checked onchange="applyColumnVisibility()"> عرض الانجليزي</label>
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>إجراءات التدريب الصوتية</th>
-                <th>الكلمة / الجملة والمثال التعليمي</th>
-                <th>محفوظة سابقاً</th>
-            </tr>
-        </thead>
-        <tbody id="words-table-body">
-            <!-- يتم توليد الصفوف عبر الجافاسكربت ديناميكياً -->
-        </tbody>
-    </table>
-
-    <div class="controls" style="margin-top: 25px;">
-        <button class="btn-action" style="background: var(--success); font-size:18px; padding: 12px 30px;" onclick="saveWholePage()">💾 حفظ الصفحة والانتقال الفوري للفوج التالي</button>
+    <div>
+        <button onclick="updateKnownWords()" style="background:#4e73df; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">🔄 تحديث الكلمات المحفوظة</button>
     </div>
 </div>
 
-<script src="C2.js"></script>
+<table>
+    <thead>
+        <tr>
+            <th width="5%">محفوظة</th>
+            <th width="8%">الاستماع</th>
+            <th width="8%">تسجيل</th>
+            <th width="20%">الكلمة / المعنى</th>
+            <th width="14%">النطق المكتوب</th>
+            <th width="10%">استماع للمثال</th>
+            <th width="10%">تسجيل للمثال</th>
+            <th width="25%">المثال وترجمته</th>
+        </tr>
+    </thead>
+    <tbody id="save-table-body"></tbody>
+</table>
+
+<div style="margin-bottom: 40px;">
+    <button id="save-btn" class="btn-action" onclick="commitPageCompletion()">💾 حفظ الصفحة والانتقال للتالي</button>
+    <button class="btn-clear" onclick="resetSaveScreen()">🧹 مسح الشاشة</button>
+    <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+</div>
+
 <script>
-    // مصفوفة افتراضية متكاملة للمحاكاة والربط
-    let levelA1_Words = [];
-    for(let i=1; i<=40; i++) {
-        levelA1_Words.push({
-            id: i,
-            en: `Word ${i}`,
-            ar: `كلمة ${i}`,
-            ex_en: `This is example number ${i} / representing modern slash learning.`,
-            ar_ex: `هذا هو المثال رقم ${i} \\ يمثل نظام تدريبي متطور لشاشات العرض.`
+    let appProgress = JSON.parse(localStorage.getItem('appProgress'));
+    let currentLvl = "A1";
+
+    window.onload = function() {
+        if(typeof levelA1_Words === 'undefined') {
+            setTimeout(initAppSequence, 1000);
+        } else {
+            initAppSequence();
+        }
+    };
+
+    function initAppSequence() {
+        const selector = document.getElementById('level-selector');
+        availableLevels.forEach(lvl => {
+            let opt = document.createElement('option'); opt.value = lvl; opt.text = getLevelName(lvl); selector.appendChild(opt);
         });
+        currentLvl = "A1";
+        selector.value = currentLvl;
+        initApp();
     }
 
-    let appProgress;
+    function onLevelChanged() {
+        currentLvl = document.getElementById('level-selector').value;
+        initApp();
+    }
 
     function initApp() {
-        let storedData = localStorage.getItem('appProgress');
-        appProgress = storedData ? JSON.parse(storedData) : null;
-
-        if(!appProgress) {
-            appProgress = { mainIndex: 0, activeList: [], savedWords: [], pagesCompleted: 0 };
+        if(!appProgress.levels[currentLvl]) {
+            appProgress.levels[currentLvl] = { mainIndex: 0, activeList: [], savedWords: [], pagesCompleted: 0 };
         }
         
-        // حساب الـ activeList مباشرة برياضيات دقيقة لضمان تفادي تعليق النقرة الأولى
-        let startIdx = (appProgress.pagesCompleted || 0) * 10;
-        appProgress.activeList = [];
-        for(let i = 0; i < 10; i++) {
-            if(startIdx + i < levelA1_Words.length) {
-                appProgress.activeList.push(startIdx + i);
+        let lData = appProgress.levels[currentLvl];
+        let db = allLevelsData[currentLvl];
+        
+        if((!lData.activeList || lData.activeList.length === 0) && lData.mainIndex < db.length) {
+            lData.activeList = [];
+            while(lData.activeList.length < 10 && lData.mainIndex < db.length) {
+                lData.activeList.push(lData.mainIndex);
+                lData.mainIndex++;
             }
+            localStorage.setItem('appProgress', JSON.stringify(appProgress));
         }
-        appProgress.mainIndex = startIdx + 10;
         
-        localStorage.setItem('appProgress', JSON.stringify(appProgress));
-        updateTopStats();
+        document.getElementById('stat-level-title').innerText = `المستوى الحالي: ${getLevelName(currentLvl)}`;
+        document.getElementById('stat-pages').innerText = `الصفحات المحفوظة: ${lData.pagesCompleted || 0} صفحة`;
+        document.getElementById('stat-words').innerText = `إجمالي الكلمات المحفوظة: ${(lData.pagesCompleted || 0) * 10} كلمة`;
+        
         renderTable();
-    }
-
-    function updateTopStats() {
-        document.getElementById('pages-count').innerText = `الصفحات المحفوظة: ${appProgress.pagesCompleted || 0} صفحة`;
-        document.getElementById('words-count').innerText = `إجمالي الكلمات المحفوظة: ${(appProgress.pagesCompleted || 0) * 10} كلمة`;
-    }
-
-    function changeLevel() {
-        alert("تم تبديل تصنيف الصف الدراسي بنجاح وجاري استدعاء البيانات المتوافقة.");
     }
 
     function renderTable() {
-        const tbody = document.getElementById('words-table-body');
+        const tbody = document.getElementById('save-table-body');
         tbody.innerHTML = "";
-        let mode = document.getElementById('display-mode-select').value;
+        let lData = appProgress.levels[currentLvl];
+        let db = allLevelsData[currentLvl];
 
-        // تحديد اللغات الصوتية والتدريبية بناء على مصفوفة متطلبات الخيارات 8 إلى 13
-        let listenLang = "en-US";
-        let speakLang = "en-US";
-
-        if (mode === "ar") { listenLang = "ar-SA"; speakLang = "en-US"; }
-        else if (mode === "en") { listenLang = "en-US"; speakLang = "ar-SA"; }
-        else { listenLang = "en-US"; speakLang = "en-US"; }
-
-        appProgress.activeList.forEach(index => {
-            if(index >= levelA1_Words.length) return;
-            let word = levelA1_Words[index];
-            
-            // تخصيص النص المراد عرضه حسب الاختيار الفعلي للواجهة
-            let displayText = "";
-            if (mode === "ar") {
-                displayText = `<div><strong>الكلمة:</strong> ${word.ar}</div><div style="margin-top:5px;"><strong>المثال:</strong> ${word.ar_ex}</div>`;
-            } else if (mode === "en") {
-                displayText = `<div><strong>Word:</strong> ${word.en}</div><div style="margin-top:5px;"><strong>Example:</strong> ${word.ex_en}</div>`;
-            } else {
-                displayText = `<div><strong>${word.en}</strong> = ${word.ar}</div>
-                               <div style="margin-top:6px; color:#666; font-size:14px;">M: ${word.ex_en}</div>
-                               <div style="color:#666; font-size:14px;">ع: ${word.ar_ex}</div>`;
-            }
-
-            // توليد الصفوف متضمنة استرجاع الـ Checkbox بالكامل (الخيار 6) وبناء الصف الثالث للتقييم الصوتى المباشر
-            let targetTextToEvaluate = (mode === "ar") ? word.ar : word.en;
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>
-                    <button class="btn-audio" onclick="playAudio('${mode === "ar" ? word.ar : word.en}', '${listenLang}')">🔊 استماع</button>
-                    <button class="btn-mic" onclick="startMic(${word.id}, '${targetTextToEvaluate}', '${speakLang}')">🎙️ مايك</button>
-                </td>
-                <td style="text-align: right;">${displayText}</td>
-                <td><input type="checkbox" class="word-checkbox" checked></td>
-            `;
-            tbody.appendChild(row);
-
-            const feedbackRow = document.createElement('tr');
-            feedbackRow.className = "feedback-row";
-            feedbackRow.innerHTML = `<td colspan="3" id="feedback-${word.id}" style="text-align: right; background: #fafbfc; color:#858796;">ℹ️ اضغط على أيقونة المايك وابدأ التدريب ونطق الكلمات...</td>`;
-            tbody.appendChild(feedbackRow);
-        });
-    }
-
-    // منطق نطق الرموز المائلة والشرطات كـ 'أو' بالعربي و 'or' بالإنجليزي (الخيار 7)
-    function playAudio(text, lang) {
-        let processedText = text;
-        if (lang.startsWith('ar')) {
-            processedText = processedText.replace(/[-\/\\]/g, " أو ");
-        } else {
-            processedText = processedText.replace(/[-\/\\]/g, " or ");
-        }
-        const utterance = new SpeechSynthesisUtterance(processedText);
-        utterance.lang = lang;
-        window.speechSynthesis.speak(utterance);
-    }
-
-    // المايكروفونات المحسنة الكفاءة تماماً دون معالجة وتداخل النصوص المؤقتة المسببة للتوقف الفجائي (الخيار 29)
-    function startMic(wordId, correctText, speechLang) {
-        const feedbackCell = document.getElementById(`feedback-${wordId}`);
-        feedbackCell.innerHTML = `🎙️ جاري الاستماع الفعلي لنطقك... تحدث الآن بوضوح`;
-        
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if(!SpeechRecognition) {
-            feedbackCell.innerHTML = "❌ ميزة التعرف على الصوت غير مدعومة في متصفحك الحالي.";
+        if(!lData.activeList || lData.activeList.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='8' style='padding:30px; font-size:18px; color:red; font-weight:bold;'>🎉 انتهت جميع كلمات هذا المستوى بالكامل! تم قفل الحفظ.</td></tr>";
+            document.getElementById('save-btn').disabled = true;
+            document.getElementById('save-btn').style.opacity = "0.4";
             return;
-        }
-        
-        const recognition = new SpeechRecognition();
-        recognition.lang = speechLang;
-        recognition.continuous = false;
-        recognition.interimResults = false; // إلغاء التحديث الفوري لمنع الإجهاد البرمجي والتجميد
-        
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            evaluatePronunciation(wordId, transcript, correctText);
-        };
-        
-        recognition.onerror = function() {
-            feedbackCell.innerHTML = "⚠️ لم يتم التقاط الصوت بوضوح تام، يرجى الضغط مرة أخرى وإعادة المحاولة.";
-        };
-        recognition.start();
-    }
-
-    // مطابقة النطق مع تسوية وتحويل همزات القطع (أ، إ، آ) إلى ألف عادية (ا) لضمان دقة المطابقة (الخيار 1)
-    function evaluatePronunciation(wordId, spokenText, targetText) {
-        const normalize = (txt) => {
-            return txt.toLowerCase()
-                .replace(/[أإآ]/g, "ا")
-                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"")
-                .replace(/\s+/g," ").trim();
-        };
-
-        let cleanSpoken = normalize(spokenText);
-        let cleanTarget = normalize(targetText);
-        const feedbackCell = document.getElementById(`feedback-${wordId}`);
-
-        if(cleanSpoken === cleanTarget) {
-            feedbackCell.innerHTML = `<span style="color: var(--success); font-weight:bold;">✅ نطق ممتاز ومطابق تماماً! الكلمة المنطوقة: (${spokenText})</span>`;
         } else {
-            feedbackCell.innerHTML = `<span style="color: var(--danger);">❌ نطق غير مطابق، حاولت قراءة: (${spokenText}) - المستهدف الصحيح: (${targetText})</span>`;
+            document.getElementById('save-btn').disabled = false;
+            document.getElementById('save-btn').style.opacity = "1";
         }
+
+        lData.activeList.forEach((wordIdx) => {
+            let word = db[wordIdx];
+            if(!word) return;
+
+            let r1 = document.createElement('tr');
+            r1.innerHTML = `
+                <td rowspan="2"><input type="checkbox" class="word-chk" value="${wordIdx}"></td>
+                <td><button class="btn-speaker" onclick="speakText('${word.en}', 'word')">🔊</button></td>
+                <td><button class="btn-mic" onclick="startSpeechCapture(${word.id}, '${word.en}', 'word')">🎙️</button></td>
+                <td class="cell-en-target" style="font-weight:bold; color:#4e73df; font-size:17px;">${word.en}</td>
+                <td></td>
+                <td><button class="btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊</button></td>
+                <td><button class="btn-mic" onclick="startSpeechCapture(${word.id}, '${word.ex_en}', 'ex')">🎙️</button></td>
+                <td class="cell-en-target" style="text-align:right; font-weight:500;">${word.ex_en}</td>
+            `;
+
+            let r2 = document.createElement('tr');
+            r2.innerHTML = `
+                <td></td><td></td>
+                <td class="cell-ar-target" style="font-weight:bold; color:#1cc88a;">${word.ar}</td>
+                <td class="cell-ar-target" style="color:#f6c23e; font-weight:bold;">[ ${word.pronounce} ]</td>
+                <td></td><td></td>
+                <td class="cell-ar-target" style="text-align:right; color:#5a5c69; font-style:italic;">${word.ar_ex}</td>
+            `;
+
+            let rFeedback = document.createElement('tr');
+            rFeedback.innerHTML = `<td colspan="8" class="feedback-cell" id="feedback-row-${word.id}">انتظار تسجيل النطق للاختبار التفاعلي...</td>`;
+
+            tbody.appendChild(r1);
+            tbody.appendChild(r2);
+            tbody.appendChild(rFeedback);
+        });
+
+        applyColumnVisibility();
     }
 
-    function saveWholePage() {
-        let today = new Date().toLocaleDateString('ar-EG');
-        appProgress.activeList.forEach(index => {
-            let wordObj = levelA1_Words[index];
-            if(!appProgress.savedWords.some(sw => sw.id === wordObj.id)) {
-                appProgress.savedWords.push({
-                    id: wordObj.id, en: wordObj.en, ar: wordObj.ar, date: today, level: document.getElementById('level-select').value
-                });
+    function applyColumnVisibility() {
+        let showAr = document.getElementById('chk-show-ar').checked;
+        let showEn = document.getElementById('chk-show-en').checked;
+
+        document.querySelectorAll('.cell-ar-target').forEach(el => el.style.visibility = showAr ? 'visible' : 'hidden');
+        document.querySelectorAll('.cell-en-target').forEach(el => el.style.visibility = showEn ? 'visible' : 'hidden');
+    }
+
+    function speakText(txt, type) {
+        let chkAr = document.getElementById('chk-show-ar').checked;
+        let chkEn = document.getElementById('chk-show-en').checked;
+        
+        let speakLang = "en-US";
+        if(chkAr && !chkEn) speakLang = "ar-SA";
+        
+        let finalTxt = formatForSpeech(txt, speakLang);
+
+        let settings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1, voiceName: "" };
+        let ut = new SpeechSynthesisUtterance(finalTxt);
+        ut.lang = speakLang;
+        ut.rate = settings.speed || 1;
+        let v = window.speechSynthesis.getVoices().find(v => v.name === settings.voiceName);
+        if(v && speakLang === "en-US") ut.voice = v;
+        window.speechSynthesis.speak(ut);
+    }
+
+    function startSpeechCapture(wordId, targetText, mode) {
+        let chkAr = document.getElementById('chk-show-ar').checked;
+        let chkEn = document.getElementById('chk-show-en').checked;
+        
+        let micLang = "en-US";
+        if(chkEn && !chkAr) micLang = "ar-SA"; 
+
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SpeechRec) { alert("متصفحك لا يدعم التعرف على الصوت الداخلي."); return; }
+        
+        let rec = new SpeechRec(); 
+        rec.lang = micLang; 
+        rec.interimResults = false;
+        
+        let box = document.getElementById(`feedback-row-${wordId}`);
+        box.innerHTML = `🎙️ <span style="color:#4e73df;">جاري الاستماع، تحدث الآن...</span>`;
+        
+        rec.onresult = function(e) {
+            let liveText = e.results[0][0].transcript;
+            processEvaluation(wordId, liveText, targetText);
+        };
+        rec.onerror = function() {
+            box.innerHTML = "⚠️ لم أسمع صوتك بوضوح، اضغط على المايك وحاول مجدداً.";
+        };
+        rec.start();
+    }
+
+    function processEvaluation(wordId, spoken, target) {
+        let cleanSpoken = normalizeArabic(spoken.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").trim());
+        let cleanTarget = normalizeArabic(target.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").trim());
+        
+        let score = 0;
+        if(cleanSpoken === cleanTarget) score = 100;
+        else if(cleanTarget.includes(cleanSpoken) && cleanSpoken.length > 0) score = 70;
+        else score = 40;
+
+        let rating = "غير مرضي 😢"; let color = "#e74a3b";
+        if(score >= 100) { rating = "متميز 💎 نطق ممتاز متطابق!"; color = "#1cc88a"; }
+        else if(score >= 85) { rating = "ممتاز ⭐ رائع جداً!"; color = "#36b9cc"; }
+        else if(score >= 70) { rating = "جيد جداً 👍 أداء ممتاز"; color = "#f6c23e"; }
+        
+        document.getElementById(`feedback-row-${wordId}`).innerHTML = `
+            <div style="color:${color}; font-weight:bold;">
+                النتيجة التقديرية: ${rating} (نسبة التطابق التقريبي: ${score}%) <br>
+                النص المكتوب الملتقط: "${spoken}"
+            </div>
+        `;
+    }
+
+    function updateKnownWords() {
+        let lData = appProgress.levels[currentLvl];
+        let db = allLevelsData[currentLvl];
+        let checkboxes = document.querySelectorAll('.word-chk:checked');
+        if(checkboxes.length === 0) return;
+
+        checkboxes.forEach(cb => {
+            let wordIndex = parseInt(cb.value);
+            let w = db[wordIndex];
+            lData.savedWords.push({ id: w.id, en: w.en, ar: w.ar, date: "تم حفظها قديماً", ex_en: w.ex_en, ar_ex: w.ar_ex, pronounce: w.pronounce });
+            lData.activeList = lData.activeList.filter(idx => idx !== wordIndex);
+        });
+
+        while(lData.activeList.length < 10 && lData.mainIndex < db.length) {
+            let nextId = db[lData.mainIndex].id;
+            if(!lData.savedWords.some(sw => sw.id === nextId) && !lData.activeList.includes(lData.mainIndex)) {
+                lData.activeList.push(lData.mainIndex);
+            }
+            lData.mainIndex++;
+        }
+        localStorage.setItem('appProgress', JSON.stringify(appProgress));
+        renderTable();
+    }
+
+    function resetSaveScreen() {
+        document.getElementById('chk-show-ar').checked = true;
+        document.getElementById('chk-show-en').checked = true;
+        applyColumnVisibility();
+        let lData = appProgress.levels[currentLvl];
+        lData.activeList.forEach(idx => {
+            let w = allLevelsData[currentLvl][idx];
+            if(w) document.getElementById(`feedback-row-${w.id}`).innerHTML = "انتظار تسجيل النطق للاختبار التفاعلي...";
+        });
+    }
+
+    function commitPageCompletion() {
+        let lData = appProgress.levels[currentLvl];
+        let db = allLevelsData[currentLvl];
+        
+        lData.activeList.forEach(idx => {
+            let w = db[idx];
+            if(w && !lData.savedWords.some(x => x.id === w.id)) {
+                lData.savedWords.push({ id: w.id, en: w.en, ar: w.ar, date: new Date().toLocaleDateString('ar-SA') + " " + new Date().toLocaleTimeString('ar-SA'), ex_en: w.ex_en, ar_ex: w.ar_ex, pronounce: w.pronounce });
             }
         });
 
-        appProgress.pagesCompleted++;
+        lData.pagesCompleted = (lData.pagesCompleted || 0) + 1;
+        lData.activeList = [];
         
-        // حساب النطاق الفوجي التالي فوراً وبنقرة واحدة صحيحة تمنع تباين العدادات
-        let startIdx = appProgress.pagesCompleted * 10;
-        appProgress.activeList = [];
-        for(let i = 0; i < 10; i++) {
-            if(startIdx + i < levelA1_Words.length) {
-                appProgress.activeList.push(startIdx + i);
+        while(lData.activeList.length < 10 && lData.mainIndex < db.length) {
+            let nextId = db[lData.mainIndex].id;
+            if(!lData.savedWords.some(sw => sw.id === nextId)) {
+                lData.activeList.push(lData.mainIndex);
             }
+            lData.mainIndex++;
         }
-        appProgress.mainIndex = startIdx + 10;
         
         localStorage.setItem('appProgress', JSON.stringify(appProgress));
-        alert("✅ تم حفظ كلمات الصفحة الحالية في ملف تقدم الطالب بنجاح والانتقال التلقائي للفوج التالي.");
-        updateTopStats();
-        renderTable();
+        initApp(); 
     }
-
-    // مسح الشاشة للوضع الافتراضي ومسح الصف الثالث التقييمي (الخيار 14)
-    function resetSaveScreen() {
-        document.getElementById('display-mode-select').value = "both";
-        appProgress.activeList.forEach(index => {
-            if(index >= levelA1_Words.length) return;
-            let word = levelA1_Words[index];
-            const feedbackCell = document.getElementById(`feedback-${word.id}`);
-            if(feedbackCell) {
-                feedbackCell.innerHTML = `ℹ️ اضغط على أيقونة المايك وابدأ التدريب ونطق الكلمات...`;
-            }
-        });
-        renderTable();
-        alert("🔄 تم إعادة ضبط الشاشة والخيارات للحالة الافتراضية بنجاح.");
-    }
-
-    window.onload = initApp;
 </script>
 </body>
 </html>

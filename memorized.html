@@ -2,112 +2,117 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سجل الكلمات المحفوظة سابقا للطلاب</title>
+    <title>الكلمات المخزنة والمحفوظة</title>
     <style>
-        :root { --primary: #4e73df; --success: #1cc88a; --light: #f8f9fc; }
-        body { font-family: sans-serif; background: var(--light); margin: 0; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #e3e6f0; padding: 12px; text-align: center; }
-        th { background: var(--primary); color: white; }
-        select { padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; min-width: 200px; }
+        body { font-family: sans-serif; background: #eef2f7; padding: 20px; text-align: center; }
+        .header-box { background: #1cc88a; color: white; padding: 20px; border-radius: 10px; max-width: 900px; margin: 0 auto 20px auto; font-size: 18px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .summary-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; max-width: 900px; margin: 10px auto; font-size: 15px; font-weight: bold; color: #4e73df; }
+        table { width: 100%; max-width: 900px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        thead { background: #4e73df; color: white; }
+        button { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 10px; cursor: pointer; margin-top: 20px; font-weight: bold; }
     </style>
+    <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
+    <script src="C1.js"></script><script src="C2.js"></script>
+    <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
+    <script src="CLASS4.js"></script><script src="CLASS5.js"></script><script src="CLASS6.js"></script>
+    <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
+    <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
+    <script>
+        function getLevelName(code) {
+            if(code.startsWith('CLASS')) {
+                let num = code.replace('CLASS', '');
+                let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'};
+                return 'الصف ' + (ordinals[num] || num);
+            }
+            return 'مستوى ' + code;
+        }
+    </script>
 </head>
 <body>
 
-<div class="card">
-    <a href="index.html?screen=dashboard" style="text-decoration: none; font-weight: bold; color: var(--primary);">🔙 العودة للوحة التحكم الرئيسية</a>
-    
-    <h2>📚 سجل وحصيلة الكلمات والصفوف المحفوظة سابقاً</h2>
-    <p>تعرض هذه الشاشة فقط الصفوف والمستويات التي أنجزت بها تقدماً علمياً فعلياً وحفظاً حتى الآن.</p>
-
-    <div style="margin: 20px 0;">
-        <label style="font-weight: bold; margin-left: 10px;">تصفية حسب الصف اللغوي المنجز:</label>
-        <!-- القائمة المنسدلة تظهر فقط المستويات المنجزة فعلياً للطالب مع مسميات عربية صحيحة (الخيارات 16، 19) -->
-        <select id="memorized-level-dropdown" onchange="renderMemorizedTable()">
-            <!-- تتولد ديناميكياً برمجياً -->
-        </select>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>الرقم التعريفي</th>
-                <th>الكلمة بالإنجليزية</th>
-                <th>الترجمة بالعربية</th>
-                <th>تاريخ الحفظ والتدريب</th>
-            </tr>
-        </thead>
-        <tbody id="memorized-table-body">
-            <!-- صفوف الكلمات المنجزة سابقا -->
-        </tbody>
-    </table>
+<div class="header-box">
+    📊 سجل أرشيف جرد الكلمات التعليمية المحفوظة للأبطال
 </div>
 
+<div style="margin: 15px 0;">
+    <label style="font-weight:bold; font-size:16px;">🔍 عرض الكلمات التي تم حفظها في: </label>
+    <select id="filter-level" onchange="loadSavedWordsArchive()" style="padding:8px; border-radius:6px; font-weight:bold;"></select>
+</div>
+
+<div class="summary-box" id="level-summary-info">جار احتساب ملخص البيانات الإحصائية للمستوى...</div>
+
+<table>
+    <thead>
+        <tr>
+            <th width="10%">الرقم</th>
+            <th width="30%">الكلمة الإنجليزية</th>
+            <th width="30%">المعنى بالعربية</th>
+            <th width="30%">تاريخ وجلسة الحفظ</th>
+        </tr>
+    </thead>
+    <tbody id="saved-body"></tbody>
+</table>
+
+<button onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+
 <script>
-    let savedWordsLog = [];
+    const allLevelsData = {
+        "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
+        "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
+        "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C2": typeof levelC2_Words !== 'undefined' ? levelC2_Words : [],
+        "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
+        "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
+        "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
+        "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
+        "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
+        "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
+    };
 
-    function loadSavedLog() {
-        let stored = localStorage.getItem('appProgress');
-        let progress = stored ? JSON.parse(stored) : { savedWords: [] };
-        savedWordsLog = progress.savedWords || [];
+    let appProgress = JSON.parse(localStorage.getItem('appProgress'));
 
-        // محاكاة لضمان الملء التلقائي لأول مرة للاختبار الفوري والدقيق للمرحلة الخامسة
-        if(savedWordsLog.length === 0) {
-            savedWordsLog = [
-                { id: 1, en: "School", ar: "مدرسة", level: "A1", date: "٢٠٢٦/٦/٢١" },
-                { id: 2, en: "Teacher", ar: "معلم", level: "CLASS1", date: "٢٠٢٦/٦/٢١" }
-            ];
+    window.onload = function() {
+        let sel = document.getElementById('filter-level');
+        for(let l in appProgress.levels) {
+            if(appProgress.levels[l].savedWords && appProgress.levels[l].savedWords.length > 0) {
+                let opt = document.createElement('option'); opt.value = l; opt.text = getLevelName(l); sel.appendChild(opt);
+            }
         }
-
-        buildFilterDropdown(savedWordsLog);
-        renderMemorizedTable();
-    }
-
-    function buildFilterDropdown(words) {
-        const select = document.getElementById('memorized-level-dropdown');
-        select.innerHTML = "";
-
-        let uniqueLevels = [...new Set(words.map(w => w.level))];
-        const labelMap = {
-            "A1": "مستوى A1", "A2": "مستوى A2", "B1": "مستوى B1", "B2": "مستوى B2", "C1": "مستوى C1", "C2": "مستوى C2",
-            "CLASS1": "الصف الأول", "CLASS2": "الصف الثاني", "CLASS3": "الصف الثالث"
-        };
-
-        uniqueLevels.forEach(lvl => {
-            let opt = document.createElement('option');
-            opt.value = lvl;
-            opt.text = labelMap[lvl] || lvl;
-            select.appendChild(opt);
-        });
-    }
-
-    function renderMemorizedTable() {
-        const tbody = document.getElementById('memorized-table-body');
-        tbody.innerHTML = "";
-
-        let selectedLvl = document.getElementById('memorized-level-dropdown').value;
-        let matchedWords = savedWordsLog.filter(w => w.level === selectedLvl);
-
-        if(matchedWords.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="color:#858796;">ℹ️ لا توجد كلمات منجزة محفوظة تحت هذا التصنيف حالياً.</td></tr>`;
+        
+        if (sel.options.length === 0) {
+            document.getElementById('saved-body').innerHTML = "<tr><td colspan='4' style='padding:20px; color:#5a5c69; font-style:italic;'>لم تقم بحفظ أي كلمات حتى الآن.</td></tr>";
+            document.getElementById('level-summary-info').innerText = "لا يوجد بيانات.";
             return;
         }
 
-        matchedWords.forEach(word => {
-            const row = document.createElement('tr');
+        loadSavedWordsArchive();
+    };
+
+    function loadSavedWordsArchive() {
+        let selected = document.getElementById('filter-level').value;
+        const tbody = document.getElementById('saved-body');
+        tbody.innerHTML = "";
+
+        let lData = appProgress.levels[selected] || { savedWords: [] };
+        let dbTotal = allLevelsData[selected] ? allLevelsData[selected].length : 0;
+        let savedCount = lData.savedWords ? lData.savedWords.length : 0;
+        let remaining = dbTotal - savedCount;
+        if(remaining < 0) remaining = 0;
+
+        document.getElementById('level-summary-info').innerText = 
+            `📊 ملخص النوع [ ${getLevelName(selected)} ]: إجمالي الكلمات الكلية بالمستوى: ${dbTotal} كلمة | المحفوظ منها: ${savedCount} | المتبقي للإنهاء: ${remaining} كلمة.`;
+
+        lData.savedWords.forEach((word, index) => {
+            let row = document.createElement('tr');
             row.innerHTML = `
-                <td>${word.id}</td>
-                <td style="font-weight:bold; color:var(--primary);">${word.en}</td>
-                <td>${word.ar}</td>
-                <td><span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:4px; font-size:13px;">${word.date}</span></td>
+                <td>${index + 1}</td>
+                <td style="font-weight:bold; color:#4e73df; font-size:16px;">${word.en}</td>
+                <td style="font-weight:bold;">${word.ar}</td>
+                <td style="color:#e74a3b; font-weight:bold; font-size:13px;">${word.date}</td>
             `;
             tbody.appendChild(row);
         });
     }
-
-    window.onload = loadSavedLog;
 </script>
 </body>
 </html>
