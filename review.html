@@ -38,6 +38,15 @@
             return 'مستوى ' + code;
         }
 
+        function normalizeArabic(text) {
+            return text.replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه');
+        }
+
+        function cleanString(str) {
+            if(!str) return "";
+            return normalizeArabic(str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?]/g,"").replace(/\s+/g," ").trim());
+        }
+
         function formatForSpeech(text, lang) {
             if(!text) return "";
             if(lang === 'ar-SA') return text.replace(/[-\\\/]/g, ' او ');
@@ -85,7 +94,7 @@
             <div id="random-inputs" class="hidden" style="margin-right:40px; margin-top:10px;">
                 <label>من صفحة:</label> <input type="number" id="rand-start" min="1" value="1" style="width:60px;">
                 <label>إلى صفحة:</label> <input type="number" id="rand-end" min="1" value="2" style="width:60px;">
-                <label>بعدد صفحات عشوائية:</label> <input type="number" id="rand-count" min="1" value="1" style="width:60px;">
+                <label>بعدد كلمات عشوائية:</label> <input type="number" id="rand-count" min="1" value="10" style="width:60px;">
             </div>
         </div>
         
@@ -221,14 +230,15 @@
             currentReviewType = 3;
             let sP = parseInt(document.getElementById('rand-start').value) || 1;
             let eP = parseInt(document.getElementById('rand-end').value) || 1;
-            let rC = parseInt(document.getElementById('rand-count').value) || 1;
+            let rW = parseInt(document.getElementById('rand-count').value) || 10;
 
-            if(sP > eP || rC > (eP - sP + 1)) { alert("⚠️ خطأ منطقي: تعارض في أرقام الفترة!"); return; }
+            if(sP > eP) { alert("⚠️ خطأ منطقي: صفحة البداية أكبر من صفحة النهاية!"); return; }
             let pool = savedDbWords.slice((sP-1)*10, eP*10);
-            if(pool.length === 0) { alert("⚠️ الفترة خارج المدى!"); return; }
+            if(pool.length === 0) { alert("⚠️ الفترة خارج المدى المحفوظ!"); return; }
+            if(rW > pool.length) { alert("⚠️ خطأ منطقي: عدد الكلمات المطلوبة أكبر من المتوفر في الفترة المحددة!"); return; }
             
             pool.sort(() => 0.5 - Math.random());
-            let sliced = pool.slice(0, rC * 10);
+            let sliced = pool.slice(0, rW);
             for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
         }
 
