@@ -29,7 +29,7 @@
         
         .settings-field { margin: 15px 0; text-align: right; }
         .settings-field label { font-weight: bold; display: block; margin-bottom: 5px; }
-        .settings-field select, .settings-field input[type="range"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
         .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
     </style>
@@ -114,7 +114,7 @@
                 <span>🧠</span> مراجعة واختبار
             </button>
             <button class="dashboard-btn" style="background: var(--warning);" onclick="showSettings()">
-                <span>⚙️</span> الإعدادات الصوتية
+                <span>⚙️</span> الإعدادات 
             </button>
         </div>
         <button style="background: var(--dark); margin-top: 20px; width: 60%;" onclick="goHome()">🔙 العودة للشاشة الرئيسية</button>
@@ -127,7 +127,14 @@
     </div>
 
     <div id="settings-screen" class="hidden">
-        <h1>الإعدادات الصوتية ⚙️</h1>
+        <h1>الإعدادات العامة ⚙️</h1>
+        
+        <div class="settings-field" style="background: #fff3cd; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba;">
+            <label style="color: #856404;">مفتاح Gemini API (للذكاء الاصطناعي):</label>
+            <input type="password" id="gemini-api-key" placeholder="أدخل المفتاح هنا للتفعيل (مثال: AIzaSy...)" onchange="saveSettings()">
+            <p style="font-size: 12px; color: #856404; margin-top: 5px; margin-bottom: 0;">يستخدم هذا المفتاح لتقييم النطق في الحفظ والمراجعة.</p>
+        </div>
+
         <div class="settings-field"><label>سرعة القراءة والصوت:</label><input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1" onchange="saveSettings()"></div>
         <div class="settings-field"><label>جنس القارئ والصوت المتاح:</label><select id="voice-gender" onchange="saveSettings()"></select></div>
         <div class="settings-field">
@@ -145,16 +152,33 @@
     function getCleanProgress() {
         let structure = { cumulativeScore: 0, levels: {} };
         availableKeys.forEach(k => {
-            structure.levels[k] = { mainIndex: 0, activeList: [], savedWords: [], pagesCompleted: 0 };
+            structure.levels[k] = { mainIndex: 0, activeList: [], savedWords: [], pagesCompleted: 0, lastPartialIndexFree: 0, lastPartialIndexTest: 0 };
         });
         return structure;
     }
 
     if(!localStorage.getItem('appProgress')) {
         localStorage.setItem('appProgress', JSON.stringify(getCleanProgress()));
+    } else {
+        // تحديث الهيكل القديم لدعم العدادين المنفصلين
+        let progress = JSON.parse(localStorage.getItem('appProgress'));
+        let needsUpdate = false;
+        for(let l in progress.levels) {
+            if(progress.levels[l].lastPartialIndex !== undefined) {
+                progress.levels[l].lastPartialIndexFree = progress.levels[l].lastPartialIndex;
+                progress.levels[l].lastPartialIndexTest = progress.levels[l].lastPartialIndex;
+                delete progress.levels[l].lastPartialIndex;
+                needsUpdate = true;
+            } else {
+                if (progress.levels[l].lastPartialIndexFree === undefined) { progress.levels[l].lastPartialIndexFree = 0; needsUpdate = true; }
+                if (progress.levels[l].lastPartialIndexTest === undefined) { progress.levels[l].lastPartialIndexTest = 0; needsUpdate = true; }
+            }
+        }
+        if(needsUpdate) localStorage.setItem('appProgress', JSON.stringify(progress));
     }
+
     if(!localStorage.getItem('audioSettings')) {
-        localStorage.setItem('audioSettings', JSON.stringify({ speed: 1, voiceName: "" }));
+        localStorage.setItem('audioSettings', JSON.stringify({ speed: 1, voiceName: "", geminiApiKey: "" }));
     }
 
     window.onload = function () {
@@ -253,6 +277,7 @@
         let settings = JSON.parse(localStorage.getItem('audioSettings'));
         document.getElementById('voice-speed').value = settings.speed || 1;
         document.getElementById('voice-gender').value = settings.voiceName || "";
+        document.getElementById('gemini-api-key').value = settings.geminiApiKey || "";
     }
     function hideAllScreens() { document.getElementById('home-screen').classList.add('hidden'); document.getElementById('dashboard-screen').classList.add('hidden'); document.getElementById('about-screen').classList.add('hidden'); document.getElementById('settings-screen').classList.add('hidden'); }
 
@@ -311,7 +336,11 @@
         });
     }
     function saveSettings() {
-        localStorage.setItem('audioSettings', JSON.stringify({ speed: parseFloat(document.getElementById('voice-speed').value), voiceName: document.getElementById('voice-gender').value }));
+        localStorage.setItem('audioSettings', JSON.stringify({ 
+            speed: parseFloat(document.getElementById('voice-speed').value), 
+            voiceName: document.getElementById('voice-gender').value,
+            geminiApiKey: document.getElementById('gemini-api-key').value
+        }));
     }
     function testVoiceOutput() {
         let settings = JSON.parse(localStorage.getItem('audioSettings'));

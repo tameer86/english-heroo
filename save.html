@@ -133,7 +133,7 @@
 
     function initApp() {
         if(!appProgress.levels[currentLvl]) {
-            appProgress.levels[currentLvl] = { mainIndex: 0, activeList: [], savedWords: [], pagesCompleted: 0 };
+            appProgress.levels[currentLvl] = { mainIndex: 0, activeList: [], savedWords: [], pagesCompleted: 0, lastPartialIndexFree: 0, lastPartialIndexTest: 0 };
         }
         
         let lData = appProgress.levels[currentLvl];
@@ -230,7 +230,7 @@
         
         let finalTxt = formatForSpeech(txt, speakLang);
 
-        let settings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1, voiceName: "" };
+        let settings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1, voiceName: "", geminiApiKey: "" };
         let ut = new SpeechSynthesisUtterance(finalTxt);
         ut.lang = speakLang;
         ut.rate = settings.speed || 1;
@@ -271,6 +271,14 @@
     }
 
     async function analyzeSavePage() {
+        let settings = JSON.parse(localStorage.getItem('audioSettings')) || {};
+        let apiKey = settings.geminiApiKey;
+
+        if (!apiKey) {
+            alert("❌ الرجاء إدخال Gemini API Key في صفحة الإعدادات للتقييم!");
+            return;
+        }
+
         let analyzeBtn = document.getElementById('analyze-btn');
         analyzeBtn.innerText = "⏳ جاري التحليل الذكي...";
         analyzeBtn.disabled = true;
@@ -283,8 +291,7 @@
             spokenEx: pageSpokenData[id].spokenEx
         }));
 
-        const apiKey = "AQ.Ab8RN6KgaUKrysi62BKlZHzoxZyryWshWn8C1Muf2jEGL9nEnw";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
         const promptText = `
         أنت معلم لغة إنجليزية تقيم نطق طالب.
         البيانات المدخلة:
@@ -303,13 +310,18 @@
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'x-goog-api-key': apiKey
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
             });
             const data = await response.json();
+            
+            if (data.error) {
+                alert("⚠️ خطأ في الاتصال، تأكد من مفتاح الـ API في الإعدادات.");
+                analyzeBtn.innerText = "🤖 تحليل النطق والتطابق";
+                analyzeBtn.disabled = false;
+                return;
+            }
+
             let text = data.candidates[0].content.parts[0].text.replace(/```json/gi, '').replace(/```/g, '').trim();
             let results = JSON.parse(text);
 
