@@ -19,7 +19,6 @@
         .dashboard-btn span { font-size: 30px; } 
         
         .profile-container { margin: 20px 0; padding: 15px; background: var(--light); border-radius: 15px; border: 2px solid #e3e6f0; }
-        .profile-container img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; }
         
         .levels-container { margin-top: 20px; text-align: right; max-height: 250px; overflow-y: auto; padding: 5px; }
         .level-card { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 10px; margin-bottom: 10px; color: #856404; }
@@ -33,7 +32,7 @@
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
         .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
     </style>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
     <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
@@ -71,14 +70,7 @@
         <p>تعلم الإنجليزية بذكاء ومرح مع التقنيات التفاعلية</p>
 
         <div id="login-section" class="profile-container">
-            <p style="font-weight:bold; color:var(--dark);">يرجى تسجيل الدخول للبدء:</p>
-            <div id="buttonDiv" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
-        </div>
-
-        <div id="profile-section" class="profile-container hidden">
-            <img id="user-pic" src="" alt="صورة المستخدم">
-            <div id="user-name" class="profile-name">مرحباً بك</div>
-            <button style="background: var(--success); width:90%;" onclick="showDashboard()">🚀 الدخول إلى البرنامج</button>
+            <button style="background: var(--success); width:90%; font-size: 18px; padding: 15px;" onclick="showDashboard()">🚀 الدخول إلى البرنامج</button>
         </div>
         
         <div class="sync-box">
@@ -91,7 +83,6 @@
         <hr style="border: 1px solid #eee; margin: 15px 0;">
         <div class="btn-group">
             <button style="background: var(--info);" onclick="showAbout()">ℹ️ حول التطبيق</button>
-            <button id="logout-btn" style="background: var(--dark);" class="hidden" onclick="logoutUser()">🚪 تسجيل الخروج</button>
             <button style="background: var(--danger);" onclick="clearProgressData()">🗑️ مسح البيانات</button>
         </div>
     </div>
@@ -164,6 +155,7 @@
     if(!localStorage.getItem('appProgress')) {
         localStorage.setItem('appProgress', JSON.stringify(getCleanProgress()));
     } else {
+        // تحديث الهيكل القديم لدعم العدادين المنفصلين
         let progress = JSON.parse(localStorage.getItem('appProgress'));
         let needsUpdate = false;
         for(let l in progress.levels) {
@@ -186,54 +178,16 @@
 
     window.onload = function () {
         const urlParams = new URLSearchParams(window.location.search);
-        const savedUser = localStorage.getItem('smartAppUser');
         
-        if (savedUser) {
-            const userData = JSON.parse(savedUser);
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('profile-section').classList.remove('hidden');
-            document.getElementById('logout-btn').classList.remove('hidden');
-            document.getElementById('user-pic').src = userData.picture;
-            document.getElementById('user-name').innerText = `مرحباً بك يا بطل: ${userData.name}`;
-            
-            if (urlParams.get('screen') === 'dashboard') {
-                hideAllScreens();
-                document.getElementById('dashboard-screen').classList.remove('hidden');
-            }
-        } else {
-            initGoogleAuth();
+        if (urlParams.get('screen') === 'dashboard') {
+            hideAllScreens();
+            document.getElementById('dashboard-screen').classList.remove('hidden');
         }
 
         loadVoiceOptions();
         if (window.speechSynthesis.onvoiceschanged !== undefined) { window.speechSynthesis.onvoiceschanged = loadVoiceOptions; }
         updateLevelStats();
     };
-
-    function initGoogleAuth() {
-        google.accounts.id.initialize({
-            client_id: "691032994394-k3d0bbdomgeedituat06mdp184eppqkp.apps.googleusercontent.com",
-            callback: handleCredentialResponse
-        });
-        google.accounts.id.renderButton(document.getElementById("buttonDiv"), { theme: "outline", size: "large", text: "signin_with" });
-    }
-
-    function handleCredentialResponse(response) {
-        const responsePayload = decodeJwtResponse(response.credential);
-        const userData = { name: responsePayload.name, picture: responsePayload.picture };
-        localStorage.setItem('smartAppUser', JSON.stringify(userData));
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('profile-section').classList.remove('hidden');
-        document.getElementById('logout-btn').classList.remove('hidden');
-        document.getElementById('user-pic').src = userData.picture;
-        document.getElementById('user-name').innerText = `مرحباً بك يا بطل: ${userData.name}`;
-        showDashboard();
-    }
-
-    function decodeJwtResponse(token) {
-        let base64Url = token.split('.')[1];
-        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-    }
 
     function updateLevelStats() {
         let progress = JSON.parse(localStorage.getItem('appProgress'));
@@ -284,18 +238,9 @@
     }
     function hideAllScreens() { document.getElementById('home-screen').classList.add('hidden'); document.getElementById('dashboard-screen').classList.add('hidden'); document.getElementById('about-screen').classList.add('hidden'); document.getElementById('settings-screen').classList.add('hidden'); }
 
-    function logoutUser() {
-        if(confirm("تنبيه: تسجيل الخروج سيؤدي إلى مسح جميع بيانات الحفظ الخاصة بك من هذا المتصفح.\nيرجى تصدير نسخة من بياناتك أولاً إذا أردت الاحتفاظ بها.\nهل أنت متأكد من تسجيل الخروج؟")) {
-            localStorage.clear();
-            location.href = "index.html";
-        }
-    }
-
     function clearProgressData() { 
-        if (confirm("تنبيه: سيتم مسح تقدمك والكلمات المحفوظة فقط دون تسجيل الخروج.\nيرجى تصدير بياناتك أولاً إذا أردت الاحتفاظ بها.\nهل أنت متأكد؟")) { 
-            let user = localStorage.getItem('smartAppUser');
+        if (confirm("تنبيه: سيتم مسح تقدمك والكلمات المحفوظة.\nيرجى تصدير بياناتك أولاً إذا أردت الاحتفاظ بها.\nهل أنت متأكد؟")) { 
             localStorage.clear(); 
-            if(user) localStorage.setItem('smartAppUser', user);
             alert("تم مسح بيانات التقدم بنجاح."); 
             location.reload(); 
         } 
