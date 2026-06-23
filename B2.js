@@ -438,7 +438,7 @@ const levelB2_Words =[
     { id: 437, en: "equivalent", ar: "مُعادِل / مكافئ", pronounce: "إِكْوِفَلَنْت", ex_en: "The result is equivalent to what we expected.", ar_ex: "النتيجةُ تعادلُ ما توقّعناهُ." },
     { id: 438, en: "erupt", ar: "يثور / ينفجر", pronounce: "إِرَبْت", ex_en: "Volcanoes began to erupt suddenly.", ar_ex: "بدأتِ البراكينُ تثورُ فجأةً." },
     { id: 439, en: "essentially", ar: "في الأساس / جوهريًّا", pronounce: "إِسِنْشَلِي", ex_en: "Essentially, the idea is correct.", ar_ex: "في الأساسِ، الفكرةُ صحيحةٌ." },
-    { id: 440, en: "establish", ar: "يؤسّس / يثبت", pronounce: "إِسْتَابْلِش", ex_en: "They established a new school in the village.", ar_ex: "أسّسوا مدرسةً جديدةً في القريةِ." }
+    { id: 440, en: "establish", ar: "يؤسّس / يثبت", pronounce: "إِسْتَابْلِش", ex_en: "They established a new school in the village.", ar_ex: "أسّسوا مدرسةً جديدةً في القريةِ." },
 	
 	
 	
@@ -882,7 +882,7 @@ const levelB2_Words =[
   { "id": 877, "en": "parliament", "ar": "برلمان", "pronounce": "بَارْلَمَنْت", "ex_en": "Parliament discussed the new law.", "ar_ex": "ناقشَ البرلمانُ القانونَ الجديدَ." },
   { "id": 878, "en": "part-time", "ar": "بدوام جزئي", "pronounce": "بَارْتْ تَايْم", "ex_en": "He works part-time in the evening.", "ar_ex": "يعملُ بدوامٍ جزئيٍّ في المساءِ." },
   { "id": 879, "en": "participant", "ar": "مشارك", "pronounce": "بَارْتِسِبَنْت", "ex_en": "Every participant got a certificate.", "ar_ex": "حصلَ كلُّ مشاركٍ على شهادةٍ." },
-  { "id": 880, "en": "participation", "ar": "مشاركة", "pronounce": "بَارْتِسِبَيْشَن", "ex_en": "We need greater participation from everyone.", "ar_ex": "نحتاجُ إلى مشاركةٍ أكبرَ من الجميعِ." }
+  { "id": 880, "en": "participation", "ar": "مشاركة", "pronounce": "بَارْتِسِبَيْشَن", "ex_en": "We need greater participation from everyone.", "ar_ex": "نحتاجُ إلى مشاركةٍ أكبرَ من الجميعِ." },
 
 	
 	

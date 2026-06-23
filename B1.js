@@ -388,7 +388,7 @@ const levelB1_Words =[
     { id: 387, en: "lie", ar: "يكذب", pronounce: "لَاي", ex_en: "Do not lie to me", ar_ex: "لا تكذب عليّ" },
     { id: 388, en: "limit", ar: "حد / يحدّ", pronounce: "لِمِت", ex_en: "There is a speed limit", ar_ex: "هناك حد للسرعة" },
     { id: 389, en: "lip", ar: "شفة", pronounce: "لِب", ex_en: "His lip is dry", ar_ex: "شفتاه جافتان" },
-    { id: 390, en: "liquid", ar: "سائل", pronounce: "لِكْوِد", ex_en: "Water is a liquid", ar_ex: "الماء سائل" }
+    { id: 390, en: "liquid", ar: "سائل", pronounce: "لِكْوِد", ex_en: "Water is a liquid", ar_ex: "الماء سائل" },
     { id: 391, en: "literature", ar: "أدب", pronounce: "لِتْرَتْشُر", ex_en: "He studies English literature", ar_ex: "هو يدرس الأدب الإنجليزي" },
     { id: 392, en: "live", ar: "مباشر / حي", pronounce: "لَايْف", ex_en: "We watched a live show", ar_ex: "شاهدنا عرضًا مباشرًا" },
     { id: 393, en: "lively", ar: "مليء بالحيوية", pronounce: "لَايْفْلِي", ex_en: "The city has a lively atmosphere", ar_ex: "المدينة بها أجواء مليئة بالحيوية" },
