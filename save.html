@@ -19,10 +19,11 @@
         .feedback-cell { background: #f1f3f9; padding: 10px; font-weight: bold; height: 50px; font-size: 14px; color: #333; }
         .btn-mic { background: #e74a3b; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-speaker { background: #f6c23e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-action { background: #1cc88a; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
-        .btn-analyze { background: #36b9cc; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-left: 10px; }
-        .btn-back { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-right: 10px; }
-        .btn-clear { background: #e74a3b; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; margin-right: 10px; }
+        .btn-youglish { background: #8540f5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        .btn-action { background: #1cc88a; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .btn-analyze { background: #36b9cc; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .btn-back { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .btn-clear { background: #e74a3b; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
         input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
     </style>
     <script>
@@ -56,6 +57,10 @@
                 return text.replace(/[-\\\/]/g, ' or ');
             }
         }
+
+        function openYouGlish(word) {
+            window.open('https://youglish.com/pronounce/' + encodeURIComponent(word) + '/english', '_blank');
+        }
     </script>
 </head>
 <body>
@@ -76,18 +81,18 @@
         <label style="font-weight:bold;"><input type="checkbox" id="chk-show-en" checked onchange="applyColumnVisibility()"> عرض الانجليزي</label>
     </div>
     <div>
-        <button onclick="updateKnownWords()" style="background:#4e73df; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">🔄 تحديث الكلمات المحفوظة</button>
+        <button onclick="updateKnownWords()" style="background:#4e73df; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">🔄 تحديث ككلمات قديمة مستثناة</button>
     </div>
 </div>
 
 <table>
     <thead>
         <tr>
-            <th width="5%">محفوظة</th>
-            <th width="8%">الاستماع</th>
+            <th width="5%">مستثناة</th>
+            <th width="15%">الاستماع</th>
             <th width="8%">تسجيل</th>
-            <th width="20%">الكلمة / المعنى</th>
-            <th width="14%">النطق المكتوب</th>
+            <th width="15%">الكلمة / المعنى</th>
+            <th width="12%">النطق المكتوب</th>
             <th width="10%">استماع للمثال</th>
             <th width="10%">تسجيل للمثال</th>
             <th width="25%">المثال وترجمته</th>
@@ -96,8 +101,9 @@
     <tbody id="save-table-body"></tbody>
 </table>
 
-<div style="margin-bottom: 40px;">
-    <button id="save-btn" class="btn-action" onclick="commitPageCompletion()">💾 حفظ الصفحة والانتقال للتالي</button>
+<div style="margin-top: 30px; margin-bottom: 40px; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <button id="save-btn" class="btn-action" onclick="commitPageCompletion()">💾 حفظ الصفحة كجديدة والانتقال للتالي</button>
+    <button id="save-all-btn" class="btn-action" style="background:#2e7d32;" onclick="saveEntireLevel()">🌟 حفظ جميع كلمات المستوى/الصف كجديدة</button>
     <button id="analyze-btn" class="btn-analyze" onclick="analyzeSavePage()">🤖 تحليل النطق والتطابق</button>
     <button class="btn-clear" onclick="resetSaveScreen()">🧹 مسح الشاشة</button>
     <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
@@ -166,12 +172,16 @@
         if(!lData.activeList || lData.activeList.length === 0) {
             tbody.innerHTML = "<tr><td colspan='8' style='padding:30px; font-size:18px; color:red; font-weight:bold;'>🎉 انتهت جميع كلمات هذا المستوى بالكامل! تم قفل الحفظ.</td></tr>";
             document.getElementById('save-btn').disabled = true;
+            document.getElementById('save-all-btn').disabled = true;
             document.getElementById('save-btn').style.opacity = "0.4";
+            document.getElementById('save-all-btn').style.opacity = "0.4";
             document.getElementById('analyze-btn').classList.add('hidden');
             return;
         } else {
             document.getElementById('save-btn').disabled = false;
+            document.getElementById('save-all-btn').disabled = false;
             document.getElementById('save-btn').style.opacity = "1";
+            document.getElementById('save-all-btn').style.opacity = "1";
             document.getElementById('analyze-btn').classList.remove('hidden');
         }
 
@@ -184,11 +194,16 @@
             let r1 = document.createElement('tr');
             r1.innerHTML = `
                 <td rowspan="2"><input type="checkbox" class="word-chk" value="${wordIdx}"></td>
-                <td><button class="btn-speaker" onclick="speakText('${word.en}', 'word')">🔊</button></td>
+                <td>
+                    <button class="btn-speaker" onclick="speakText('${word.en}', 'word')">🔊</button>
+                    <button class="btn-youglish" onclick="openYouGlish('${word.en}')">📺 YG</button>
+                </td>
                 <td><button class="btn-mic" onclick="startSpeechCapture(${word.id}, '${word.en}', 'word')">🎙️</button></td>
                 <td class="cell-en-target" style="font-weight:bold; color:#4e73df; font-size:17px;">${word.en}</td>
                 <td></td>
-                <td><button class="btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊</button></td>
+                <td>
+                    <button class="btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊</button>
+                </td>
                 <td><button class="btn-mic" onclick="startSpeechCapture(${word.id}, '${word.ex_en}', 'ex')">🎙️</button></td>
                 <td class="cell-en-target" style="text-align:right; font-weight:500;">${word.ex_en}</td>
             `;
@@ -351,10 +366,16 @@
         let checkboxes = document.querySelectorAll('.word-chk:checked');
         if(checkboxes.length === 0) return;
 
+        let now = Date.now();
+        let dateStr = new Date().toLocaleDateString('en-CA');
+
         checkboxes.forEach(cb => {
             let wordIndex = parseInt(cb.value);
             let w = db[wordIndex];
-            lData.savedWords.push({ id: w.id, en: w.en, ar: w.ar, date: "تم حفظها قديماً", ex_en: w.ex_en, ar_ex: w.ar_ex, pronounce: w.pronounce });
+            lData.savedWords.push({ 
+                id: w.id, en: w.en, ar: w.ar, date: dateStr, unixTime: now, isOld: true, 
+                ex_en: w.ex_en, ar_ex: w.ar_ex, pronounce: w.pronounce 
+            });
             lData.activeList = lData.activeList.filter(idx => idx !== wordIndex);
         });
 
@@ -387,14 +408,20 @@
         let lData = appProgress.levels[currentLvl];
         let db = allLevelsData[currentLvl];
         
+        let now = Date.now();
+        let dateStr = new Date().toLocaleDateString('en-CA');
+
         lData.activeList.forEach(idx => {
             let w = db[idx];
             if(w && !lData.savedWords.some(x => x.id === w.id)) {
-                lData.savedWords.push({ id: w.id, en: w.en, ar: w.ar, date: new Date().toLocaleDateString('ar-SA') + " " + new Date().toLocaleTimeString('ar-SA'), ex_en: w.ex_en, ar_ex: w.ar_ex, pronounce: w.pronounce });
+                lData.savedWords.push({ 
+                    id: w.id, en: w.en, ar: w.ar, date: dateStr, unixTime: now, isOld: false, 
+                    ex_en: w.ex_en, ar_ex: w.ar_ex, pronounce: w.pronounce 
+                });
             }
         });
 
-        lData.pagesCompleted = (lData.pagesCompleted || 0) + 1;
+        lData.pagesCompleted = Math.ceil(lData.savedWords.length / 10);
         lData.activeList = [];
         
         while(lData.activeList.length < 10 && lData.mainIndex < db.length) {
@@ -407,6 +434,33 @@
         
         localStorage.setItem('appProgress', JSON.stringify(appProgress));
         initApp(); 
+    }
+
+    function saveEntireLevel() {
+        if(!confirm("هل أنت متأكد من حفظ جميع كلمات هذا المستوى ككلمات جديدة دفعة واحدة؟")) return;
+        
+        let lData = appProgress.levels[currentLvl];
+        let db = allLevelsData[currentLvl];
+        
+        let now = Date.now();
+        let dateStr = new Date().toLocaleDateString('en-CA');
+
+        db.forEach(w => {
+            if(!lData.savedWords.some(sw => sw.id === w.id)) {
+                lData.savedWords.push({ 
+                    id: w.id, en: w.en, ar: w.ar, date: dateStr, unixTime: now, isOld: false, 
+                    ex_en: w.ex_en, ar_ex: w.ar_ex, pronounce: w.pronounce 
+                });
+            }
+        });
+
+        lData.pagesCompleted = Math.ceil(lData.savedWords.length / 10);
+        lData.mainIndex = db.length;
+        lData.activeList = [];
+        
+        localStorage.setItem('appProgress', JSON.stringify(appProgress));
+        alert("تم حفظ جميع كلمات المستوى بنجاح!");
+        initApp();
     }
 </script>
 </body>

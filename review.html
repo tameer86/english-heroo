@@ -10,7 +10,7 @@
         .section-box { border: 2px solid #e3e6f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: right; background: #f8f9fc; }
         .section-title { font-size: 18px; font-weight: bold; color: #4e73df; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #4e73df; padding-bottom: 5px; }
         label { font-weight: bold; margin-left: 10px; }
-        select, input[type="number"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; }
+        select, input[type="number"], input[type="date"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; background: white; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         th, td { border: 1px solid #e3e6f0; padding: 12px; text-align: center; }
         thead { background: #4e73df; color: white; }
@@ -20,7 +20,9 @@
         .btn-analyze { background: #36b9cc; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 10px; }
         .btn-back { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 10px; }
         .btn-clear { background: #e74a3b; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 10px; }
+        .btn-youglish { background: #8540f5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 2px; }
         .hidden { display: none !important; }
+        .rev-type-row { margin-bottom: 15px; }
     </style>
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -52,6 +54,10 @@
             if(lang === 'ar-SA') return text.replace(/[-\\\/]/g, ' او ');
             return text.replace(/[-\\\/]/g, ' or ');
         }
+
+        function openYouGlish(word) {
+            window.open('https://youglish.com/pronounce/' + encodeURIComponent(word) + '/english', '_blank');
+        }
     </script>
 </head>
 <body>
@@ -71,30 +77,58 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
             <div>
                 <label>تحديد المستوى للمراجعة:</label>
-                <select id="review-level-select" style="width:60%;"></select>
+                <select id="review-level-select" style="width:60%;" onchange="updateSeqInfo()"></select>
             </div>
             <div>
                 <label>طريقة العرض والتحكم:</label>
-                <input type="radio" id="mode-ar-en" name="view-mode" checked> <label for="mode-ar-en">عربي 👈 إنجليزي</label>
-                <input type="radio" id="mode-en-ar" name="view-mode"> <label for="mode-en-ar">إنجليزي 👈 عربي</label>
+                <input type="radio" id="mode-ar-en" name="view-mode" checked> <label for="mode-ar-en">عربي ➔ إنجليزي</label>
+                <input type="radio" id="mode-en-ar" name="view-mode"> <label for="mode-en-ar">إنجليزي ➔ عربي</label>
             </div>
         </div>
 
-        <div class="section-title" style="margin-top:25px;">🎯 ثانياً: اختيار نوع المراجعة</div>
-        <div>
-            <input type="radio" id="type-all" name="rev-type" checked onclick="toggleTypeInputs()"> <label for="type-all">1. المراجعة الشاملة</label><br><br>
+        <div class="section-title" style="margin-top:25px;">🎯 ثانياً: اختيار نوع المراجعة <small style="color:#e74a3b;">(الكلمات القديمة مستثناة تلقائياً)</small></div>
+        
+        <div class="rev-type-row">
+            <input type="radio" id="type-all" name="rev-type" checked onclick="toggleTypeInputs()"> <label for="type-all">1. المراجعة الشاملة</label>
+        </div>
+        
+        <div class="rev-type-row">
             <input type="radio" id="type-part" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-part">2. المراجعة الجزئية التتابعية</label>
             <span id="part-inputs" class="hidden" style="margin-right:20px;">
                 <label>عدد الصفحات المطلوبة:</label> <input type="number" id="part-pages" min="1" value="1" style="width:70px;">
                 <span id="remaining-pages-info" style="margin-right: 15px; color: #5a5c69; font-weight:normal;"></span>
                 <button class="btn-action" style="padding: 5px 10px; font-size:14px; background: #e74a3b;" onclick="resetPartialIndex()">إعادة البدء 🔄</button>
-            </span><br><br>
-            
-            <input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-random">3. المراجعة الجزئية العشوائية</label>
+            </span>
+        </div>
+        
+        <div class="rev-type-row">
+            <input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-random">3. المراجعة الجزئية العشوائية المتقدمة</label>
             <div id="random-inputs" class="hidden" style="margin-right:40px; margin-top:10px;">
                 <label>من صفحة:</label> <input type="number" id="rand-start" min="1" value="1" style="width:60px;">
                 <label>إلى صفحة:</label> <input type="number" id="rand-end" min="1" value="2" style="width:60px;">
                 <label>بعدد كلمات عشوائية:</label> <input type="number" id="rand-count" min="1" value="10" style="width:60px;">
+            </div>
+        </div>
+
+        <div class="rev-type-row">
+            <input type="radio" id="type-last-pages" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-last-pages">4. مراجعة آخر عدد صفحات حفظها الطالب</label>
+            <span id="last-pages-inputs" class="hidden" style="margin-right:20px;">
+                <label>عدد الصفحات الأخيرة:</label> <input type="number" id="last-pages-count" min="1" value="1" style="width:70px;">
+            </span>
+        </div>
+
+        <div class="rev-type-row">
+            <input type="radio" id="type-last-days" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-last-days">5. مراجعة ما تم حفظه في آخر عدد أيام</label>
+            <span id="last-days-inputs" class="hidden" style="margin-right:20px;">
+                <label>عدد الأيام الأخيرة:</label> <input type="number" id="last-days-count" min="1" value="3" style="width:70px;">
+            </span>
+        </div>
+
+        <div class="rev-type-row">
+            <input type="radio" id="type-date-range" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-date-range">6. مراجعة ما تم حفظه في فترة زمنية محددة</label>
+            <div id="date-range-inputs" class="hidden" style="margin-right:40px; margin-top:10px;">
+                <label>من تاريخ:</label> <input type="date" id="rev-from-date">
+                <label>إلى تاريخ:</label> <input type="date" id="rev-to-date">
             </div>
         </div>
         
@@ -162,7 +196,6 @@
             }
         }
         toggleTypeInputs();
-        document.getElementById('review-level-select').addEventListener('change', updateSeqInfo);
         updateSeqInfo();
     };
 
@@ -190,8 +223,15 @@
     function toggleTypeInputs() {
         document.getElementById('part-inputs').classList.add('hidden');
         document.getElementById('random-inputs').classList.add('hidden');
+        document.getElementById('last-pages-inputs').classList.add('hidden');
+        document.getElementById('last-days-inputs').classList.add('hidden');
+        document.getElementById('date-range-inputs').classList.add('hidden');
+        
         if(document.getElementById('type-part').checked) document.getElementById('part-inputs').classList.remove('hidden');
         if(document.getElementById('type-random').checked) document.getElementById('random-inputs').classList.remove('hidden');
+        if(document.getElementById('type-last-pages').checked) document.getElementById('last-pages-inputs').classList.remove('hidden');
+        if(document.getElementById('type-last-days').checked) document.getElementById('last-days-inputs').classList.remove('hidden');
+        if(document.getElementById('type-date-range').checked) document.getElementById('date-range-inputs').classList.remove('hidden');
     }
 
     function startReviewSession() {
@@ -200,10 +240,14 @@
         
         currentSysMode = document.getElementById('sys-test').checked ? 'test' : 'free';
         let lData = appProgress.levels[selectedLevel];
-        
-        let savedIds = lData.savedWords.map(w => w.id);
         let fullDb = allLevelsData[selectedLevel] || [];
-        let savedDbWords = fullDb.filter(w => savedIds.includes(w.id));
+        
+        // جلب الكلمات المحفوظة مع استثناء الكلمات "القديمة" لكافة أنواع المراجعة (شرط d)
+        let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.date !== "تم حفظها قديماً");
+        let validIds = validSavedWords.map(w => w.id);
+        let savedDbWords = fullDb.filter(w => validIds.includes(w.id));
+
+        if(savedDbWords.length === 0) { alert("⚠️ لا توجد كلمات جديدة محفوظة في هذا المستوى (جميع الكلمات قديمة ومستثناة أو لم يتم الحفظ بعد)."); return; }
 
         testWordsChunks = [];
         currentChunkIdx = 0;
@@ -240,6 +284,39 @@
             pool.sort(() => 0.5 - Math.random());
             let sliced = pool.slice(0, rW);
             for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
+        }
+        else if(document.getElementById('type-last-pages').checked) {
+            currentReviewType = 4;
+            let reqPages = parseInt(document.getElementById('last-pages-count').value) || 1;
+            let totalSavedPages = Math.ceil(savedDbWords.length / 10);
+            if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من المحفوظة!"); return; }
+            
+            let startIdx = Math.max(0, savedDbWords.length - (reqPages * 10));
+            let sliced = savedDbWords.slice(startIdx);
+            for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
+        }
+        else if(document.getElementById('type-last-days').checked) {
+            currentReviewType = 5;
+            let days = parseInt(document.getElementById('last-days-count').value) || 1;
+            let cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+            let timeFiltered = validSavedWords.filter(w => w.unixTime && w.unixTime >= cutoff).map(w => w.id);
+            let targetWords = fullDb.filter(w => timeFiltered.includes(w.id));
+            
+            if(targetWords.length === 0) { alert("⚠️ لم يتم حفظ أي كلمات جديدة في آخر " + days + " أيام."); return; }
+            for(let i=0; i<targetWords.length; i+=10) { testWordsChunks.push(targetWords.slice(i, i+10)); }
+        }
+        else if(document.getElementById('type-date-range').checked) {
+            currentReviewType = 6;
+            let dF = new Date(document.getElementById('rev-from-date').value).getTime();
+            let dT = new Date(document.getElementById('rev-to-date').value);
+            if(isNaN(dF) || isNaN(dT.getTime())) { alert("⚠️ يرجى تحديد فترة زمنية صحيحة!"); return; }
+            dT.setHours(23,59,59,999);
+            
+            let timeFiltered = validSavedWords.filter(w => w.unixTime && w.unixTime >= dF && w.unixTime <= dT.getTime()).map(w => w.id);
+            let targetWords = fullDb.filter(w => timeFiltered.includes(w.id));
+            
+            if(targetWords.length === 0) { alert("⚠️ لا توجد كلمات جديدة محفوظة في هذه الفترة الزمنية المحددة."); return; }
+            for(let i=0; i<targetWords.length; i+=10) { testWordsChunks.push(targetWords.slice(i, i+10)); }
         }
 
         document.getElementById('setup-area').classList.add('hidden');
@@ -301,7 +378,8 @@
 
             tr.innerHTML = `
                 <td>
-                    <button style="background:#f6c23e; border:none; padding:6px; margin:2px; border-radius:5px; cursor:pointer;" onclick="playReviewAudio('${listenWordTarget}', '${listenWordLang}')">🔊 كلمة</button><br>
+                    <button style="background:#f6c23e; border:none; padding:6px; margin:2px; border-radius:5px; cursor:pointer;" onclick="playReviewAudio('${listenWordTarget}', '${listenWordLang}')">🔊 كلمة</button>
+                    <button class="btn-youglish" onclick="openYouGlish('${w.en}')">📺 YG</button><br>
                     <button style="background:#f6c23e; border:none; padding:6px; margin:2px; border-radius:5px; cursor:pointer;" onclick="playReviewAudio('${listenExTarget}', '${listenExLang}')">🔊 مثال</button>
                 </td>
                 <td style="text-align:right; font-weight:bold;">
@@ -520,7 +598,7 @@
             let startW = (lData[idxKey] || 0);
             let nextIndex = startW + (reqPages * 10);
             
-            let savedIds = lData.savedWords.map(w => w.id);
+            let savedIds = lData.savedWords.filter(w => !w.isOld).map(w => w.id);
             let fullDb = allLevelsData[selectedLevel] || [];
             let savedDbWords = fullDb.filter(w => savedIds.includes(w.id));
 
@@ -562,7 +640,7 @@
 
     function returnToMenu() {
         if (currentSysMode === 'test') {
-            if(confirm("تنبيه: إذا عدت الآن، الصفحات التي لم تنهها أو المحاولات غير المكتملة لن تُحتسب ولن يتم تغيير العداد التتابعي ولن تدخل في علامتك التراكمية. هل تريد العودة؟")) {
+            if(confirm("تنبيه: إذا عدت الآن، المحاولات غير المكتملة لن تُحتسب ولن يتم تغيير العداد التتابعي ولن تدخل في علامتك التراكمية. هل تريد العودة؟")) {
                 window.location.href = "index.html?screen=dashboard";
             }
         } else {

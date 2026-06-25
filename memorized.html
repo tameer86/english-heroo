@@ -6,11 +6,19 @@
     <style>
         body { font-family: sans-serif; background: #eef2f7; padding: 20px; text-align: center; }
         .header-box { background: #1cc88a; color: white; padding: 20px; border-radius: 10px; max-width: 900px; margin: 0 auto 20px auto; font-size: 18px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .summary-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; max-width: 900px; margin: 10px auto; font-size: 15px; font-weight: bold; color: #4e73df; }
+        .filter-box { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #ccc; max-width: 900px; margin: 10px auto; font-weight: bold; color: #333; text-align: right; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .summary-box { background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; max-width: 900px; margin: 10px auto; font-size: 15px; font-weight: bold; color: #2e7d32; }
         table { width: 100%; max-width: 900px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
         thead { background: #4e73df; color: white; }
-        button { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 10px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        select, input[type="number"], input[type="date"] { padding: 6px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; }
+        button { cursor: pointer; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; font-weight: bold; margin: 5px; }
+        .btn-action { background: #4e73df; color: white; }
+        .btn-danger { background: #e74a3b; color: white; }
+        .btn-back { background: #5a5c69; color: white; margin-top: 20px; }
+        .hidden { display: none !important; }
+        .badge-old { background:#f6c23e; color:#fff; padding:3px 6px; border-radius:4px; font-size:11px; }
+        .badge-new { background:#1cc88a; color:#fff; padding:3px 6px; border-radius:4px; font-size:11px; }
     </style>
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -32,12 +40,46 @@
 <body>
 
 <div class="header-box">
-    📊 سجل أرشيف جرد الكلمات التعليمية المحفوظة للأبطال
+    📊 سجل أرشيف الكلمات المحفوظة وإدارة الفلاتر الذكية
 </div>
 
-<div style="margin: 15px 0;">
-    <label style="font-weight:bold; font-size:16px;">🔍 عرض الكلمات التي تم حفظها في: </label>
-    <select id="filter-level" onchange="loadSavedWordsArchive()" style="padding:8px; border-radius:6px; font-weight:bold;"></select>
+<div class="filter-box">
+    <div style="margin-bottom: 15px;">
+        <label>المستوى:</label>
+        <select id="filter-level" onchange="applyFilters()">
+            <option value="ALL">جميع المستويات معاً</option>
+        </select>
+    </div>
+    
+    <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+        <label style="margin-left:20px;"><input type="checkbox" id="chk-new" checked> الكلمات الحديثة (المتعلمة في الحفظ)</label>
+        <label><input type="checkbox" id="chk-old" checked> الكلمات القديمة (المستثناة)</label>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label>نوع الفلترة الزمنية:</label>
+        <select id="filter-type" onchange="toggleDateInputs()">
+            <option value="all">عرض الجميع</option>
+            <option value="days">آخر عدد أيام محدد</option>
+            <option value="range">فترة زمنية محددة</option>
+        </select>
+        
+        <span id="mem-days-inputs" class="hidden" style="margin-right:20px;">
+            <input type="number" id="filter-days" min="1" value="3" style="width:70px;"> يوم/أيام
+        </span>
+        
+        <span id="mem-range-inputs" class="hidden" style="margin-right:20px;">
+            من: <input type="date" id="filter-from"> 
+            إلى: <input type="date" id="filter-to">
+        </span>
+        
+        <button class="btn-action" style="margin-right:20px;" onclick="applyFilters()">🔍 تطبيق الفلتر</button>
+    </div>
+
+    <div style="margin-top:20px; border-top: 1px solid #ccc; padding-top:20px; text-align:center;">
+        <button class="btn-danger" onclick="removeAllLevelWords()">🗑️ إزالة جميع كلمات المستوى المحدد بالكامل</button>
+        <button class="btn-danger" style="background:#d32f2f;" onclick="removeFilteredWords()">🗑️ إزالة الكلمات المعروضة حالياً بالفلتر</button>
+    </div>
 </div>
 
 <div class="summary-box" id="level-summary-info">جار احتساب ملخص البيانات الإحصائية للمستوى...</div>
@@ -46,30 +88,21 @@
     <thead>
         <tr>
             <th width="10%">الرقم</th>
-            <th width="30%">الكلمة الإنجليزية</th>
-            <th width="30%">المعنى بالعربية</th>
-            <th width="30%">تاريخ وجلسة الحفظ</th>
+            <th width="25%">الكلمة الإنجليزية</th>
+            <th width="25%">المعنى بالعربية</th>
+            <th width="25%">تاريخ الإضافة</th>
+            <th width="15%">الحالة</th>
         </tr>
     </thead>
     <tbody id="saved-body"></tbody>
 </table>
 
-<button onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+<button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
 
 <script>
-    const allLevelsData = {
-        "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
-        "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
-        "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C2": typeof levelC2_Words !== 'undefined' ? levelC2_Words : [],
-        "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
-        "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
-        "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
-        "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
-        "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
-        "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
-    };
-
+    const availableKeys = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
     let appProgress = JSON.parse(localStorage.getItem('appProgress'));
+    let currentDisplayedWords = [];
 
     window.onload = function() {
         let sel = document.getElementById('filter-level');
@@ -78,40 +111,114 @@
                 let opt = document.createElement('option'); opt.value = l; opt.text = getLevelName(l); sel.appendChild(opt);
             }
         }
+        toggleDateInputs();
+        applyFilters();
+    };
+
+    function toggleDateInputs() {
+        let v = document.getElementById('filter-type').value;
+        document.getElementById('mem-days-inputs').classList.add('hidden');
+        document.getElementById('mem-range-inputs').classList.add('hidden');
+        if(v === 'days') document.getElementById('mem-days-inputs').classList.remove('hidden');
+        if(v === 'range') document.getElementById('mem-range-inputs').classList.remove('hidden');
+    }
+
+    function applyFilters() {
+        let selectedLvl = document.getElementById('filter-level').value;
+        let filterType = document.getElementById('filter-type').value;
+        let showNew = document.getElementById('chk-new').checked;
+        let showOld = document.getElementById('chk-old').checked;
         
-        if (sel.options.length === 0) {
-            document.getElementById('saved-body').innerHTML = "<tr><td colspan='4' style='padding:20px; color:#5a5c69; font-style:italic;'>لم تقم بحفظ أي كلمات حتى الآن.</td></tr>";
-            document.getElementById('level-summary-info').innerText = "لا يوجد بيانات.";
+        let wordsPool = [];
+        let levelsToSearch = selectedLvl === "ALL" ? Object.keys(appProgress.levels) : [selectedLvl];
+        
+        levelsToSearch.forEach(lvl => {
+            let saved = appProgress.levels[lvl].savedWords || [];
+            saved.forEach(w => { w.levelCode = lvl; wordsPool.push(w); });
+        });
+        
+        let filtered = wordsPool.filter(w => {
+            let isOld = w.isOld === true;
+            if(isOld && !showOld) return false;
+            if(!isOld && !showNew) return false;
+            
+            if(filterType === 'days') {
+                let d = parseInt(document.getElementById('filter-days').value) || 0;
+                if(d > 0 && w.unixTime) {
+                    let cutoff = Date.now() - (d * 24 * 60 * 60 * 1000);
+                    if(w.unixTime < cutoff) return false;
+                }
+            } else if(filterType === 'range') {
+                let fDate = new Date(document.getElementById('filter-from').value).getTime();
+                let tDate = new Date(document.getElementById('filter-to').value);
+                if(!isNaN(fDate) && !isNaN(tDate.getTime()) && w.unixTime) {
+                    tDate.setHours(23,59,59,999);
+                    if(w.unixTime < fDate || w.unixTime > tDate.getTime()) return false;
+                }
+            }
+            return true;
+        });
+        
+        currentDisplayedWords = filtered;
+        
+        document.getElementById('level-summary-info').innerText = 
+            `📊 إجمالي الكلمات المعروضة بناءً على الفلتر الحالي: ${filtered.length} كلمة.`;
+            
+        const tbody = document.getElementById('saved-body');
+        tbody.innerHTML = "";
+        
+        if(filtered.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='5' style='padding:20px; color:#5a5c69; font-style:italic;'>لا توجد كلمات مطابقة للفلتر المحدد.</td></tr>";
             return;
         }
 
-        loadSavedWordsArchive();
-    };
-
-    function loadSavedWordsArchive() {
-        let selected = document.getElementById('filter-level').value;
-        const tbody = document.getElementById('saved-body');
-        tbody.innerHTML = "";
-
-        let lData = appProgress.levels[selected] || { savedWords: [] };
-        let dbTotal = allLevelsData[selected] ? allLevelsData[selected].length : 0;
-        let savedCount = lData.savedWords ? lData.savedWords.length : 0;
-        let remaining = dbTotal - savedCount;
-        if(remaining < 0) remaining = 0;
-
-        document.getElementById('level-summary-info').innerText = 
-            `📊 ملخص النوع [ ${getLevelName(selected)} ]: إجمالي الكلمات الكلية بالمستوى: ${dbTotal} كلمة | المحفوظ منها: ${savedCount} | المتبقي للإنهاء: ${remaining} كلمة.`;
-
-        lData.savedWords.forEach((word, index) => {
+        filtered.forEach((word, index) => {
+            let badge = word.isOld ? `<span class="badge-old">قديمة (مستثناة)</span>` : `<span class="badge-new">حديثة</span>`;
             let row = document.createElement('tr');
             row.innerHTML = `
-                <td>${index + 1}</td>
+                <td style="font-weight:bold; font-size:12px;">${index + 1}</td>
                 <td style="font-weight:bold; color:#4e73df; font-size:16px;">${word.en}</td>
                 <td style="font-weight:bold;">${word.ar}</td>
-                <td style="color:#e74a3b; font-weight:bold; font-size:13px;">${word.date}</td>
+                <td style="color:#e74a3b; font-weight:bold; font-size:13px;">${word.date || '---'}</td>
+                <td>${badge}</td>
             `;
             tbody.appendChild(row);
         });
+    }
+
+    function removeAllLevelWords() {
+        let lvl = document.getElementById('filter-level').value;
+        if(lvl === "ALL") { alert("يرجى تحديد مستوى معين من القائمة العلوية لحذفه بالكامل، لتجنب حذف جميع مستويات التطبيق بالخطأ."); return; }
+        
+        if(!confirm(`⚠️ تحذير: هل أنت متأكد تماماً من إزالة كافة الكلمات المحفوظة لـ (${getLevelName(lvl)})؟ سيتم إعادتها للبرنامج التعليمي من جديد.`)) return;
+
+        appProgress.levels[lvl].savedWords = [];
+        appProgress.levels[lvl].mainIndex = 0;
+        appProgress.levels[lvl].activeList = [];
+        appProgress.levels[lvl].pagesCompleted = 0;
+        
+        localStorage.setItem('appProgress', JSON.stringify(appProgress));
+        alert("تم إزالة كلمات المستوى وإرجاعها للبرنامج التعليمي.");
+        applyFilters();
+    }
+
+    function removeFilteredWords() {
+        if(currentDisplayedWords.length === 0) { alert("لا توجد كلمات معروضة لحذفها."); return; }
+        if(!confirm(`⚠️ تحذير: هل أنت متأكد من إزالة (${currentDisplayedWords.length}) كلمة معروضة في الجدول حالياً وإرجاعها لبرنامج الحفظ؟`)) return;
+
+        currentDisplayedWords.forEach(w => {
+            let lData = appProgress.levels[w.levelCode];
+            lData.savedWords = lData.savedWords.filter(sw => sw.id !== w.id);
+            lData.pagesCompleted = Math.ceil(lData.savedWords.length / 10);
+            
+            // إعادة تعيين مؤشرات الاستدعاء ليظهروا في الحفظ من جديد
+            lData.mainIndex = 0;
+            lData.activeList = [];
+        });
+
+        localStorage.setItem('appProgress', JSON.stringify(appProgress));
+        alert("تم إزالة الكلمات المحددة بنجاح.");
+        applyFilters();
     }
 </script>
 </body>
