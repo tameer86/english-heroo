@@ -4,175 +4,230 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة المطابقة والذاكرة</title>
-    <script src="CLASS1.js"></script> 
+    
+    <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
+    <script src="C1.js"></script><script src="C2.js"></script>
+    <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
+    <script src="CLASS4.js"></script><script src="CLASS5.js"></script><script src="CLASS6.js"></script>
+    <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
+    <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f9f9f9; padding: 20px; margin: 0; text-align: center; }
-        h1 { color: #2c3e50; margin-bottom: 10px; }
+        :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #eef2f7; padding: 20px; margin: 0; text-align: center; }
+        h1 { color: var(--primary); margin-bottom: 10px; }
         
         /* واجهة الإحصائيات واختيار المستوى */
         .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
-        .score-text { color: #f39c12; font-size: 20px;}
-        .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid #3498db; cursor: pointer; font-family: inherit; }
+        .score-text { color: var(--warning); font-size: 20px;}
+        .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
         
         /* واجهة المراحل */
         #stages-screen { display: block; }
-        .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; }
-        .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: #3498db; color: white; transition: 0.2s; position: relative; min-width: 120px;}
-        .stage-btn:hover { background: #2980b9; transform: scale(1.05); }
-        .stage-btn.locked { background: #95a5a6; cursor: not-allowed; transform: none; }
-        .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; }
+        .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
+        .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
+        .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
+        .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
+        .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
         
         /* أدوات تصفير النقاط */
         .admin-controls { margin-top: 50px; padding: 20px; background: #fff; border-radius: 10px; border: 1px solid #ddd; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .admin-controls input { padding: 8px; font-size: 16px; margin-left: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: left; direction: ltr;}
-        .admin-controls button { padding: 8px 15px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;}
-        .admin-controls button:hover { background: #c0392b; }
+        .admin-controls button { padding: 8px 15px; background: var(--danger); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;}
+        .admin-controls button:hover { opacity: 0.9; }
 
         /* واجهة اللعب */
         #game-screen { display: none; }
-        .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-        .timer { font-size: 24px; color: #e74c3c; font-weight: bold; }
-        .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 1000px; margin: 0 auto; }
-        .card { background: #fff; border: 3px solid #bdc3c7; border-radius: 10px; padding: 20px 10px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s; user-select: none; display: flex; align-items: center; justify-content: center; min-height: 80px;}
-        .card:hover { border-color: #3498db; }
-        .card.selected { background: #dff9fb; border-color: #22a6b3; transform: scale(1.05); }
-        .card.matched { visibility: hidden; opacity: 0; transition: visibility 0s 0.3s, opacity 0.3s linear;} /* إخفاء ناعم */
+        .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto;}
+        .timer { font-size: 24px; color: var(--danger); font-weight: bold; }
+        .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 1100px; margin: 0 auto; }
+        .card { background: #fff; border: 3px solid #cbd5e1; border-radius: 10px; padding: 20px 10px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; user-select: none; display: flex; align-items: center; justify-content: center; min-height: 80px; color: var(--dark);}
+        .card:hover { border-color: var(--primary); }
+        .card.selected { background: #e3f2fd; border-color: var(--info); transform: scale(1.05); }
+        .card.matched { visibility: hidden; opacity: 0; transition: visibility 0s 0.3s, opacity 0.3s linear;}
 
-        .btn-back { background: #7f8c8d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;}
-        .btn-back:hover { background: #95a5a6; }
+        .btn-back { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
+        .btn-back:hover { opacity: 0.9; }
         
         /* نافذة النتيجة */
         #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
-        .modal-content h2 { margin-top: 0; color: #2c3e50;}
-        .stars-display { font-size: 40px; color: #f1c40f; margin: 15px 0; }
-        .modal-btn { background: #2ecc71; color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
-        .modal-btn:hover { background: #27ae60; }
-        
+        .modal-content h2 { margin-top: 0; color: var(--primary);}
+        .stars-display { font-size: 40px; color: #f1c40f; margin: 15px 0; letter-spacing: 5px;}
+        .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
+        .modal-btn:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
 
     <div class="header-stats">
         <div class="level-selector">
-            <label for="level-select">اختر المستوى: </label>
-            <select id="level-select" onchange="checkLevelAvailability()">
-                <option value="CLASS1">الصف الأول (CLASS 1)</option>
-                <option value="CLASS2">الصف الثاني (CLASS 2)</option>
-                <option value="CLASS3">الصف الثالث (CLASS 3)</option>
-                <option value="CLASS4">الصف الرابع (CLASS 4)</option>
-                <option value="CLASS5">الصف الخامس (CLASS 5)</option>
-            </select>
+            <label for="level-select">اختر المستوى المكتمل للعب: </label>
+            <select id="level-select" onchange="onLevelChange()">
+                </select>
         </div>
-        <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
+        <div class="score-text">النقاط التراكمية المشتركة: <span id="total-score">0</span> 🏆</div>
     </div>
 
     <div id="stages-screen">
         <h1>لعبة الذاكرة والمطابقة 🎴</h1>
-        <p style="color: #7f8c8d; font-size: 18px;">اختر المرحلة لتبدأ التحدي. طابق الكلمة مع معناها بأسرع وقت لجمع النجوم!</p>
-        <div class="stages-grid" id="stages-container">
-            </div>
+        <p style="color: var(--dark); font-size: 18px; font-weight: bold;">اختر المرحلة لتبدأ التحدي. طابق الكلمة مع معناها بأسرع وقت لجمع النجوم والنقاط!</p>
+        <div class="stages-grid" id="stages-container"></div>
 
         <div class="admin-controls">
-            <h3>تصفير النقاط والمراحل (لولي الأمر)</h3>
+            <h3 style="color: var(--dark); margin-top: 0;">تصفير المراحل والنجوم للمستوى المحدد (لولي الأمر)</h3>
             <input type="password" id="reset-password" placeholder="أدخل كلمة المرور">
             <button onclick="resetProgress()">تصفير الآن</button>
         </div>
+        <br>
+        <button class="btn-back" style="margin-top: 30px; padding: 12px 30px;" onclick="window.location.href='game.html'">🔙 العودة لصفحة الألعاب</button>
     </div>
 
     <div id="game-screen">
         <div class="game-controls">
-            <button class="btn-back" onclick="showStagesScreen()">🔙 عودة للمراحل</button>
-            <h2>المرحلة: <span id="current-stage-display">1</span></h2>
-            <div class="timer">الوقت: <span id="timer-display">0</span> ثانية ⏱️</div>
-        </div>
-        <div class="board" id="game-board">
+            <button class="btn-back" onclick="showStagesScreen()">🔙 خروج من المرحلة</button>
+            <h2 style="margin: 0; color: var(--primary);">المرحلة: <span id="current-stage-display">1</span></h2>
+            <div class="timer">
+                الوقت: <span id="timer-display">0</span> ثانية ⏱️
+                <span id="live-stars" style="color: #f1c40f; font-size: 20px; margin-right: 15px; letter-spacing: 2px;">★★★★★</span>
             </div>
+        </div>
+        <div class="board" id="game-board"></div>
     </div>
 
     <div id="result-modal">
         <div class="modal-content">
-            <h2>أحسنت! أنهيت المرحلة 🎉</h2>
+            <h2 id="modal-title">أحسنت! أنهيت المرحلة 🎉</h2>
             <div class="stars-display" id="modal-stars">⭐⭐⭐</div>
-            <p style="font-size: 18px;">وقت الإجابة: <strong id="modal-time"></strong> ثانية</p>
-            <p id="modal-points-msg" style="color: #27ae60; font-weight: bold; font-size: 18px;"></p>
+            <p style="font-size: 18px; color: var(--dark);">وقت الإجابة: <strong id="modal-time" style="color: var(--danger);"></strong> ثانية</p>
+            <p id="modal-points-msg" style="color: var(--success); font-weight: bold; font-size: 18px;"></p>
             <button class="modal-btn" onclick="showStagesScreen()">متابعة</button>
         </div>
     </div>
 
 <script>
-    // --- التحقق من توفر الكلمات من ملف CLASS1.js ---
-    let wordsData = [];
-    if (typeof CLASS1 !== 'undefined') {
-        wordsData = CLASS1;
-    } else if (typeof wordsList !== 'undefined') {
-        wordsData = wordsList;
-    } else {
-        alert("تنبيه: لم يتم العثور على الكلمات. تأكد من أن ملف CLASS1.js موجود ومرفق بشكل صحيح في نفس المجلد.");
+    // --- 1. قاموس البيانات الأساسي (نفسه الموجود في ملفاتك) ---
+    const allLevelsData = {
+        "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
+        "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
+        "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C2": typeof levelC2_Words !== 'undefined' ? levelC2_Words : [],
+        "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
+        "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
+        "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
+        "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
+        "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
+        "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
+    };
+
+    function getLevelName(code) {
+        if(code.startsWith('CLASS')) {
+            let num = code.replace('CLASS', '');
+            let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'};
+            return 'الصف ' + (ordinals[num] || num);
+        }
+        return 'مستوى ' + code;
     }
 
-    const WORDS_PER_STAGE = 10;
-    const totalStages = Math.ceil(wordsData.length / WORDS_PER_STAGE); 
-    
-    // جلب النقاط التراكمية وسجل اللعبة من التخزين المحلي
-    let cumulativeScore = parseInt(localStorage.getItem('cumulativeScore')) || 0;
+    // --- 2. المتغيرات العامة ---
+    let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
     let gameProgress = JSON.parse(localStorage.getItem('matchGameProgress')) || {};
+    let currentLevel = "";
+    let wordsData = [];
+    const WORDS_PER_STAGE = 10;
+    let totalStages = 0;
     
-    // تهيئة سجل مستوى CLASS1 إذا لم يكن موجوداً
-    if(!gameProgress['CLASS1']) {
-        gameProgress['CLASS1'] = { 1: { unlocked: true, stars: 0, time: 0 } };
-    }
-
-    document.getElementById('total-score').innerText = cumulativeScore;
-
     let currentStage = 1;
     let timerInterval;
     let secondsElapsed = 0;
     let selectedCards = [];
     let matchesFound = 0;
 
-    // --- دالة التحقق من القائمة المنسدلة ---
-    function checkLevelAvailability() {
+    // --- 3. التشغيل الأولي وبناء القائمة المنسدلة ---
+    window.onload = function() {
+        document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
+        initializeDropdown();
+    };
+
+    function initializeDropdown() {
         const selectElement = document.getElementById('level-select');
-        if (selectElement.value !== 'CLASS1') {
-            alert("عذراً، هذا المستوى قيد التطوير والبرمجة حالياً. يرجى اللعب في الصف الأول.");
-            selectElement.value = 'CLASS1'; // إعادة الاختيار للصف الأول
+        selectElement.innerHTML = ''; 
+        let hasCompletedLevels = false;
+
+        // البحث داخل مستويات appProgress لتحديد المكتملة فقط
+        for(let lvl in appProgress.levels) {
+            let lData = appProgress.levels[lvl];
+            let db = allLevelsData[lvl] || [];
+            
+            // الشرط: أن يكون المستوى له كلمات، وأن الطالب حفظ جميع كلماته
+            if (db.length > 0 && lData.savedWords && lData.savedWords.length === db.length) {
+                let option = document.createElement('option');
+                option.value = lvl;
+                option.textContent = getLevelName(lvl);
+                selectElement.appendChild(option);
+                hasCompletedLevels = true;
+            }
         }
+
+        if (!hasCompletedLevels) {
+            selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
+            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل (100%) في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
+            selectElement.disabled = true;
+            return;
+        }
+
+        currentLevel = selectElement.value;
+        loadGameData();
     }
 
-    // --- دوال عرض المراحل ---
-    function renderStages() {
-        if (wordsData.length === 0) return; // منع الخطأ إذا لم يتم تحميل الكلمات
+    function onLevelChange() {
+        currentLevel = document.getElementById('level-select').value;
+        loadGameData();
+    }
 
+    // --- 4. تجهيز بيانات اللعبة وعرض المراحل ---
+    function loadGameData() {
+        wordsData = allLevelsData[currentLevel] || [];
+        if(wordsData.length === 0) return;
+
+        totalStages = Math.ceil(wordsData.length / WORDS_PER_STAGE);
+        
+        // تهيئة سجل اللعبة لهذا المستوى إن لم يكن موجوداً
+        if(!gameProgress[currentLevel]) {
+            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
+        }
+        
+        renderStages();
+    }
+
+    function renderStages() {
         const container = document.getElementById('stages-container');
         container.innerHTML = '';
-        let levelData = gameProgress['CLASS1'];
+        let levelData = gameProgress[currentLevel];
 
         for(let i = 1; i <= totalStages; i++) {
             let btn = document.createElement('button');
             btn.className = 'stage-btn';
             
             let isUnlocked = levelData[i] && levelData[i].unlocked;
-            if(i === 1) isUnlocked = true; // المرحلة الأولى دائما مفتوحة
+            if(i === 1) isUnlocked = true; 
 
             if(!isUnlocked) {
                 btn.classList.add('locked');
-                btn.innerHTML = `مرحلة ${i} 🔒`;
+                btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`;
             } else {
                 let starsCount = levelData[i]?.stars || 0;
                 let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';
-                let starsHTML = '⭐'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
+                let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
                 
-                btn.innerHTML = `مرحلة ${i} <br><span class="stage-stars">${starsHTML} ${timeSpent}</span>`;
+                btn.innerHTML = `مرحلة ${i} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
                 btn.onclick = () => startGame(i);
             }
             container.appendChild(btn);
         }
-        document.getElementById('total-score').innerText = cumulativeScore;
+        document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
     }
 
-    // --- منطق تجهيز المرحلة وبدء اللعبة ---
+    // --- 5. بدء المرحلة وبناء البطاقات ---
     function startGame(stageNumber) {
         currentStage = stageNumber;
         document.getElementById('stages-screen').style.display = 'none';
@@ -184,13 +239,11 @@
         let stageWords = wordsData.slice(startIndex, endIndex);
 
         // إكمال المرحلة الأخيرة بكلمات سابقة إذا كان عددها أقل من 10
-        if(stageWords.length < WORDS_PER_STAGE && wordsData.length > WORDS_PER_STAGE) {
+        if(stageWords.length < WORDS_PER_STAGE && wordsData.length >= WORDS_PER_STAGE) {
             let needed = WORDS_PER_STAGE - stageWords.length;
-            // جلب جميع الكلمات التي تم لعبها في المراحل السابقة
             let previousWords = wordsData.slice(0, startIndex);
-            // خلط الكلمات السابقة عشوائياً
+            // خلط الكلمات السابقة عشوائياً لأخذ كلمات مختلفة كل مرة
             previousWords.sort(() => Math.random() - 0.5);
-            // أخذ العدد المطلوب لإكمال المرحلة
             let extraWords = previousWords.slice(0, needed); 
             stageWords = stageWords.concat(extraWords);
         }
@@ -206,16 +259,13 @@
         matchesFound = 0;
 
         let cardsArray = [];
-        stageWords.forEach((item, index) => {
-            // التعامل مع اختلاف مسميات المفاتيح في ملف الـ JSON
-            let englishWord = item.en || item.word || "Error";
-            let arabicMeaning = item.ar || item.meaning || item.translation || "خطأ";
-
-            cardsArray.push({ id: index, text: englishWord, type: 'en', lang: 'ltr' });
-            cardsArray.push({ id: index, text: arabicMeaning, type: 'ar', lang: 'rtl' });
+        stageWords.forEach((item) => {
+            // إضافة الكلمة بالانجليزي والعربي من هيكلية البيانات الخاصة بك
+            cardsArray.push({ id: item.id, text: item.en, type: 'en', lang: 'ltr' });
+            cardsArray.push({ id: item.id, text: item.ar, type: 'ar', lang: 'rtl' });
         });
 
-        // خلط البطاقات عشوائياً في الصفحة
+        // خلط جميع البطاقات (20 بطاقة) عشوائياً
         cardsArray.sort(() => Math.random() - 0.5);
 
         cardsArray.forEach(item => {
@@ -224,14 +274,14 @@
             cardDiv.innerText = item.text;
             cardDiv.dataset.id = item.id;
             cardDiv.dataset.type = item.type;
-            cardDiv.dir = item.lang; // ضبط اتجاه النص (انجليزي يسار-يمين والعكس)
+            cardDiv.dir = item.lang; 
             
             cardDiv.onclick = () => onCardClick(cardDiv);
             board.appendChild(cardDiv);
         });
     }
 
-    // --- منطق النقر والمطابقة ---
+    // --- 6. منطق النقر والمطابقة ---
     function onCardClick(card) {
         if(selectedCards.length >= 2 || card.classList.contains('selected') || card.classList.contains('matched')) return;
 
@@ -247,9 +297,8 @@
         let card1 = selectedCards[0];
         let card2 = selectedCards[1];
 
-        // المطابقة تتم إذا كان لهما نفس الـ ID ومختلفين في النوع (عربي/انجليزي)
+        // المطابقة: نفس الـ id ومختلفين في النوع (عربي/انجليزي)
         if(card1.dataset.id === card2.dataset.id && card1.dataset.type !== card2.dataset.type) {
-            // مطابقة صحيحة
             setTimeout(() => {
                 card1.classList.remove('selected');
                 card1.classList.add('matched');
@@ -262,7 +311,6 @@
                 }
             }, 400);
         } else {
-            // مطابقة خاطئة
             setTimeout(() => {
                 card1.classList.remove('selected');
                 card2.classList.remove('selected');
@@ -271,14 +319,28 @@
         }
     }
 
-    // --- منطق الوقت والنجوم والنقاط ---
+    // --- 7. منطق الوقت، النجوم والنقاط التراكمية المشتركة ---
+    function updateLiveStars(time) {
+        let currentStars = 0;
+        if(time <= 60) currentStars = 5;
+        else if(time <= 70) currentStars = 4;
+        else if(time <= 100) currentStars = 3;
+        else if(time <= 140) currentStars = 2;
+        else if(time <= 180) currentStars = 1;
+        else currentStars = 0;
+        
+        document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars);
+    }
+
     function startTimer() {
         secondsElapsed = 0;
         document.getElementById('timer-display').innerText = secondsElapsed;
+        document.getElementById('live-stars').innerText = '★★★★★'; // إضاءة الخمس نجوم مع بداية التحدي
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             secondsElapsed++;
             document.getElementById('timer-display').innerText = secondsElapsed;
+            updateLiveStars(secondsElapsed); // تحديث النجوم بشكل حي
         }, 1000);
     }
 
@@ -287,23 +349,24 @@
         let time = secondsElapsed;
         let stars = 0;
 
-        // احتساب النجوم بناءً على شروطك
-        if(time <= 10) stars = 5;
-        else if(time <= 20) stars = 4;
-        else if(time <= 30) stars = 3;
-        else if(time <= 50) stars = 2;
-        else if(time <= 60) stars = 1;
+        // احتساب النجوم وفقاً للجدول الزمني الجديد
+        if(time <= 60) stars = 5;
+        else if(time <= 70) stars = 4;
+        else if(time <= 100) stars = 3;
+        else if(time <= 140) stars = 2;
+        else if(time <= 180) stars = 1;
         else stars = 0;
 
-        let levelData = gameProgress['CLASS1'];
+        let levelData = gameProgress[currentLevel];
         let previousStars = levelData[currentStage]?.stars || 0;
         let pointsGained = 0;
 
-        // إعطاء النقاط فقط لفارق النجوم الجديد
+        // إعطاء النقاط فقط لفارق النجوم الجديد وحفظها في التخزين التراكمي للتطبيق
         if(stars > previousStars) {
             pointsGained = (stars - previousStars) * 5;
-            cumulativeScore += pointsGained;
-            localStorage.setItem('cumulativeScore', cumulativeScore);
+            appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
+            localStorage.setItem('appProgress', JSON.stringify(appProgress)); // حفظ النقاط للتطبيق الأم
+            document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
             
             levelData[currentStage] = {
                 unlocked: true,
@@ -319,22 +382,22 @@
             levelData[currentStage + 1] = levelData[currentStage + 1] || { unlocked: true, stars: 0 };
         }
 
-        gameProgress['CLASS1'] = levelData;
+        gameProgress[currentLevel] = levelData;
         localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
 
         showResultModal(stars, time, pointsGained);
     }
 
-    // --- النوافذ والانتقالات ---
+    // --- 8. النوافذ والانتقالات ---
     function showResultModal(stars, time, points) {
-        document.getElementById('modal-stars').innerText = '⭐'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
+        document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
         document.getElementById('modal-time').innerText = time;
         
         let msgElement = document.getElementById('modal-points-msg');
         if(points > 0) {
-            msgElement.innerText = `رائع! حصلت على ${points} نقطة إضافية للمجموع التراكمي! 🏆`;
+            msgElement.innerText = `رائع! كسبت ${points} نقطة إضافية للعلامة التراكمية! 🏆`;
         } else {
-            msgElement.innerText = `لم تحصل على نقاط جديدة. حاول مرة أخرى بوقت أسرع لرفع نجومك! 💪`;
+            msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع لرفع نجومك! 💪`;
         }
         
         document.getElementById('result-modal').style.display = 'flex';
@@ -348,25 +411,21 @@
         renderStages();
     }
 
-    // --- زر التصفير لولي الأمر ---
+    // --- 9. زر التصفير لولي الأمر ---
     function resetProgress() {
         let passInput = document.getElementById('reset-password').value;
         if(passInput === 'T@mer2023') { 
-            // تصفير مراحل اللعبة فقط دون المساس بالنقاط التراكمية
-            gameProgress['CLASS1'] = { 1: { unlocked: true, stars: 0, time: 0 } };
+            if(!currentLevel) return;
+            // تصفير مراحل اللعبة للمستوى المختار فقط
+            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
             localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
             document.getElementById('reset-password').value = '';
-            alert('تم تصفير جميع المراحل والنجوم لهذا المستوى بنجاح وإغلاقها ما عدا المرحلة الأولى.');
+            alert(`تم تصفير جميع المراحل والنجوم لمستوى (${getLevelName(currentLevel)}) بنجاح وإغلاقها ما عدا المرحلة الأولى.`);
             renderStages();
         } else {
             alert('كلمة المرور غير صحيحة!');
         }
     }
-
-    // التشغيل الأولي عند تحميل الصفحة
-    window.onload = () => {
-        renderStages();
-    };
 </script>
 
 </body>
