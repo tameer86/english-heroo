@@ -2,19 +2,49 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صفحة الألعاب التعليمية</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #eef2f7; text-align: center; padding: 50px; }
-        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        h1 { color: #f6c23e; }
-        button { background: #5a5c69; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; margin-top: 20px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 { color: #2c3e50; }
+        .games-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .game-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .game-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-5px);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎮 منطقة الألعاب</h1>
-        <p>هذه الصفحة تحت الإنشاء، انتظرنا قريباً مع ألعاب ممتعة لتعلم الإنجليزية!</p>
-        <button onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+
+    <h1>🎮 مرحباً بك في قسم الألعاب 🎮</h1>
+    <p>اختر اللعبة التي تريد أن تلعبها لتبدأ التحدي وتجمع النقاط!</p>
+
+    <div class="games-container">
+        <a href="matchg.html" class="game-btn">لعبة المطابقة والذاكرة 🎴</a>
     </div>
+
 </body>
 </html>
