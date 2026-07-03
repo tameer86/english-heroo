@@ -106,7 +106,7 @@
     </div>
 
 <script>
-    // --- 1. قاموس البيانات الأساسي (نفسه الموجود في ملفاتك) ---
+    // --- 1. قاموس البيانات الأساسي ---
     const allLevelsData = {
         "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
         "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
@@ -158,8 +158,14 @@
             let lData = appProgress.levels[lvl];
             let db = allLevelsData[lvl] || [];
             
-            // الشرط: أن يكون المستوى له كلمات، وأن الطالب حفظ جميع كلماته
-            if (db.length > 0 && lData.savedWords && lData.savedWords.length === db.length) {
+            // تم تغيير الشرط هنا لحل مشكلة الـ ID المكرر في B1 وأي ملف آخر
+            // نعتمد على مؤشر الوصول (mainIndex) وفراغ صفحة الحفظ (activeList)
+            let isLevelFinished = (db.length > 0) && 
+                                  (lData.mainIndex >= db.length) && 
+                                  (!lData.activeList || lData.activeList.length === 0) && 
+                                  (lData.savedWords && lData.savedWords.length > 0);
+
+            if (isLevelFinished) {
                 let option = document.createElement('option');
                 option.value = lvl;
                 option.textContent = getLevelName(lvl);
@@ -170,7 +176,7 @@
 
         if (!hasCompletedLevels) {
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
-            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل (100%) في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
+            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
             selectElement.disabled = true;
             return;
         }
