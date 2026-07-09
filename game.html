@@ -13,6 +13,7 @@
             --warning: #f1c40f;
             --dark: #5a5c69;
             --light: #f8f9fc;
+            --gold: #ffd700;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,181 +21,104 @@
             text-align: center;
             padding: 40px 20px;
             margin: 0;
+            overflow-x: hidden;
         }
         h1 { color: #2c3e50; margin-bottom: 5px; }
-        .subtitle { color: var(--dark); font-size: 16px; margin-bottom: 30px; }
+        .subtitle { color: var(--dark); font-size: 16px; margin-bottom: 30px; font-weight: bold;}
         
-        .games-container {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .game-btn {
-            color: white;
-            border: none;
-            padding: 20px 40px;
-            font-size: 24px;
-            border-radius: 15px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            transition: transform 0.2s, background-color 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: bold;
-        }
-        .game-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
+        .games-container { display: flex; justify-content: center; gap: 25px; margin-top: 20px; flex-wrap: wrap; }
+        .game-btn { color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block; font-weight: bold; }
+        .game-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-        /* أزرار الإعدادات والبنك العلوية */
-        .top-icons {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            gap: 15px;
-        }
-        .btn-top-action {
-            background: none;
-            border: none;
-            font-size: 32px;
-            cursor: pointer;
-            transition: transform 0.3s;
-            user-select: none;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-        }
-        .btn-top-action:hover {
-            transform: scale(1.2);
-        }
+        /* أزرار الإعدادات والبنك ولوحة الشرف العلوية */
+        .top-icons { position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 50; }
+        .btn-top-action { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .btn-top-action:hover { transform: scale(1.2); }
 
-        /* لوحة الإعدادات المخفية */
-        .admin-panel {
-            display: none;
-            max-width: 500px;
-            margin: 25px auto 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 1px solid #ddd;
-            text-align: right;
-        }
-        .admin-panel h3 { margin-top: 0; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 8px; text-align: center; }
-        .admin-row { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
-        .admin-row label { font-weight: bold; color: var(--dark); }
+        /* النوافذ المنبثقة (Modals) الأساسية */
+        .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content-box { background: #f8f9fc; width: 95%; max-width: 450px; padding: 25px; border-radius: 15px; text-align: center; position: relative; max-height: 95vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
+        .btn-close-modal { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 10;}
+        .btn-close-modal:hover { opacity: 0.8; }
+
+        /* تنسيقات الإعدادات */
+        .admin-row { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; text-align: right;}
         .admin-row input { padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; font-weight: bold; }
-        
-        .admin-checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; background: var(--light); padding: 12px; border-radius: 6px; }
-        .admin-checkbox-group label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; }
-        .admin-checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .admin-checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; background: var(--light); padding: 12px; border-radius: 6px; text-align: right; border: 1px solid #ddd;}
+        .btn-admin-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; color: white; cursor: pointer; background-color: var(--danger); margin-top: 10px; }
 
-        .btn-admin-action {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            background-color: var(--danger);
-            margin-top: 10px;
-            transition: opacity 0.2s;
-        }
-        .btn-admin-action:hover { opacity: 0.9; }
-
-        .btn-back {
-            background-color: var(--dark);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 40px;
-            text-decoration: none;
-            display: inline-block;
-            transition: opacity 0.2s;
-        }
-        .btn-back:hover { opacity: 0.9; }
-
-        /* تنسيق الصورة المتجاوبة والنسبية */
-        .game-image {
-            margin-top: 35px;
-            width: clamp(240px, 42vw, 480px);
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        /* ------------------ نظام البنك وعجلة الحظ ------------------ */
-        .bank-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000;
-        }
-        .bank-content {
-            background: #f8f9fc; width: 95%; max-width: 450px; padding: 25px;
-            border-radius: 15px; text-align: center; position: relative; max-height: 95vh; overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .btn-close-bank {
-            position: absolute; top: 10px; right: 10px; background: var(--danger);
-            color: white; border: none; width: 35px; height: 35px; border-radius: 50%;
-            font-weight: bold; font-size: 18px; cursor: pointer;
-        }
-        .btn-close-bank:hover { opacity: 0.8; }
-        
-        .bank-stats {
-            background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px;
-            font-weight: bold; color: var(--dark); border: 2px solid var(--primary); text-align: right;
-        }
+        /* تنسيقات البنك */
+        .bank-stats { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; font-weight: bold; color: var(--dark); border: 2px solid var(--primary); text-align: right; }
         .bank-stats span { color: var(--danger); font-size: 18px; font-weight: 900;}
-
-        /* تنسيقات العجلة */
         .wheel-box { position: relative; width: 250px; height: 250px; margin: 20px auto; }
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 35px; color: var(--danger); z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .wheel { 
-            width: 100%; height: 100%; border-radius: 50%; 
-            background: conic-gradient(#f1c40f 0deg 72deg, #e67e22 72deg 144deg, #e74a3b 144deg 216deg, #9b59b6 216deg 288deg, #3498db 288deg 360deg); 
-            border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
-            position: relative; overflow: hidden;
-        }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#f1c40f 0deg 72deg, #e67e22 72deg 144deg, #e74a3b 144deg 216deg, #9b59b6 216deg 288deg, #3498db 288deg 360deg); border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
         .wheel-text { position: absolute; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; }
-        .wheel-text span { 
-            position: absolute; top: 15px; left: 50%; transform-origin: 50% 110px; 
-            font-weight: bold; font-size: 18px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); 
-        }
-
-        .btn-spin { 
-            background-color: var(--success); color: white; border: none; padding: 12px 35px; 
-            font-size: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px;
-        }
-        .btn-spin:hover { opacity: 0.9; transform: scale(1.05); }
+        .wheel-text span { position: absolute; top: 15px; left: 50%; transform-origin: 50% 110px; font-weight: bold; font-size: 18px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); }
+        .btn-spin { background-color: var(--success); color: white; border: none; padding: 12px 35px; font-size: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
         .btn-spin.stop-mode { background-color: var(--danger); }
-        .btn-spin:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        .withdraw-box {
-            margin-top: 15px; padding: 15px; background: white; border-radius: 10px;
-            border: 2px solid var(--success); text-align: right;
-        }
-        .withdraw-box h4 { margin-top: 0; color: var(--success); border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 15px;}
+        .withdraw-box { margin-top: 15px; padding: 15px; background: white; border-radius: 10px; border: 2px solid var(--success); text-align: right; }
         .withdraw-box input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-weight: bold;}
-        .btn-withdraw { width: 100%; background: var(--success); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px;}
-        .btn-withdraw:hover { opacity: 0.9; }
+        .btn-withdraw { width: 100%; background: var(--success); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer;}
+
+        /* ------------------ لوحة الشرف والأوسمة ------------------ */
+        #fame-content { max-width: 800px; width: 95%; background: #2c3e50; color: white; }
+        .fame-header { color: var(--gold); font-size: 28px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); margin-bottom: 5px; margin-top: 0;}
+        .fame-score-badge { display: inline-block; background: var(--gold); color: #000; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 18px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
+        
+        .stage-card { background: #34495e; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 2px solid #455a64; text-align: right; position: relative; overflow: hidden;}
+        .stage-title { font-size: 22px; color: var(--gold); margin: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
+        .stage-points-req { font-size: 14px; color: #bdc3c7; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 10px; }
+        
+        /* تنسيق الوصف الفكاهي الجديد للمراحل */
+        .stage-desc {
+            font-size: 14px;
+            color: #ecf0f1;
+            margin: 10px 0 15px 0;
+            line-height: 1.6;
+            font-style: italic;
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border-right: 3px solid var(--gold);
+        }
+
+        .stage-main-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; background: #fff; float: left; margin-left: 10px;}
+        
+        .progress-bar-container { width: 100%; height: 12px; background: #1a252f; border-radius: 6px; margin: 15px 0; overflow: hidden; position: relative; border: 1px solid #455a64;}
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.5s ease; width: 0%;}
+        
+        .badges-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 15px; clear: both;}
+        .badge-item { width: 90px; text-align: center; position: relative; }
+        .badge-img-wrapper { position: relative; width: 70px; height: 70px; margin: 0 auto; }
+        .badge-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); transition: all 0.3s;}
+        .badge-title { font-size: 11px; font-weight: bold; margin-top: 5px; color: #ecf0f1; line-height: 1.2; }
+        .badge-req { font-size: 10px; color: #95a5a6; }
+
+        /* فلاتر القفل */
+        .locked-badge .badge-img { filter: grayscale(100%) contrast(0.5); opacity: 0.6; }
+        .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: rgba(255,255,255,0.8); z-index: 10; text-shadow: 0 2px 4px #000; }
+        .locked-stage { opacity: 0.7; }
+        .locked-stage .stage-main-img { filter: grayscale(100%); border-color: #7f8c8d; }
+
+        /* نافذة الاحتفال */
+        #celebration-modal { z-index: 2000; background: rgba(0,0,0,0.85); }
+        .celebration-content { background: radial-gradient(circle, #fff 0%, #f1c40f 100%); color: #000; border: 5px solid #fff; border-radius: 20px; padding: 40px 20px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .celebration-img { width: 120px; height: 120px; object-fit: contain; margin: 15px 0; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); animation: float 2s infinite ease-in-out;}
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .btn-back { background-color: var(--dark); color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 40px; text-decoration: none; display: inline-block; transition: opacity 0.2s; }
+        .btn-back:hover { opacity: 0.9; }
+        .game-image { margin-top: 35px; width: clamp(240px, 42vw, 480px); height: auto; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
     <div class="top-icons">
-        <button class="btn-top-action" onclick="toggleAdminPanel()" title="إعدادات الألعاب لولي الأمر">⚙️</button>
-        <button class="btn-top-action" onclick="toggleBankModal()" title="بنك الأبطال وقرص الحظ">💰</button>
+        <button class="btn-top-action" onclick="toggleModal('admin-modal')" title="إعدادات الألعاب لولي الأمر">⚙️</button>
+        <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
+        <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
     </div>
 
     <h1>🎮 مرحباً بك في قسم الألعاب 🎮</h1>
@@ -205,31 +129,34 @@
         <a href="listen.html" id="link-listen" class="game-btn" style="background-color: var(--purple);">لعبة صائد الأمثلة المسموعة 🎧</a>
     </div>
 
-    <div id="admin-panel" class="admin-panel">
-        <h3>⚙️ إعدادات التحكم بالألعاب (لولي الأمر)</h3>
-        
-        <div class="admin-checkbox-group">
-            <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تفعيل أو تعطيل الألعاب للطفل:</strong>
-            <label><input type="checkbox" id="chk-matchg" checked onchange="updateGamesState()"> تفعيل لعبة المطابقة والذاكرة</label>
-            <label><input type="checkbox" id="chk-listen" checked onchange="updateGamesState()"> تفعيل لعبة صائد الأمثلة المسموعة</label>
-        </div>
+    <div id="admin-modal" class="custom-modal">
+        <div class="modal-content-box" style="background: white;">
+            <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
+            <h3 style="color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top:0;">⚙️ إعدادات التحكم بالألعاب</h3>
+            
+            <div class="admin-checkbox-group">
+                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تفعيل أو تعطيل الألعاب للطفل:</strong>
+                <label><input type="checkbox" id="chk-matchg" checked onchange="updateGamesState()"> تفعيل لعبة المطابقة والذاكرة</label>
+                <label><input type="checkbox" id="chk-listen" checked onchange="updateGamesState()"> تفعيل لعبة صائد الأمثلة المسموعة</label>
+            </div>
 
-        <div class="admin-row" style="margin-top: 20px;">
-            <label>تصفير مراحل جميع الألعاب للبدء من جديد:</label>
-            <input type="password" id="admin-password" placeholder="أدخل كلمة المرور للتأكيد">
+            <div class="admin-row" style="margin-top: 20px;">
+                <label>تصفير مراحل جميع الألعاب للبدء من جديد:</label>
+                <input type="password" id="admin-password" placeholder="أدخل كلمة المرور للتأكيد">
+            </div>
+            <button class="btn-admin-action" onclick="resetAllGamesProgress()">🔄 تصفير النجوم والمراحل للكل</button>
         </div>
-        <button class="btn-admin-action" onclick="resetAllGamesProgress()">🔄 تصفير النجوم والمراحل للكل</button>
     </div>
 
-    <div id="bank-modal" class="bank-modal">
-        <div class="bank-content">
-            <button class="btn-close-bank" onclick="toggleBankModal()">✖</button>
-            <h2 style="color: var(--warning); margin-top: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">💰 بنك الأبطال وقرص الحظ 🎡</h2>
+    <div id="bank-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
+            <h2 style="color: var(--warning); margin-top: 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">💰 بنك الأبطال 🎡</h2>
             
             <div class="bank-stats">
-                <div>إجمالي النقاط المكتسبة: <span id="stat-total">0</span> نقطة</div>
-                <div>النقاط المستبدلة باللعب: <span id="stat-exch">0</span> نقطة</div>
-                <div>الرصيد البنكي الحالي: <span id="stat-bank" style="color: var(--success);">0</span> جنيه فلسطيني</div>
+                <div>النقاط التراكمية: <span id="stat-total">0</span></div>
+                <div>النقاط المستبدلة باللعب: <span id="stat-exch">0</span></div>
+                <div>الرصيد البنكي الحالي: <span id="stat-bank" style="color: var(--success);">0</span> جنيه</div>
             </div>
 
             <div class="wheel-box">
@@ -246,40 +173,274 @@
             <button id="btn-spin" class="btn-spin" onclick="handleSpinClick()">ابدأ الدوران 🎡</button>
 
             <div class="withdraw-box">
-                <h4>💳 سحب من البنك (لولي الأمر)</h4>
-                <input type="number" id="withdraw-amount" placeholder="أدخل القيمة المراد سحبها">
-                <input type="password" id="withdraw-password" placeholder="أدخل كلمة المرور للتأكيد">
+                <h4 style="margin-top:0; color:var(--success);">💳 سحب من البنك (لولي الأمر)</h4>
+                <input type="number" id="withdraw-amount" placeholder="القيمة المراد سحبها">
+                <input type="password" id="withdraw-password" placeholder="كلمة المرور">
                 <button class="btn-withdraw" onclick="withdrawBank()">سحب وتأكيد</button>
             </div>
         </div>
     </div>
 
-    <div>
-        <img src="mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image">
+    <div id="fame-modal" class="custom-modal">
+        <div class="modal-content-box" id="fame-content">
+            <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
+            <h2 class="fame-header">🏆 لوحة الشرف والأوسمة 🏆</h2>
+            <div class="fame-score-badge">رصيد نقاطك: <span id="fame-total-points">0</span> ⚡</div>
+            
+            <div id="stages-wrapper">
+                </div>
+        </div>
     </div>
+
+    <div id="celebration-modal" class="custom-modal">
+        <div class="modal-content-box celebration-content">
+            <h1 style="margin-top:0; color:#e74a3b; font-size:30px;">🎉 إنجاز جديد! 🎉</h1>
+            <h2 id="cel-title" style="color:#2c3e50;">مبروك! تم فتح وسام</h2>
+            <img id="cel-img" src="" class="celebration-img" alt="Achievement">
+            <h3 id="cel-name" style="color:#8e44ad; font-size:26px; margin-bottom:5px;">اسم الوسام</h3>
+            <p id="cel-desc" style="font-weight:bold; font-size:16px;"></p>
+            <button class="btn-withdraw" style="background:#e74a3b; margin-top:20px;" onclick="closeCelebration()">رائع! استمرار 🚀</button>
+        </div>
+    </div>
+
+    <div><img src="images/mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image"></div>
 
     <br>
     <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
 
 <script>
     const ADMIN_PASSWORD = 'T@mer2023';
-    
-    // متغيرات قرص الحظ
-    let wheelAngle = 0;
-    let isSpinning = false;
-    let reqAnim;
-    let chosenPrize = 0;
 
+    // ==========================================
+    // 1. قاعدة بيانات لوحة الشرف والمراحل مع إضافة الأوصاف
+    // ==========================================
+    const fameStages = [
+        {
+            num: 1, name: "الحفاضة الفولاذية", start: 1000, end: 10000, img: "images/1.png",
+            desc: "بداية متواضعة لكنها مرعبة، البطل ما زال يحبو في عالم الكلمات ويأكل الحروف الطائرة، لكن لكمته اللغوية قوية ومدمرة!",
+            badges: [
+                { id: "1.1", name: "مُفجر الحروف", req: 2000, img: "images/1.1.png" },
+                { id: "1.2", name: "المطاط الصغير", req: 4000, img: "images/1.2.png" },
+                { id: "1.3", name: "العطسة المدمرة", req: 6000, img: "images/1.3.png" },
+                { id: "1.4", name: "البربور الحارق", req: 8000, img: "images/1.4.png" },
+                { id: "1.5", name: "الشرارة اللغوية", req: 10000, img: "images/1.5.png" }
+            ]
+        },
+        {
+            num: 2, name: "الديناصور الثرثار", start: 10000, end: 30000, img: "images/2.png",
+            desc: "يركب تي-ريكس يعتقد أن الحروف الإنجليزية هي وجبته الخفيفة المفضلة. الطفل يتحدث كثيراً لدرجة أن الديناصور يضطر للاستماع، ومعاً يصنعان انفجاراً صوتياً من المفردات يرعب القواميس.",
+            badges: [
+                { id: "2.1", name: "تنين الأعور", req: 14000, img: "images/2.1.png" },
+                { id: "2.2", name: "الخارق الحارق", req: 18000, img: "images/2.2.png" },
+                { id: "2.3", name: "القدم الثقيلة", req: 22000, img: "images/2.3.png" },
+                { id: "2.4", name: "هزيم الرعد", req: 26000, img: "images/2.4.png" },
+                { id: "2.5", name: "الدارع الفارع", req: 30000, img: "images/2.5.png" }
+            ]
+        },
+        {
+            num: 3, name: "نينجا الكلمات الصامت", start: 30000, end: 70000, img: "images/3.png",
+            desc: "يتحرك غير مرئي بين الجمل المعقدة. يمكنه التوازن تماماً على حرف جر واحد. يضرب بقنابل سياقية دقيقة وأشباح سياقية لإخفاء الارتباك. خَفْه، فإنه سينظم مكتبتك... بصمت.",
+            badges: [
+                { id: "3.1", name: "السيف الفالق", req: 38000, img: "images/3.1.png" },
+                { id: "3.2", name: "الشبح السارق", req: 46000, img: "images/3.2.png" },
+                { id: "3.3", name: "العين الثالثة الذكية", req: 54000, img: "images/3.3.png" },
+                { id: "3.4", name: "مغناطيس الرعب", req: 62000, img: "images/3.4.png" },
+                { id: "3.5", name: "القنبلة السنفورية", req: 70000, img: "images/3.5.png" }
+            ]
+        },
+        {
+            num: 4, name: "زومبي الحفظ الذكي", start: 70000, end: 150000, img: "images/4.png",
+            desc: "لديه الكثير من الكلمات في رأسه لدرجة أن عقله خرج للحصول على بعض الهواء النقي. إنه لا يريد عقولاً؛ إنه يريد مرادفات. خبير في \"استهلاك\" قوائم المفردات بلا تفكير، وتورياته سيئة لدرجة أنها يمكن أن تعيد إحياء الحجج الميتة. احذر من عضته الفكرية!",
+            badges: [
+                { id: "4.1", name: "العقل المشع", req: 86000, img: "images/4.1.png" },
+                { id: "4.2", name: "الأسطورة النمورة", req: 102000, img: "images/4.2.png" },
+                { id: "4.3", name: "بروسلي الكلمات", req: 118000, img: "images/4.3.png" },
+                { id: "4.4", name: "أبو الحروف", req: 134000, img: "images/4.4.png" },
+                { id: "4.5", name: "المعالج الخارق", req: 150000, img: "images/4.5.png" }
+            ]
+        },
+        {
+            num: 5, name: "ساحرة الأبجدية العجوز", start: 150000, end: 310000, img: "images/5.png",
+            desc: "قرأ كل قاموس من النهاية إلى البداية. تعاويذه مصنوعة من قواعد نحوية معقدة. يمكنه تحويل فقرة مملة إلى عمل فني بصفة واحدة. تحذير: قد يحول قلمك من حين لآخر إلى ببغاء صغير وثرثار.",
+            badges: [
+                { id: "5.1", name: "الساحرة الشمطاء", req: 182000, img: "images/5.1.png" },
+                { id: "5.2", name: "البلورة الكركوزية", req: 214000, img: "images/5.2.png" },
+                { id: "5.3", name: "مستدعي الصقور", req: 246000, img: "images/5.3.png" },
+                { id: "5.4", name: "بوابة البعد المنفلوطي", req: 278000, img: "images/5.4.png" },
+                { id: "5.5", name: "اللعنة السنفورية", req: 310000, img: "images/5.5.png" }
+            ]
+        },
+        {
+            num: 6, name: "السايبورغ اللغوي", start: 310000, end: 630000, img: "images/6.png",
+            desc: "جزء فتى، جزء كمبيوتر فائق. دماغه لديه سرعة معالجة أسرع من جوجل. ذراعه 'كاسح الجمل' تكسر فعلياً القواعد المعقدة. إنه لا يقرأ الكلمات فقط؛ إنه يحملها، ومفرداته يتم تحديثها أسرع من متجر التطبيقات.",
+            badges: [
+                { id: "6.1", name: "رادار الليزر الفاقع", req: 374000, img: "images/6.1.png" },
+                { id: "6.2", name: "القبضة الحديدية المصدية", req: 438000, img: "images/6.2.png" },
+                { id: "6.3", name: "شريحة الحفظ المنشطح", req: 502000, img: "images/6.3.png" },
+                { id: "6.4", name: "صدمة الليزر الشلوطية", req: 566000, img: "images/6.4.png" },
+                { id: "6.5", name: "النفاث الصاروخي المشوي", req: 630000, img: "images/6.5.png" }
+            ]
+        },
+        {
+            num: 7, name: "حاكم مجرة الأنجلو سنفورية", start: 630000, end: 1000000, img: "images/7.png",
+            desc: "كيان كوني بأبعاد لغوية. يرتدي زي السنفور الفضائي العملاق لأنه يستطيع. إنه لا يتعلم الكلمات؛ إنه يستهلك لغات كاملة ويبصق روايات ملحمية مثالية ومصقولة. الكون هو مكتبته، ولديه بطاقة مكتبة لا تنتهي أبداً. هدفه: تنظيم كل المعنى، بدءاً من قائمة التسوق الخاصة بك. كانت 'القنبلة السنفورية' مجرد بداية.",
+            badges: [
+                { id: "7.1", name: "مستدعي النيازك السنفورية", req: 704000, img: "images/7.1.png" },
+                { id: "7.2", name: "صاعق شرشبيل الزمني", req: 778000, img: "images/7.2.png" },
+                { id: "7.3", name: "تاج بابا سنفور المنقور", req: 852000, img: "images/7.3.png" },
+                { id: "7.4", name: "جاذبية الكواكب", req: 926000, img: "images/7.4.png" },
+                { id: "7.5", name: "سيد اللانهاية السنفورية", req: 1000000, img: "images/7.5.png" }
+            ]
+        }
+    ];
+
+    let celebrationQueue = [];
+
+    // ==========================================
+    // تهيئة الصفحة وتشغيل المراقبة
+    // ==========================================
     window.onload = function() {
         loadGamesState();
+        checkNewFameAchievements(); // فحص الأوسمة والمكافآت بمجرد فتح الصفحة
     };
 
-    function toggleAdminPanel() {
-        const panel = document.getElementById('admin-panel');
-        panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+    function toggleModal(id) {
+        const modal = document.getElementById(id);
+        if(modal.style.display === 'flex') {
+            if(id === 'bank-modal' && isSpinning) return; 
+            modal.style.display = 'none';
+        } else {
+            if(id === 'bank-modal') updateBankUI();
+            modal.style.display = 'flex';
+        }
     }
 
-    // ---- نظام حفظ الألعاب (ولي الأمر) ----
+    // ==========================================
+    // نظام فحص وعرض لوحة الشرف
+    // ==========================================
+    function checkNewFameAchievements() {
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let score = Math.floor(appProg.cumulativeScore || 0);
+        
+        appProg.notifiedBadges = appProg.notifiedBadges || [];
+        appProg.claimedStagesFame = appProg.claimedStagesFame || [];
+        let needsSave = false;
+
+        fameStages.forEach(stage => {
+            // 1. فحص الأوسمة الفردية داخل المرحلة
+            stage.badges.forEach(badge => {
+                if (score >= badge.req && !appProg.notifiedBadges.includes(badge.id)) {
+                    appProg.notifiedBadges.push(badge.id);
+                    needsSave = true;
+                    // إضافة نافذة الاحتفال للطابور
+                    celebrationQueue.push({
+                        type: 'badge', title: "مبروك! تم فتح وسام", name: badge.name,
+                        desc: `لقد تخطيت ${badge.req.toLocaleString()} نقطة!`, img: badge.img
+                    });
+                }
+            });
+
+            // 2. فحص ختم المرحلة بالكامل للحصول على المكافأة المالية
+            if (score >= stage.end && !appProg.claimedStagesFame.includes(stage.num)) {
+                let reward = stage.num * 10;
+                appProg.bankBalance = (appProg.bankBalance || 0) + reward;
+                appProg.claimedStagesFame.push(stage.num);
+                needsSave = true;
+                celebrationQueue.push({
+                    type: 'stage', title: "إنجاز أسطوري! 🏆", name: `ختم مرحلة: ${stage.name}`,
+                    desc: `تخطيت ${stage.end.toLocaleString()} نقطة! تمت إضافة ${reward} جنيه لرصيدك البنكي 💰`, img: stage.img
+                });
+            }
+        });
+
+        if(needsSave) localStorage.setItem('appProgress', JSON.stringify(appProg));
+        processCelebrationQueue();
+    }
+
+    function processCelebrationQueue() {
+        if(celebrationQueue.length > 0) {
+            let item = celebrationQueue.shift();
+            document.getElementById('cel-title').innerText = item.title;
+            document.getElementById('cel-name').innerText = item.name;
+            document.getElementById('cel-desc').innerText = item.desc;
+            
+            let imgEl = document.getElementById('cel-img');
+            imgEl.src = item.img;
+            imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; // تم التعديل إلى المجلد images
+
+            document.getElementById('celebration-modal').style.display = 'flex';
+        }
+    }
+
+    function closeCelebration() {
+        document.getElementById('celebration-modal').style.display = 'none';
+        setTimeout(processCelebrationQueue, 500); // عرض الاحتفال التالي إذا وجد
+    }
+
+    function openFameModal() {
+        renderHallOfFame();
+        toggleModal('fame-modal');
+    }
+
+    function renderHallOfFame() {
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let score = Math.floor(appProg.cumulativeScore || 0);
+        document.getElementById('fame-total-points').innerText = score.toLocaleString();
+        
+        const wrapper = document.getElementById('stages-wrapper');
+        wrapper.innerHTML = '';
+
+        fameStages.forEach(stage => {
+            let isStageUnlocked = score >= stage.start;
+            let stageClass = isStageUnlocked ? '' : 'locked-stage';
+            
+            // حساب نسبة اكتمال المرحلة للشريط الديناميكي
+            let progressPercent = 0;
+            if (score >= stage.end) { progressPercent = 100; } 
+            else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
+
+            // تم إضافة الوصف الفكاهي أسفل العنوان
+            let html = `
+                <div class="stage-card ${stageClass}">
+                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'">
+                    <h3 class="stage-title">
+                        مرحلة ${stage.num}: ${stage.name}
+                        <span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span>
+                    </h3>
+                    <p class="stage-desc">${stage.desc}</p>
+                    
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                    </div>
+                    
+                    <div class="badges-grid">
+            `;
+
+            stage.badges.forEach(badge => {
+                let isBadgeUnlocked = score >= badge.req;
+                let badgeClass = isBadgeUnlocked ? '' : 'locked-badge';
+                let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>';
+                
+                html += `
+                    <div class="badge-item ${badgeClass}">
+                        <div class="badge-img-wrapper">
+                            <img src="${badge.img}" class="badge-img" onerror="this.src='images/mon.jpeg'">
+                            ${lockOverlay}
+                        </div>
+                        <div class="badge-title">${badge.name}</div>
+                        <div class="badge-req">${badge.req.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            wrapper.innerHTML += html;
+        });
+    }
+
+    // ==========================================
+    // إعدادات تفعيل الألعاب (ولي الأمر)
+    // ==========================================
     function updateGamesState() {
         const matchgActive = document.getElementById('chk-matchg').checked;
         const listenActive = document.getElementById('chk-listen').checked;
@@ -305,9 +466,8 @@
     }
 
     function resetAllGamesProgress() {
-        const passInput = document.getElementById('admin-password').value;
-        if (passInput === ADMIN_PASSWORD) {
-            if (confirm('⚠️ تحذير: هل أنت متأكد من تصفير كافة النجوم لجميع الألعاب؟')) {
+        if (document.getElementById('admin-password').value === ADMIN_PASSWORD) {
+            if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل للألعاب؟')) {
                 let matchProg = JSON.parse(localStorage.getItem('matchGameProgress')) || {};
                 for (let lvl in matchProg) matchProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
                 localStorage.setItem('matchGameProgress', JSON.stringify(matchProg));
@@ -317,79 +477,53 @@
                 localStorage.setItem('listenGameProgress', JSON.stringify(listenProg));
 
                 document.getElementById('admin-password').value = ''; 
-                alert('تم تصفير تقدم المراحل والنجوم بنجاح تام! 🔄');
-                toggleAdminPanel();
+                alert('تم التصفير بنجاح! 🔄');
+                toggleModal('admin-modal');
             }
-        } else {
-            alert('خطأ: كلمة المرور غير صحيحة!');
-        }
+        } else { alert('كلمة المرور غير صحيحة!'); }
     }
 
-    // ---- نظام البنك وقرص الحظ ----
-    function toggleBankModal() {
-        let modal = document.getElementById('bank-modal');
-        if(modal.style.display === 'flex') {
-            if(isSpinning) return; // منع الإغلاق أثناء الدوران
-            modal.style.display = 'none';
-        } else {
-            updateBankUI();
-            modal.style.display = 'flex';
-        }
-    }
+    // ==========================================
+    // نظام البنك وقرص الحظ
+    // ==========================================
+    let wheelAngle = 0, isSpinning = false, reqAnim, chosenPrize = 0;
 
     function updateBankUI() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let total = Math.floor(appProg.cumulativeScore || 0);
-        let exch = appProg.exchangedPoints || 0;
-        let bank = appProg.bankBalance || 0;
-        
-        document.getElementById('stat-total').innerText = total;
-        document.getElementById('stat-exch').innerText = exch;
-        document.getElementById('stat-bank').innerText = bank;
+        document.getElementById('stat-total').innerText = Math.floor(appProg.cumulativeScore || 0);
+        document.getElementById('stat-exch').innerText = appProg.exchangedPoints || 0;
+        document.getElementById('stat-bank').innerText = appProg.bankBalance || 0;
     }
 
     function handleSpinClick() {
         let btn = document.getElementById('btn-spin');
         
         if(isSpinning) {
-            // حالة توقيف العجلة بالتباطؤ
             stopWheel();
             btn.innerText = 'ابدأ الدوران 🎡';
             btn.classList.remove('stop-mode');
-            btn.disabled = true; // تعطيل حتى يتم منح الجائزة
+            btn.disabled = true; 
         } else {
-            // حالة البدء باللعب
             let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
             let total = Math.floor(appProg.cumulativeScore || 0);
             let exch = appProg.exchangedPoints || 0;
             
-            // فحص الرصيد
             if (total - exch < 3000) {
-                let nextTarget = exch + 3000;
-                alert(`انت لا تملك رصيد! يمكن المحاولة عند الوصول الى ${nextTarget} نقطة على الأقل.`);
+                alert(`رصيد نقاطك لا يكفي! تحتاج الوصول إلى ${exch + 3000} نقطة للمحاولة.`);
                 return;
             }
             
-            // خصم النقاط للعب
             appProg.exchangedPoints = exch + 3000;
             localStorage.setItem('appProgress', JSON.stringify(appProg));
             updateBankUI();
-            alert(`تم استبدال 3000 نقطة لبدء اللعب! إجمالي النقاط المستبدلة حالياً: ${appProg.exchangedPoints}`);
-
-            // تحديد الجائزة حسب النسب المئوية (30, 30, 20, 10, 10)
+            
             let rand = Math.floor(Math.random() * 100) + 1;
-            if (rand <= 30) chosenPrize = 1;
-            else if (rand <= 60) chosenPrize = 2;
-            else if (rand <= 80) chosenPrize = 3;
-            else if (rand <= 90) chosenPrize = 4;
-            else chosenPrize = 5;
+            if (rand <= 30) chosenPrize = 1; else if (rand <= 60) chosenPrize = 2; else if (rand <= 80) chosenPrize = 3; else if (rand <= 90) chosenPrize = 4; else chosenPrize = 5;
 
-            // بدء الدوران السريع
             isSpinning = true;
             document.getElementById('wheel').style.transition = 'none';
             animateSpin();
 
-            // تحويل الزر إلى "توقف"
             btn.innerText = 'توقف 🛑';
             btn.classList.add('stop-mode');
         }
@@ -397,7 +531,7 @@
 
     function animateSpin() {
         if(isSpinning) {
-            wheelAngle = (wheelAngle + 15) % 360; // سرعة الدوران
+            wheelAngle = (wheelAngle + 15) % 360; 
             document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`;
             reqAnim = requestAnimationFrame(animateSpin);
         }
@@ -407,77 +541,45 @@
         isSpinning = false;
         cancelAnimationFrame(reqAnim);
 
-        // زوايا توقف مركز كل جائزة بالنسبة للون المخصص لها
         let prizeAngleMap = { 1: 324, 2: 252, 3: 180, 4: 108, 5: 36 };
-        let targetA = prizeAngleMap[chosenPrize];
-        
-        // إضافة عشوائية بسيطة داخل قطاع الجائزة لتبدو حقيقية (بين -30 و +30 درجة)
-        let offset = Math.floor(Math.random() * 60) - 30;
-        let finalTarget = targetA + offset;
-
-        // إضافة دورات إضافية (3 لفات) لتباطؤ واقعي
-        let spins = 3 * 360;
-        let finalAngle = wheelAngle + spins;
-        let remainder = finalAngle % 360;
-        
-        finalAngle += (finalTarget - remainder);
-        if (finalTarget < remainder) finalAngle += 360;
+        let finalTarget = prizeAngleMap[chosenPrize] + (Math.floor(Math.random() * 60) - 30);
+        let finalAngle = wheelAngle + (3 * 360) + (finalTarget - (wheelAngle % 360));
+        if (finalTarget < (wheelAngle % 360)) finalAngle += 360;
 
         let wheelEl = document.getElementById('wheel');
-        // تطبيق تأثير التباطؤ (Ease-Out)
         wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)';
         wheelEl.style.transform = `rotate(${finalAngle}deg)`;
 
-        // منح الجائزة بعد انتهاء التباطؤ
         setTimeout(() => {
             wheelEl.style.transition = 'none';
             wheelAngle = finalAngle % 360;
             wheelEl.style.transform = `rotate(${wheelAngle}deg)`;
-            awardPrize();
+            
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+            appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize;
+            localStorage.setItem('appProgress', JSON.stringify(appProg));
+            
+            updateBankUI();
+            alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه. أضيفت لرصيدك!`);
+            document.getElementById('btn-spin').disabled = false;
         }, 3500);
     }
 
-    function awardPrize() {
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize;
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        
-        updateBankUI();
-        alert(`مبروك يا بطل! 🎊 لقد ربحت ${chosenPrize} جنيه فلسطيني! تمت إضافتها لرصيدك البنكي.`);
-        document.getElementById('btn-spin').disabled = false; // تفعيل الزر للعب مجدداً
-    }
-
-    // ---- نظام السحب البنكي ----
     function withdrawBank() {
+        if(document.getElementById('withdraw-password').value !== ADMIN_PASSWORD) { alert("كلمة المرور غير صحيحة!"); return; }
         let amount = parseFloat(document.getElementById('withdraw-amount').value);
-        let pwd = document.getElementById('withdraw-password').value;
-        
-        if(pwd !== ADMIN_PASSWORD) {
-            alert("خطأ: كلمة المرور غير صحيحة!");
-            return;
-        }
-        if(isNaN(amount) || amount <= 0) {
-            alert("يرجى إدخال مبلغ صحيح وموجب للسحب!");
-            return;
-        }
+        if(isNaN(amount) || amount <= 0) { alert("أدخل مبلغاً صحيحاً!"); return; }
         
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let currentBank = appProg.bankBalance || 0;
+        if(amount > (appProg.bankBalance || 0)) { alert("الرصيد لا يكفي!"); return; }
         
-        if(amount > currentBank) {
-            alert("لا يمكنك سحب مبلغ أكبر من حسابك البنكي الحالي!");
-            return;
-        }
-        
-        // إتمام عملية السحب
-        appProg.bankBalance = currentBank - amount;
+        appProg.bankBalance -= amount;
         localStorage.setItem('appProgress', JSON.stringify(appProg));
         
         document.getElementById('withdraw-amount').value = '';
         document.getElementById('withdraw-password').value = '';
         updateBankUI();
-        
-        alert(`تمت العملية بنجاح! تم سحب ${amount} جنيه فلسطيني من حساب الطفل.`);
+        alert(`تم سحب ${amount} جنيه بنجاح.`);
     }
 </script>
 
