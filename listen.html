@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة صائد1 الأمثلة المسموعة</title>
+    <title>لعبة صائد الكلمات المسموعة</title>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -47,12 +47,11 @@
         .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
         .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
         
-        /* التعديل الجذري لمنطقة اللعب لتكون متجاوبة */
         .game-area { 
             position: relative; 
             width: 100%; 
             max-width: 1100px; 
-            height: 65vh; /* يعتمد على طول شاشة الجهاز */
+            height: 65vh; 
             min-height: 400px;
             background: #fff; 
             border-radius: 15px; 
@@ -62,12 +61,10 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.05); 
         }
         
-        /* التعديل الجذري للمربعات/البالونات لتتجاوب مع الجوالات */
         .bubble { 
             position: absolute; 
             background: #3498db; 
             color: white; 
-            /* التوسيط المطاطي للحجم والهوامش */
             padding: clamp(5px, 1.5vw, 15px) clamp(5px, 1vw, 20px); 
             border-radius: clamp(10px, 2vw, 30px); 
             font-size: clamp(13px, 3.5vw, 22px); 
@@ -78,13 +75,11 @@
             transition: background-color 0.2s; 
             text-align: center; 
             
-            /* هذه النسبة تضمن وجود 4 مربعات بجانب بعضها دون أي تداخل أبداً */
             width: 23%; 
             box-sizing: border-box;
             word-wrap: break-word;
             line-height: 1.3;
             
-            /* لتوسيط النص داخل المربع بشكل مثالي */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -117,7 +112,7 @@
     </div>
 
     <div id="stages-screen">
-        <h1>لعبة صائد الأمثلة المسموعة 🎧</h1>
+        <h1>لعبة صائد الكلمات المسموعة 🎧</h1>
         <p style="color: var(--dark); font-size: clamp(14px, 2.5vw, 18px); font-weight: bold;">استمع للمثال الإنجليزي بعناية، ثم اصطد مربع المعنى العربي المفرد الصحيح للكلمة!</p>
         <div class="stages-grid" id="stages-container"></div>
 
@@ -137,8 +132,13 @@
                 <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="140"></div>
                 <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="180"></div>
                 
+                <div class="settings-row">
+                    <label>سرعة هبوط الفقاعات (1 بطيء - 5 سريع):</label> 
+                    <input type="number" id="bubble-speed-input" min="1" max="5" step="0.5" value="2">
+                </div>
+                
                 <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
-                    <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات الجديدة:</label>
+                    <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات والسرعة الجديدة:</label>
                     <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">   
                         <input type="radio" id="apply-current" name="apply-scope" checked> <label for="apply-current" style="min-width:auto; margin-left:20px;">تطبيق على الصف المحدد</label>
                     </div>
@@ -153,7 +153,7 @@
                 </div>
 
                 <div class="action-btns">
-                    <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الأوقات</button>
+                    <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الإعدادات</button>
                     <button class="btn-reset-curr" onclick="resetProgress()">تصفير</button>
                     <button class="btn-reset-all" onclick="resetAllProgress()">تصفير الكل</button>
                 </div>
@@ -275,7 +275,7 @@
     }
 
     function getLevelTimes(level) {
-        let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180 };
+        let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180, speed: 2 };
         return gameTimeSettings[level] || defaultTimes;
     }
 
@@ -287,6 +287,7 @@
         document.getElementById('time-3').value = t.t3;
         document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1;
+        document.getElementById('bubble-speed-input').value = t.speed || 2;
         loadVoices();
     }
 
@@ -336,13 +337,14 @@
         let t3 = parseInt(document.getElementById('time-3').value) || 100;
         let t2 = parseInt(document.getElementById('time-2').value) || 140;
         let t1 = parseInt(document.getElementById('time-1').value) || 180;
+        let bSpeed = parseFloat(document.getElementById('bubble-speed-input').value) || 2;
         
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) {
             alert("تنبيه: يجب أن يكون الوقت منطقياً بحيث وقت الـ 5 نجوم هو الأقل، وهكذا تصاعدياً.");
             return;
         }
         
-        let newSettings = { t5: t5, t4: t4, t3: t3, t2: t2, t1: t1 };
+        let newSettings = { t5: t5, t4: t4, t3: t3, t2: t2, t1: t1, speed: bSpeed };
         
         if(document.getElementById('apply-all').checked) {
             let selectElement = document.getElementById('level-select');
@@ -350,11 +352,11 @@
                 let lvl = selectElement.options[i].value;
                 if(lvl) gameTimeSettings[lvl] = newSettings;
             }
-            alert("تم تطبيق أوقات النجوم الجديدة على جميع المستويات والصفوف المفتوحة بنجاح.");
+            alert("تم تطبيق الإعدادات الجديدة وسرعة الهبوط على جميع المستويات والصفوف المفتوحة بنجاح.");
         } else {
             if(!currentLevel) return;
             gameTimeSettings[currentLevel] = newSettings;
-            alert(`تم تطبيق أوقات النجوم الجديدة على (${getLevelName(currentLevel)}) بنجاح.`);
+            alert(`تم تطبيق الإعدادات الجديدة وسرعة الهبوط على (${getLevelName(currentLevel)}) بنجاح.`);
         }
         
         localStorage.setItem('listenGameSettings', JSON.stringify(gameTimeSettings));
@@ -486,8 +488,10 @@
         
         choices.sort(() => Math.random() - 0.5);
 
-        // توزيع المربعات بالنسبة المئوية ليناسب أحجام الشاشات المختلفة
-        let segmentPercent = 100 / choices.length; // كل مسار يأخذ 25% من الشاشة
+        let segmentPercent = 100 / choices.length; 
+
+        // جلب قيمة السرعة المحددة من الإعدادات للتحكم بالهبوط
+        let baseSpeed = getLevelTimes(currentLevel).speed || 2;
 
         choices.forEach((choice, index) => {
             let bDiv = document.createElement('div');
@@ -497,14 +501,12 @@
             let colors = ['#3498db', '#e67e22', '#2ecc71', '#9b59b6'];
             bDiv.style.backgroundColor = colors[index % colors.length];
 
-            // تعيين المكان الأفقي كنسبة مئوية مع مسافة عشوائية بسيطة داخل مسارها
             let leftOffset = (index * segmentPercent) + (Math.random() * 2);
             bDiv.style.left = leftOffset + '%';
-            
-            // تعيين الارتفاع المبدئي المخفي فوق الشاشة
             bDiv.style.top = '-' + (Math.random() * 60 + 80) + 'px';
 
-            let speed = Math.random() * 1.5 + 1.0; 
+            // حساب السرعة الفردية لكل فقاعة بناءً على السرعة العامة المحددة لولي الأمر
+            let speed = Math.random() * (baseSpeed * 0.75) + (baseSpeed * 0.5); 
 
             bDiv.onclick = () => onBubbleClick(choice.isCorrect, bDiv);
 
@@ -512,7 +514,6 @@
             currentBubbles.push({ element: bDiv, top: parseFloat(bDiv.style.top), speed: speed });
         });
 
-        // قراءة الارتفاع الفعلي لمنطقة اللعب على شاشة الجهاز
         let areaHeight = gameArea.clientHeight || 500;
 
         animationInterval = setInterval(() => {
@@ -520,7 +521,6 @@
                 b.top += b.speed;
                 b.element.style.top = b.top + 'px';
 
-                // إذا تجاوز المربع قاع الشاشة، يعود للأعلى
                 if (b.top > areaHeight) {
                     b.top = -80;
                     b.element.style.top = b.top + 'px';
