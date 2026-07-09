@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة صائد الكلمات المسموعة</title>
+    <title>لعبة صائد1 الأمثلة المسموعة</title>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -28,7 +28,6 @@
         .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
         
-        /* إعدادات اللعبة لولي الأمر */
         .settings-container { margin-top: 50px; display: inline-block; text-align: right; max-width: 600px; width: 100%;}
         .btn-toggle-settings { background: var(--info); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
         .settings-panel { display: none; margin-top: 10px; padding: 25px; background: #fff; border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -45,24 +44,64 @@
         .btn-reset-all { background: var(--danger); }
 
         #game-screen { display: none; position: relative; }
-        .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto;}
-        .timer { font-size: 24px; color: var(--danger); font-weight: bold; }
+        .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
+        .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
         
-        .game-area { position: relative; width: 100%; max-width: 1100px; height: 500px; background: #fff; border-radius: 15px; border: 3px dashed var(--primary); margin: 0 auto; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+        /* التعديل الجذري لمنطقة اللعب لتكون متجاوبة */
+        .game-area { 
+            position: relative; 
+            width: 100%; 
+            max-width: 1100px; 
+            height: 65vh; /* يعتمد على طول شاشة الجهاز */
+            min-height: 400px;
+            background: #fff; 
+            border-radius: 15px; 
+            border: 3px dashed var(--primary); 
+            margin: 0 auto; 
+            overflow: hidden; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05); 
+        }
         
-        .bubble { position: absolute; background: #3498db; color: white; padding: 15px 20px; border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; user-select: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background-color 0.2s; text-align: center; max-width: 200px; min-width: 120px; line-height: 1.2; }
-        .bubble:hover { background: #2980b9; }
+        /* التعديل الجذري للمربعات/البالونات لتتجاوب مع الجوالات */
+        .bubble { 
+            position: absolute; 
+            background: #3498db; 
+            color: white; 
+            /* التوسيط المطاطي للحجم والهوامش */
+            padding: clamp(5px, 1.5vw, 15px) clamp(5px, 1vw, 20px); 
+            border-radius: clamp(10px, 2vw, 30px); 
+            font-size: clamp(13px, 3.5vw, 22px); 
+            font-weight: bold; 
+            cursor: pointer; 
+            user-select: none; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+            transition: background-color 0.2s; 
+            text-align: center; 
+            
+            /* هذه النسبة تضمن وجود 4 مربعات بجانب بعضها دون أي تداخل أبداً */
+            width: 23%; 
+            box-sizing: border-box;
+            word-wrap: break-word;
+            line-height: 1.3;
+            
+            /* لتوسيط النص داخل المربع بشكل مثالي */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: clamp(40px, 8vw, 80px);
+        }
+        .bubble:hover { background: #2980b9; transform: scale(1.05); }
         
-        .btn-repeat { background: var(--warning); color: #856404; font-size: 18px; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
+        .btn-repeat { background: var(--warning); color: #856404; font-size: clamp(14px, 2.5vw, 18px); padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
         .btn-repeat:hover { opacity: 0.9; }
 
-        .btn-back { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
+        .btn-back { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: clamp(14px, 2.5vw, 16px); font-weight: bold;}
         .btn-back:hover { opacity: 0.9; }
         
         #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
         .modal-content h2 { margin-top: 0; color: var(--primary);}
-        .stars-display { font-size: 40px; color: #f1c40f; margin: 15px 0; letter-spacing: 5px;}
+        .stars-display { font-size: clamp(25px, 5vw, 40px); color: #f1c40f; margin: 15px 0; letter-spacing: 5px;}
         .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
         .modal-btn:hover { opacity: 0.9; }
     </style>
@@ -79,7 +118,7 @@
 
     <div id="stages-screen">
         <h1>لعبة صائد الأمثلة المسموعة 🎧</h1>
-        <p style="color: var(--dark); font-size: 18px; font-weight: bold;">استمع للمثال الإنجليزي بعناية، ثم اصطد بالون المعنى العربي المفرد الصحيح للكلمة!</p>
+        <p style="color: var(--dark); font-size: clamp(14px, 2.5vw, 18px); font-weight: bold;">استمع للمثال الإنجليزي بعناية، ثم اصطد مربع المعنى العربي المفرد الصحيح للكلمة!</p>
         <div class="stages-grid" id="stages-container"></div>
 
         <div class="settings-container">
@@ -92,21 +131,11 @@
                     <select id="voice-select" onchange="saveVoiceSetting()" style="padding:10px; font-size:16px; border-radius:5px; border:1px solid #4caf50; cursor:pointer; width:100%; font-family:inherit;"></select>
                 </div>
 
-                <div class="settings-row">
-                    <label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60">
-                </div>
-                <div class="settings-row">
-                    <label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="70">
-                </div>
-                <div class="settings-row">
-                    <label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="100">
-                </div>
-                <div class="settings-row">
-                    <label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="140">
-                </div>
-                <div class="settings-row">
-                    <label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="180">
-                </div>
+                <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60"></div>
+                <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="70"></div>
+                <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="100"></div>
+                <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="140"></div>
+                <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="180"></div>
                 
                 <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                     <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات الجديدة:</label>
@@ -136,11 +165,11 @@
 
     <div id="game-screen">
         <div class="game-controls">
-            <button class="btn-back" onclick="showStagesScreen()">🔙 خروج من المرحلة</button>
-            <h2 style="margin: 0; color: var(--primary);">المرحلة: <span id="current-stage-display">1</span> | السؤال: <span id="question-num-display">1</span>/10</h2>
+            <button class="btn-back" onclick="showStagesScreen()">🔙 خروج</button>
+            <h2 style="margin: 0; color: var(--primary); font-size: clamp(16px, 3vw, 24px);">المرحلة: <span id="current-stage-display">1</span> | السؤال: <span id="question-num-display">1</span>/10</h2>
             <div class="timer">
-                الوقت: <span id="timer-display">0</span> ثانية ⏱️
-                <span id="live-stars" style="color: #f1c40f; font-size: 20px; margin-right: 15px; letter-spacing: 2px;">★★★★★</span>
+                الوقت: <span id="timer-display">0</span> ث ⏱️
+                <span id="live-stars" style="color: #f1c40f; font-size: clamp(16px, 3vw, 20px); letter-spacing: 2px;">★★★★★</span>
             </div>
         </div>
         <button class="btn-repeat" onclick="playCurrentExampleAudio()">🔊 إعادة استماع للمثال</button>
@@ -152,7 +181,7 @@
             <h2 id="modal-title">أحسنت البطل! أنهيت صيد الأمثلة 🎉</h2>
             <div class="stars-display" id="modal-stars">⭐⭐⭐⭐⭐</div>
             <p style="font-size: 18px; color: var(--dark);">وقت الإجابة الكلي: <strong id="modal-time" style="color: var(--danger);"></strong> ثانية</p>
-            <p id="modal-points-msg" style="color: var(--success); font-weight: bold; font-size: 18px;"></p>
+            <p id="modal-points-msg" style="color: var(--success); font-weight: bold; font-size: clamp(14px, 3vw, 18px);"></p>
             <button class="modal-btn" onclick="showStagesScreen()">متابعة</button>
         </div>
     </div>
@@ -200,7 +229,7 @@
     window.onload = function() {
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
         initializeDropdown();
-        window.speechSynthesis.onvoiceschanged = loadVoices; // لتحديث الأصوات عند اكتمال تحميلها
+        window.speechSynthesis.onvoiceschanged = loadVoices; 
     };
 
     function initializeDropdown() {
@@ -245,7 +274,6 @@
         loadSettingsUI();
     }
 
-    // --- إعدادات اللعبة والأوقات والأصوات ---
     function getLevelTimes(level) {
         let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180 };
         return gameTimeSettings[level] || defaultTimes;
@@ -365,7 +393,6 @@
         }
     }
 
-    // --- تحميل مراحل اللعبة ---
     function loadGameData() {
         wordsData = allLevelsData[currentLevel] || [];
         if(wordsData.length === 0) return;
@@ -426,7 +453,6 @@
             stageWords = stageWords.concat(extraWords);
         }
 
-        // خلط ترتيب أسئلة المرحلة بشكل عشوائي في كل مرة
         stageWords.sort(() => Math.random() - 0.5);
 
         startTimer();
@@ -460,8 +486,8 @@
         
         choices.sort(() => Math.random() - 0.5);
 
-        let areaWidth = gameArea.clientWidth || 1000;
-        let segment = areaWidth / choices.length;
+        // توزيع المربعات بالنسبة المئوية ليناسب أحجام الشاشات المختلفة
+        let segmentPercent = 100 / choices.length; // كل مسار يأخذ 25% من الشاشة
 
         choices.forEach((choice, index) => {
             let bDiv = document.createElement('div');
@@ -471,11 +497,14 @@
             let colors = ['#3498db', '#e67e22', '#2ecc71', '#9b59b6'];
             bDiv.style.backgroundColor = colors[index % colors.length];
 
-            let leftPos = (index * segment) + Math.random() * (segment - 150);
-            bDiv.style.left = Math.max(10, Math.min(leftPos, areaWidth - 160)) + 'px';
-            bDiv.style.top = '-' + (Math.random() * 60 + 50) + 'px';
+            // تعيين المكان الأفقي كنسبة مئوية مع مسافة عشوائية بسيطة داخل مسارها
+            let leftOffset = (index * segmentPercent) + (Math.random() * 2);
+            bDiv.style.left = leftOffset + '%';
+            
+            // تعيين الارتفاع المبدئي المخفي فوق الشاشة
+            bDiv.style.top = '-' + (Math.random() * 60 + 80) + 'px';
 
-            let speed = Math.random() * 1.2 + 1.0; 
+            let speed = Math.random() * 1.5 + 1.0; 
 
             bDiv.onclick = () => onBubbleClick(choice.isCorrect, bDiv);
 
@@ -483,13 +512,17 @@
             currentBubbles.push({ element: bDiv, top: parseFloat(bDiv.style.top), speed: speed });
         });
 
+        // قراءة الارتفاع الفعلي لمنطقة اللعب على شاشة الجهاز
+        let areaHeight = gameArea.clientHeight || 500;
+
         animationInterval = setInterval(() => {
             currentBubbles.forEach(b => {
                 b.top += b.speed;
                 b.element.style.top = b.top + 'px';
 
-                if (b.top > 500) {
-                    b.top = -50;
+                // إذا تجاوز المربع قاع الشاشة، يعود للأعلى
+                if (b.top > areaHeight) {
+                    b.top = -80;
                     b.element.style.top = b.top + 'px';
                 }
             });
