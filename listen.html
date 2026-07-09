@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة صائد الكلمات المسموعة</title>
+    <title>لعبة صائد الأمثلة المسموعة</title>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -17,7 +17,23 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #eef2f7; padding: 20px; margin: 0; text-align: center; overflow-x: hidden; }
         h1 { color: var(--primary); margin-bottom: 10px; }
         
-        .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
+        /* كبسة الترس للإعدادات في الزاوية اليسرى العليا */
+        .btn-settings-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            user-select: none;
+            z-index: 100;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        .btn-settings-toggle:hover { transform: rotate(45deg); }
+
+        .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; margin-top: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
         .score-text { color: var(--warning); font-size: 20px;}
         .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
         
@@ -28,14 +44,18 @@
         .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
         
-        .settings-container { margin-top: 50px; display: inline-block; text-align: right; max-width: 600px; width: 100%;}
-        .btn-toggle-settings { background: var(--info); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-        .settings-panel { display: none; margin-top: 10px; padding: 25px; background: #fff; border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .settings-panel h3 { color: var(--primary); margin-top: 0; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px;}
+        /* نافذة الإعدادات المنبثقة (Modal) */
+        .settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; }
+        .settings-content { background: #fff; width: 95%; max-width: 550px; padding: 25px; border-radius: 15px; text-align: right; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .btn-close-modal { position: absolute; top: 15px; left: 15px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .btn-close-modal:hover { opacity: 0.8; }
+        
+        .settings-content h3 { color: var(--primary); margin-top: 0; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px;}
         .settings-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
         .settings-row label { font-weight: bold; min-width: 150px; color: var(--dark);}
         .settings-row input[type="number"] { padding: 8px; width: 80px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; text-align: center;}
         .settings-row input[type="password"] { padding: 10px; flex-grow: 1; border: 1px solid #ccc; border-radius: 5px; font-weight: bold;}
+        
         .action-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 25px; justify-content: center;}
         .action-btns button { padding: 10px 20px; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px; flex-grow: 1;}
         .action-btns button:hover { opacity: 0.9; }
@@ -47,49 +67,13 @@
         .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
         .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
         
-        .game-area { 
-            position: relative; 
-            width: 100%; 
-            max-width: 1100px; 
-            height: 65vh; 
-            min-height: 400px;
-            background: #fff; 
-            border-radius: 15px; 
-            border: 3px dashed var(--primary); 
-            margin: 0 auto; 
-            overflow: hidden; 
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05); 
-        }
+        .game-area { position: relative; width: 100%; max-width: 1100px; height: 65vh; min-height: 400px; background: #fff; border-radius: 15px; border: 3px dashed var(--primary); margin: 0 auto; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
         
-        .bubble { 
-            position: absolute; 
-            background: #3498db; 
-            color: white; 
-            padding: clamp(5px, 1.5vw, 15px) clamp(5px, 1vw, 20px); 
-            border-radius: clamp(10px, 2vw, 30px); 
-            font-size: clamp(13px, 3.5vw, 22px); 
-            font-weight: bold; 
-            cursor: pointer; 
-            user-select: none; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
-            transition: background-color 0.2s; 
-            text-align: center; 
-            
-            width: 23%; 
-            box-sizing: border-box;
-            word-wrap: break-word;
-            line-height: 1.3;
-            
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: clamp(40px, 8vw, 80px);
-        }
+        .bubble { position: absolute; background: #3498db; color: white; padding: clamp(5px, 1.5vw, 15px) clamp(5px, 1vw, 20px); border-radius: clamp(10px, 2vw, 30px); font-size: clamp(13px, 3.5vw, 22px); font-weight: bold; cursor: pointer; user-select: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background-color 0.2s; text-align: center; width: 23%; box-sizing: border-box; word-wrap: break-word; line-height: 1.3; display: flex; justify-content: center; align-items: center; min-height: clamp(40px, 8vw, 80px); }
         .bubble:hover { background: #2980b9; transform: scale(1.05); }
         
         .btn-repeat { background: var(--warning); color: #856404; font-size: clamp(14px, 2.5vw, 18px); padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
         .btn-repeat:hover { opacity: 0.9; }
-
         .btn-back { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: clamp(14px, 2.5vw, 16px); font-weight: bold;}
         .btn-back:hover { opacity: 0.9; }
         
@@ -103,6 +87,8 @@
 </head>
 <body>
 
+    <button class="btn-settings-toggle" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
+
     <div class="header-stats">
         <div class="level-selector">
             <label for="level-select">اختر المستوى المكتمل للعب: </label>
@@ -112,55 +98,67 @@
     </div>
 
     <div id="stages-screen">
-        <h1>لعبة صائد الكلمات المسموعة 🎧</h1>
+        <h1>لعبة صائد الأمثلة المسموعة 🎧</h1>
         <p style="color: var(--dark); font-size: clamp(14px, 2.5vw, 18px); font-weight: bold;">استمع للمثال الإنجليزي بعناية، ثم اصطد مربع المعنى العربي المفرد الصحيح للكلمة!</p>
         <div class="stages-grid" id="stages-container"></div>
-
-        <div class="settings-container">
-            <button class="btn-toggle-settings" onclick="toggleSettings()">⚙️ إعدادات اللعبة (لولي الأمر)</button>
-            <div id="settings-panel" class="settings-panel">
-                <h3>إعدادات اللعبة والأوقات</h3>
-                
-                <div class="settings-row" style="background:#e8f5e9; padding:15px; border-radius:8px; border: 1px solid #c8e6c9;">
-                    <label style="display:block; width:100%; margin-bottom:10px; color:#2e7d32;">اختر صوت القارئ (لا يحتاج مرور):</label>
-                    <select id="voice-select" onchange="saveVoiceSetting()" style="padding:10px; font-size:16px; border-radius:5px; border:1px solid #4caf50; cursor:pointer; width:100%; font-family:inherit;"></select>
-                </div>
-
-                <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60"></div>
-                <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="70"></div>
-                <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="100"></div>
-                <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="140"></div>
-                <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="180"></div>
-                
-                <div class="settings-row">
-                    <label>سرعة هبوط الفقاعات (1 بطيء - 5 سريع):</label> 
-                    <input type="number" id="bubble-speed-input" min="1" max="5" step="0.5" value="2">
-                </div>
-                
-                <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
-                    <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات والسرعة الجديدة:</label>
-                    <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">   
-                        <input type="radio" id="apply-current" name="apply-scope" checked> <label for="apply-current" style="min-width:auto; margin-left:20px;">تطبيق على الصف المحدد</label>
-                    </div>
-                    <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">
-                         <input type="radio" id="apply-all" name="apply-scope"> <label for="apply-all" style="min-width:auto;">تطبيق على جميع الصفوف</label>
-                    </div>
-                </div>
-
-                <div class="settings-row" style="margin-top:20px;">
-                    <label style="color: var(--danger);">كلمة المرور للتأكيد:</label>
-                    <input type="password" id="settings-password" placeholder="أدخل كلمة المرور لإتمام التعديل أو التصفير">
-                </div>
-
-                <div class="action-btns">
-                    <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الإعدادات</button>
-                    <button class="btn-reset-curr" onclick="resetProgress()">تصفير</button>
-                    <button class="btn-reset-all" onclick="resetAllProgress()">تصفير الكل</button>
-                </div>
-            </div>
-        </div>
         <br>
         <button class="btn-back" style="margin-top: 30px; padding: 12px 30px;" onclick="window.location.href='game.html'">🔙 العودة لصفحة الألعاب</button>
+    </div>
+
+    <div id="settings-modal" class="settings-modal">
+        <div class="settings-content">
+            <button class="btn-close-modal" onclick="toggleSettingsModal()">✖</button>
+            <h3>⚙️ إعدادات اللعبة والأصوات</h3>
+            
+            <div style="background:#e8f5e9; padding:15px; border-radius:8px; border: 1px solid #c8e6c9; margin-bottom: 20px;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px; color:#2e7d32;">اختر صوت القارئ (لا يحتاج مرور):</label>
+                <select id="voice-select" onchange="saveAudioSettings()" style="padding:10px; font-size:16px; border-radius:5px; border:1px solid #4caf50; cursor:pointer; width:100%; font-family:inherit; margin-bottom: 10px;"></select>
+                
+                <label style="display:block; font-weight:bold; margin-bottom:5px; color:#2e7d32;">سرعة النطق الصوتي:</label>
+                <select id="voice-speed" onchange="saveAudioSettings()" style="padding:10px; font-size:16px; border-radius:5px; border:1px solid #4caf50; cursor:pointer; width:100%; font-family:inherit;">
+                    <option value="0.1">0.1x (بطيء جداً)</option>
+                    <option value="0.2">0.2x</option>
+                    <option value="0.5">0.5x (بطيء)</option>
+                    <option value="0.8">0.8x</option>
+                    <option value="1.0">1.0x (طبيعي)</option>
+                    <option value="1.2">1.2x</option>
+                    <option value="1.5">1.5x (سريع)</option>
+                    <option value="2.0">2.0x (سريع جداً)</option>
+                </select>
+            </div>
+
+            <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60"></div>
+            <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="70"></div>
+            <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="100"></div>
+            <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="140"></div>
+            <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="180"></div>
+            
+            <div class="settings-row">
+                <label>سرعة هبوط الفقاعات (1 بطيء - 5 سريع):</label> 
+                <input type="number" id="bubble-speed-input" min="1" max="5" step="0.5" value="2">
+            </div>
+            
+            <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
+                <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات وسرعة الهبوط:</label>
+                <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">   
+                    <input type="radio" id="apply-current" name="apply-scope" checked> <label for="apply-current" style="min-width:auto; margin-left:20px;">على الصف المحدد</label>
+                </div>
+                <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">
+                     <input type="radio" id="apply-all" name="apply-scope"> <label for="apply-all" style="min-width:auto;">على جميع الصفوف</label>
+                </div>
+            </div>
+
+            <div class="settings-row" style="margin-top:20px;">
+                <label style="color: var(--danger);">كلمة المرور للتأكيد:</label>
+                <input type="password" id="settings-password" placeholder="كلمة المرور للإعدادات والتصفير">
+            </div>
+
+            <div class="action-btns">
+                <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الإعدادات</button>
+                <button class="btn-reset-curr" onclick="resetProgress()">تصفير</button>
+                <button class="btn-reset-all" onclick="resetAllProgress()">تصفير الكل</button>
+            </div>
+        </div>
     </div>
 
     <div id="game-screen">
@@ -225,6 +223,9 @@
     let secondsElapsed = 0;
     let animationInterval;
     let currentBubbles = [];
+    
+    // علم برمجي لمنع النقرات المتعددة السريعة أثناء معالجة الإجابة
+    let isProcessingAnswer = false; 
 
     window.onload = function() {
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
@@ -240,11 +241,7 @@
         for(let lvl in appProgress.levels) {
             let lData = appProgress.levels[lvl];
             let db = allLevelsData[lvl] || [];
-            
-            let isLevelFinished = (db.length > 0) && 
-                                  (lData.mainIndex >= db.length) && 
-                                  (!lData.activeList || lData.activeList.length === 0) && 
-                                  (lData.savedWords && lData.savedWords.length > 0);
+            let isLevelFinished = (db.length > 0) && (lData.mainIndex >= db.length) && (!lData.activeList || lData.activeList.length === 0) && (lData.savedWords && lData.savedWords.length > 0);
 
             if (isLevelFinished) {
                 let option = document.createElement('option');
@@ -259,7 +256,7 @@
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
             document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
             selectElement.disabled = true;
-            document.querySelector('.settings-container').style.display = 'none';
+            document.querySelector('.btn-settings-toggle').style.display = 'none';
             return;
         }
 
@@ -279,6 +276,16 @@
         return gameTimeSettings[level] || defaultTimes;
     }
 
+    function toggleSettingsModal() {
+        let modal = document.getElementById('settings-modal');
+        if(modal.style.display === 'flex') {
+            modal.style.display = 'none';
+        } else {
+            loadSettingsUI();
+            modal.style.display = 'flex';
+        }
+    }
+
     function loadSettingsUI() {
         if(!currentLevel) return;
         let t = getLevelTimes(currentLevel);
@@ -291,41 +298,71 @@
         loadVoices();
     }
 
+    // فلترة الأصوات (3 ذكور، 3 إناث متضمنة أمريكي وبريطاني)
     function loadVoices() {
         let select = document.getElementById('voice-select');
         select.innerHTML = '';
-        let voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+        let allVoices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+        
+        let males = [], females = [];
+        
+        allVoices.forEach(v => {
+            let name = v.name.toLowerCase();
+            if (name.includes('female') || name.includes('zira') || name.includes('samantha') || name.includes('susan') || name.includes('hazel')) {
+                females.push(v);
+            } else if (name.includes('male') || name.includes('david') || name.includes('mark') || name.includes('george')) {
+                males.push(v);
+            } else {
+                if (males.length <= females.length) males.push(v); else females.push(v);
+            }
+        });
+
+        let usMales = males.filter(v => v.lang === 'en-US' || v.name.includes('US'));
+        let ukMales = males.filter(v => v.lang === 'en-GB' || v.name.includes('UK'));
+        let usFemales = females.filter(v => v.lang === 'en-US' || v.name.includes('US'));
+        let ukFemales = females.filter(v => v.lang === 'en-GB' || v.name.includes('UK'));
+
+        let selected = [];
+        selected.push(...usMales.slice(0, 2).map(v => ({v:v, label:`ذكر - أمريكي (${v.name})`})));
+        selected.push(...ukMales.slice(0, 1).map(v => ({v:v, label:`ذكر - بريطاني (${v.name})`})));
+        selected.push(...usFemales.slice(0, 2).map(v => ({v:v, label:`أنثى - أمريكي (${v.name})`})));
+        selected.push(...ukFemales.slice(0, 1).map(v => ({v:v, label:`أنثى - بريطاني (${v.name})`})));
+
+        if(selected.length < 6) {
+            let existingNames = selected.map(s => s.v.name);
+            for(let v of allVoices) {
+                if(!existingNames.includes(v.name) && selected.length < 6) {
+                    selected.push({v:v, label: `${females.includes(v) ? 'أنثى' : 'ذكر'} - (${v.name})`});
+                }
+            }
+        }
+
         let savedSettings = JSON.parse(localStorage.getItem('audioSettings')) || {};
         
-        if(voices.length === 0) {
+        if(selected.length === 0) {
             select.innerHTML = "<option value=''>الصوت الافتراضي</option>";
-            return;
+        } else {
+            selected.forEach(item => {
+                let opt = document.createElement('option');
+                opt.text = item.label;
+                opt.value = item.v.name;
+                if(item.v.name === savedSettings.voiceName) opt.selected = true;
+                select.appendChild(opt);
+            });
         }
         
-        voices.forEach(v => {
-            let opt = document.createElement('option');
-            let gender = (v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('hazel')) ? "أنثى" : "ذكر";
-            opt.text = `${v.name} (${gender})`;
-            opt.value = v.name;
-            if(v.name === savedSettings.voiceName) opt.selected = true;
-            select.appendChild(opt);
-        });
-    }
-
-    function saveVoiceSetting() {
-        let savedSettings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1 };
-        savedSettings.voiceName = document.getElementById('voice-select').value;
-        localStorage.setItem('audioSettings', JSON.stringify(savedSettings));
-    }
-
-    function toggleSettings() {
-        let panel = document.getElementById('settings-panel');
-        if(panel.style.display === 'block') {
-            panel.style.display = 'none';
-        } else {
-            panel.style.display = 'block';
-            loadSettingsUI();
+        // جلب السرعة المحفوظة مسبقاً وتطبيقها
+        if (savedSettings.speed) {
+            document.getElementById('voice-speed').value = savedSettings.speed;
         }
+    }
+
+    // حفظ الصوت والسرعة معاً فور التغيير دون باسورد
+    function saveAudioSettings() {
+        let savedSettings = JSON.parse(localStorage.getItem('audioSettings')) || {};
+        savedSettings.voiceName = document.getElementById('voice-select').value;
+        savedSettings.speed = parseFloat(document.getElementById('voice-speed').value) || 1.0;
+        localStorage.setItem('audioSettings', JSON.stringify(savedSettings));
     }
 
     function saveTimeSettings() {
@@ -352,16 +389,16 @@
                 let lvl = selectElement.options[i].value;
                 if(lvl) gameTimeSettings[lvl] = newSettings;
             }
-            alert("تم تطبيق الإعدادات الجديدة وسرعة الهبوط على جميع المستويات والصفوف المفتوحة بنجاح.");
+            alert("تم تطبيق الإعدادات وسرعة الهبوط على جميع المستويات والصفوف بنجاح.");
         } else {
             if(!currentLevel) return;
             gameTimeSettings[currentLevel] = newSettings;
-            alert(`تم تطبيق الإعدادات الجديدة وسرعة الهبوط على (${getLevelName(currentLevel)}) بنجاح.`);
+            alert(`تم تطبيق الإعدادات الجديدة على (${getLevelName(currentLevel)}) بنجاح.`);
         }
         
         localStorage.setItem('listenGameSettings', JSON.stringify(gameTimeSettings));
         document.getElementById('settings-password').value = '';
-        toggleSettings();
+        toggleSettingsModal();
     }
 
     function resetProgress() {
@@ -371,40 +408,31 @@
             gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
             localStorage.setItem('listenGameProgress', JSON.stringify(gameProgress));
             document.getElementById('settings-password').value = '';
-            alert(`تم تصفير جميع المراحل والنجوم لمستوى (${getLevelName(currentLevel)}) بنجاح وإغلاقها ما عدا المرحلة الأولى.`);
+            alert(`تم تصفير جميع المراحل لمستوى (${getLevelName(currentLevel)}) بنجاح وإغلاقها.`);
             renderStages();
-        } else {
-            alert('كلمة المرور غير صحيحة!');
-        }
+            toggleSettingsModal();
+        } else { alert('كلمة المرور غير صحيحة!'); }
     }
 
     function resetAllProgress() {
         let passInput = document.getElementById('settings-password').value;
         if(passInput === 'T@mer2023') { 
-            if (confirm("هل أنت متأكد تماماً من تصفير جميع المراحل لجميع المستويات والصفوف المفتوحة للطفل؟")) {
-                for(let lvl in gameProgress) {
-                    gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
-                }
+            if (confirm("هل أنت متأكد تماماً من تصفير جميع المراحل لجميع المستويات المفتوحة للطفل؟")) {
+                for(let lvl in gameProgress) { gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; }
                 localStorage.setItem('listenGameProgress', JSON.stringify(gameProgress));
                 document.getElementById('settings-password').value = '';
                 alert('تم تصفير جميع المراحل لجميع المستويات المفتوحة بنجاح التام.');
                 renderStages();
+                toggleSettingsModal();
             }
-        } else {
-            alert('كلمة المرور غير صحيحة!');
-        }
+        } else { alert('كلمة المرور غير صحيحة!'); }
     }
 
     function loadGameData() {
         wordsData = allLevelsData[currentLevel] || [];
         if(wordsData.length === 0) return;
-
         totalStages = Math.ceil(wordsData.length / WORDS_PER_STAGE);
-        
-        if(!gameProgress[currentLevel]) {
-            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
-        }
-        
+        if(!gameProgress[currentLevel]) { gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } }; }
         renderStages();
     }
 
@@ -416,7 +444,6 @@
         for(let i = 1; i <= totalStages; i++) {
             let btn = document.createElement('button');
             btn.className = 'stage-btn';
-            
             let isUnlocked = levelData[i] && levelData[i].unlocked;
             if(i === 1) isUnlocked = true; 
 
@@ -427,7 +454,6 @@
                 let starsCount = levelData[i]?.stars || 0;
                 let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';
                 let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
-                
                 btn.innerHTML = `مرحلة ${i} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
                 btn.onclick = () => startGame(i);
             }
@@ -456,7 +482,6 @@
         }
 
         stageWords.sort(() => Math.random() - 0.5);
-
         startTimer();
         loadQuestion();
     }
@@ -467,6 +492,9 @@
             return;
         }
 
+        // فتح القفل عند بدء سؤال جديد
+        isProcessingAnswer = false; 
+
         document.getElementById('question-num-display').innerText = currentQuestionIdx + 1;
         const gameArea = document.getElementById('game-area');
         gameArea.innerHTML = '';
@@ -474,7 +502,6 @@
         clearInterval(animationInterval);
 
         let currentWord = stageWords[currentQuestionIdx];
-        
         playCurrentExampleAudio();
 
         let choices = [{ id: currentWord.id, text: currentWord.ar, isCorrect: true }];
@@ -489,8 +516,6 @@
         choices.sort(() => Math.random() - 0.5);
 
         let segmentPercent = 100 / choices.length; 
-
-        // جلب قيمة السرعة المحددة من الإعدادات للتحكم بالهبوط
         let baseSpeed = getLevelTimes(currentLevel).speed || 2;
 
         choices.forEach((choice, index) => {
@@ -505,7 +530,6 @@
             bDiv.style.left = leftOffset + '%';
             bDiv.style.top = '-' + (Math.random() * 60 + 80) + 'px';
 
-            // حساب السرعة الفردية لكل فقاعة بناءً على السرعة العامة المحددة لولي الأمر
             let speed = Math.random() * (baseSpeed * 0.75) + (baseSpeed * 0.5); 
 
             bDiv.onclick = () => onBubbleClick(choice.isCorrect, bDiv);
@@ -547,6 +571,10 @@
     }
 
     function onBubbleClick(isCorrect, element) {
+        // حماية من النقر المتعدد السريع وتجاوز الأسئلة
+        if (isProcessingAnswer) return; 
+        isProcessingAnswer = true; 
+        
         clearInterval(animationInterval);
         
         if(isCorrect) {
