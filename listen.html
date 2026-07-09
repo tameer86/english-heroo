@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة المطابقة والذاكرة</title>
+    <title>لعبة صائد الكلمات المسموعة</title>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -13,16 +13,14 @@
     <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     
     <style>
-        :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #eef2f7; padding: 20px; margin: 0; text-align: center; }
+        :root { --primary: #8e44ad; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #eef2f7; padding: 20px; margin: 0; text-align: center; overflow-x: hidden; }
         h1 { color: var(--primary); margin-bottom: 10px; }
         
-        /* واجهة الإحصائيات واختيار المستوى */
         .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
         .score-text { color: var(--warning); font-size: 20px;}
         .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
         
-        /* واجهة المراحل */
         #stages-screen { display: block; }
         .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
         .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
@@ -46,20 +44,21 @@
         .btn-reset-curr { background: var(--warning); color: #333 !important;}
         .btn-reset-all { background: var(--danger); }
 
-        /* واجهة اللعب */
-        #game-screen { display: none; }
+        #game-screen { display: none; position: relative; }
         .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto;}
         .timer { font-size: 24px; color: var(--danger); font-weight: bold; }
-        .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 1100px; margin: 0 auto; }
-        .card { background: #fff; border: 3px solid #cbd5e1; border-radius: 10px; padding: 20px 10px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; user-select: none; display: flex; align-items: center; justify-content: center; min-height: 80px; color: var(--dark);}
-        .card:hover { border-color: var(--primary); }
-        .card.selected { background: #e3f2fd; border-color: var(--info); transform: scale(1.05); }
-        .card.matched { visibility: hidden; opacity: 0; transition: visibility 0s 0.3s, opacity 0.3s linear;}
+        
+        .game-area { position: relative; width: 100%; max-width: 1100px; height: 500px; background: #fff; border-radius: 15px; border: 3px dashed var(--primary); margin: 0 auto; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+        
+        .bubble { position: absolute; background: #3498db; color: white; padding: 15px 20px; border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; user-select: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background-color 0.2s; text-align: center; max-width: 200px; min-width: 120px; line-height: 1.2; }
+        .bubble:hover { background: #2980b9; }
+        
+        .btn-repeat { background: var(--warning); color: #856404; font-size: 18px; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
+        .btn-repeat:hover { opacity: 0.9; }
 
         .btn-back { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
         .btn-back:hover { opacity: 0.9; }
         
-        /* نافذة النتيجة */
         #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
         .modal-content h2 { margin-top: 0; color: var(--primary);}
@@ -79,15 +78,20 @@
     </div>
 
     <div id="stages-screen">
-        <h1>لعبة الذاكرة والمطابقة 🎴</h1>
-        <p style="color: var(--dark); font-size: 18px; font-weight: bold;">اختر المرحلة لتبدأ التحدي. طابق الكلمة مع معناها بأسرع وقت لجمع النجوم والنقاط!</p>
+        <h1>لعبة صائد الأمثلة المسموعة 🎧</h1>
+        <p style="color: var(--dark); font-size: 18px; font-weight: bold;">استمع للمثال الإنجليزي بعناية، ثم اصطد بالون المعنى العربي المفرد الصحيح للكلمة!</p>
         <div class="stages-grid" id="stages-container"></div>
 
         <div class="settings-container">
             <button class="btn-toggle-settings" onclick="toggleSettings()">⚙️ إعدادات اللعبة (لولي الأمر)</button>
             <div id="settings-panel" class="settings-panel">
-                <h3>إعدادات الأوقات وإدارة المراحل</h3>
+                <h3>إعدادات اللعبة والأوقات</h3>
                 
+                <div class="settings-row" style="background:#e8f5e9; padding:15px; border-radius:8px; border: 1px solid #c8e6c9;">
+                    <label style="display:block; width:100%; margin-bottom:10px; color:#2e7d32;">اختر صوت القارئ (لا يحتاج مرور):</label>
+                    <select id="voice-select" onchange="saveVoiceSetting()" style="padding:10px; font-size:16px; border-radius:5px; border:1px solid #4caf50; cursor:pointer; width:100%; font-family:inherit;"></select>
+                </div>
+
                 <div class="settings-row">
                     <label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60">
                 </div>
@@ -106,21 +110,17 @@
                 
                 <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                     <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات الجديدة:</label>
-                 <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">   
-					<input type="radio" id="apply-current" name="apply-scope" checked> <label for="apply-current" style="min-width:auto; margin-left:20px;">تطبيق على الصف الذي تم اختياره</label>
+                    <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">   
+                        <input type="radio" id="apply-current" name="apply-scope" checked> <label for="apply-current" style="min-width:auto; margin-left:20px;">تطبيق على الصف المحدد</label>
+                    </div>
+                    <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">
+                         <input type="radio" id="apply-all" name="apply-scope"> <label for="apply-all" style="min-width:auto;">تطبيق على جميع الصفوف</label>
+                    </div>
                 </div>
-				<div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
-                     <input type="radio" id="apply-all" name="apply-scope"> <label for="apply-all" style="min-width:auto;">تطبيق على جميع الصفوف والمستويات</label>
-                </div>
-				</div>
-				
-				
-				
-				
 
                 <div class="settings-row" style="margin-top:20px;">
                     <label style="color: var(--danger);">كلمة المرور للتأكيد:</label>
-                    <input type="password" id="settings-password" placeholder="أدخل كلمة المرور لإتمام أي إجراء">
+                    <input type="password" id="settings-password" placeholder="أدخل كلمة المرور لإتمام التعديل أو التصفير">
                 </div>
 
                 <div class="action-btns">
@@ -130,35 +130,34 @@
                 </div>
             </div>
         </div>
-
         <br>
-        <button class="btn-back" style="margin-top: 40px; padding: 12px 30px;" onclick="window.location.href='game.html'">🔙 العودة لصفحة الألعاب</button>
+        <button class="btn-back" style="margin-top: 30px; padding: 12px 30px;" onclick="window.location.href='game.html'">🔙 العودة لصفحة الألعاب</button>
     </div>
 
     <div id="game-screen">
         <div class="game-controls">
             <button class="btn-back" onclick="showStagesScreen()">🔙 خروج من المرحلة</button>
-            <h2 style="margin: 0; color: var(--primary);">المرحلة: <span id="current-stage-display">1</span></h2>
+            <h2 style="margin: 0; color: var(--primary);">المرحلة: <span id="current-stage-display">1</span> | السؤال: <span id="question-num-display">1</span>/10</h2>
             <div class="timer">
                 الوقت: <span id="timer-display">0</span> ثانية ⏱️
                 <span id="live-stars" style="color: #f1c40f; font-size: 20px; margin-right: 15px; letter-spacing: 2px;">★★★★★</span>
             </div>
         </div>
-        <div class="board" id="game-board"></div>
+        <button class="btn-repeat" onclick="playCurrentExampleAudio()">🔊 إعادة استماع للمثال</button>
+        <div class="game-area" id="game-area"></div>
     </div>
 
     <div id="result-modal">
         <div class="modal-content">
-            <h2 id="modal-title">أحسنت! أنهيت المرحلة 🎉</h2>
-            <div class="stars-display" id="modal-stars">⭐⭐⭐</div>
-            <p style="font-size: 18px; color: var(--dark);">وقت الإجابة: <strong id="modal-time" style="color: var(--danger);"></strong> ثانية</p>
+            <h2 id="modal-title">أحسنت البطل! أنهيت صيد الأمثلة 🎉</h2>
+            <div class="stars-display" id="modal-stars">⭐⭐⭐⭐⭐</div>
+            <p style="font-size: 18px; color: var(--dark);">وقت الإجابة الكلي: <strong id="modal-time" style="color: var(--danger);"></strong> ثانية</p>
             <p id="modal-points-msg" style="color: var(--success); font-weight: bold; font-size: 18px;"></p>
             <button class="modal-btn" onclick="showStagesScreen()">متابعة</button>
         </div>
     </div>
 
 <script>
-    // --- 1. قاموس البيانات الأساسي ---
     const allLevelsData = {
         "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
         "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
@@ -180,10 +179,9 @@
         return 'مستوى ' + code;
     }
 
-    // --- 2. المتغيرات العامة ---
     let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
-    let gameProgress = JSON.parse(localStorage.getItem('matchGameProgress')) || {};
-    let gameTimeSettings = JSON.parse(localStorage.getItem('matchGameSettings')) || {};
+    let gameProgress = JSON.parse(localStorage.getItem('listenGameProgress')) || {};
+    let gameTimeSettings = JSON.parse(localStorage.getItem('listenGameSettings')) || {};
     
     let currentLevel = "";
     let wordsData = [];
@@ -191,15 +189,18 @@
     let totalStages = 0;
     
     let currentStage = 1;
+    let currentQuestionIdx = 0;
+    let stageWords = [];
+    
     let timerInterval;
     let secondsElapsed = 0;
-    let selectedCards = [];
-    let matchesFound = 0;
+    let animationInterval;
+    let currentBubbles = [];
 
-    // --- 3. التشغيل الأولي وبناء القائمة المنسدلة ---
     window.onload = function() {
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
         initializeDropdown();
+        window.speechSynthesis.onvoiceschanged = loadVoices; // لتحديث الأصوات عند اكتمال تحميلها
     };
 
     function initializeDropdown() {
@@ -229,7 +230,7 @@
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
             document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
             selectElement.disabled = true;
-            document.querySelector('.settings-container').style.display = 'none'; // إخفاء الإعدادات إذا لم يكن هناك مستويات
+            document.querySelector('.settings-container').style.display = 'none';
             return;
         }
 
@@ -244,7 +245,7 @@
         loadSettingsUI();
     }
 
-    // --- 4. إعدادات اللعبة والأوقات (الجديدة) ---
+    // --- إعدادات اللعبة والأوقات والأصوات ---
     function getLevelTimes(level) {
         let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180 };
         return gameTimeSettings[level] || defaultTimes;
@@ -258,6 +259,34 @@
         document.getElementById('time-3').value = t.t3;
         document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1;
+        loadVoices();
+    }
+
+    function loadVoices() {
+        let select = document.getElementById('voice-select');
+        select.innerHTML = '';
+        let voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+        let savedSettings = JSON.parse(localStorage.getItem('audioSettings')) || {};
+        
+        if(voices.length === 0) {
+            select.innerHTML = "<option value=''>الصوت الافتراضي</option>";
+            return;
+        }
+        
+        voices.forEach(v => {
+            let opt = document.createElement('option');
+            let gender = (v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('hazel')) ? "أنثى" : "ذكر";
+            opt.text = `${v.name} (${gender})`;
+            opt.value = v.name;
+            if(v.name === savedSettings.voiceName) opt.selected = true;
+            select.appendChild(opt);
+        });
+    }
+
+    function saveVoiceSetting() {
+        let savedSettings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1 };
+        savedSettings.voiceName = document.getElementById('voice-select').value;
+        localStorage.setItem('audioSettings', JSON.stringify(savedSettings));
     }
 
     function toggleSettings() {
@@ -300,12 +329,43 @@
             alert(`تم تطبيق أوقات النجوم الجديدة على (${getLevelName(currentLevel)}) بنجاح.`);
         }
         
-        localStorage.setItem('matchGameSettings', JSON.stringify(gameTimeSettings));
+        localStorage.setItem('listenGameSettings', JSON.stringify(gameTimeSettings));
         document.getElementById('settings-password').value = '';
-        toggleSettings(); // إخفاء اللوحة بعد الحفظ
+        toggleSettings();
     }
 
-    // --- 5. تجهيز بيانات اللعبة وعرض المراحل ---
+    function resetProgress() {
+        let passInput = document.getElementById('settings-password').value;
+        if(passInput === 'T@mer2023') { 
+            if(!currentLevel) return;
+            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
+            localStorage.setItem('listenGameProgress', JSON.stringify(gameProgress));
+            document.getElementById('settings-password').value = '';
+            alert(`تم تصفير جميع المراحل والنجوم لمستوى (${getLevelName(currentLevel)}) بنجاح وإغلاقها ما عدا المرحلة الأولى.`);
+            renderStages();
+        } else {
+            alert('كلمة المرور غير صحيحة!');
+        }
+    }
+
+    function resetAllProgress() {
+        let passInput = document.getElementById('settings-password').value;
+        if(passInput === 'T@mer2023') { 
+            if (confirm("هل أنت متأكد تماماً من تصفير جميع المراحل لجميع المستويات والصفوف المفتوحة للطفل؟")) {
+                for(let lvl in gameProgress) {
+                    gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+                }
+                localStorage.setItem('listenGameProgress', JSON.stringify(gameProgress));
+                document.getElementById('settings-password').value = '';
+                alert('تم تصفير جميع المراحل لجميع المستويات المفتوحة بنجاح التام.');
+                renderStages();
+            }
+        } else {
+            alert('كلمة المرور غير صحيحة!');
+        }
+    }
+
+    // --- تحميل مراحل اللعبة ---
     function loadGameData() {
         wordsData = allLevelsData[currentLevel] || [];
         if(wordsData.length === 0) return;
@@ -347,16 +407,16 @@
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
     }
 
-    // --- 6. بدء المرحلة وبناء البطاقات ---
     function startGame(stageNumber) {
         currentStage = stageNumber;
+        currentQuestionIdx = 0;
         document.getElementById('stages-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
         document.getElementById('current-stage-display').innerText = stageNumber;
         
         let startIndex = (stageNumber - 1) * WORDS_PER_STAGE;
         let endIndex = startIndex + WORDS_PER_STAGE;
-        let stageWords = wordsData.slice(startIndex, endIndex);
+        stageWords = wordsData.slice(startIndex, endIndex);
 
         if(stageWords.length < WORDS_PER_STAGE && wordsData.length >= WORDS_PER_STAGE) {
             let needed = WORDS_PER_STAGE - stageWords.length;
@@ -366,75 +426,111 @@
             stageWords = stageWords.concat(extraWords);
         }
 
-        renderBoard(stageWords);
+        // خلط ترتيب أسئلة المرحلة بشكل عشوائي في كل مرة
+        stageWords.sort(() => Math.random() - 0.5);
+
         startTimer();
+        loadQuestion();
     }
 
-    function renderBoard(stageWords) {
-        const board = document.getElementById('game-board');
-        board.innerHTML = '';
-        selectedCards = [];
-        matchesFound = 0;
+    function loadQuestion() {
+        if(currentQuestionIdx >= WORDS_PER_STAGE) {
+            endGame();
+            return;
+        }
 
-        let cardsArray = [];
-        stageWords.forEach((item) => {
-            cardsArray.push({ id: item.id, text: item.en, type: 'en', lang: 'ltr' });
-            cardsArray.push({ id: item.id, text: item.ar, type: 'ar', lang: 'rtl' });
-        });
+        document.getElementById('question-num-display').innerText = currentQuestionIdx + 1;
+        const gameArea = document.getElementById('game-area');
+        gameArea.innerHTML = '';
+        currentBubbles = [];
+        clearInterval(animationInterval);
 
-        cardsArray.sort(() => Math.random() - 0.5);
+        let currentWord = stageWords[currentQuestionIdx];
+        
+        playCurrentExampleAudio();
 
-        cardsArray.forEach(item => {
-            let cardDiv = document.createElement('div');
-            cardDiv.className = 'card';
-            cardDiv.innerText = item.text;
-            cardDiv.dataset.id = item.id;
-            cardDiv.dataset.type = item.type;
-            cardDiv.dir = item.lang; 
+        let choices = [{ id: currentWord.id, text: currentWord.ar, isCorrect: true }];
+        
+        let pool = wordsData.filter(w => w.id !== currentWord.id);
+        pool.sort(() => Math.random() - 0.5);
+        
+        for(let i = 0; i < Math.min(3, pool.length); i++) {
+            choices.push({ id: pool[i].id, text: pool[i].ar, isCorrect: false });
+        }
+        
+        choices.sort(() => Math.random() - 0.5);
+
+        let areaWidth = gameArea.clientWidth || 1000;
+        let segment = areaWidth / choices.length;
+
+        choices.forEach((choice, index) => {
+            let bDiv = document.createElement('div');
+            bDiv.className = 'bubble';
+            bDiv.innerText = choice.text;
             
-            cardDiv.onclick = () => onCardClick(cardDiv);
-            board.appendChild(cardDiv);
+            let colors = ['#3498db', '#e67e22', '#2ecc71', '#9b59b6'];
+            bDiv.style.backgroundColor = colors[index % colors.length];
+
+            let leftPos = (index * segment) + Math.random() * (segment - 150);
+            bDiv.style.left = Math.max(10, Math.min(leftPos, areaWidth - 160)) + 'px';
+            bDiv.style.top = '-' + (Math.random() * 60 + 50) + 'px';
+
+            let speed = Math.random() * 1.2 + 1.0; 
+
+            bDiv.onclick = () => onBubbleClick(choice.isCorrect, bDiv);
+
+            gameArea.appendChild(bDiv);
+            currentBubbles.push({ element: bDiv, top: parseFloat(bDiv.style.top), speed: speed });
         });
-    }
 
-    // --- 7. منطق النقر والمطابقة ---
-    function onCardClick(card) {
-        if(selectedCards.length >= 2 || card.classList.contains('selected') || card.classList.contains('matched')) return;
+        animationInterval = setInterval(() => {
+            currentBubbles.forEach(b => {
+                b.top += b.speed;
+                b.element.style.top = b.top + 'px';
 
-        card.classList.add('selected');
-        selectedCards.push(card);
-
-        if(selectedCards.length === 2) {
-            checkMatch();
-        }
-    }
-
-    function checkMatch() {
-        let card1 = selectedCards[0];
-        let card2 = selectedCards[1];
-
-        if(card1.dataset.id === card2.dataset.id && card1.dataset.type !== card2.dataset.type) {
-            setTimeout(() => {
-                card1.classList.remove('selected');
-                card1.classList.add('matched');
-                card2.classList.remove('selected');
-                card2.classList.add('matched');
-                selectedCards = [];
-                matchesFound++;
-                if(matchesFound === WORDS_PER_STAGE) {
-                    endGame();
+                if (b.top > 500) {
+                    b.top = -50;
+                    b.element.style.top = b.top + 'px';
                 }
-            }, 400);
-        } else {
+            });
+        }, 20);
+    }
+
+    function playCurrentExampleAudio() {
+        let currentWord = stageWords[currentQuestionIdx];
+        if(!currentWord) return;
+        
+        let settings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1, voiceName: "" };
+        let cleanText = currentWord.ex_en.replace(/[-\\\/]/g, ' or ');
+        
+        let ut = new SpeechSynthesisUtterance(cleanText);
+        ut.lang = 'en-US';
+        ut.rate = settings.speed || 1;
+        let v = window.speechSynthesis.getVoices().find(v => v.name === settings.voiceName);
+        if(v) ut.voice = v;
+        
+        window.speechSynthesis.cancel(); 
+        window.speechSynthesis.speak(ut);
+    }
+
+    function onBubbleClick(isCorrect, element) {
+        clearInterval(animationInterval);
+        
+        if(isCorrect) {
+            element.style.backgroundColor = 'var(--success)';
             setTimeout(() => {
-                card1.classList.remove('selected');
-                card2.classList.remove('selected');
-                selectedCards = [];
-            }, 800);
+                currentQuestionIdx++;
+                loadQuestion();
+            }, 500);
+        } else {
+            element.style.backgroundColor = 'var(--danger)';
+            element.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                loadQuestion(); 
+            }, 500);
         }
     }
 
-    // --- 8. حساب النجوم بناءً على الإعدادات ---
     function getStarsForTime(time) {
         let t = getLevelTimes(currentLevel);
         if(time <= t.t5) return 5;
@@ -453,7 +549,7 @@
     function startTimer() {
         secondsElapsed = 0;
         document.getElementById('timer-display').innerText = secondsElapsed;
-        document.getElementById('live-stars').innerText = '★★★★★'; 
+        document.getElementById('live-stars').innerText = '★★★★★';
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             secondsElapsed++;
@@ -464,6 +560,9 @@
 
     function endGame() {
         clearInterval(timerInterval);
+        clearInterval(animationInterval);
+        window.speechSynthesis.cancel();
+
         let time = secondsElapsed;
         let stars = getStarsForTime(time);
 
@@ -477,11 +576,7 @@
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
             
-            levelData[currentStage] = {
-                unlocked: true,
-                stars: stars,
-                time: time 
-            };
+            levelData[currentStage] = { unlocked: true, stars: stars, time: time };
         } else if (!levelData[currentStage]) {
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
         }
@@ -491,7 +586,7 @@
         }
 
         gameProgress[currentLevel] = levelData;
-        localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
+        localStorage.setItem('listenGameProgress', JSON.stringify(gameProgress));
 
         showResultModal(stars, time, pointsGained);
     }
@@ -502,9 +597,9 @@
         
         let msgElement = document.getElementById('modal-points-msg');
         if(points > 0) {
-            msgElement.innerText = `رائع! كسبت ${points} نقطة إضافية للعلامة التراكمية! 🏆`;
+            msgElement.innerText = `رائع جداً! كسبت ${points} نقطة إضافية للعلامة التراكمية! 🏆`;
         } else {
-            msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع لرفع نجومك! 💪`;
+            msgElement.innerText = `لم تحصل على نقاط جديدة. حاول في المرة القادمة بوقت أسرع لرفع نجومك! 💪`;
         }
         
         document.getElementById('result-modal').style.display = 'flex';
@@ -512,43 +607,12 @@
 
     function showStagesScreen() {
         clearInterval(timerInterval);
+        clearInterval(animationInterval);
+        window.speechSynthesis.cancel();
         document.getElementById('result-modal').style.display = 'none';
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('stages-screen').style.display = 'block';
         renderStages();
-    }
-
-    // --- 9. أزرار التصفير لولي الأمر ---
-    function resetProgress() {
-        let passInput = document.getElementById('settings-password').value;
-        if(passInput === 'T@mer2023') { 
-            if(!currentLevel) return;
-            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
-            localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
-            document.getElementById('settings-password').value = '';
-            alert(`تم تصفير جميع المراحل والنجوم لمستوى (${getLevelName(currentLevel)}) بنجاح وإغلاقها ما عدا المرحلة الأولى.`);
-            renderStages();
-        } else {
-            alert('كلمة المرور غير صحيحة!');
-        }
-    }
-
-    function resetAllProgress() {
-        let passInput = document.getElementById('settings-password').value;
-        if(passInput === 'T@mer2023') { 
-            if (confirm("هل أنت متأكد تماماً من تصفير جميع المراحل لجميع المستويات والصفوف المفتوحة للطفل؟")) {
-                // تصفير جميع المستويات الموجودة في سجل تقدم اللعبة
-                for(let lvl in gameProgress) {
-                    gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
-                }
-                localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
-                document.getElementById('settings-password').value = '';
-                alert('تم تصفير جميع المراحل لجميع المستويات المفتوحة بنجاح التام.');
-                renderStages();
-            }
-        } else {
-            alert('كلمة المرور غير صحيحة!');
-        }
     }
 </script>
 
