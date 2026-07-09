@@ -108,6 +108,10 @@
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
+        /* نافذة عرض الصورة المكبرة */
+        #image-modal { z-index: 3000; cursor: pointer; flex-direction: column; }
+        .full-size-image { max-width: 95%; max-height: 90vh; border-radius: 15px; border: 4px solid var(--gold); box-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: popIn 0.3s ease-out; object-fit: contain; cursor: default; }
+
         .btn-back { background-color: var(--dark); color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 40px; text-decoration: none; display: inline-block; transition: opacity 0.2s; }
         .btn-back:hover { opacity: 0.9; }
         .game-image { margin-top: 35px; width: clamp(240px, 42vw, 480px); height: auto; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
@@ -201,6 +205,11 @@
             <p id="cel-desc" style="font-weight:bold; font-size:16px;"></p>
             <button class="btn-withdraw" style="background:#e74a3b; margin-top:20px;" onclick="closeCelebration()">رائع! استمرار 🚀</button>
         </div>
+    </div>
+
+    <div id="image-modal" class="custom-modal" onclick="closeImageModal(event)">
+        <button class="btn-close-modal" style="top: 20px; right: 20px; z-index: 1001;" onclick="closeImageModal(event)">✖</button>
+        <img id="full-size-img" src="" class="full-size-image" alt="صورة المرحلة المكبرة">
     </div>
 
     <div><img src="images/mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image"></div>
@@ -315,6 +324,18 @@
         }
     }
 
+    // عرض الصورة بالحجم الكامل
+    function openFullImage(imgSrc) {
+        document.getElementById('full-size-img').src = imgSrc;
+        document.getElementById('image-modal').style.display = 'flex';
+    }
+
+    function closeImageModal(e) {
+        if (e.target.id === 'image-modal' || e.target.tagName === 'BUTTON') {
+            document.getElementById('image-modal').style.display = 'none';
+        }
+    }
+
     // ==========================================
     // نظام فحص وعرض لوحة الشرف
     // ==========================================
@@ -399,10 +420,13 @@
             if (score >= stage.end) { progressPercent = 100; } 
             else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
 
+            // تفعيل حدث النقر فقط إذا كانت المرحلة مفتوحة
+            let imgClickAction = isStageUnlocked ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="اضغط لتكبير الصورة"` : '';
+
             // تم إضافة الوصف الفكاهي أسفل العنوان
             let html = `
                 <div class="stage-card ${stageClass}">
-                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'">
+                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction}>
                     <h3 class="stage-title">
                         مرحلة ${stage.num}: ${stage.name}
                         <span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span>
