@@ -31,342 +31,235 @@
             flex-wrap: wrap;
         }
         
-        .game-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         .game-btn {
-            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 22px 45px;
+            padding: 20px 40px;
             font-size: 24px;
             border-radius: 15px;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            transition: transform 0.2s, background-color 0.2s, opacity 0.3s;
+            transition: transform 0.2s, background-color 0.2s;
             text-decoration: none;
             display: inline-block;
             font-weight: bold;
         }
         .game-btn:hover {
             transform: translateY(-5px);
-            opacity: 0.95;
-        }
-        
-        /* تصميم الزر المعطل */
-        .game-btn.disabled {
-            background-color: #cbd5e1 !important;
-            color: #94a3b8 !important;
-            cursor: not-allowed !important;
-            box-shadow: none !important;
-            transform: none !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
-        /* زر فتح الإعدادات (المسنن) */
+        /* زر الإعدادات المسنن */
         .btn-settings-toggle {
-            background-color: white;
-            color: var(--dark);
-            border: 2px solid #ddd;
-            padding: 10px 20px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 50px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-            transition: 0.2s;
-        }
-        .btn-settings-toggle:hover {
-            background-color: #f8f9fc;
-            border-color: #ccc;
-        }
-
-        /* لوحة التحكم والإعدادات لولي الأمر */
-        .admin-panel {
-            display: none; /* مخفية بشكل افتراضي */
-            margin-top: 20px;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid #e3e6f0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            display: none; /* مخفية بشكل افتراضي */
-            max-width: 500px;
-            width: 100%;
-            text-align: right;
-            position: relative;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        /* زر الإغلاق داخل اللوحة */
-        .close-panel-btn {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 20px;
+            left: 20px;
             background: none;
             border: none;
-            font-size: 20px;
-            color: var(--danger);
+            font-size: 28px;
             cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.2s;
+            transition: transform 0.3s;
+            user-select: none;
         }
-        .close-panel-btn:hover {
-            transform: scale(1.2);
+        .btn-settings-toggle:hover {
+            transform: rotate(45deg);
         }
 
-        .admin-panel h3 {
-            margin-top: 0;
-            color: var(--dark);
-            border-bottom: 2px solid #eaecf4;
-            padding-bottom: 10px;
-            text-align: center;
-            padding-right: 20px; /* لترك مساحة لزر الإغلاق */
+        /* لوحة الإعدادات المخفية */
+        .admin-panel {
+            display: none;
+            max-width: 500px;
+            margin: 25px auto 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            text-align: right;
         }
-        .control-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 5px;
-            border-bottom: 1px dashed #eaecf4;
-        }
-        .control-row label {
-            font-size: 17px;
-            font-weight: bold;
-            color: #4e73df;
-            cursor: pointer;
-        }
-        .control-row input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            cursor: pointer;
-        }
+        .admin-panel h3 { margin-top: 0; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 8px; text-align: center; }
+        .admin-row { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        .admin-row label { font-weight: bold; color: var(--dark); }
+        .admin-row input { padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; font-weight: bold; }
         
-        .password-section {
-            margin-top: 20px;
-            background: #f8f9fc;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #dddfeb;
-        }
-        .password-section label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: var(--danger);
-        }
-        .password-section input {
+        .admin-checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; background: var(--light); padding: 12px; border-radius: 6px; }
+        .admin-checkbox-group label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; }
+        .admin-checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+        .btn-admin-action {
             width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
+            padding: 12px;
+            border: none;
             border-radius: 6px;
             font-size: 16px;
-            text-align: left;
-            direction: ltr;
-        }
-        
-        .btn-reset-all {
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
             font-weight: bold;
-            width: 100%;
-            margin-top: 15px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            color: white;
+            cursor: pointer;
+            background-color: var(--danger);
+            margin-top: 10px;
             transition: opacity 0.2s;
         }
-        .btn-reset-all:hover { opacity: 0.9; }
+        .btn-admin-action:hover { opacity: 0.9; }
 
         .btn-back {
             background-color: var(--dark);
             color: white;
             border: none;
-            padding: 12px 35px;
+            padding: 12px 30px;
             font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 40px;
             text-decoration: none;
             display: inline-block;
             transition: opacity 0.2s;
         }
         .btn-back:hover { opacity: 0.9; }
 
-        .bottom-controls {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+        /* تنسيق الصورة المتجاوبة والنسبية */
+        .game-image {
+            margin-top: 35px;
+            width: clamp(240px, 42vw, 480px);
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
+    <button class="btn-settings-toggle" onclick="toggleAdminPanel()" title="إعدادات الألعاب لولي الأمر">⚙️</button>
+
     <h1>🎮 مرحباً بك في قسم الألعاب 🎮</h1>
     <p class="subtitle">اختر اللعبة التي تريد أن تلعبها لتبدأ التحدي وتجمع النقاط!</p>
 
     <div class="games-container">
-        <div class="game-card">
-            <a href="matchg.html" id="link-matchg" class="game-btn">لعبة المطابقة والذاكرة 🎴</a>
-        </div>
-        <div class="game-card">
-            <a href="listen.html" id="link-listen" class="game-btn" style="background-color: var(--purple);">لعبة صائد الكلمات المسموعة 🎧</a>
-        </div>
+        <a href="matchg.html" id="link-matchg" class="game-btn" style="background-color: var(--primary);">لعبة المطابقة والذاكرة 🎴</a>
+        <a href="listen.html" id="link-listen" class="game-btn" style="background-color: var(--purple);">لعبة صائد الأمثلة المسموعة 🎧</a>
     </div>
 
-    <div class="bottom-controls">
-        <button class="btn-settings-toggle" onclick="toggleAdminPanel()">⚙️ إعدادات ولي الأمر</button>
+    <div id="admin-panel" class="admin-panel">
+        <h3>⚙️ إعدادات التحكم بالألعاب (لولي الأمر)</h3>
+        
+        <div class="admin-checkbox-group">
+            <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تفعيل أو تعطيل الألعاب للطفل:</strong>
+            <label>
+                <input type="checkbox" id="chk-matchg" checked onchange="updateGamesState()"> تفعيل لعبة المطابقة والذاكرة
+            </label>
+            <label>
+                <input type="checkbox" id="chk-listen" checked onchange="updateGamesState()"> تفعيل لعبة صائد الأمثلة المسموعة
+            </label>
+        </div>
 
-        <div class="admin-panel" id="admin-panel">
-            <button class="close-panel-btn" onclick="toggleAdminPanel()" title="إغلاق">✖</button>
-            <h3>⚙️ إعدادات الألعاب (لولي الأمر)</h3>
-            
-            <div class="control-row">
-                <label for="check-matchg">تفعيل لعبة المطابقة والذاكرة</label>
-                <input type="checkbox" id="check-matchg" checked onchange="toggleGameActivation('matchg', this)">
-            </div>
-            
-            <div class="control-row">
-                <label for="check-listen">تفعيل لعبة صائد الأمثلة المسموعة</label>
-                <input type="checkbox" id="check-listen" checked onchange="toggleGameActivation('listen', this)">
-            </div>
+        <div class="admin-row" style="margin-top: 20px;">
+            <label>تصفير مراحل جميع الألعاب للبدء من جديد:</label>
+            <input type="password" id="admin-password" placeholder="أدخل كلمة المرور للتأكيد">
+        </div>
+        <button class="btn-admin-action" onclick="resetAllGamesProgress()">🔄 تصفير النجوم والمراحل للكل</button>
+    </div>
 
-            <div class="password-section">
-                <label>كلمة المرور لتأكيد التغييرات أو التصفير:</label>
-                <input type="password" id="admin-password" placeholder="أدخل كلمة المرور لتفعيل الإجراء">
+    <div>
+        <img src="mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image">
+    </div>
+
+    <br>
+    <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+
+<script>
+    const ADMIN_PASSWORD = 'T@mer2023';
+
+    window.onload = function() {
+        loadGamesState();
+    };
+
+    function toggleAdminPanel() {
+        const panel = document.getElementById('admin-panel');
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+        } else {
+            panel.style.display = 'block';
+        }
+    }
+
+    // حفظ حالة تفعيل/تعطيل الألعاب في الـ localStorage
+    function updateGamesState() {
+        const matchgActive = document.getElementById('chk-matchg').checked;
+        const listenActive = document.getElementById('chk-listen').checked;
+
+        const gameState = { matchg: matchgActive, listen: listenActive };
+        localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState));
+        
+        applyGamesState(gameState);
+    }
+
+    function loadGamesState() {
+        const savedState = JSON.parse(localStorage.getItem('disabledGamesConfig')) || { matchg: true, listen: true };
+        
+        document.getElementById('chk-matchg').checked = savedState.matchg;
+        document.getElementById('chk-listen').checked = savedState.listen;
+        
+        applyGamesState(savedState);
+    }
+
+    // تطبيق التعطيل (تعتيم الكبسة وإلغاء الرابط)
+    function applyGamesState(state) {
+        const btnMatch = document.getElementById('link-matchg');
+        const btnListen = document.getElementById('link-listen');
+
+        // لعبة الذاكرة
+        if (state.matchg) {
+            btnMatch.style.opacity = '1';
+            btnMatch.style.pointerEvents = 'auto';
+            btnMatch.setAttribute('href', 'matchg.html');
+        } else {
+            btnMatch.style.opacity = '0.35';
+            btnMatch.style.pointerEvents = 'none';
+            btnMatch.removeAttribute('href');
+        }
+
+        // لعبة الاستماع
+        if (state.listen) {
+            btnListen.style.opacity = '1';
+            btnListen.style.pointerEvents = 'auto';
+            btnListen.setAttribute('href', 'listen.html');
+        } else {
+            btnListen.style.opacity = '0.35';
+            btnListen.style.pointerEvents = 'none';
+            btnListen.removeAttribute('href');
+        }
+    }
+
+    // تصفير تقدم الألعاب بالكامل بناءً على كلمة المرور
+    function resetAllGamesProgress() {
+        const passInput = document.getElementById('admin-password').value;
+
+        if (passInput === ADMIN_PASSWORD) {
+            if (confirm('⚠️ تحذير لولي الأمر: هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟ سيبدأ الطفل من المرحلة الأولى مجدداً.')) {
                 
-                <button class="btn-reset-all" onclick="resetAllGamesProgress()">🔄 تصفير مراحل جميع الألعاب</button>
-            </div>
-        </div>
-
-        <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
-    </div>
-
-    <script>
-        // تعريف كلمة المرور الافتراضية للتطبيق بناء على طلبك
-        const ADMIN_PASSWORD = "T@mer2023";
-
-        // كائن يحفظ الإعدادات الافتراضية للألعاب وتفعيلها
-        let gameStatus = JSON.parse(localStorage.getItem('gameActivationSettings')) || {
-            matchg: true,
-            listen: true
-        };
-
-        window.onload = function() {
-            // مزامنة واجهة المستخدم بناءً على الإعدادات المخزنة في المتصفح
-            document.getElementById('check-matchg').checked = gameStatus.matchg;
-            document.getElementById('check-listen').checked = gameStatus.listen;
-            
-            applyUIChanges();
-        };
-
-        // دالة لفتح وإغلاق لوحة الإعدادات
-        function toggleAdminPanel() {
-            const panel = document.getElementById('admin-panel');
-            if (panel.style.display === 'none' || panel.style.display === '') {
-                panel.style.display = 'inline-block';
-                // تمرير الشاشة للأسفل بسلاسة لتظهر اللوحة
-                setTimeout(() => panel.scrollIntoView({ behavior: 'smooth' }), 100);
-            } else {
-                panel.style.display = 'none';
-            }
-        }
-
-        // دالة تطبيق التغييرات على الأزرار (تفعيل/تعطيل بصري وروابط)
-        function applyUIChanges() {
-            const btnMatch = document.getElementById('link-matchg');
-            const btnListen = document.getElementById('link-listen');
-
-            // إعدادات لعبة المطابقة
-            if (gameStatus.matchg) {
-                btnMatch.classList.remove('disabled');
-                btnMatch.setAttribute('href', 'matchg.html');
-                btnMatch.onclick = null;
-            } else {
-                btnMatch.classList.add('disabled');
-                btnMatch.removeAttribute('href');
-                btnMatch.onclick = function(e) { 
-                    e.preventDefault(); 
-                    alert('عذراً يا بطل، هذه اللعبة مغلقة حالياً من قبل ولي الأمر! 🔒'); 
-                    return false; 
-                };
-            }
-
-            // إعدادات لعبة السمع
-            if (gameStatus.listen) {
-                btnListen.classList.remove('disabled');
-                btnListen.setAttribute('href', 'listen.html');
-                btnListen.onclick = null;
-            } else {
-                btnListen.classList.add('disabled');
-                btnListen.removeAttribute('href');
-                btnListen.onclick = function(e) { 
-                    e.preventDefault(); 
-                    alert('عذراً يا بطل، هذه اللعبة مغلقة حالياً من قبل ولي الأمر! 🔒'); 
-                    return false; 
-                };
-            }
-        }
-
-        // دالة تغيير التفعيل عند الضغط على الـ Checkbox (مرتبطة بكلمة المرور)
-        function toggleGameActivation(gameKey, checkboxElement) {
-            const passInput = document.getElementById('admin-password').value;
-
-            if (passInput === ADMIN_PASSWORD) {
-                gameStatus[gameKey] = checkboxElement.checked;
-                localStorage.setItem('gameActivationSettings', JSON.stringify(gameStatus));
-                applyUIChanges();
-                document.getElementById('admin-password').value = ''; // تصفير حقل كلمة المرور بعد النجاح
-                alert('تم تعديل حالة تفعيل اللعبة بنجاح. ✔️');
-            } else {
-                alert('خطأ: كلمة المرور غير صحيحة! لا يمكنك تغيير إعدادات اللعبة بدونها.');
-                // إعادة صندوق الاختيار لحالته السابقة لعدم مطابقة كلمة المرور
-                checkboxElement.checked = !checkboxElement.checked;
-            }
-        }
-
-        // دالة تصفير مراحل جميع الألعاب دفعة واحدة (مرتبطة بكلمة المرور)
-        function resetAllGamesProgress() {
-            const passInput = document.getElementById('admin-password').value;
-
-            if (passInput === ADMIN_PASSWORD) {
-                if (confirm('⚠️ تحذير لولي الأمر: هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟ سيبدأ الطفل من المرحلة الأولى مجدداً.')) {
-                    
-                    // تصفير ملف لعبة الذاكرة والمطابقة
-                    let matchProg = JSON.parse(localStorage.getItem('matchGameProgress')) || {};
-                    for (let lvl in matchProg) {
-                        matchProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
-                    }
-                    localStorage.setItem('matchGameProgress', JSON.stringify(matchProg));
-
-                    // تصفير ملف لعبة صائد الكلمات المسموعة
-                    let listenProg = JSON.parse(localStorage.getItem('listenGameProgress')) || {};
-                    for (let lvl in listenProg) {
-                        listenProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
-                    }
-                    localStorage.setItem('listenGameProgress', JSON.stringify(listenProg));
-
-                    document.getElementById('admin-password').value = ''; // تفريغ الحقل
-                    alert('تم تصفير تقدم المراحل والنجوم لجميع الألعاب بنجاح تام! 🔄');
+                // تصفير لعبة الذاكرة والمطابقة
+                let matchProg = JSON.parse(localStorage.getItem('matchGameProgress')) || {};
+                for (let lvl in matchProg) {
+                    matchProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
                 }
-            } else {
-                alert('خطأ: كلمة المرور غير صحيحة! لا يمكنك تصفير مراحل الألعاب.');
+                localStorage.setItem('matchGameProgress', JSON.stringify(matchProg));
+
+                // تصفير لعبة صائد الأمثلة المسموعة
+                let listenProg = JSON.parse(localStorage.getItem('listenGameProgress')) || {};
+                for (let lvl in listenProg) {
+                    listenProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+                }
+                localStorage.setItem('listenGameProgress', JSON.stringify(listenProg));
+
+                document.getElementById('admin-password').value = ''; 
+                alert('تم تصفير تقدم المراحل والنجوم لجميع الألعاب بنجاح تام! 🔄');
+                toggleAdminPanel();
             }
+        } else {
+            alert('خطأ: كلمة المرور غير صحيحة! لا يمكنك تصفير مراحل الألعاب.');
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
