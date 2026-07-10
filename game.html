@@ -26,11 +26,13 @@
         h1 { color: #2c3e50; margin-bottom: 5px; }
         .subtitle { color: var(--dark); font-size: 16px; margin-bottom: 30px; font-weight: bold;}
         
-        .games-container { display: flex; justify-content: center; gap: 25px; margin-top: 20px; flex-wrap: wrap; }
-        .game-btn { color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block; font-weight: bold; }
+        /* تم التعديل هنا لترتيب الأزرار عمودياً */
+        .games-container { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 20px; }
+        
+        .game-btn { color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block; font-weight: bold; width: 80%; max-width: 400px; }
         .game-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-        /* أزرار الإعدادات والبنك ولوحة الشرف العلوية */
+        /* أزرار الإعدادات والبنك ولوحة الشرف والرجوع العلوية */
         .top-icons { position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 50; }
         .btn-top-action { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         .btn-top-action:hover { transform: scale(1.2); }
@@ -70,7 +72,7 @@
         .stage-title { font-size: 22px; color: var(--gold); margin: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
         .stage-points-req { font-size: 14px; color: #bdc3c7; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 10px; }
         
-        /* تنسيق الوصف الفكاهي الجديد للمراحل */
+        /* تنسيق الوصف الفكاهي للمراحل */
         .stage-desc {
             font-size: 14px;
             color: #ecf0f1;
@@ -112,14 +114,13 @@
         #image-modal { z-index: 3000; cursor: pointer; flex-direction: column; }
         .full-size-image { max-width: 95%; max-height: 90vh; border-radius: 15px; border: 4px solid var(--gold); box-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: popIn 0.3s ease-out; object-fit: contain; cursor: default; }
 
-        .btn-back { background-color: var(--dark); color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 40px; text-decoration: none; display: inline-block; transition: opacity 0.2s; }
-        .btn-back:hover { opacity: 0.9; }
         .game-image { margin-top: 35px; width: clamp(240px, 42vw, 480px); height: auto; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
     <div class="top-icons">
+        <button class="btn-top-action" onclick="window.location.href='index.html?screen=dashboard'" title="العودة للوحة التحكم">🔙</button>
         <button class="btn-top-action" onclick="toggleModal('admin-modal')" title="إعدادات الألعاب لولي الأمر">⚙️</button>
         <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
         <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
@@ -131,6 +132,9 @@
     <div class="games-container">
         <a href="matchg.html" id="link-matchg" class="game-btn" style="background-color: var(--primary);">لعبة المطابقة والذاكرة 🎴</a>
         <a href="listen.html" id="link-listen" class="game-btn" style="background-color: var(--purple);">لعبة صائد الأمثلة المسموعة 🎧</a>
+        <a href="missing_letters.html" id="link-missing" class="game-btn" style="background-color: var(--success);">لعبة الحروف الناقصة 🔠</a>
+        <a href="scramble_letters.html" id="link-arrange" class="game-btn" style="background-color: var(--warning); color: #2c3e50;">لعبة ترتيب الحروف 🔀</a>
+        <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
     </div>
 
     <div id="admin-modal" class="custom-modal">
@@ -140,12 +144,15 @@
             
             <div class="admin-checkbox-group">
                 <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تفعيل أو تعطيل الألعاب للطفل:</strong>
-                <label><input type="checkbox" id="chk-matchg" checked onchange="updateGamesState()"> تفعيل لعبة المطابقة والذاكرة</label>
-                <label><input type="checkbox" id="chk-listen" checked onchange="updateGamesState()"> تفعيل لعبة صائد الأمثلة المسموعة</label>
+                <label><input type="checkbox" id="chk-matchg" checked onchange="handleCheckboxChange(event)"> تفعيل لعبة المطابقة والذاكرة</label>
+                <label><input type="checkbox" id="chk-listen" checked onchange="handleCheckboxChange(event)"> تفعيل لعبة صائد الأمثلة المسموعة</label>
+                <label><input type="checkbox" id="chk-missing" checked onchange="handleCheckboxChange(event)"> تفعيل لعبة الحروف الناقصة</label>
+                <label><input type="checkbox" id="chk-arrange" checked onchange="handleCheckboxChange(event)"> تفعيل لعبة ترتيب الحروف</label>
+                <label><input type="checkbox" id="chk-crossword" checked onchange="handleCheckboxChange(event)"> تفعيل لعبة الكلمات المتقاطعة</label>
             </div>
 
             <div class="admin-row" style="margin-top: 20px;">
-                <label>تصفير مراحل جميع الألعاب للبدء من جديد:</label>
+                <label style="color: var(--danger); font-size: 14px; margin-bottom: 5px;">⚠️ كلمة المرور (مطلوبة لتفعيل/تعطيل الألعاب وللتصفير):</label>
                 <input type="password" id="admin-password" placeholder="أدخل كلمة المرور للتأكيد">
             </div>
             <button class="btn-admin-action" onclick="resetAllGamesProgress()">🔄 تصفير النجوم والمراحل للكل</button>
@@ -213,9 +220,6 @@
     </div>
 
     <div><img src="images/mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image"></div>
-
-    <br>
-    <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
 
 <script>
     const ADMIN_PASSWORD = 'T@mer2023';
@@ -387,7 +391,7 @@
             
             let imgEl = document.getElementById('cel-img');
             imgEl.src = item.img;
-            imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; // تم التعديل إلى المجلد images
+            imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; 
 
             document.getElementById('celebration-modal').style.display = 'flex';
         }
@@ -465,33 +469,84 @@
     // ==========================================
     // إعدادات تفعيل الألعاب (ولي الأمر)
     // ==========================================
+
+    // دالة جديدة للتحقق من الباسوورد قبل تغيير حالة أي لعبة
+    function handleCheckboxChange(event) {
+        const passwordInput = document.getElementById('admin-password').value;
+        if (passwordInput !== ADMIN_PASSWORD) {
+            alert('عذراً، يجب إدخال كلمة المرور الصحيحة في الحقل بالأسفل لتفعيل أو تعطيل الألعاب!');
+            // إعادة الصندوق (Checkbox) لحالته السابقة
+            event.target.checked = !event.target.checked;
+            return;
+        }
+        // إذا كانت كلمة المرور صحيحة، نستدعي دالة التحديث
+        updateGamesState();
+    }
+
     function updateGamesState() {
         const matchgActive = document.getElementById('chk-matchg').checked;
         const listenActive = document.getElementById('chk-listen').checked;
-        const gameState = { matchg: matchgActive, listen: listenActive };
+        const missingActive = document.getElementById('chk-missing').checked;
+        const arrangeActive = document.getElementById('chk-arrange').checked;
+        const crosswordActive = document.getElementById('chk-crossword').checked;
+
+        const gameState = { 
+            matchg: matchgActive, 
+            listen: listenActive,
+            missing: missingActive,
+            arrange: arrangeActive,
+            crossword: crosswordActive
+        };
         localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState));
         applyGamesState(gameState);
     }
 
     function loadGamesState() {
-        const savedState = JSON.parse(localStorage.getItem('disabledGamesConfig')) || { matchg: true, listen: true };
+        const savedState = JSON.parse(localStorage.getItem('disabledGamesConfig')) || { 
+            matchg: true, listen: true, missing: true, arrange: true, crossword: true 
+        };
+        
+        // تفادي أخطاء السجلات القديمة التي لا تحتوي على الألعاب الجديدة
+        if(savedState.missing === undefined) savedState.missing = true;
+        if(savedState.arrange === undefined) savedState.arrange = true;
+        if(savedState.crossword === undefined) savedState.crossword = true;
+
         document.getElementById('chk-matchg').checked = savedState.matchg;
         document.getElementById('chk-listen').checked = savedState.listen;
+        document.getElementById('chk-missing').checked = savedState.missing;
+        document.getElementById('chk-arrange').checked = savedState.arrange;
+        document.getElementById('chk-crossword').checked = savedState.crossword;
         applyGamesState(savedState);
     }
 
     function applyGamesState(state) {
         const btnMatch = document.getElementById('link-matchg');
         const btnListen = document.getElementById('link-listen');
+        const btnMissing = document.getElementById('link-missing');
+        const btnArrange = document.getElementById('link-arrange');
+        const btnCrossword = document.getElementById('link-crossword');
+
+        // حالة الألعاب
         if (state.matchg) { btnMatch.style.opacity = '1'; btnMatch.style.pointerEvents = 'auto'; btnMatch.setAttribute('href', 'matchg.html'); } 
         else { btnMatch.style.opacity = '0.35'; btnMatch.style.pointerEvents = 'none'; btnMatch.removeAttribute('href'); }
+        
         if (state.listen) { btnListen.style.opacity = '1'; btnListen.style.pointerEvents = 'auto'; btnListen.setAttribute('href', 'listen.html'); } 
         else { btnListen.style.opacity = '0.35'; btnListen.style.pointerEvents = 'none'; btnListen.removeAttribute('href'); }
+
+        if (state.missing) { btnMissing.style.opacity = '1'; btnMissing.style.pointerEvents = 'auto'; btnMissing.setAttribute('href', 'missing_letters.html'); } 
+        else { btnMissing.style.opacity = '0.35'; btnMissing.style.pointerEvents = 'none'; btnMissing.removeAttribute('href'); }
+
+        if (state.arrange) { btnArrange.style.opacity = '1'; btnArrange.style.pointerEvents = 'auto'; btnArrange.setAttribute('href', 'scramble_letters.html'); } 
+        else { btnArrange.style.opacity = '0.35'; btnArrange.style.pointerEvents = 'none'; btnArrange.removeAttribute('href'); }
+
+        if (state.crossword) { btnCrossword.style.opacity = '1'; btnCrossword.style.pointerEvents = 'auto'; btnCrossword.setAttribute('href', 'crossword.html'); } 
+        else { btnCrossword.style.opacity = '0.35'; btnCrossword.style.pointerEvents = 'none'; btnCrossword.removeAttribute('href'); }
     }
 
     function resetAllGamesProgress() {
         if (document.getElementById('admin-password').value === ADMIN_PASSWORD) {
-            if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل للألعاب؟')) {
+            if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟')) {
+                // تصفير الألعاب
                 let matchProg = JSON.parse(localStorage.getItem('matchGameProgress')) || {};
                 for (let lvl in matchProg) matchProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
                 localStorage.setItem('matchGameProgress', JSON.stringify(matchProg));
@@ -500,8 +555,20 @@
                 for (let lvl in listenProg) listenProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
                 localStorage.setItem('listenGameProgress', JSON.stringify(listenProg));
 
+                let missingProg = JSON.parse(localStorage.getItem('missingGameProgress')) || {};
+                for (let lvl in missingProg) missingProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+                localStorage.setItem('missingGameProgress', JSON.stringify(missingProg));
+
+                let arrangeProg = JSON.parse(localStorage.getItem('arrangeGameProgress')) || {};
+                for (let lvl in arrangeProg) arrangeProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+                localStorage.setItem('arrangeGameProgress', JSON.stringify(arrangeProg));
+
+                let crossProg = JSON.parse(localStorage.getItem('crosswordProgress')) || {};
+                for (let lvl in crossProg) crossProg[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+                localStorage.setItem('crosswordProgress', JSON.stringify(crossProg));
+
                 document.getElementById('admin-password').value = ''; 
-                alert('تم التصفير بنجاح! 🔄');
+                alert('تم تصفير جميع الألعاب بنجاح! 🔄');
                 toggleModal('admin-modal');
             }
         } else { alert('كلمة المرور غير صحيحة!'); }

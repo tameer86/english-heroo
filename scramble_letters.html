@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة المطابقة والذاكرة</title>
+    <title>لعبة ترتيب الحروف</title>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -13,19 +13,19 @@
     <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     
     <style>
-        :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #eef2f7; padding: 20px; margin: 0; text-align: center; overflow-x: hidden; }
-        h1 { color: var(--primary); margin-bottom: 10px; margin-top: 60px;}
+        :root { --primary: #e83e8c; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #fdf5f8; padding: 20px; margin: 0; text-align: center; overflow-x: hidden; }
+        h1 { color: var(--primary); margin-bottom: 10px; margin-top: 20px;}
         
-        /* الأيقونات العلوية في الزاوية اليسرى */
-        .left-header-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center; }
-        .icon-btn { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); text-decoration: none; display: flex; justify-content: center; align-items: center;}
-        .icon-btn:hover { transform: scale(1.1); }
-
         .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
-        .score-text { color: var(--warning); font-size: 20px;}
         .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
         
+        /* تجميعة الأيقونات والنقاط مدمجة في الشريط الأبيض */
+        .left-header-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .score-text { color: var(--warning); font-size: 20px;}
+        .icon-btn { background: none; border: none; font-size: 28px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); text-decoration: none; display: flex; justify-content: center; align-items: center;}
+        .icon-btn:hover { transform: scale(1.15); }
+
         #stages-screen { display: block; }
         .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
         .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
@@ -33,10 +33,9 @@
         .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
         
-        /* النافذة المنبثقة للإعدادات */
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
         .modal-content-box { background: #fff; width: 95%; max-width: 500px; padding: 25px; border-radius: 15px; text-align: right; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
-        .btn-close-modal { position: absolute; top: 15px; left: 15px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 10; }
+        .btn-close-modal { position: absolute; top: 15px; left: 15px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 10;}
         .btn-close-modal:hover { opacity: 0.8; }
         
         .modal-content-box h3 { color: var(--primary); margin-top: 0; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px;}
@@ -50,18 +49,56 @@
         .btn-reset-curr { background: var(--warning); color: #333 !important;}
         .btn-reset-all { background: var(--danger); }
 
-        #game-screen { display: none; }
+        #game-screen { display: none; position: relative; }
         .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
         .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
         
-        .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(8px, 1.5vw, 15px); max-width: 1100px; margin: 0 auto; padding: 5px; }
-        @media (max-width: 768px) { .board { grid-template-columns: repeat(4, 1fr); } }
-
-        .card { background: #fff; border: clamp(2px, 0.5vw, 3px) solid #cbd5e1; border-radius: clamp(8px, 2vw, 12px); padding: clamp(5px, 1.5vw, 20px) clamp(2px, 1vw, 10px); font-size: clamp(12px, 3.5vw, 22px); font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; user-select: none; display: flex; align-items: center; justify-content: center; min-height: clamp(55px, 12vw, 90px); color: var(--dark); text-align: center; line-height: 1.2; word-wrap: break-word; }
-        .card:hover { border-color: var(--primary); background: #f8f9fc; transform: scale(1.02); }
-        .card.selected { background: var(--warning); color: #fff; border-color: var(--warning); }
-        .card.matched { background: var(--success); color: #fff; border-color: var(--success); cursor: default; transform: scale(0.95); opacity: 0; pointer-events: none;}
+        .game-area { width: 100%; max-width: 900px; background: #fff; border-radius: 15px; padding: clamp(15px, 4vw, 30px); margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); box-sizing: border-box;}
         
+        .arabic-word { font-size: clamp(24px, 5vw, 36px); color: var(--primary); font-weight: bold; margin-bottom: 30px; border-bottom: 3px dashed #eee; padding-bottom: 15px; }
+        
+        .letters-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2vw, 15px); margin-bottom: 40px; min-height: 80px;}
+        
+        .letter-btn { 
+            width: clamp(45px, 8vw, 65px); 
+            height: clamp(45px, 8vw, 65px); 
+            font-size: clamp(20px, 4.5vw, 30px); 
+            font-weight: bold; 
+            border-radius: 10px; 
+            background: #9b59b6; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            box-shadow: 0 4px 0 #8e44ad; 
+            transition: transform 0.1s, box-shadow 0.1s, background 0.3s; 
+            text-transform: lowercase;
+        }
+        .letter-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #8e44ad; }
+        .letter-btn.wrong { background: var(--danger); box-shadow: 0 4px 0 #c0392b; animation: shake 0.4s; }
+        .letter-btn.used { visibility: hidden; pointer-events: none; }
+
+        @keyframes shake {
+            0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); }
+        }
+
+        .english-word-display { display: flex; justify-content: center; gap: clamp(4px, 1.5vw, 8px); flex-wrap: wrap; direction: ltr; }
+        .char-box { 
+            width: clamp(35px, 6vw, 55px); 
+            height: clamp(45px, 8vw, 65px); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: clamp(22px, 5vw, 34px); 
+            font-weight: bold; 
+            border-bottom: 4px solid var(--dark); 
+            color: var(--dark); 
+            text-transform: lowercase; 
+        }
+        .char-box.hidden-char { border-bottom: 4px solid var(--primary); color: transparent; background: #f8f9fc; border-radius: 5px 5px 0 0;}
+        .char-box.active-blank { border-bottom: 4px solid var(--warning); background: #fff3cd; transform: scale(1.1); transition: 0.2s;}
+        .char-box.filled { color: var(--success); border-bottom: 4px solid var(--success); background: transparent; transform: scale(1);}
+        .char-box.space { border-bottom: none; width: clamp(10px, 3vw, 20px); background: transparent; }
+
         #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 2500; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
         .modal-content h2 { margin-top: 0; color: var(--primary);}
@@ -85,16 +122,15 @@
     </div>
 
     <div id="stages-screen">
-        <h1>لعبة الذاكرة والمطابقة 🎴</h1>
-        <p style="color: var(--dark); font-size: 18px; font-weight: bold;">اختر المرحلة لتبدأ التحدي. طابق الكلمة مع معناها بأسرع وقت لجمع النجوم والنقاط!</p>
+        <h1>لعبة ترتيب الحروف 🧩</h1>
+        <p style="color: var(--dark); font-size: 18px; font-weight: bold;">انظر لمعنى الكلمة، ثم قم بترتيب جميع الحروف المبعثرة بالأسفل لكتابة الكلمة الصحيحة!</p>
         <div class="stages-grid" id="stages-container"></div>
     </div>
 
     <div id="settings-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleSettingsModal()">✖</button>
-            <h3>⚙️ إعدادات الأوقات وإدارة المراحل</h3>
-            
+            <h3>⚙️ إعدادات الأوقات والتصفير (ترتيب الحروف)</h3>
             <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60"></div>
             <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="70"></div>
             <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="100"></div>
@@ -126,18 +162,27 @@
 
     <div id="game-screen">
         <div class="game-controls">
-            <h2 style="margin: 0; color: var(--primary);">المرحلة: <span id="current-stage-display">1</span></h2>
+            <h2 style="margin: 0; color: var(--primary);">المرحلة: <span id="current-stage-display">1</span> | الكلمة: <span id="word-counter">1</span>/10</h2>
             <div class="timer">
-                الوقت: <span id="timer-display">0</span> ثانية ⏱️
-                <span id="live-stars" style="color: #f1c40f; font-size: 20px; margin-right: 15px; letter-spacing: 2px;">★★★★★</span>
+                الوقت: <span id="timer-display">0</span> ث ⏱️
+                <span id="live-stars" style="color: #f1c40f; font-size: 20px; letter-spacing: 2px;">★★★★★</span>
             </div>
         </div>
-        <div class="board" id="game-board"></div>
+        
+        <div class="game-area">
+            <div class="arabic-word" id="arabic-display">معنى الكلمة بالعربي</div>
+            
+            <div class="english-word-display" id="english-display" style="margin-bottom: 40px;">
+                </div>
+            
+            <div class="letters-pool" id="letters-pool">
+                </div>
+        </div>
     </div>
 
     <div id="result-modal">
         <div class="modal-content">
-            <h2 id="modal-title">أحسنت! أنهيت المرحلة 🎉</h2>
+            <h2 id="modal-title">أحسنت! رتبت الكلمات بنجاح 🎉</h2>
             <div class="stars-display" id="modal-stars">⭐⭐⭐</div>
             <p style="font-size: 18px; color: var(--dark);">وقت الإجابة: <strong id="modal-time" style="color: var(--danger);"></strong> ثانية</p>
             <p id="modal-points-msg" style="color: var(--success); font-weight: bold; font-size: 18px;"></p>
@@ -168,8 +213,9 @@
     }
 
     let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
-    let gameProgress = JSON.parse(localStorage.getItem('matchGameProgress')) || {};
-    let gameTimeSettings = JSON.parse(localStorage.getItem('matchGameSettings')) || {};
+    // استخدام مفاتيح خاصة بهذه اللعبة بالذات
+    let gameProgress = JSON.parse(localStorage.getItem('scrambleGameProgress')) || {};
+    let gameTimeSettings = JSON.parse(localStorage.getItem('scrambleGameSettings')) || {};
     
     let currentLevel = "";
     let wordsData = [];
@@ -177,17 +223,21 @@
     let totalStages = 0;
     
     let currentStage = 1;
+    let currentWordIndex = 0;
+    let stageWords = [];
+    
     let timerInterval;
     let secondsElapsed = 0;
-    let selectedCards = [];
-    let matchesFound = 0;
+    
+    let currentBlanks = []; 
+    let activeBlankIndex = 0; 
 
     window.onload = function() {
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
         initializeDropdown();
     };
 
-    // دالة الرجوع الذكية
+    // دالة الرجوع الموحدة
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal');
         const gameScreen = document.getElementById('game-screen');
@@ -224,7 +274,6 @@
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
             document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
             selectElement.disabled = true;
-            document.querySelector('.top-left-controls button:nth-child(2)').style.display = 'none';
             return;
         }
 
@@ -256,11 +305,11 @@
 
     function toggleSettingsModal() {
         let modal = document.getElementById('settings-modal');
-        if(modal.style.display === 'flex') {
-            modal.style.display = 'none';
-        } else {
-            modal.style.display = 'flex';
-            loadSettingsUI();
+        if(modal.style.display === 'flex') { 
+            modal.style.display = 'none'; 
+        } else { 
+            modal.style.display = 'flex'; 
+            loadSettingsUI(); 
         }
     }
 
@@ -274,9 +323,9 @@
         let t2 = parseInt(document.getElementById('time-2').value) || 140;
         let t1 = parseInt(document.getElementById('time-1').value) || 180;
         
-        if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب أن يكون الوقت منطقياً."); return; }
+        if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب أن يكون الوقت منطقياً بحيث وقت الـ 5 نجوم هو الأقل."); return; }
         
-        let newSettings = { t5: t5, t4: t4, t3: t3, t2: t2, t1: t1 };
+        let newSettings = { t5, t4, t3, t2, t1 };
         
         if(document.getElementById('apply-all').checked) {
             let selectElement = document.getElementById('level-select');
@@ -291,9 +340,36 @@
             alert(`تم تطبيق الأوقات على (${getLevelName(currentLevel)}) بنجاح.`);
         }
         
-        localStorage.setItem('matchGameSettings', JSON.stringify(gameTimeSettings));
+        localStorage.setItem('scrambleGameSettings', JSON.stringify(gameTimeSettings));
         document.getElementById('settings-password').value = '';
-        toggleSettingsModal(); 
+        toggleSettingsModal();
+    }
+
+    function resetProgress() {
+        let passInput = document.getElementById('settings-password').value;
+        if(passInput === 'T@mer2023') { 
+            if(!currentLevel) return;
+            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
+            localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
+            document.getElementById('settings-password').value = '';
+            alert(`تم تصفير المراحل لمستوى (${getLevelName(currentLevel)}).`);
+            renderStages();
+            toggleSettingsModal();
+        } else { alert('كلمة المرور غير صحيحة!'); }
+    }
+
+    function resetAllProgress() {
+        let passInput = document.getElementById('settings-password').value;
+        if(passInput === 'T@mer2023') { 
+            if (confirm("هل أنت متأكد من تصفير جميع المستويات المفتوحة للعبة ترتيب الحروف؟")) {
+                for(let lvl in gameProgress) { gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; }
+                localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
+                document.getElementById('settings-password').value = '';
+                alert('تم التصفير بنجاح التام.');
+                renderStages();
+                toggleSettingsModal();
+            }
+        } else { alert('كلمة المرور غير صحيحة!'); }
     }
 
     function loadGameData() {
@@ -333,13 +409,14 @@
 
     function startGame(stageNumber) {
         currentStage = stageNumber;
+        currentWordIndex = 0;
         document.getElementById('stages-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
         document.getElementById('current-stage-display').innerText = stageNumber;
         
         let startIndex = (stageNumber - 1) * WORDS_PER_STAGE;
         let endIndex = startIndex + WORDS_PER_STAGE;
-        let stageWords = wordsData.slice(startIndex, endIndex);
+        stageWords = wordsData.slice(startIndex, endIndex);
 
         if(stageWords.length < WORDS_PER_STAGE && wordsData.length >= WORDS_PER_STAGE) {
             let needed = WORDS_PER_STAGE - stageWords.length;
@@ -349,63 +426,103 @@
             stageWords = stageWords.concat(extraWords);
         }
 
-        renderBoard(stageWords);
+        stageWords.sort(() => Math.random() - 0.5);
+
         startTimer();
+        loadWord();
     }
 
-    function renderBoard(stageWords) {
-        const board = document.getElementById('game-board');
-        board.innerHTML = '';
-        selectedCards = [];
-        matchesFound = 0;
+    function loadWord() {
+        if(currentWordIndex >= WORDS_PER_STAGE) {
+            endGame();
+            return;
+        }
 
-        let cardsArray = [];
-        stageWords.forEach((item) => {
-            cardsArray.push({ id: item.id, text: item.en, type: 'en', lang: 'ltr' });
-            cardsArray.push({ id: item.id, text: item.ar, type: 'ar', lang: 'rtl' });
-        });
+        document.getElementById('word-counter').innerText = (currentWordIndex + 1);
+        let wordObj = stageWords[currentWordIndex];
+        let enWord = wordObj.en.trim();
+        let arWord = wordObj.ar;
 
-        cardsArray.sort(() => Math.random() - 0.5);
+        document.getElementById('arabic-display').innerText = arWord;
+        
+        let englishDisplay = document.getElementById('english-display');
+        let lettersPool = document.getElementById('letters-pool');
+        englishDisplay.innerHTML = '';
+        lettersPool.innerHTML = '';
+        
+        currentBlanks = [];
+        activeBlankIndex = 0;
 
-        cardsArray.forEach(item => {
-            let cardDiv = document.createElement('div');
-            cardDiv.className = 'card';
-            cardDiv.innerText = item.text;
-            cardDiv.dataset.id = item.id;
-            cardDiv.dataset.type = item.type;
-            cardDiv.dir = item.lang; 
-            cardDiv.onclick = () => onCardClick(cardDiv);
-            board.appendChild(cardDiv);
-        });
-    }
+        let missingChars = []; // سنضع فيه جميع الأحرف (لأن اللعبة هي ترتيب لكل الحروف)
 
-    function onCardClick(card) {
-        if(selectedCards.length >= 2 || card.classList.contains('selected') || card.classList.contains('matched')) return;
-        card.classList.add('selected');
-        selectedCards.push(card);
-        if(selectedCards.length === 2) checkMatch();
-    }
+        for(let i=0; i<enWord.length; i++) {
+            let char = enWord[i];
+            let box = document.createElement('div');
+            box.className = 'char-box';
+            
+            // إذا كان مسافة أو رمز، نتركه ظاهراً ولا نعتبره حرفاً مخفياً
+            if(!char.match(/[a-z]/i)) {
+                box.innerText = char;
+                if(char === ' ') box.classList.add('space');
+                englishDisplay.appendChild(box);
+                continue;
+            }
 
-    function checkMatch() {
-        let card1 = selectedCards[0];
-        let card2 = selectedCards[1];
+            // إخفاء كافة الأحرف الصحيحة
+            box.classList.add('hidden-char');
+            box.dataset.char = char.toLowerCase();
+            missingChars.push(char.toLowerCase());
+            currentBlanks.push(box);
+            
+            englishDisplay.appendChild(box);
+        }
 
-        if(card1.dataset.id === card2.dataset.id && card1.dataset.type !== card2.dataset.type) {
-            setTimeout(() => {
-                card1.classList.remove('selected');
-                card1.classList.add('matched');
-                card2.classList.remove('selected');
-                card2.classList.add('matched');
-                selectedCards = [];
-                matchesFound++;
-                if(matchesFound === WORDS_PER_STAGE) endGame();
-            }, 400);
+        if(currentBlanks.length > 0) {
+            currentBlanks[0].classList.add('active-blank');
         } else {
-            setTimeout(() => {
-                card1.classList.remove('selected');
-                card2.classList.remove('selected');
-                selectedCards = [];
-            }, 800);
+            // كاحتياط لو لم يكن هناك حروف (مثال فارغ)
+            setTimeout(() => { currentWordIndex++; loadWord(); }, 500);
+            return;
+        }
+
+        // إنشاء أزرار الأحرف المبعثرة بالأسفل بحيث تكون مطابقة تماماً لأحرف الكلمة
+        let poolChars = [...missingChars]; 
+        
+        // خلط الأحرف
+        poolChars.sort(() => Math.random() - 0.5);
+
+        poolChars.forEach(char => {
+            let btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.innerText = char;
+            btn.onclick = () => onLetterClick(char, btn);
+            lettersPool.appendChild(btn);
+        });
+    }
+
+    function onLetterClick(char, btnElement) {
+        if (activeBlankIndex >= currentBlanks.length || btnElement.classList.contains('used')) return;
+
+        let activeBlank = currentBlanks[activeBlankIndex];
+        let expectedChar = activeBlank.dataset.char;
+
+        if (char === expectedChar) {
+            btnElement.classList.add('used'); 
+            activeBlank.classList.remove('hidden-char', 'active-blank');
+            activeBlank.classList.add('filled');
+            activeBlank.innerText = char;
+
+            activeBlankIndex++;
+
+            if (activeBlankIndex < currentBlanks.length) {
+                currentBlanks[activeBlankIndex].classList.add('active-blank');
+            } else {
+                setTimeout(() => { currentWordIndex++; loadWord(); }, 600);
+            }
+        } else {
+            btnElement.classList.remove('wrong'); 
+            void btnElement.offsetWidth; // حيلة تقنية لإعادة الـ animation
+            btnElement.classList.add('wrong');
         }
     }
 
@@ -440,6 +557,7 @@
         clearInterval(timerInterval);
         let time = secondsElapsed;
         let stars = getStarsForTime(time);
+
         let levelData = gameProgress[currentLevel];
         let previousStars = levelData[currentStage]?.stars || 0;
         let pointsGained = 0;
@@ -449,6 +567,7 @@
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
+            
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
         } else if (!levelData[currentStage]) {
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
@@ -459,7 +578,7 @@
         }
 
         gameProgress[currentLevel] = levelData;
-        localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
+        localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
 
         showResultModal(stars, time, pointsGained);
     }
@@ -467,9 +586,14 @@
     function showResultModal(stars, time, points) {
         document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
         document.getElementById('modal-time').innerText = time;
+        
         let msgElement = document.getElementById('modal-points-msg');
-        if(points > 0) msgElement.innerText = `رائع! كسبت ${points} نقطة إضافية للعلامة التراكمية! 🏆`;
-        else msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع لرفع نجومك! 💪`;
+        if(points > 0) {
+            msgElement.innerText = `رائع! كسبت ${points} نقطة إضافية للعلامة التراكمية! 🏆`;
+        } else {
+            msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع لرفع نجومك! 💪`;
+        }
+        
         document.getElementById('result-modal').style.display = 'flex';
     }
 
@@ -479,33 +603,6 @@
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('stages-screen').style.display = 'block';
         renderStages();
-    }
-
-    function resetProgress() {
-        let passInput = document.getElementById('settings-password').value;
-        if(passInput === 'T@mer2023') { 
-            if(!currentLevel) return;
-            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
-            localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
-            document.getElementById('settings-password').value = '';
-            alert(`تم تصفير جميع المراحل لمستوى (${getLevelName(currentLevel)}).`);
-            renderStages();
-            toggleSettingsModal();
-        } else { alert('كلمة المرور غير صحيحة!'); }
-    }
-
-    function resetAllProgress() {
-        let passInput = document.getElementById('settings-password').value;
-        if(passInput === 'T@mer2023') { 
-            if (confirm("هل أنت متأكد من تصفير جميع المستويات المفتوحة؟")) {
-                for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
-                localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
-                document.getElementById('settings-password').value = '';
-                alert('تم التصفير بنجاح التام.');
-                renderStages();
-                toggleSettingsModal();
-            }
-        } else { alert('كلمة المرور غير صحيحة!'); }
     }
 </script>
 
