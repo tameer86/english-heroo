@@ -114,6 +114,7 @@
             <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="120"></div>
             <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="180"></div>
             <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="240"></div>
+            <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" value="10"></div>
             
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                 <label style="display:block; width:100%; margin-bottom:10px;">نطاق التطبيق:</label>
@@ -131,7 +132,7 @@
             </div>
 
             <div class="action-btns">
-                <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الأوقات</button>
+                <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الإعدادات</button>
                 <button class="btn-reset-curr" onclick="resetProgress()">تصفير</button>
                 <button class="btn-reset-all" onclick="resetAllProgress()">تصفير الكل</button>
             </div>
@@ -266,7 +267,7 @@
     }
 
     function getLevelTimes(level) {
-        let defaultTimes = { t5: 60, t4: 90, t3: 120, t2: 180, t1: 240 };
+        let defaultTimes = { t5: 60, t4: 90, t3: 120, t2: 180, t1: 240, starPrice: 10 };
         return gameTimeSettings[level] || defaultTimes;
     }
 
@@ -278,6 +279,7 @@
         document.getElementById('time-3').value = t.t3;
         document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1;
+        document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 10;
     }
 
     function toggleSettingsModal() {
@@ -295,9 +297,10 @@
         let t3 = parseInt(document.getElementById('time-3').value) || 120;
         let t2 = parseInt(document.getElementById('time-2').value) || 180;
         let t1 = parseInt(document.getElementById('time-1').value) || 240;
+        let starPrice = parseInt(document.getElementById('star-price').value) || 10;
         
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
-        let newSettings = { t5, t4, t3, t2, t1 };
+        let newSettings = { t5, t4, t3, t2, t1, starPrice };
         
         if(document.getElementById('apply-all').checked) {
             let selectElement = document.getElementById('level-select');
@@ -685,9 +688,12 @@
         let levelData = gameProgress[currentLevel];
         let previousStars = levelData[currentStage]?.stars || 0;
         let pointsGained = 0;
+        
+        let t = getLevelTimes(currentLevel);
+        let starPrice = t.starPrice !== undefined ? t.starPrice : 10;
 
         if(stars > previousStars) {
-            pointsGained = (stars - previousStars) * 5;
+            pointsGained = (stars - previousStars) * starPrice;
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);

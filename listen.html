@@ -117,6 +117,8 @@
                 <label>سرعة هبوط الفقاعات (1 بطيء - 5 سريع):</label> 
                 <input type="number" id="bubble-speed-input" min="1" max="5" step="0.5" value="2">
             </div>
+
+            <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" value="5"></div>
             
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                 <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات وسرعة الهبوط:</label>
@@ -263,7 +265,7 @@
     }
 
     function getLevelTimes(level) {
-        let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180, speed: 2 };
+        let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180, speed: 2, starPrice: 5 };
         return gameTimeSettings[level] || defaultTimes;
     }
 
@@ -286,6 +288,7 @@
         document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1;
         document.getElementById('bubble-speed-input').value = t.speed || 2;
+        document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 5;
         loadVoices();
     }
 
@@ -347,10 +350,11 @@
         let t2 = parseInt(document.getElementById('time-2').value) || 140;
         let t1 = parseInt(document.getElementById('time-1').value) || 180;
         let bSpeed = parseFloat(document.getElementById('bubble-speed-input').value) || 2;
+        let starPrice = parseInt(document.getElementById('star-price').value) || 5;
         
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: الأوقات غير منطقية."); return; }
         
-        let newSettings = { t5: t5, t4: t4, t3: t3, t2: t2, t1: t1, speed: bSpeed };
+        let newSettings = { t5: t5, t4: t4, t3: t3, t2: t2, t1: t1, speed: bSpeed, starPrice: starPrice };
         
         if(document.getElementById('apply-all').checked) {
             let selectElement = document.getElementById('level-select');
@@ -579,9 +583,12 @@
         let levelData = gameProgress[currentLevel];
         let previousStars = levelData[currentStage]?.stars || 0;
         let pointsGained = 0;
+        
+        let t = getLevelTimes(currentLevel);
+        let starPrice = t.starPrice !== undefined ? t.starPrice : 5;
 
         if(stars > previousStars) {
-            pointsGained = (stars - previousStars) * 5;
+            pointsGained = (stars - previousStars) * starPrice;
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);

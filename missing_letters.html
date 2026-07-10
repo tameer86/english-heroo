@@ -138,6 +138,7 @@
             <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="100"></div>
             <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="140"></div>
             <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="180"></div>
+            <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" value="7"></div>
             
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                 <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات الجديدة:</label>
@@ -289,7 +290,7 @@
     }
 
     function getLevelTimes(level) {
-        let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180 };
+        let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180, starPrice: 7 };
         return gameTimeSettings[level] || defaultTimes;
     }
 
@@ -301,6 +302,7 @@
         document.getElementById('time-3').value = t.t3;
         document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1;
+        document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 7;
     }
 
     function toggleSettingsModal() {
@@ -322,10 +324,11 @@
         let t3 = parseInt(document.getElementById('time-3').value) || 100;
         let t2 = parseInt(document.getElementById('time-2').value) || 140;
         let t1 = parseInt(document.getElementById('time-1').value) || 180;
+        let starPrice = parseInt(document.getElementById('star-price').value) || 7;
         
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب أن يكون الوقت منطقياً بحيث وقت الـ 5 نجوم هو الأقل."); return; }
         
-        let newSettings = { t5, t4, t3, t2, t1 };
+        let newSettings = { t5, t4, t3, t2, t1, starPrice };
         
         if(document.getElementById('apply-all').checked) {
             let selectElement = document.getElementById('level-select');
@@ -583,9 +586,12 @@
         let levelData = gameProgress[currentLevel];
         let previousStars = levelData[currentStage]?.stars || 0;
         let pointsGained = 0;
+        
+        let t = getLevelTimes(currentLevel);
+        let starPrice = t.starPrice !== undefined ? t.starPrice : 7;
 
         if(stars > previousStars) {
-            pointsGained = (stars - previousStars) * 5;
+            pointsGained = (stars - previousStars) * starPrice;
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
