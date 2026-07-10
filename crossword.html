@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة الكلمات المتقاطعة</title>
+    
+    <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
+    <script src="C1.js"></script><script src="C2.js"></script>
+    <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
+    <script src="CLASS4.js"></script><script src="CLASS5.js"></script><script src="CLASS6.js"></script>
+    <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
+    <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
+    
+    <style>
+        :root { --primary: #1abc9c; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --dark: #34495e; --light: #f8f9fc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4fbf9; padding: 20px; margin: 0; text-align: center; overflow-x: hidden; }
+        h1 { color: var(--primary); margin-bottom: 10px; margin-top: 20px;}
+        
+        /* تجميعة الأيقونات والنقاط مدمجة في الشريط الأبيض */
+        .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
+        .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
+        .left-header-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .score-text { color: var(--warning); font-size: 20px;}
+        .icon-btn { background: none; border: none; font-size: 28px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); text-decoration: none; display: flex; justify-content: center; align-items: center;}
+        .icon-btn:hover { transform: scale(1.15); }
+
+        #stages-screen { display: block; }
+        .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
+        .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
+        .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
+        .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
+        .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
+
+        /* الإعدادات */
+        .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
+        .modal-content-box { background: #fff; width: 95%; max-width: 500px; padding: 25px; border-radius: 15px; text-align: right; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
+        .btn-close-modal { position: absolute; top: 15px; left: 15px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 10;}
+        .btn-close-modal:hover { opacity: 0.8; }
+        .modal-content-box h3 { color: var(--primary); margin-top: 0; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px;}
+        .settings-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
+        .settings-row label { font-weight: bold; min-width: 150px; color: var(--dark);}
+        .settings-row input[type="number"] { padding: 8px; width: 80px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; text-align: center;}
+        .settings-row input[type="password"] { padding: 10px; flex-grow: 1; border: 1px solid #ccc; border-radius: 5px; font-weight: bold;}
+        .action-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 25px; justify-content: center;}
+        .action-btns button { padding: 10px 20px; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px; flex-grow: 1;}
+        .btn-save { background: var(--success); }
+        .btn-reset-curr { background: var(--warning); color: #333 !important;}
+        .btn-reset-all { background: var(--danger); }
+
+        #game-screen { display: none; position: relative; }
+        .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
+        .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
+        
+        /* شاشة اللعب - الكلمات المتقاطعة */
+        .cw-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 1100px; margin: 0 auto;}
+        @media (min-width: 900px) { .cw-layout { flex-direction: row-reverse; align-items: flex-start; justify-content: center; } }
+
+        /* الشبكة الذكية والمتجاوبة */
+        .cw-board-container { background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow: auto; max-width: 100%; direction: ltr;}
+        .cw-grid { display: grid; gap: 2px; background: #2c3e50; padding: 2px; border-radius: 5px; width: max-content; margin: 0 auto; }
+        
+        .cw-cell { position: relative; width: clamp(35px, 7vw, 45px); height: clamp(35px, 7vw, 45px); background: transparent; }
+        .cw-input { width: 100%; height: 100%; border: none; text-align: center; font-size: clamp(20px, 4vw, 26px); font-weight: bold; text-transform: lowercase; color: #2c3e50; background: #fff; border-radius: 3px; caret-color: var(--danger);}
+        .cw-input:focus { outline: 2px solid var(--warning); z-index: 10; background: #fffdf5;}
+        .cw-input.correct { background: var(--success); color: white; border: none; pointer-events: none;}
+        .cw-cell.empty { background: transparent; }
+        
+        .cw-number { position: absolute; top: 2px; left: 3px; font-size: 11px; font-weight: bold; color: #7f8c8d; pointer-events: none; z-index: 5;}
+        .cw-input.correct + .cw-number { color: #ecf0f1; }
+
+        /* منطقة المعاني (Clues) */
+        .cw-clues { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: right; box-sizing: border-box;}
+        .clues-section h3 { color: var(--primary); border-bottom: 2px dashed #eee; padding-bottom: 5px; margin-top: 0;}
+        .clues-list { list-style: none; padding: 0; margin: 0 0 20px 0; }
+        .clues-list li { margin-bottom: 8px; font-size: clamp(14px, 3vw, 16px); color: var(--dark); font-weight: bold; line-height: 1.4; transition: 0.2s;}
+        .clues-list li.completed { text-decoration: line-through; color: #bdc3c7; }
+        .clues-list li span.num-badge { display: inline-block; background: var(--dark); color: white; width: 22px; height: 22px; text-align: center; border-radius: 50%; margin-left: 5px; font-size: 14px;}
+
+        #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 2500; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
+        .modal-content h2 { margin-top: 0; color: var(--primary);}
+        .stars-display { font-size: clamp(25px, 5vw, 40px); color: #f1c40f; margin: 15px 0; letter-spacing: 5px;}
+        .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
+        .modal-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <div class="header-stats">
+        <div class="level-selector">
+            <label for="level-select">اختر المستوى للعب: </label>
+            <select id="level-select" onchange="onLevelChange()"></select>
+        </div>
+        <div class="left-header-group">
+            <div class="score-text">النقاط: <span id="total-score">0</span> 🏆</div>
+            <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
+            <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
+        </div>
+    </div>
+
+    <div id="stages-screen">
+        <h1>لعبة الكلمات المتقاطعة 📝</h1>
+        <p style="color: var(--dark); font-size: 18px; font-weight: bold;">اقرأ المعنى العربي (أفقي وعمودي) واكتب الكلمة الإنجليزية المناسبة في الشبكة!</p>
+        <div class="stages-grid" id="stages-container"></div>
+    </div>
+
+    <div id="settings-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleSettingsModal()">✖</button>
+            <h3>⚙️ إعدادات الأوقات والتصفير</h3>
+            <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60"></div>
+            <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="90"></div>
+            <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="120"></div>
+            <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="180"></div>
+            <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="240"></div>
+            
+            <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
+                <label style="display:block; width:100%; margin-bottom:10px;">نطاق التطبيق:</label>
+                <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">   
+                    <input type="radio" id="apply-current" name="apply-scope" checked> <label for="apply-current" style="min-width:auto; margin-left:20px;">على الصف المحدد</label>
+                </div>
+                <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">
+                    <input type="radio" id="apply-all" name="apply-scope"> <label for="apply-all" style="min-width:auto;">على جميع الصفوف</label>
+                </div>
+            </div>
+
+            <div class="settings-row" style="margin-top:20px;">
+                <label style="color: var(--danger);">كلمة المرور:</label>
+                <input type="password" id="settings-password" placeholder="لتأكيد الحفظ أو التصفير">
+            </div>
+
+            <div class="action-btns">
+                <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الأوقات</button>
+                <button class="btn-reset-curr" onclick="resetProgress()">تصفير</button>
+                <button class="btn-reset-all" onclick="resetAllProgress()">تصفير الكل</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-screen">
+        <div class="game-controls">
+            <h2 style="margin: 0; color: var(--primary);">المرحلة: <span id="current-stage-display">1</span></h2>
+            <div class="timer">
+                الوقت: <span id="timer-display">0</span> ث ⏱️
+                <span id="live-stars" style="color: #f1c40f; font-size: 20px; letter-spacing: 2px;">★★★★★</span>
+            </div>
+        </div>
+        
+        <div class="cw-layout">
+            <div class="cw-clues">
+                <div class="clues-section">
+                    <h3>➡️ أُفقي (Across)</h3>
+                    <ul class="clues-list" id="clues-across"></ul>
+                </div>
+                <div class="clues-section">
+                    <h3>⬇️ عمودي (Down)</h3>
+                    <ul class="clues-list" id="clues-down"></ul>
+                </div>
+            </div>
+
+            <div class="cw-board-container">
+                <div class="cw-grid" id="cw-grid">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">عبقري! حللت الكلمات المتقاطعة 🎉</h2>
+            <div class="stars-display" id="modal-stars">⭐⭐⭐</div>
+            <p style="font-size: 18px; color: var(--dark);">وقت الإجابة: <strong id="modal-time" style="color: var(--danger);"></strong> ثانية</p>
+            <p id="modal-points-msg" style="color: var(--success); font-weight: bold; font-size: 18px;"></p>
+            <button class="modal-btn" onclick="showStagesScreen()">متابعة</button>
+        </div>
+    </div>
+
+<script>
+    const allLevelsData = {
+        "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
+        "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
+        "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C2": typeof levelC2_Words !== 'undefined' ? levelC2_Words : [],
+        "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
+        "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
+        "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
+        "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
+        "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
+        "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
+    };
+
+    function getLevelName(code) {
+        if(code.startsWith('CLASS')) {
+            let num = code.replace('CLASS', '');
+            let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'};
+            return 'الصف ' + (ordinals[num] || num);
+        }
+        return 'مستوى ' + code;
+    }
+
+    let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
+    let gameProgress = JSON.parse(localStorage.getItem('crosswordGameProgress')) || {};
+    let gameTimeSettings = JSON.parse(localStorage.getItem('crosswordGameSettings')) || {};
+    
+    let currentLevel = "";
+    let wordsData = [];
+    const WORDS_PER_STAGE = 10;
+    let totalStages = 0;
+    
+    let currentStage = 1;
+    let timerInterval;
+    let secondsElapsed = 0;
+    
+    // متغيرات الشبكة الأساسية
+    let cwGridData = {}; 
+    let placedWordsInfo = []; 
+
+    window.onload = function() {
+        document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
+        initializeDropdown();
+    };
+
+    function handleGlobalBack() {
+        const modal = document.getElementById('settings-modal');
+        const gameScreen = document.getElementById('game-screen');
+        if(modal.style.display === 'flex') { modal.style.display = 'none'; } 
+        else if (gameScreen.style.display === 'block') { showStagesScreen(); } 
+        else { window.location.href = 'game.html'; }
+    }
+
+    function initializeDropdown() {
+        const selectElement = document.getElementById('level-select');
+        selectElement.innerHTML = ''; 
+        let hasCompletedLevels = false;
+
+        for(let lvl in appProgress.levels) {
+            let lData = appProgress.levels[lvl];
+            let db = allLevelsData[lvl] || [];
+            let isLevelFinished = (db.length > 0) && (lData.mainIndex >= db.length) && (!lData.activeList || lData.activeList.length === 0) && (lData.savedWords && lData.savedWords.length > 0);
+
+            if (isLevelFinished) {
+                let option = document.createElement('option');
+                option.value = lvl;
+                option.textContent = getLevelName(lvl);
+                selectElement.appendChild(option);
+                hasCompletedLevels = true;
+            }
+        }
+
+        if (!hasCompletedLevels) {
+            selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
+            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">عذراً، يجب عليك إتمام حفظ كلمات مستوى واحد على الأقل لتتمكن من اللعب.</p>';
+            selectElement.disabled = true;
+            return;
+        }
+
+        currentLevel = selectElement.value;
+        loadGameData();
+        loadSettingsUI();
+    }
+
+    function onLevelChange() {
+        currentLevel = document.getElementById('level-select').value;
+        loadGameData();
+        loadSettingsUI();
+    }
+
+    function getLevelTimes(level) {
+        let defaultTimes = { t5: 60, t4: 90, t3: 120, t2: 180, t1: 240 };
+        return gameTimeSettings[level] || defaultTimes;
+    }
+
+    function loadSettingsUI() {
+        if(!currentLevel) return;
+        let t = getLevelTimes(currentLevel);
+        document.getElementById('time-5').value = t.t5;
+        document.getElementById('time-4').value = t.t4;
+        document.getElementById('time-3').value = t.t3;
+        document.getElementById('time-2').value = t.t2;
+        document.getElementById('time-1').value = t.t1;
+    }
+
+    function toggleSettingsModal() {
+        let modal = document.getElementById('settings-modal');
+        if(modal.style.display === 'flex') modal.style.display = 'none';
+        else { modal.style.display = 'flex'; loadSettingsUI(); }
+    }
+
+    function saveTimeSettings() {
+        let passInput = document.getElementById('settings-password').value;
+        if(passInput !== 'T@mer2023') { alert('كلمة المرور غير صحيحة!'); return; }
+        
+        let t5 = parseInt(document.getElementById('time-5').value) || 60;
+        let t4 = parseInt(document.getElementById('time-4').value) || 90;
+        let t3 = parseInt(document.getElementById('time-3').value) || 120;
+        let t2 = parseInt(document.getElementById('time-2').value) || 180;
+        let t1 = parseInt(document.getElementById('time-1').value) || 240;
+        
+        if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
+        let newSettings = { t5, t4, t3, t2, t1 };
+        
+        if(document.getElementById('apply-all').checked) {
+            let selectElement = document.getElementById('level-select');
+            for (let i = 0; i < selectElement.options.length; i++) {
+                if(selectElement.options[i].value) gameTimeSettings[selectElement.options[i].value] = newSettings;
+            }
+        } else {
+            if(currentLevel) gameTimeSettings[currentLevel] = newSettings;
+        }
+        
+        localStorage.setItem('crosswordGameSettings', JSON.stringify(gameTimeSettings));
+        document.getElementById('settings-password').value = '';
+        alert("تم الحفظ بنجاح!");
+        toggleSettingsModal();
+    }
+
+    function resetProgress() {
+        let passInput = document.getElementById('settings-password').value;
+        if(passInput === 'T@mer2023') { 
+            if(!currentLevel) return;
+            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
+            localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
+            document.getElementById('settings-password').value = '';
+            alert(`تم تصفير المراحل.`);
+            renderStages();
+            toggleSettingsModal();
+        } else alert('كلمة المرور غير صحيحة!');
+    }
+
+    function resetAllProgress() {
+        if(document.getElementById('settings-password').value === 'T@mer2023') { 
+            if (confirm("هل أنت متأكد من تصفير جميع المستويات؟")) {
+                for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+                localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
+                document.getElementById('settings-password').value = '';
+                alert('تم التصفير التام.');
+                renderStages();
+                toggleSettingsModal();
+            }
+        } else alert('كلمة المرور غير صحيحة!');
+    }
+
+    function loadGameData() {
+        wordsData = allLevelsData[currentLevel] || [];
+        if(wordsData.length === 0) return;
+        totalStages = Math.ceil(wordsData.length / WORDS_PER_STAGE);
+        if(!gameProgress[currentLevel]) gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
+        renderStages();
+    }
+
+    function renderStages() {
+        const container = document.getElementById('stages-container');
+        container.innerHTML = '';
+        let levelData = gameProgress[currentLevel];
+
+        for(let i = 1; i <= totalStages; i++) {
+            let btn = document.createElement('button');
+            btn.className = 'stage-btn';
+            
+            let isUnlocked = levelData[i] && levelData[i].unlocked;
+            if(i === 1) isUnlocked = true; 
+
+            if(!isUnlocked) {
+                btn.classList.add('locked');
+                btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`;
+            } else {
+                let starsCount = levelData[i]?.stars || 0;
+                let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';
+                let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
+                btn.innerHTML = `مرحلة ${i} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                btn.onclick = () => startGame(i);
+            }
+            container.appendChild(btn);
+        }
+        document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
+    }
+
+    function startGame(stageNumber) {
+        currentStage = stageNumber;
+        document.getElementById('stages-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('current-stage-display').innerText = stageNumber;
+        
+        let startIndex = (stageNumber - 1) * WORDS_PER_STAGE;
+        let endIndex = startIndex + WORDS_PER_STAGE;
+        let stageWords = wordsData.slice(startIndex, endIndex);
+
+        if(stageWords.length < WORDS_PER_STAGE && wordsData.length >= WORDS_PER_STAGE) {
+            let needed = WORDS_PER_STAGE - stageWords.length;
+            let previousWords = wordsData.slice(0, startIndex).sort(() => Math.random() - 0.5);
+            stageWords = stageWords.concat(previousWords.slice(0, needed));
+        }
+
+        generateCrosswordAlgorithm(stageWords);
+        startTimer();
+    }
+
+    // ==========================================
+    // 🧠 خوارزمية بناء الكلمات المتقاطعة (Crossword Generator)
+    // ==========================================
+    function generateCrosswordAlgorithm(wordsArray) {
+        cwGridData = {};
+        placedWordsInfo = [];
+        
+        // تنظيف الكلمات (إزالة المسافات للشبكة) لكن نحتفظ بالكلمة الأصلية للتلميح
+        let cleanWords = wordsArray.map(w => ({
+            id: w.id, 
+            ar: w.ar, 
+            originalEn: w.en.trim(), 
+            en: w.en.trim().replace(/[^a-zA-Z]/g, '').toLowerCase() 
+        })).filter(w => w.en.length > 0);
+        
+        // ترتيب الكلمات من الأطول للأقصر لتسهيل المقاطعة
+        cleanWords.sort((a,b) => b.en.length - a.en.length);
+
+        function getCell(x, y) { return cwGridData[`${x},${y}`]; }
+        function setCell(x, y, char, wordId) { 
+            if(!cwGridData[`${x},${y}`]) cwGridData[`${x},${y}`] = { char: char, words: [] };
+            cwGridData[`${x},${y}`].words.push(wordId);
+        }
+
+        // دالة فحص إمكانية وضع الكلمة بدون تداخل غير مسموح
+        function canPlaceWord(wordStr, startX, startY, isHoriz) {
+            let dx = isHoriz ? 1 : 0;
+            let dy = isHoriz ? 0 : 1;
+            
+            // فحص الخلية التي تسبق الكلمة والتي تليها (يجب أن تكون فارغة حتى لا تلتصق الكلمات)
+            if(getCell(startX - dx, startY - dy)) return false;
+            if(getCell(startX + wordStr.length * dx, startY + wordStr.length * dy)) return false;
+
+            let intersections = 0;
+
+            for(let i=0; i<wordStr.length; i++) {
+                let cx = startX + i*dx;
+                let cy = startY + i*dy;
+                let cell = getCell(cx, cy);
+
+                if(cell) {
+                    if(cell.char !== wordStr[i]) return false; // تقاطع بحرف غير متطابق
+                    intersections++;
+                } else {
+                    // إذا الخلية فارغة، تأكد أن الخلايا المجاورة لها عمودياً/أفقياً فارغة لعدم التصاق الكلمات جانبياً
+                    if (isHoriz) {
+                        if(getCell(cx, cy-1) || getCell(cx, cy+1)) return false;
+                    } else {
+                        if(getCell(cx-1, cy) || getCell(cx+1, cy)) return false;
+                    }
+                }
+            }
+            return intersections;
+        }
+
+        // 1. وضع الكلمة الأولى في المنتصف (إحداثيات 0,0)
+        let firstWord = cleanWords[0];
+        for(let i=0; i<firstWord.en.length; i++) setCell(i, 0, firstWord.en[i], firstWord.id);
+        placedWordsInfo.push({ id: firstWord.id, ar: firstWord.ar, x: 0, y: 0, isHoriz: true, len: firstWord.en.length });
+
+        let unplaced = cleanWords.slice(1);
+        let maxAttempts = 3; // نحاول عدة مرات لتركيب الباقي
+
+        while(unplaced.length > 0 && maxAttempts > 0) {
+            let stillUnplaced = [];
+            
+            for(let uWord of unplaced) {
+                let bestPlacement = null;
+                let maxIntersections = -1;
+
+                // البحث في جميع الحروف الموضوعة على الشبكة عن نقطة تقاطع
+                for(let key in cwGridData) {
+                    let [gx, gy] = key.split(',').map(Number);
+                    let gridChar = cwGridData[key].char;
+
+                    for(let i=0; i<uWord.en.length; i++) {
+                        if(uWord.en[i] === gridChar) {
+                            // وجدنا حرف متطابق، لنجرب الوضع الأفقي والعمودي
+                            
+                            // جرب أفقي (إذا كان الحرف المتقاطع جزء من كلمة عمودية)
+                            let startX_h = gx - i;
+                            let startY_h = gy;
+                            let scoreH = canPlaceWord(uWord.en, startX_h, startY_h, true);
+                            if(scoreH !== false && scoreH > maxIntersections) {
+                                maxIntersections = scoreH;
+                                bestPlacement = { x: startX_h, y: startY_h, isHoriz: true };
+                            }
+
+                            // جرب عمودي
+                            let startX_v = gx;
+                            let startY_v = gy - i;
+                            let scoreV = canPlaceWord(uWord.en, startX_v, startY_v, false);
+                            if(scoreV !== false && scoreV > maxIntersections) {
+                                maxIntersections = scoreV;
+                                bestPlacement = { x: startX_v, y: startY_v, isHoriz: false };
+                            }
+                        }
+                    }
+                }
+
+                if(bestPlacement) {
+                    let dx = bestPlacement.isHoriz ? 1 : 0;
+                    let dy = bestPlacement.isHoriz ? 0 : 1;
+                    for(let i=0; i<uWord.en.length; i++) {
+                        setCell(bestPlacement.x + i*dx, bestPlacement.y + i*dy, uWord.en[i], uWord.id);
+                    }
+                    placedWordsInfo.push({ id: uWord.id, ar: uWord.ar, x: bestPlacement.x, y: bestPlacement.y, isHoriz: bestPlacement.isHoriz, len: uWord.en.length });
+                } else {
+                    stillUnplaced.push(uWord);
+                }
+            }
+            unplaced = stillUnplaced;
+            maxAttempts--;
+        }
+
+        // إذا تبقى كلمات لم نتمكن من مقاطعتها (لا يوجد حروف مشتركة)، نضعها في الأسفل منفصلة لضمان استخدام الـ 10 كلمات
+        if(unplaced.length > 0) {
+            let maxBottomY = 2;
+            for(let key in cwGridData) { let y = parseInt(key.split(',')[1]); if(y > maxBottomY) maxBottomY = y; }
+            
+            unplaced.forEach(uWord => {
+                maxBottomY += 2; // مسافة فاصلة
+                for(let i=0; i<uWord.en.length; i++) setCell(i, maxBottomY, uWord.en[i], uWord.id);
+                placedWordsInfo.push({ id: uWord.id, ar: uWord.ar, x: 0, y: maxBottomY, isHoriz: true, len: uWord.en.length });
+            });
+        }
+
+        renderCrosswordUI();
+    }
+
+    function renderCrosswordUI() {
+        // 1. حساب حدود الشبكة الدقيقة
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        for(let key in cwGridData) {
+            let [x, y] = key.split(',').map(Number);
+            if(x < minX) minX = x; if(x > maxX) maxX = x;
+            if(y < minY) minY = y; if(y > maxY) maxY = y;
+        }
+
+        let colsCount = (maxX - minX) + 1;
+        let rowsCount = (maxY - minY) + 1;
+
+        let gridEl = document.getElementById('cw-grid');
+        gridEl.innerHTML = '';
+        // استخدام Grid مطاطي حسب العدد الفعلي للأعمدة المطلوبة للكلمات
+        gridEl.style.gridTemplateColumns = `repeat(${colsCount}, clamp(35px, 7vw, 45px))`;
+        gridEl.style.gridTemplateRows = `repeat(${rowsCount}, clamp(35px, 7vw, 45px))`;
+
+        // ترتيب الكلمات وإعطائها أرقاماً للعرض
+        placedWordsInfo.sort((a,b) => (a.y === b.y) ? a.x - b.x : a.y - b.y);
+        let clueNum = 1;
+        placedWordsInfo.forEach(pw => {
+            if(!cwGridData[`${pw.x},${pw.y}`].displayNum) {
+                cwGridData[`${pw.x},${pw.y}`].displayNum = clueNum++;
+            }
+            pw.displayNum = cwGridData[`${pw.x},${pw.y}`].displayNum;
+        });
+
+        // 2. بناء المربعات في واجهة المستخدم
+        for(let r = minY; r <= maxY; r++) {
+            for(let c = minX; c <= maxX; c++) {
+                let cellData = cwGridData[`${c},${r}`];
+                let cellDiv = document.createElement('div');
+                cellDiv.className = 'cw-cell';
+                
+                if(cellData) {
+                    let input = document.createElement('input');
+                    input.className = 'cw-input';
+                    input.maxLength = 1;
+                    input.dataset.x = c;
+                    input.dataset.y = r;
+                    input.dataset.expected = cellData.char;
+                    input.oninput = (e) => onCellInput(e, input);
+                    
+                    cellDiv.appendChild(input);
+
+                    if(cellData.displayNum) {
+                        let numSpan = document.createElement('span');
+                        numSpan.className = 'cw-number';
+                        numSpan.innerText = cellData.displayNum;
+                        cellDiv.appendChild(numSpan);
+                    }
+                } else {
+                    cellDiv.classList.add('empty');
+                }
+                gridEl.appendChild(cellDiv);
+            }
+        }
+
+        // 3. بناء قوائم المعاني (أفقي وعمودي)
+        let ulAcross = document.getElementById('clues-across');
+        let ulDown = document.getElementById('clues-down');
+        ulAcross.innerHTML = ''; ulDown.innerHTML = '';
+
+        placedWordsInfo.forEach(pw => {
+            let li = document.createElement('li');
+            li.innerHTML = `<span class="num-badge">${pw.displayNum}</span> ${pw.ar}`;
+            li.id = `clue-${pw.id}`;
+            
+            if(pw.isHoriz) ulAcross.appendChild(li);
+            else ulDown.appendChild(li);
+        });
+    }
+
+    function onCellInput(e, inputEl) {
+        let val = inputEl.value.toLowerCase();
+        // الانتقال التلقائي للخلية التالية (مبسط)
+        if(val.match(/[a-z]/i)) {
+            let allInputs = Array.from(document.querySelectorAll('.cw-input:not(.correct)'));
+            let currentIndex = allInputs.indexOf(inputEl);
+            if(currentIndex >= 0 && currentIndex < allInputs.length - 1) {
+                allInputs[currentIndex + 1].focus();
+            }
+        } else {
+            inputEl.value = ''; // منع الرموز
+        }
+        checkWordsCompletion();
+    }
+
+    function checkWordsCompletion() {
+        let allCorrect = true;
+        
+        placedWordsInfo.forEach(pw => {
+            let dx = pw.isHoriz ? 1 : 0;
+            let dy = pw.isHoriz ? 0 : 1;
+            let wordCorrect = true;
+            let inputsToLock = [];
+
+            for(let i=0; i<pw.len; i++) {
+                let cx = pw.x + i*dx;
+                let cy = pw.y + i*dy;
+                let input = document.querySelector(`.cw-input[data-x="${cx}"][data-y="${cy}"]`);
+                if(input) {
+                    inputsToLock.push(input);
+                    if(input.value.toLowerCase() !== input.dataset.expected) {
+                        wordCorrect = false;
+                        allCorrect = false;
+                    }
+                }
+            }
+
+            let clueLi = document.getElementById(`clue-${pw.id}`);
+            if(wordCorrect) {
+                inputsToLock.forEach(inp => inp.classList.add('correct'));
+                if(clueLi) clueLi.classList.add('completed');
+            } else {
+                if(clueLi) clueLi.classList.remove('completed');
+            }
+        });
+
+        if(allCorrect) {
+            setTimeout(endGame, 500);
+        }
+    }
+
+    function getStarsForTime(time) {
+        let t = getLevelTimes(currentLevel);
+        if(time <= t.t5) return 5;
+        if(time <= t.t4) return 4;
+        if(time <= t.t3) return 3;
+        if(time <= t.t2) return 2;
+        if(time <= t.t1) return 1;
+        return 0;
+    }
+
+    function updateLiveStars(time) {
+        let currentStars = getStarsForTime(time);
+        document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars);
+    }
+
+    function startTimer() {
+        secondsElapsed = 0;
+        document.getElementById('timer-display').innerText = secondsElapsed;
+        document.getElementById('live-stars').innerText = '★★★★★'; 
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            document.getElementById('timer-display').innerText = secondsElapsed;
+            updateLiveStars(secondsElapsed);
+        }, 1000);
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        let time = secondsElapsed;
+        let stars = getStarsForTime(time);
+
+        let levelData = gameProgress[currentLevel];
+        let previousStars = levelData[currentStage]?.stars || 0;
+        let pointsGained = 0;
+
+        if(stars > previousStars) {
+            pointsGained = (stars - previousStars) * 5;
+            appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
+            localStorage.setItem('appProgress', JSON.stringify(appProgress));
+            document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
+            levelData[currentStage] = { unlocked: true, stars: stars, time: time };
+        } else if (!levelData[currentStage]) {
+            levelData[currentStage] = { unlocked: true, stars: stars, time: time };
+        }
+
+        if(currentStage < totalStages) {
+            levelData[currentStage + 1] = levelData[currentStage + 1] || { unlocked: true, stars: 0 };
+        }
+
+        gameProgress[currentLevel] = levelData;
+        localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
+
+        showResultModal(stars, time, pointsGained);
+    }
+
+    function showResultModal(stars, time, points) {
+        document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
+        document.getElementById('modal-time').innerText = time;
+        let msg = document.getElementById('modal-points-msg');
+        if(points > 0) msg.innerText = `عبقري! كسبت ${points} نقطة إضافية! 🏆`;
+        else msg.innerText = `لم تحصل على نقاط جديدة. حاول في المرة القادمة بوقت أسرع! 💪`;
+        
+        document.getElementById('result-modal').style.display = 'flex';
+    }
+
+    function showStagesScreen() {
+        clearInterval(timerInterval);
+        document.getElementById('result-modal').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('stages-screen').style.display = 'block';
+        renderStages();
+    }
+</script>
+
+</body>
+</html>
