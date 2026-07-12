@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة المطابقة والذاكرة</title>
+	<script>
+    // نظام حماية الصفحات: يمنع الدخول إذا لم يتم التفعيل
+    (function checkActivation() {
+        if (!localStorage.getItem('app_is_activated')) {
+            alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
+            window.location.replace("index.html"); // الطرد للصفحة الرئيسية
+        }
+    })();
+</script>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>

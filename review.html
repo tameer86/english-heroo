@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>منصة المراجعة والاختبارات الذكية</title>
+	<script>
+    // نظام حماية الصفحات: يمنع الدخول إذا لم يتم التفعيل
+    (function checkActivation() {
+        if (!localStorage.getItem('app_is_activated')) {
+            alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
+            window.location.replace("index.html"); // الطرد للصفحة الرئيسية
+        }
+    })();
+</script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 20px; text-align: center; margin: 0; }
         .container { background: white; max-width: 1100px; margin: 0 auto; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }

@@ -12,12 +12,21 @@
     <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
     <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     
+    <script>
+        // نظام حماية الصفحات: يمنع الدخول إذا لم يتم التفعيل
+        (function checkActivation() {
+            if (!localStorage.getItem('app_is_activated')) {
+                alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
+                window.location.replace("index.html"); 
+            }
+        })();
+    </script>
+
     <style>
         :root { --primary: #1abc9c; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --dark: #34495e; --light: #f8f9fc; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4fbf9; padding: 20px; margin: 0; text-align: center; overflow-x: hidden; }
         h1 { color: var(--primary); margin-bottom: 10px; margin-top: 20px;}
         
-        /* تجميعة الأيقونات والنقاط مدمجة في الشريط الأبيض */
         .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
         .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
         .left-header-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center; }
@@ -52,11 +61,9 @@
         .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
         .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
         
-        /* شاشة اللعب - الكلمات المتقاطعة */
         .cw-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 1100px; margin: 0 auto;}
         @media (min-width: 900px) { .cw-layout { flex-direction: row-reverse; align-items: flex-start; justify-content: center; } }
 
-        /* الشبكة الذكية والمتجاوبة */
         .cw-board-container { background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow: auto; max-width: 100%; direction: ltr;}
         .cw-grid { display: grid; gap: 2px; background: #2c3e50; padding: 2px; border-radius: 5px; width: max-content; margin: 0 auto; }
         
@@ -69,7 +76,6 @@
         .cw-number { position: absolute; top: 2px; left: 3px; font-size: 11px; font-weight: bold; color: #7f8c8d; pointer-events: none; z-index: 5;}
         .cw-input.correct + .cw-number { color: #ecf0f1; }
 
-        /* منطقة المعاني (Clues) */
         .cw-clues { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: right; box-sizing: border-box;}
         .clues-section h3 { color: var(--primary); border-bottom: 2px dashed #eee; padding-bottom: 5px; margin-top: 0;}
         .clues-list { list-style: none; padding: 0; margin: 0 0 20px 0; }
@@ -109,11 +115,12 @@
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleSettingsModal()">✖</button>
             <h3>⚙️ إعدادات الأوقات والتصفير</h3>
-            <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60"></div>
-            <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="90"></div>
-            <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="120"></div>
-            <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="180"></div>
-            <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="240"></div>
+            <p style="font-size:12px; color:var(--info); font-weight:bold; text-align:center;">يتم احتساب الوقت الكلي بضرب (التسعيرة) بعدد أحرف الكلمات في المرحلة.</p>
+            <div class="settings-row"><label>الوقت للحرف لـ 5 نجوم:</label> <input type="number" id="time-5" value="1" step="0.1"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 4 نجوم:</label> <input type="number" id="time-4" value="2" step="0.1"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 3 نجوم:</label> <input type="number" id="time-3" value="3" step="0.1"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 2 نجوم:</label> <input type="number" id="time-2" value="4" step="0.1"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 1 نجمة:</label> <input type="number" id="time-1" value="5" step="0.1"> ث</div>
             <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" value="10"></div>
             
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
@@ -161,8 +168,7 @@
             </div>
 
             <div class="cw-board-container">
-                <div class="cw-grid" id="cw-grid">
-                    </div>
+                <div class="cw-grid" id="cw-grid"></div>
             </div>
         </div>
     </div>
@@ -212,9 +218,10 @@
     let timerInterval;
     let secondsElapsed = 0;
     
-    // متغيرات الشبكة الأساسية
     let cwGridData = {}; 
     let placedWordsInfo = []; 
+    window.currentStageTotalLetters = 0; // لحفظ عدد الحروف للمرحلة الحالية
+    window.typingDirection = null; // للاحتفاظ باتجاه الإدخال 'h' أو 'v'
 
     window.onload = function() {
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
@@ -266,8 +273,9 @@
         loadSettingsUI();
     }
 
+    // تم تغيير القيم الافتراضية لتناسب الحرف الواحد (ثواني)
     function getLevelTimes(level) {
-        let defaultTimes = { t5: 60, t4: 90, t3: 120, t2: 180, t1: 240, starPrice: 10 };
+        let defaultTimes = { t5: 1, t4: 2, t3: 3, t2: 4, t1: 5, starPrice: 10 };
         return gameTimeSettings[level] || defaultTimes;
     }
 
@@ -292,11 +300,11 @@
         let passInput = document.getElementById('settings-password').value;
         if(passInput !== 'T@mer2023') { alert('كلمة المرور غير صحيحة!'); return; }
         
-        let t5 = parseInt(document.getElementById('time-5').value) || 60;
-        let t4 = parseInt(document.getElementById('time-4').value) || 90;
-        let t3 = parseInt(document.getElementById('time-3').value) || 120;
-        let t2 = parseInt(document.getElementById('time-2').value) || 180;
-        let t1 = parseInt(document.getElementById('time-1').value) || 240;
+        let t5 = parseFloat(document.getElementById('time-5').value) || 1;
+        let t4 = parseFloat(document.getElementById('time-4').value) || 2;
+        let t3 = parseFloat(document.getElementById('time-3').value) || 3;
+        let t2 = parseFloat(document.getElementById('time-2').value) || 4;
+        let t1 = parseFloat(document.getElementById('time-1').value) || 5;
         let starPrice = parseInt(document.getElementById('star-price').value) || 10;
         
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
@@ -398,14 +406,10 @@
         startTimer();
     }
 
-    // ==========================================
-    // 🧠 خوارزمية بناء الكلمات المتقاطعة (Crossword Generator)
-    // ==========================================
     function generateCrosswordAlgorithm(wordsArray) {
         cwGridData = {};
         placedWordsInfo = [];
         
-        // تنظيف الكلمات (إزالة المسافات للشبكة) لكن نحتفظ بالكلمة الأصلية للتلميح
         let cleanWords = wordsArray.map(w => ({
             id: w.id, 
             ar: w.ar, 
@@ -413,7 +417,6 @@
             en: w.en.trim().replace(/[^a-zA-Z]/g, '').toLowerCase() 
         })).filter(w => w.en.length > 0);
         
-        // ترتيب الكلمات من الأطول للأقصر لتسهيل المقاطعة
         cleanWords.sort((a,b) => b.en.length - a.en.length);
 
         function getCell(x, y) { return cwGridData[`${x},${y}`]; }
@@ -422,12 +425,10 @@
             cwGridData[`${x},${y}`].words.push(wordId);
         }
 
-        // دالة فحص إمكانية وضع الكلمة بدون تداخل غير مسموح
         function canPlaceWord(wordStr, startX, startY, isHoriz) {
             let dx = isHoriz ? 1 : 0;
             let dy = isHoriz ? 0 : 1;
             
-            // فحص الخلية التي تسبق الكلمة والتي تليها (يجب أن تكون فارغة حتى لا تلتصق الكلمات)
             if(getCell(startX - dx, startY - dy)) return false;
             if(getCell(startX + wordStr.length * dx, startY + wordStr.length * dy)) return false;
 
@@ -439,10 +440,9 @@
                 let cell = getCell(cx, cy);
 
                 if(cell) {
-                    if(cell.char !== wordStr[i]) return false; // تقاطع بحرف غير متطابق
+                    if(cell.char !== wordStr[i]) return false; 
                     intersections++;
                 } else {
-                    // إذا الخلية فارغة، تأكد أن الخلايا المجاورة لها عمودياً/أفقياً فارغة لعدم التصاق الكلمات جانبياً
                     if (isHoriz) {
                         if(getCell(cx, cy-1) || getCell(cx, cy+1)) return false;
                     } else {
@@ -453,13 +453,12 @@
             return intersections;
         }
 
-        // 1. وضع الكلمة الأولى في المنتصف (إحداثيات 0,0)
         let firstWord = cleanWords[0];
         for(let i=0; i<firstWord.en.length; i++) setCell(i, 0, firstWord.en[i], firstWord.id);
         placedWordsInfo.push({ id: firstWord.id, ar: firstWord.ar, x: 0, y: 0, isHoriz: true, len: firstWord.en.length });
 
         let unplaced = cleanWords.slice(1);
-        let maxAttempts = 3; // نحاول عدة مرات لتركيب الباقي
+        let maxAttempts = 3; 
 
         while(unplaced.length > 0 && maxAttempts > 0) {
             let stillUnplaced = [];
@@ -468,16 +467,12 @@
                 let bestPlacement = null;
                 let maxIntersections = -1;
 
-                // البحث في جميع الحروف الموضوعة على الشبكة عن نقطة تقاطع
                 for(let key in cwGridData) {
                     let [gx, gy] = key.split(',').map(Number);
                     let gridChar = cwGridData[key].char;
 
                     for(let i=0; i<uWord.en.length; i++) {
                         if(uWord.en[i] === gridChar) {
-                            // وجدنا حرف متطابق، لنجرب الوضع الأفقي والعمودي
-                            
-                            // جرب أفقي (إذا كان الحرف المتقاطع جزء من كلمة عمودية)
                             let startX_h = gx - i;
                             let startY_h = gy;
                             let scoreH = canPlaceWord(uWord.en, startX_h, startY_h, true);
@@ -486,7 +481,6 @@
                                 bestPlacement = { x: startX_h, y: startY_h, isHoriz: true };
                             }
 
-                            // جرب عمودي
                             let startX_v = gx;
                             let startY_v = gy - i;
                             let scoreV = canPlaceWord(uWord.en, startX_v, startY_v, false);
@@ -513,23 +507,23 @@
             maxAttempts--;
         }
 
-        // إذا تبقى كلمات لم نتمكن من مقاطعتها (لا يوجد حروف مشتركة)، نضعها في الأسفل منفصلة لضمان استخدام الـ 10 كلمات
         if(unplaced.length > 0) {
             let maxBottomY = 2;
             for(let key in cwGridData) { let y = parseInt(key.split(',')[1]); if(y > maxBottomY) maxBottomY = y; }
             
             unplaced.forEach(uWord => {
-                maxBottomY += 2; // مسافة فاصلة
+                maxBottomY += 2; 
                 for(let i=0; i<uWord.en.length; i++) setCell(i, maxBottomY, uWord.en[i], uWord.id);
                 placedWordsInfo.push({ id: uWord.id, ar: uWord.ar, x: 0, y: maxBottomY, isHoriz: true, len: uWord.en.length });
             });
         }
+        
+        window.currentStageTotalLetters = Object.keys(cwGridData).length; // حساب مجموع الأحرف
 
         renderCrosswordUI();
     }
 
     function renderCrosswordUI() {
-        // 1. حساب حدود الشبكة الدقيقة
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         for(let key in cwGridData) {
             let [x, y] = key.split(',').map(Number);
@@ -542,11 +536,9 @@
 
         let gridEl = document.getElementById('cw-grid');
         gridEl.innerHTML = '';
-        // استخدام Grid مطاطي حسب العدد الفعلي للأعمدة المطلوبة للكلمات
         gridEl.style.gridTemplateColumns = `repeat(${colsCount}, clamp(35px, 7vw, 45px))`;
         gridEl.style.gridTemplateRows = `repeat(${rowsCount}, clamp(35px, 7vw, 45px))`;
 
-        // ترتيب الكلمات وإعطائها أرقاماً للعرض
         placedWordsInfo.sort((a,b) => (a.y === b.y) ? a.x - b.x : a.y - b.y);
         let clueNum = 1;
         placedWordsInfo.forEach(pw => {
@@ -556,7 +548,6 @@
             pw.displayNum = cwGridData[`${pw.x},${pw.y}`].displayNum;
         });
 
-        // 2. بناء المربعات في واجهة المستخدم
         for(let r = minY; r <= maxY; r++) {
             for(let c = minX; c <= maxX; c++) {
                 let cellData = cwGridData[`${c},${r}`];
@@ -570,6 +561,9 @@
                     input.dataset.x = c;
                     input.dataset.y = r;
                     input.dataset.expected = cellData.char;
+                    
+                    // أحداث الكيبورد والإدخال للتنقل الذكي
+                    input.onkeydown = (e) => onCellKeydown(e, input);
                     input.oninput = (e) => onCellInput(e, input);
                     
                     cellDiv.appendChild(input);
@@ -587,7 +581,6 @@
             }
         }
 
-        // 3. بناء قوائم المعاني (أفقي وعمودي)
         let ulAcross = document.getElementById('clues-across');
         let ulDown = document.getElementById('clues-down');
         ulAcross.innerHTML = ''; ulDown.innerHTML = '';
@@ -602,17 +595,58 @@
         });
     }
 
+    // ==========================================
+    // 🧠 آلية التركيز (Focus) الذكية بناءً على طلبك
+    // ==========================================
+    function getNextInput(x, y, dir) {
+        let nX = x, nY = y;
+        if(dir === 'h') nX++; else if(dir === '-h') nX--;
+        else if(dir === 'v') nY++; else if(dir === '-v') nY--;
+        return document.querySelector(`.cw-input[data-x="${nX}"][data-y="${nY}"]:not(.correct)`);
+    }
+
+    function onCellKeydown(e, inputEl) {
+        if(e.key === 'ArrowRight') { window.typingDirection = '-h'; }
+        else if(e.key === 'ArrowLeft') { window.typingDirection = 'h'; } // الإنجليزي يكتب لليسار في الشاشة
+        else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; }
+        else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; }
+    }
+
     function onCellInput(e, inputEl) {
         let val = inputEl.value.toLowerCase();
-        // الانتقال التلقائي للخلية التالية (مبسط)
+        let curX = parseInt(inputEl.dataset.x);
+        let curY = parseInt(inputEl.dataset.y);
+
         if(val.match(/[a-z]/i)) {
-            let allInputs = Array.from(document.querySelectorAll('.cw-input:not(.correct)'));
-            let currentIndex = allInputs.indexOf(inputEl);
-            if(currentIndex >= 0 && currentIndex < allInputs.length - 1) {
-                allInputs[currentIndex + 1].focus();
+            // الخوارزمية الذكية للانتقال بناءً على موقع الحرف
+            let nextInput = null;
+
+            // إذا كان المستخدم حدد اتجاه معين مسبقاً بالأسهم
+            if(window.typingDirection) {
+                nextInput = getNextInput(curX, curY, window.typingDirection);
+            } 
+            // إذا لم يحدد، نعتمد الاستنتاج الذكي (بداية صف، نهاية صف، عمود إلخ)
+            if(!nextInput) {
+                let rightHas = getNextInput(curX, curY, 'h');
+                let leftHas = getNextInput(curX, curY, '-h');
+                let downHas = getNextInput(curX, curY, 'v');
+                let upHas = getNextInput(curX, curY, '-v');
+
+                if(downHas) { 
+                    window.typingDirection = 'v'; nextInput = downHas; // بداية عمود -> انزل للأسفل
+                } else if(upHas && !downHas && !rightHas && !leftHas) {
+                    window.typingDirection = '-v'; nextInput = upHas; // نهاية عمود -> اصعد للأعلى
+                } else if(rightHas) {
+                    window.typingDirection = 'h'; nextInput = rightHas; // بداية صف -> اذهب لليسار (x+1)
+                } else if(leftHas && !rightHas && !downHas && !upHas) {
+                    window.typingDirection = '-h'; nextInput = leftHas; // نهاية صف -> ارجع لليمين (x-1)
+                }
             }
+
+            if(nextInput) nextInput.focus();
+
         } else {
-            inputEl.value = ''; // منع الرموز
+            inputEl.value = ''; 
         }
         checkWordsCompletion();
     }
@@ -655,11 +689,14 @@
 
     function getStarsForTime(time) {
         let t = getLevelTimes(currentLevel);
-        if(time <= t.t5) return 5;
-        if(time <= t.t4) return 4;
-        if(time <= t.t3) return 3;
-        if(time <= t.t2) return 2;
-        if(time <= t.t1) return 1;
+        let letters = window.currentStageTotalLetters || 10;
+        
+        // حساب الوقت الكلي = (ثواني النجمة للحرف) * (عدد أحرف المرحلة)
+        if(time <= (t.t5 * letters)) return 5;
+        if(time <= (t.t4 * letters)) return 4;
+        if(time <= (t.t3 * letters)) return 3;
+        if(time <= (t.t2 * letters)) return 2;
+        if(time <= (t.t1 * letters)) return 1;
         return 0;
     }
 

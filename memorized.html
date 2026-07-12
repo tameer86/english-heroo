@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>الكلمات المخزنة والمحفوظة</title>
+	<script>
+    // نظام حماية الصفحات: يمنع الدخول إذا لم يتم التفعيل
+    (function checkActivation() {
+        if (!localStorage.getItem('app_is_activated')) {
+            alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
+            window.location.replace("index.html"); // الطرد للصفحة الرئيسية
+        }
+    })();
+</script>
     <style>
         body { font-family: sans-serif; background: #eef2f7; padding: 20px; text-align: center; }
         .header-box { background: #1cc88a; color: white; padding: 20px; border-radius: 10px; max-width: 900px; margin: 0 auto 20px auto; font-size: 18px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }

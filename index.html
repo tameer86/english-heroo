@@ -28,9 +28,14 @@
         
         .settings-field { margin: 15px 0; text-align: right; }
         .settings-field label { font-weight: bold; display: block; margin-bottom: 5px; }
-        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"], .settings-field input[type="text"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
         .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
+
+        /* تنسيقات شاشة التفعيل */
+        #activation-screen { background: #fff; padding: 30px; border-radius: 20px; width: 100%; }
+        .serial-box { display: flex; justify-content: center; gap: 10px; margin: 20px 0; direction: ltr; }
+        .serial-input { width: 150px !important; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; }
     </style>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
@@ -60,90 +65,160 @@
             }
             return 'مستوى ' + code;
         }
+
+        // إنشاء معرف فريد للجهاز ليتم استخدامه في التفعيل (بديل الماك أدرس)
+        if(!localStorage.getItem('device_uuid')) {
+            localStorage.setItem('device_uuid', 'dev_' + Math.random().toString(36).substr(2, 9));
+        }
     </script>
 </head>
 <body>
 
 <div class="container">
-    <div id="home-screen">
-        <h1>تطبيق الحفظ الذكي 🌟</h1>
-        <p>تعلم الإنجليزية بذكاء ومرح مع التقنيات التفاعلية</p>
-
-        <div id="login-section" class="profile-container">
-            <button style="background: var(--success); width:90%; font-size: 18px; padding: 15px;" onclick="showDashboard()">🚀 الدخول إلى البرنامج</button>
+    
+    <div id="activation-screen" class="hidden">
+        <h1 style="color: var(--danger);">🔒 تفعيل التطبيق</h1>
+        <p style="font-weight: bold; color: var(--dark);">يرجى إدخال سيريال التفعيل المكون من 5 أرقام للوصول إلى البرنامج.</p>
+        <p style="font-size: 12px; color: var(--info);">ملاحظة لولي الأمر: التفعيل يتم لمرة واحدة فقط لهذا الجهاز.</p>
+        
+        <div class="settings-field serial-box">
+            <input type="text" id="serial-input" class="serial-input" maxlength="5" placeholder="12345" autocomplete="off">
         </div>
         
-        <div class="sync-box">
-            <h4 style="margin:0 0 10px 0; color:#0d47a1;">🔄 نقل البيانات بين الأجهزة</h4>
-            <button style="background:var(--info); font-size:14px; padding:8px; width:45%; margin:2px;" onclick="exportProgress()">📤 تصدير نسخة</button>
-            <button style="background:var(--warning); font-size:14px; padding:8px; width:45%; margin:2px;" onclick="document.getElementById('import-file').click()">📥 استيراد نسخة</button>
-            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importProgress(event)">
-        </div>
-
-        <hr style="border: 1px solid #eee; margin: 15px 0;">
-        <div class="btn-group">
-            <button style="background: var(--info);" onclick="showAbout()">ℹ️ حول التطبيق</button>
-            <button style="background: var(--danger);" onclick="clearProgressData()">🗑️ مسح البيانات</button>
-        </div>
+        <button style="background: var(--success); width: 100%; padding: 15px; font-size: 18px;" onclick="verifyActivation()">✅ تأكيد التفعيل</button>
+        <p id="activation-error" style="color: var(--danger); font-weight: bold; margin-top: 15px; display: none;">السيريال المدخل غير صحيح!</p>
     </div>
 
-    <div id="dashboard-screen" class="hidden">
-        <h1>لوحة التحكم الإستراتيجية 🎯</h1>
-        
-        <h3 id="cumulative-score-display" style="color: var(--primary); margin: 10px 0;">النقاط التراكمية المشتركة: 0 🏆</h3>
-        <h4 style="text-align:right; margin:10px 0 5px 0;">📈 تقدمك في المستويات المفتوحة:</h4>
-        <div class="levels-container" id="levels-progress-area"></div>
+    <div id="main-app-content" class="hidden">
+        <div id="home-screen">
+            <h1>تطبيق الحفظ الذكي 🌟</h1>
+            <p>تعلم الإنجليزية بذكاء ومرح مع التقنيات التفاعلية</p>
 
-        <div class="dashboard-grid">
-            <button class="dashboard-btn" style="background: var(--primary);" onclick="window.location.href='save.html'">
-                <span>📚</span> الحفظ اليومي
-            </button>
-            <button class="dashboard-btn" style="background: var(--success);" onclick="window.location.href='memorized.html'">
-                <span>🔄</span> الكلمات المحفوظة
-            </button>
-            <button class="dashboard-btn" style="background: var(--info);" onclick="window.location.href='review.html'">
-                <span>🧠</span> مراجعة واختبار
-            </button>
-            <button class="dashboard-btn" style="background: #f6c23e;" onclick="window.location.href='game.html'">
-                <span>🎮</span> الألعاب
-            </button>
-            <button class="dashboard-btn" style="background: var(--warning);" onclick="showSettings()">
-                <span>⚙️</span> الإعدادات 
-            </button>
-        </div>
-        <button style="background: var(--dark); margin-top: 20px; width: 60%;" onclick="goHome()">🔙 العودة للشاشة الرئيسية</button>
-    </div>
+            <div id="login-section" class="profile-container">
+                <button style="background: var(--success); width:90%; font-size: 18px; padding: 15px;" onclick="showDashboard()">🚀 الدخول إلى البرنامج</button>
+            </div>
+            
+            <div class="sync-box">
+                <h4 style="margin:0 0 10px 0; color:#0d47a1;">🔄 نقل البيانات بين الأجهزة</h4>
+                <button style="background:var(--info); font-size:14px; padding:8px; width:45%; margin:2px;" onclick="exportProgress()">📤 تصدير نسخة</button>
+                <button style="background:var(--warning); font-size:14px; padding:8px; width:45%; margin:2px;" onclick="document.getElementById('import-file').click()">📥 استيراد نسخة</button>
+                <input type="file" id="import-file" class="hidden" accept=".json" onchange="importProgress(event)">
+            </div>
 
-    <div id="about-screen" class="hidden">
-        <h1>حول التطبيق ℹ️</h1>
-        <p style="text-align: right; line-height: 1.6;">    النسخة :  1.8 V <br>المطور و المبرمج : المهندس تامر خطيب <br><br>الوصف: <br>هذا التطبيق هو نظام ذكي مصمم لمساعدتك على حفظ الكلمات والمصطلحات الإنجليزية الأساسية لكل مستوى بالترتيب، واختبار جودة نطقك بدقة، ومتابعة تقدمك التعليمي خطوة بخطوة بالنجوم والتقارير المتقدمة.<br>وهو يتكون من كلمات المنهاج الفلسطيني من الصف الأول حتى الصف الثاني عشر ، بالإضافة الى المستويات الستة المعتمدة من نظام  CEFR (الإطار الأوروبي المرجعي الموحد للغات)، وهو المقياس الأساسي لتحديد مستوى أي شخص في اللغات الأجنبية.</p>
-		
-		
-        <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
-    </div>
-
-    <div id="settings-screen" class="hidden">
-        <h1>الإعدادات العامة ⚙️</h1>
-        
-        <div class="settings-field" style="background: #fff3cd; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba;">
-            <label style="color: #856404;">مفتاح Gemini API (للذكاء الاصطناعي):</label>
-            <input type="password" id="gemini-api-key" placeholder="أدخل المفتاح هنا للتفعيل (مثال: AIzaSy...)" onchange="saveSettings()">
-            <p style="font-size: 12px; color: #856404; margin-top: 5px; margin-bottom: 0;">يستخدم هذا المفتاح لتقييم النطق في الحفظ والمراجعة.</p>
-            <button style="background: var(--info); color: white; border: none; padding: 8px 15px; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;" onclick="window.open('https://aistudio.google.com/api-keys', '_blank')">🔑 الحصول على مفتاح Gemini API جديد</button>
+            <hr style="border: 1px solid #eee; margin: 15px 0;">
+            <div class="btn-group">
+                <button style="background: var(--info);" onclick="showAbout()">ℹ️ حول التطبيق</button>
+                <button style="background: var(--danger);" onclick="clearProgressData()">🗑️ مسح البيانات</button>
+            </div>
         </div>
 
-        <div class="settings-field"><label>سرعة القراءة والصوت:</label><input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1" onchange="saveSettings()"></div>
-        <div class="settings-field"><label>جنس القارئ والصوت المتاح:</label><select id="voice-gender" onchange="saveSettings()"></select></div>
-        <div class="settings-field">
-            <label>نص تجريبي لاختبار تنظيم القراءة وعلامات الترقيم:</label>
-            <textarea class="test-textarea" id="test-text" readonly>Hello my friend! Welcome to your smart app, where you can learn English perfectly.</textarea>
+        <div id="dashboard-screen" class="hidden">
+            <h1>لوحة التحكم الإستراتيجية 🎯</h1>
+            
+            <h3 id="cumulative-score-display" style="color: var(--primary); margin: 10px 0;">النقاط التراكمية المشتركة: 0 🏆</h3>
+            <h4 style="text-align:right; margin:10px 0 5px 0;">📈 تقدمك في المستويات المفتوحة:</h4>
+            <div class="levels-container" id="levels-progress-area"></div>
+
+            <div class="dashboard-grid">
+                <button class="dashboard-btn" style="background: var(--primary);" onclick="window.location.href='save.html'">
+                    <span>📚</span> الحفظ اليومي
+                </button>
+                <button class="dashboard-btn" style="background: var(--success);" onclick="window.location.href='memorized.html'">
+                    <span>🔄</span> الكلمات المحفوظة
+                </button>
+                <button class="dashboard-btn" style="background: var(--info);" onclick="window.location.href='review.html'">
+                    <span>🧠</span> مراجعة واختبار
+                </button>
+                <button class="dashboard-btn" style="background: #f6c23e;" onclick="window.location.href='game.html'">
+                    <span>🎮</span> الألعاب
+                </button>
+                <button class="dashboard-btn" style="background: var(--warning);" onclick="showSettings()">
+                    <span>⚙️</span> الإعدادات 
+                </button>
+            </div>
+            <button style="background: var(--dark); margin-top: 20px; width: 60%;" onclick="goHome()">🔙 العودة للشاشة الرئيسية</button>
         </div>
-        <button style="background: var(--success);" onclick="testVoiceOutput()">🔊 تجربة الاستماع للنص</button>
-        <button style="background: var(--dark); margin-top: 10px;" onclick="showDashboard()">🔙 العودة للوحة التحكم</button>
+
+        <div id="about-screen" class="hidden">
+            <h1>حول التطبيق ℹ️</h1>
+            <p style="text-align: right; line-height: 1.6;">    النسخة :  1.8 V <br>المطور و المبرمج : المهندس تامر خطيب <br><br>الوصف: <br>هذا التطبيق هو نظام ذكي مصمم لمساعدتك على حفظ الكلمات والمصطلحات الإنجليزية الأساسية لكل مستوى بالترتيب، واختبار جودة نطقك بدقة، ومتابعة تقدمك التعليمي خطوة بخطوة بالنجوم والتقارير المتقدمة.<br>وهو يتكون من كلمات المنهاج الفلسطيني من الصف الأول حتى الصف الثاني عشر ، بالإضافة الى المستويات الستة المعتمدة من نظام  CEFR (الإطار الأوروبي المرجعي الموحد للغات)، وهو المقياس الأساسي لتحديد مستوى أي شخص في اللغات الأجنبية.</p>
+            
+            
+            <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
+        </div>
+
+        <div id="settings-screen" class="hidden">
+            <h1>الإعدادات العامة ⚙️</h1>
+            
+            <div class="settings-field" style="background: #fff3cd; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba;">
+                <label style="color: #856404;">مفتاح Gemini API (للذكاء الاصطناعي):</label>
+                <input type="password" id="gemini-api-key" placeholder="أدخل المفتاح هنا للتفعيل (مثال: AIzaSy...)" onchange="saveSettings()">
+                <p style="font-size: 12px; color: #856404; margin-top: 5px; margin-bottom: 0;">يستخدم هذا المفتاح لتقييم النطق في الحفظ والمراجعة.</p>
+                <button style="background: var(--info); color: white; border: none; padding: 8px 15px; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;" onclick="window.open('https://aistudio.google.com/api-keys', '_blank')">🔑 الحصول على مفتاح Gemini API جديد</button>
+            </div>
+
+            <div class="settings-field"><label>سرعة القراءة والصوت:</label><input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1" onchange="saveSettings()"></div>
+            <div class="settings-field"><label>جنس القارئ والصوت المتاح:</label><select id="voice-gender" onchange="saveSettings()"></select></div>
+            <div class="settings-field">
+                <label>نص تجريبي لاختبار تنظيم القراءة وعلامات الترقيم:</label>
+                <textarea class="test-textarea" id="test-text" readonly>Hello my friend! Welcome to your smart app, where you can learn English perfectly.</textarea>
+            </div>
+            <button style="background: var(--success);" onclick="testVoiceOutput()">🔊 تجربة الاستماع للنص</button>
+            <button style="background: var(--dark); margin-top: 10px;" onclick="showDashboard()">🔙 العودة للوحة التحكم</button>
+        </div>
     </div>
 </div>
 
 <script>
+    // ================== نظام التفعيل ==================
+    function checkAppActivation() {
+        if (localStorage.getItem('app_is_activated') === 'true') {
+            document.getElementById('activation-screen').classList.add('hidden');
+            document.getElementById('main-app-content').classList.remove('hidden');
+            document.getElementById('home-screen').classList.remove('hidden');
+        } else {
+            document.getElementById('activation-screen').classList.remove('hidden');
+            document.getElementById('main-app-content').classList.add('hidden');
+        }
+    }
+
+    async function verifyActivation() {
+        const serialInput = document.getElementById('serial-input').value.trim();
+        const errorMsg = document.getElementById('activation-error');
+        errorMsg.style.display = 'none';
+
+        if(serialInput.length !== 5) {
+            errorMsg.innerText = "الرجاء إدخال السيريال المكون من 5 أرقام!";
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        try {
+            // جلب السيريالات من ملف JSON
+            const response = await fetch('serials.json');
+            const serials = await response.json();
+            
+            // البحث عن السيريال المدخل
+            const isValid = serials.some(item => item.serial === serialInput);
+
+            if (isValid) {
+                // تفعيل ناجح
+                localStorage.setItem('app_is_activated', 'true');
+                localStorage.setItem('app_serial_used', serialInput); // للحفظ كمرجع
+                alert('🎉 تم تفعيل البرنامج بنجاح! أهلاً بك.');
+                checkAppActivation();
+            } else {
+                errorMsg.innerText = "السيريال المدخل غير صحيح!";
+                errorMsg.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("خطأ في قراءة ملف السيريالات", error);
+            errorMsg.innerText = "حدث خطأ في النظام، تأكد من وجود ملف serials.json";
+            errorMsg.style.display = 'block';
+        }
+    }
+    // ==================================================
+
     const availableKeys = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
 
     function getCleanProgress() {
@@ -157,7 +232,6 @@
     if(!localStorage.getItem('appProgress')) {
         localStorage.setItem('appProgress', JSON.stringify(getCleanProgress()));
     } else {
-        // تحديث الهيكل القديم لدعم العدادين المنفصلين
         let progress = JSON.parse(localStorage.getItem('appProgress'));
         let needsUpdate = false;
         for(let l in progress.levels) {
@@ -179,16 +253,19 @@
     }
 
     window.onload = function () {
-        const urlParams = new URLSearchParams(window.location.search);
+        checkAppActivation(); // فحص التفعيل أولاً
         
-        if (urlParams.get('screen') === 'dashboard') {
-            hideAllScreens();
-            document.getElementById('dashboard-screen').classList.remove('hidden');
-        }
+        if (localStorage.getItem('app_is_activated') === 'true') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('screen') === 'dashboard') {
+                hideAllScreens();
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+            }
 
-        loadVoiceOptions();
-        if (window.speechSynthesis.onvoiceschanged !== undefined) { window.speechSynthesis.onvoiceschanged = loadVoiceOptions; }
-        updateLevelStats();
+            loadVoiceOptions();
+            if (window.speechSynthesis.onvoiceschanged !== undefined) { window.speechSynthesis.onvoiceschanged = loadVoiceOptions; }
+            updateLevelStats();
+        }
     };
 
     function updateLevelStats() {
@@ -242,7 +319,14 @@
 
     function clearProgressData() { 
         if (confirm("تنبيه: سيتم مسح تقدمك والكلمات المحفوظة.\nيرجى تصدير بياناتك أولاً إذا أردت الاحتفاظ بها.\nهل أنت متأكد؟")) { 
+            // الاحتفاظ بحالة التفعيل عند مسح البيانات
+            let isAct = localStorage.getItem('app_is_activated');
+            let uuid = localStorage.getItem('device_uuid');
             localStorage.clear(); 
+            if(isAct) {
+                localStorage.setItem('app_is_activated', isAct);
+                localStorage.setItem('device_uuid', uuid);
+            }
             alert("تم مسح بيانات التقدم بنجاح."); 
             location.reload(); 
         } 
