@@ -1,11 +1,11 @@
 [
-    { "serial": "22014", "status": "unused", "device_id": "" },
-    { "serial": "122015", "status": "unused", "device_id": "" },
-    { "serial": "102019", "status": "unused", "device_id": "" },
-    { "serial": "22018", "status": "unused", "device_id": "" },
+    { "serial": "02014", "status": "unused", "device_id": "" },
+    { "serial": "02015", "status": "unused", "device_id": "" },
+    { "serial": "02019", "status": "unused", "device_id": "" },
+    { "serial": "02018", "status": "unused", "device_id": "" },
 	{ "serial": "11111", "status": "unused", "device_id": "" },
 	{ "serial": "00000", "status": "unused", "device_id": "" },
 	{ "serial": "22222", "status": "unused", "device_id": "" },
 	{ "serial": "33333", "status": "unused", "device_id": "" },
-    { "serial": "21986", "status": "unused", "device_id": "" }
+    { "serial": "01986", "status": "unused", "device_id": "" }
 ]
