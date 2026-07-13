@@ -2,13 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صفحة الحفظ اليومي الذكي</title>
 	<script>
-    // نظام حماية الصفحات: يمنع الدخول إذا لم يتم التفعيل
     (function checkActivation() {
         if (!localStorage.getItem('app_is_activated')) {
             alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
-            window.location.replace("index.html"); // الطرد للصفحة الرئيسية
+            window.location.replace("index.html"); 
         }
     })();
 </script>
@@ -19,21 +19,40 @@
     <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
     <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 20px; text-align: center; margin: 0; }
-        .top-stats { background: #4e73df; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-around; font-size: 17px; font-weight: bold; max-width: 1100px; margin: 0 auto 20px auto; }
-        .selector-box { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; justify-content: center; gap: 25px; align-items: center; }
-        table { width: 100%; max-width: 1100px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 15px; }
+        :root { --primary: #3498db; --success: #1cc88a; --warning: #f1c40f; --danger: #e74a3b; --dark: #5a5c69; --light: #f8f9fc; --purple: #8540f5; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4fbf9; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; }
+        
+        .top-stats { background: var(--primary); color: white; padding: 15px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-size: clamp(14px, 3vw, 17px); font-weight: bold; max-width: 1100px; margin: 0 auto 15px auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .top-stats div { flex: 1 1 200px; }
+
+        .control-panel { background: white; max-width: 1100px; margin: 0 auto 20px auto; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
+        .selector-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; }
+        .selector-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+        select { padding: 8px; border-radius: 6px; font-weight: bold; font-family: inherit; border: 1px solid #ccc; }
+        
+        .action-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .btn { padding: 12px 20px; font-size: clamp(14px, 3vw, 16px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 150px; max-width: 300px; display: flex; align-items: center; justify-content: center; text-align: center;}
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-action { background: var(--success); }
+        .btn-analyze { background: #36b9cc; }
+        .btn-back { background: var(--dark); }
+        .btn-clear { background: var(--danger); }
+        .btn-update { background: var(--primary); }
+        .btn-save-all { background: #2e7d32; }
+
+        .table-responsive { width: 100%; max-width: 1100px; margin: 0 auto; overflow-x: auto; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { border: 1px solid #e3e6f0; padding: 10px; text-align: center; font-size: 15px; }
         thead { background: #36b9cc; color: white; }
         .feedback-cell { background: #f1f3f9; padding: 10px; font-weight: bold; height: 50px; font-size: 14px; color: #333; }
-        .btn-mic { background: #e74a3b; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-speaker { background: #f6c23e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-youglish { background: #8540f5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-right: 5px; }
-        .btn-action { background: #1cc88a; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
-        .btn-analyze { background: #36b9cc; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
-        .btn-back { background: #5a5c69; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
-        .btn-clear { background: #e74a3b; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
-        input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
+        
+        .icon-btn { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin: 2px; }
+        .btn-mic { background: var(--danger); }
+        .btn-speaker { background: var(--warning); }
+        .btn-youglish { background: var(--purple); }
+        input[type="checkbox"] { transform: scale(1.3); cursor: pointer; margin: 0 5px; }
+        
+        .hidden { display: none !important; }
     </style>
     <script>
         const availableLevels = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
@@ -80,42 +99,46 @@
     <div id="stat-words">إجمالي الكلمات المحفوظة: 0 كلمة</div>
 </div>
 
-<div class="selector-box">
-    <div>
-        <label style="font-weight:bold;">📚 اختر مستوى أو صف الحفظ: </label>
-        <select id="level-selector" onchange="onLevelChanged()" style="padding: 8px; border-radius: 6px; font-weight:bold;"></select>
+<div class="control-panel">
+    <div class="selector-box">
+        <div class="selector-item">
+            <label style="font-weight:bold;">📚 مستوى/صف الحفظ: </label>
+            <select id="level-selector" onchange="onLevelChanged()"></select>
+        </div>
+        <div class="selector-item" style="border-right: 2px solid #ccc; padding-right: 15px; border-left: 2px solid #ccc; padding-left: 15px;">
+            <label style="font-weight:bold;"><input type="checkbox" id="chk-show-ar" checked onchange="applyColumnVisibility()"> عرض العربي</label>
+            <label style="font-weight:bold;"><input type="checkbox" id="chk-show-en" checked onchange="applyColumnVisibility()"> عرض الانجليزي</label>
+        </div>
+        <div class="selector-item">
+            <button class="btn btn-update" onclick="updateKnownWords()">🔄 تحديث كقديمة</button>
+        </div>
     </div>
-    <div style="border-right: 2px solid #ccc; padding-right: 20px;">
-        <label style="font-weight:bold; margin-left:10px;"><input type="checkbox" id="chk-show-ar" checked onchange="applyColumnVisibility()"> عرض العربي</label>
-        <label style="font-weight:bold;"><input type="checkbox" id="chk-show-en" checked onchange="applyColumnVisibility()"> عرض الانجليزي</label>
-    </div>
-    <div>
-        <button onclick="updateKnownWords()" style="background:#4e73df; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">🔄 تحديث ككلمات قديمة مستثناة</button>
+    
+    <div class="action-btns">
+        <button id="save-btn" class="btn btn-action" onclick="commitPageCompletion()">💾 حفظ كجديدة والتالي</button>
+        <button id="save-all-btn" class="btn btn-save-all" onclick="saveEntireLevel()">🌟 حفظ كل المستوى</button>
+        <button id="analyze-btn" class="btn btn-analyze" onclick="analyzeSavePage()">🤖 تحليل النطق</button>
+        <button class="btn btn-clear" onclick="resetSaveScreen()">🧹 مسح الشاشة</button>
+        <button class="btn btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة</button>
     </div>
 </div>
 
-<table>
-    <thead>
-        <tr>
-            <th width="5%">مستثناة</th>
-            <th width="15%">الاستماع</th>
-            <th width="8%">تسجيل</th>
-            <th width="15%">الكلمة / المعنى</th>
-            <th width="12%">النطق المكتوب</th>
-            <th width="10%">استماع للمثال</th>
-            <th width="10%">تسجيل للمثال</th>
-            <th width="25%">المثال وترجمته</th>
-        </tr>
-    </thead>
-    <tbody id="save-table-body"></tbody>
-</table>
-
-<div style="margin-top: 30px; margin-bottom: 40px; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-    <button id="save-btn" class="btn-action" onclick="commitPageCompletion()">💾 حفظ الصفحة كجديدة والانتقال للتالي</button>
-    <button id="save-all-btn" class="btn-action" style="background:#2e7d32;" onclick="saveEntireLevel()">🌟 حفظ جميع كلمات المستوى/الصف كجديدة</button>
-    <button id="analyze-btn" class="btn-analyze" onclick="analyzeSavePage()">🤖 تحليل النطق والتطابق</button>
-    <button class="btn-clear" onclick="resetSaveScreen()">🧹 مسح الشاشة</button>
-    <button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+<div class="table-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th width="5%">مستثناة</th>
+                <th width="15%">الاستماع</th>
+                <th width="8%">تسجيل</th>
+                <th width="15%">الكلمة / المعنى</th>
+                <th width="12%">النطق المكتوب</th>
+                <th width="10%">استماع للمثال</th>
+                <th width="10%">تسجيل للمثال</th>
+                <th width="25%">المثال وترجمته</th>
+            </tr>
+        </thead>
+        <tbody id="save-table-body"></tbody>
+    </table>
 </div>
 
 <script>
@@ -204,16 +227,16 @@
             r1.innerHTML = `
                 <td rowspan="2"><input type="checkbox" class="word-chk" value="${wordIdx}"></td>
                 <td>
-                    <button class="btn-speaker" onclick="speakText('${word.en}', 'word')">🔊</button>
-                    <button class="btn-youglish" onclick="openYouGlish('${word.en}')">📺 YG</button>
+                    <button class="icon-btn btn-speaker" onclick="speakText('${word.en}', 'word')">🔊</button>
+                    <button class="icon-btn btn-youglish" onclick="openYouGlish('${word.en}')">📺 YG</button>
                 </td>
-                <td><button class="btn-mic" onclick="startSpeechCapture(${word.id}, '${word.en}', 'word')">🎙️</button></td>
+                <td><button class="icon-btn btn-mic" onclick="startSpeechCapture(${word.id}, '${word.en}', 'word')">🎙️</button></td>
                 <td class="cell-en-target" style="font-weight:bold; color:#4e73df; font-size:17px;">${word.en}</td>
                 <td></td>
                 <td>
-                    <button class="btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊</button>
+                    <button class="icon-btn btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊</button>
                 </td>
-                <td><button class="btn-mic" onclick="startSpeechCapture(${word.id}, '${word.ex_en}', 'ex')">🎙️</button></td>
+                <td><button class="icon-btn btn-mic" onclick="startSpeechCapture(${word.id}, '${word.ex_en}', 'ex')">🎙️</button></td>
                 <td class="cell-en-target" style="text-align:right; font-weight:500;">${word.ex_en}</td>
             `;
 

@@ -2,32 +2,47 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الكلمات المخزنة والمحفوظة</title>
 	<script>
-    // نظام حماية الصفحات: يمنع الدخول إذا لم يتم التفعيل
     (function checkActivation() {
         if (!localStorage.getItem('app_is_activated')) {
             alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
-            window.location.replace("index.html"); // الطرد للصفحة الرئيسية
+            window.location.replace("index.html"); 
         }
     })();
 </script>
     <style>
-        body { font-family: sans-serif; background: #eef2f7; padding: 20px; text-align: center; }
-        .header-box { background: #1cc88a; color: white; padding: 20px; border-radius: 10px; max-width: 900px; margin: 0 auto 20px auto; font-size: 18px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .filter-box { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #ccc; max-width: 900px; margin: 10px auto; font-weight: bold; color: #333; text-align: right; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-        .summary-box { background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9; max-width: 900px; margin: 10px auto; font-size: 15px; font-weight: bold; color: #2e7d32; }
-        table { width: 100%; max-width: 900px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --dark: #5a5c69; --light: #f8f9fc; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; text-align: center; margin: 0; }
+        
+        .header-box { background: var(--success); color: white; padding: 15px; border-radius: 10px; max-width: 1000px; margin: 0 auto 15px auto; font-size: clamp(16px, 3vw, 20px); font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        .control-panel { background: white; padding: 20px; border-radius: 10px; max-width: 1000px; margin: 0 auto 20px auto; font-weight: bold; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
+        
+        .filter-row { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: center; border-bottom: 1px dashed #eee; padding-bottom: 15px; }
+        .filter-item { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        
+        .summary-box { background: #e8f5e9; padding: 12px; border-radius: 8px; border: 1px solid #c8e6c9; font-size: 15px; font-weight: bold; color: #2e7d32; }
+        
+        select, input[type="number"], input[type="date"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; }
+        
+        .action-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
+        .btn { padding: 10px 15px; font-size: clamp(14px, 3vw, 16px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 180px; max-width: 300px; display: flex; align-items: center; justify-content: center; text-align: center;}
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-action { background: var(--primary); }
+        .btn-danger { background: var(--danger); }
+        .btn-back { background: var(--dark); }
+
+        .table-responsive { width: 100%; max-width: 1000px; margin: 0 auto; overflow-x: auto; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        thead { background: #4e73df; color: white; }
-        select, input[type="number"], input[type="date"] { padding: 6px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; }
-        button { cursor: pointer; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; font-weight: bold; margin: 5px; }
-        .btn-action { background: #4e73df; color: white; }
-        .btn-danger { background: #e74a3b; color: white; }
-        .btn-back { background: #5a5c69; color: white; margin-top: 20px; }
+        thead { background: var(--primary); color: white; }
+        
         .hidden { display: none !important; }
-        .badge-old { background:#f6c23e; color:#fff; padding:3px 6px; border-radius:4px; font-size:11px; }
-        .badge-new { background:#1cc88a; color:#fff; padding:3px 6px; border-radius:4px; font-size:11px; }
+        .badge-old { background: var(--warning); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
+        .badge-new { background: var(--success); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
+        input[type="checkbox"] { transform: scale(1.3); cursor: pointer; margin: 0 5px; }
     </style>
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -49,64 +64,67 @@
 <body>
 
 <div class="header-box">
-    📊 سجل أرشيف الكلمات المحفوظة وإدارة الفلاتر الذكية
+    📊 سجل أرشيف الكلمات المحفوظة وإدارة الفلاتر
 </div>
 
-<div class="filter-box">
-    <div style="margin-bottom: 15px;">
-        <label>المستوى:</label>
-        <select id="filter-level" onchange="applyFilters()">
-            <option value="ALL">جميع المستويات معاً</option>
-        </select>
-    </div>
-    
-    <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-        <label style="margin-left:20px;"><input type="checkbox" id="chk-new" checked> الكلمات الحديثة (المتعلمة في الحفظ)</label>
-        <label><input type="checkbox" id="chk-old" checked> الكلمات القديمة (المستثناة)</label>
+<div class="control-panel">
+    <div class="filter-row">
+        <div class="filter-item">
+            <label>المستوى:</label>
+            <select id="filter-level" onchange="applyFilters()">
+                <option value="ALL">جميع المستويات معاً</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <label><input type="checkbox" id="chk-new" checked onchange="applyFilters()"> حديثة (حفظ)</label>
+            <label><input type="checkbox" id="chk-old" checked onchange="applyFilters()"> قديمة (مستثناة)</label>
+        </div>
     </div>
 
-    <div style="margin-bottom: 15px;">
-        <label>نوع الفلترة الزمنية:</label>
-        <select id="filter-type" onchange="toggleDateInputs()">
-            <option value="all">عرض الجميع</option>
-            <option value="days">آخر عدد أيام محدد</option>
-            <option value="range">فترة زمنية محددة</option>
-        </select>
+    <div class="filter-row" style="border-bottom: none; padding-bottom: 0;">
+        <div class="filter-item">
+            <label>نوع الفلترة:</label>
+            <select id="filter-type" onchange="toggleDateInputs()">
+                <option value="all">عرض الجميع</option>
+                <option value="days">آخر عدد أيام</option>
+                <option value="range">فترة زمنية محددة</option>
+            </select>
+        </div>
         
-        <span id="mem-days-inputs" class="hidden" style="margin-right:20px;">
-            <input type="number" id="filter-days" min="1" value="3" style="width:70px;"> يوم/أيام
-        </span>
+        <div id="mem-days-inputs" class="filter-item hidden">
+            <input type="number" id="filter-days" min="1" value="3" style="width:70px;"> أيام
+        </div>
         
-        <span id="mem-range-inputs" class="hidden" style="margin-right:20px;">
+        <div id="mem-range-inputs" class="filter-item hidden">
             من: <input type="date" id="filter-from"> 
             إلى: <input type="date" id="filter-to">
-        </span>
-        
-        <button class="btn-action" style="margin-right:20px;" onclick="applyFilters()">🔍 تطبيق الفلتر</button>
+        </div>
     </div>
-
-    <div style="margin-top:20px; border-top: 1px solid #ccc; padding-top:20px; text-align:center;">
-        <button class="btn-danger" onclick="removeAllLevelWords()">🗑️ إزالة جميع كلمات المستوى المحدد بالكامل</button>
-        <button class="btn-danger" style="background:#d32f2f;" onclick="removeFilteredWords()">🗑️ إزالة الكلمات المعروضة حالياً بالفلتر</button>
+    
+    <div class="action-btns">
+        <button class="btn btn-action" onclick="applyFilters()">🔍 تطبيق الفلتر</button>
+        <button class="btn btn-danger" onclick="removeFilteredWords()">🗑️ إزالة الكلمات المعروضة حالياً</button>
+        <button class="btn btn-danger" style="background:#d32f2f;" onclick="removeAllLevelWords()">🗑️ إزالة كل كلمات المستوى المحدد</button>
+        <button class="btn btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة</button>
     </div>
+    
+    <div class="summary-box" id="level-summary-info">جار احتساب البيانات...</div>
 </div>
 
-<div class="summary-box" id="level-summary-info">جار احتساب ملخص البيانات الإحصائية للمستوى...</div>
-
-<table>
-    <thead>
-        <tr>
-            <th width="10%">الرقم</th>
-            <th width="25%">الكلمة الإنجليزية</th>
-            <th width="25%">المعنى بالعربية</th>
-            <th width="25%">تاريخ الإضافة</th>
-            <th width="15%">الحالة</th>
-        </tr>
-    </thead>
-    <tbody id="saved-body"></tbody>
-</table>
-
-<button class="btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة للوحة التحكم</button>
+<div class="table-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th width="10%">الرقم</th>
+                <th width="25%">الإنجليزية</th>
+                <th width="30%">العربية</th>
+                <th width="20%">التاريخ</th>
+                <th width="15%">الحالة</th>
+            </tr>
+        </thead>
+        <tbody id="saved-body"></tbody>
+    </table>
+</div>
 
 <script>
     const availableKeys = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
@@ -130,6 +148,7 @@
         document.getElementById('mem-range-inputs').classList.add('hidden');
         if(v === 'days') document.getElementById('mem-days-inputs').classList.remove('hidden');
         if(v === 'range') document.getElementById('mem-range-inputs').classList.remove('hidden');
+        applyFilters();
     }
 
     function applyFilters() {
@@ -170,25 +189,24 @@
         
         currentDisplayedWords = filtered;
         
-        document.getElementById('level-summary-info').innerText = 
-            `📊 إجمالي الكلمات المعروضة بناءً على الفلتر الحالي: ${filtered.length} كلمة.`;
+        document.getElementById('level-summary-info').innerText = `📊 إجمالي الكلمات المعروضة حالياً: ${filtered.length} كلمة.`;
             
         const tbody = document.getElementById('saved-body');
         tbody.innerHTML = "";
         
         if(filtered.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='padding:20px; color:#5a5c69; font-style:italic;'>لا توجد كلمات مطابقة للفلتر المحدد.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5' style='padding:20px; color:var(--dark); font-style:italic;'>لا توجد كلمات مطابقة للفلتر المحدد.</td></tr>";
             return;
         }
 
         filtered.forEach((word, index) => {
-            let badge = word.isOld ? `<span class="badge-old">قديمة (مستثناة)</span>` : `<span class="badge-new">حديثة</span>`;
+            let badge = word.isOld ? `<span class="badge-old">قديمة</span>` : `<span class="badge-new">حديثة</span>`;
             let row = document.createElement('tr');
             row.innerHTML = `
-                <td style="font-weight:bold; font-size:12px;">${index + 1}</td>
-                <td style="font-weight:bold; color:#4e73df; font-size:16px;">${word.en}</td>
-                <td style="font-weight:bold;">${word.ar}</td>
-                <td style="color:#e74a3b; font-weight:bold; font-size:13px;">${word.date || '---'}</td>
+                <td style="font-weight:bold; font-size:14px;">${index + 1}</td>
+                <td style="font-weight:bold; color:var(--primary); font-size:16px;">${word.en}</td>
+                <td style="font-weight:bold; font-size:14px;">${word.ar}</td>
+                <td style="color:var(--danger); font-weight:bold; font-size:13px;">${word.date || '---'}</td>
                 <td>${badge}</td>
             `;
             tbody.appendChild(row);
@@ -197,9 +215,9 @@
 
     function removeAllLevelWords() {
         let lvl = document.getElementById('filter-level').value;
-        if(lvl === "ALL") { alert("يرجى تحديد مستوى معين من القائمة العلوية لحذفه بالكامل، لتجنب حذف جميع مستويات التطبيق بالخطأ."); return; }
+        if(lvl === "ALL") { alert("يرجى تحديد مستوى معين من القائمة لتجنب حذف جميع المستويات بالخطأ."); return; }
         
-        if(!confirm(`⚠️ تحذير: هل أنت متأكد تماماً من إزالة كافة الكلمات المحفوظة لـ (${getLevelName(lvl)})؟ سيتم إعادتها للبرنامج التعليمي من جديد.`)) return;
+        if(!confirm(`⚠️ هل أنت متأكد من إزالة كافة كلمات (${getLevelName(lvl)}) وإعادتها لبرنامج الحفظ من جديد؟`)) return;
 
         appProgress.levels[lvl].savedWords = [];
         appProgress.levels[lvl].mainIndex = 0;
@@ -207,20 +225,18 @@
         appProgress.levels[lvl].pagesCompleted = 0;
         
         localStorage.setItem('appProgress', JSON.stringify(appProgress));
-        alert("تم إزالة كلمات المستوى وإرجاعها للبرنامج التعليمي.");
+        alert("تمت إزالة كلمات المستوى وإرجاعها للبرنامج.");
         applyFilters();
     }
 
     function removeFilteredWords() {
         if(currentDisplayedWords.length === 0) { alert("لا توجد كلمات معروضة لحذفها."); return; }
-        if(!confirm(`⚠️ تحذير: هل أنت متأكد من إزالة (${currentDisplayedWords.length}) كلمة معروضة في الجدول حالياً وإرجاعها لبرنامج الحفظ؟`)) return;
+        if(!confirm(`⚠️ هل أنت متأكد من إزالة (${currentDisplayedWords.length}) كلمة المعروضة حالياً وإرجاعها للحفظ؟`)) return;
 
         currentDisplayedWords.forEach(w => {
             let lData = appProgress.levels[w.levelCode];
             lData.savedWords = lData.savedWords.filter(sw => sw.id !== w.id);
             lData.pagesCompleted = Math.ceil(lData.savedWords.length / 10);
-            
-            // إعادة تعيين مؤشرات الاستدعاء ليظهروا في الحفظ من جديد
             lData.mainIndex = 0;
             lData.activeList = [];
         });
