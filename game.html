@@ -88,6 +88,14 @@
         @keyframes pulseEvent { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } 100% { transform: translateX(-50%) scale(1); } }
         #event-active-banner { display: none; position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: #1cc88a; color: white; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2); animation: pulseEvent 2s infinite; border: 2px solid #fff; font-size: 14px; }
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
+
+        .report-selectors { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
+        .report-selectors select { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; min-width: 150px;}
+        .report-block { margin-bottom: 15px; padding: 12px; background: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+        .report-block h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 16px; border-bottom: 2px dashed #eee; padding-bottom: 5px;}
+        .stat-item { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--dark); font-weight: bold; font-size: 15px;}
+        .stat-val { color: var(--danger); font-size: 16px;}
+        .stat-val.good { color: var(--success); }
     </style>
 </head>
 <body>
@@ -101,6 +109,7 @@
         <button class="btn-top-action" onclick="toggleModal('event-modal')" title="إعدادات الأحداث">📅</button>
         <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
         <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
+        <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
     </div>
 
     <h1>🎮 مرحباً بك في قسم الألعاب 🎮</h1>
@@ -114,6 +123,39 @@
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
     </div>
 
+    <!-- نافذة التقارير الشاملة -->
+    <div id="reports-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('reports-modal')">✖</button>
+            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📊 تقارير الأداء والإنجاز</h3>
+            
+            <div style="margin-bottom: 15px; text-align: right;">
+                <label style="font-weight: bold; color: var(--dark); display: block; margin-bottom: 5px;">اختر نوع التقرير:</label>
+                <select id="main-report-type" onchange="toggleReportInputs()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--primary); font-weight: bold; font-family: inherit;">
+                    <option value="points">1. تقرير النقاط المكتسبة (زمني)</option>
+                    <option value="progress">2. تقرير إنجاز المراحل والنجوم (حجم الإنجاز)</option>
+                    <option value="performance">3. تقرير تحليل الأداء (السرعة والدقة)</option>
+                </select>
+            </div>
+
+            <!-- خيارات تقرير النقاط (يظهر فقط عند اختياره) -->
+            <div id="time-selectors" class="report-selectors">
+                <select id="report-type" onchange="updateReportRangeOptions()">
+                    <option value="hours">في آخر عدد ساعات</option>
+                    <option value="days">في آخر عدد أيام</option>
+                    <option value="weeks">في آخر عدد أسابيع</option>
+                    <option value="months">في آخر عدد أشهر</option>
+                </select>
+                <select id="report-num"></select>
+            </div>
+            
+            <button class="btn-admin-action" style="background: var(--info); margin-bottom: 15px;" onclick="generateSelectedReport()">عرض التقرير 🔍</button>
+            
+            <div id="report-results" style="display: none; background: #f8f9fc; padding: 10px; border-radius: 8px; text-align: right; max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- نافذة الإعدادات الإدارية -->
     <div id="admin-modal" class="custom-modal">
         <div class="modal-content-box" style="background: white;">
             <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
@@ -158,6 +200,7 @@
         </div>
     </div>
 
+    <!-- نافذة الأحداث -->
     <div id="event-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('event-modal')">✖</button>
@@ -181,6 +224,7 @@
         </div>
     </div>
 
+    <!-- نافذة البنك -->
     <div id="bank-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
@@ -213,6 +257,7 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة الشرف -->
     <div id="fame-modal" class="custom-modal">
         <div class="modal-content-box" id="fame-content">
             <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
@@ -242,17 +287,17 @@
 
 <script>
     const fameStages = [
-        { num: 1, name: "الحفاضة الفولاذية", start: 1000, end: 10000, img: "images/1.png", desc: "بداية متواضعة لكنها مرعبة...", badges: [ { id: "1.1", name: "مُفجر الحروف", req: 2000, img: "images/1.1.png" }, { id: "1.2", name: "المطاط الصغير", req: 4000, img: "images/1.2.png" }, { id: "1.3", name: "العطسة المدمرة", req: 6000, img: "images/1.3.png" }, { id: "1.4", name: "البربور الحارق", req: 8000, img: "images/1.4.png" }, { id: "1.5", name: "الشرارة اللغوية", req: 10000, img: "images/1.5.png" } ] },
-        { num: 2, name: "الديناصور الثرثار", start: 10000, end: 30000, img: "images/2.png", desc: "يركب تي-ريكس يعتقد أن الحروف...", badges: [ { id: "2.1", name: "تنين الأعور", req: 14000, img: "images/2.1.png" }, { id: "2.2", name: "الخارق الحارق", req: 18000, img: "images/2.2.png" }, { id: "2.3", name: "القدم الثقيلة", req: 22000, img: "images/2.3.png" }, { id: "2.4", name: "هزيم الرعد", req: 26000, img: "images/2.4.png" }, { id: "2.5", name: "الدارع الفارع", req: 30000, img: "images/2.5.png" } ] },
-        { num: 3, name: "نينجا الكلمات الصامت", start: 30000, end: 70000, img: "images/3.png", desc: "يتحرك غير مرئي بين الجمل...", badges: [ { id: "3.1", name: "السيف الفالق", req: 38000, img: "images/3.1.png" }, { id: "3.2", name: "الشبح السارق", req: 46000, img: "images/3.2.png" }, { id: "3.3", name: "العين الثالثة الذكية", req: 54000, img: "images/3.3.png" }, { id: "3.4", name: "مغناطيس الرعب", req: 62000, img: "images/3.4.png" }, { id: "3.5", name: "القنبلة السنفورية", req: 70000, img: "images/3.5.png" } ] },
-        { num: 4, name: "زومبي الحفظ الذكي", start: 70000, end: 150000, img: "images/4.png", desc: "لديه الكثير من الكلمات في رأسه...", badges: [ { id: "4.1", name: "العقل المشع", req: 86000, img: "images/4.1.png" }, { id: "4.2", name: "الأسطورة النمورة", req: 102000, img: "images/4.2.png" }, { id: "4.3", name: "بروسلي الكلمات", req: 118000, img: "images/4.3.png" }, { id: "4.4", name: "أبو الحروف", req: 134000, img: "images/4.4.png" }, { id: "4.5", name: "المعالج الخارق", req: 150000, img: "images/4.5.png" } ] },
-        { num: 5, name: "ساحرة الأبجدية العجوز", start: 150000, end: 310000, img: "images/5.png", desc: "قرأ كل قاموس من النهاية إلى...", badges: [ { id: "5.1", name: "الساحرة الشمطاء", req: 182000, img: "images/5.1.png" }, { id: "5.2", name: "البلورة الكركوزية", req: 214000, img: "images/5.2.png" }, { id: "5.3", name: "مستدعي الصقور", req: 246000, img: "images/5.3.png" }, { id: "5.4", name: "بوابة البعد المنفلوطي", req: 278000, img: "images/5.4.png" }, { id: "5.5", name: "اللعنة السنفورية", req: 310000, img: "images/5.5.png" } ] },
-        { num: 6, name: "السايبورغ اللغوي", start: 310000, end: 630000, img: "images/6.png", desc: "جزء فتى، جزء كمبيوتر فائق...", badges: [ { id: "6.1", name: "رادار الليزر الفاقع", req: 374000, img: "images/6.1.png" }, { id: "6.2", name: "القبضة الحديدية المصدية", req: 438000, img: "images/6.2.png" }, { id: "6.3", name: "شريحة الحفظ المنشطح", req: 502000, img: "images/6.3.png" }, { id: "6.4", name: "صدمة الليزر الشلوطية", req: 566000, img: "images/6.4.png" }, { id: "6.5", name: "النفاث الصاروخي المشوي", req: 630000, img: "images/6.5.png" } ] },
-        { num: 7, name: "حاكم مجرة الأنجلو سنفورية", start: 630000, end: 1000000, img: "images/7.png", desc: "كيان كوني بأبعاد لغوية...", badges: [ { id: "7.1", name: "مستدعي النيازك السنفورية", req: 704000, img: "images/7.1.png" }, { id: "7.2", name: "صاعق شرشبيل الزمني", req: 778000, img: "images/7.2.png" }, { id: "7.3", name: "تاج بابا سنفور المنقور", req: 852000, img: "images/7.3.png" }, { id: "7.4", name: "جاذبية الكواكب", req: 926000, img: "images/7.4.png" }, { id: "7.5", name: "سيد اللانهاية السنفورية", req: 1000000, img: "images/7.5.png" } ] }
+        { num: 1, name: "الحفاضة الفولاذية", start: 1000, end: 10000, img: "images/1.png", desc: "بداية متواضعة لكنها مرعبة، البطل ما زال يحبو في عالم الكلمات ويأكل الحروف الطائرة، لكن لكمته اللغوية قوية ومدمرة!", badges: [ { id: "1.1", name: "مُفجر الحروف", req: 2000, img: "images/1.1.png" }, { id: "1.2", name: "المطاط الصغير", req: 4000, img: "images/1.2.png" }, { id: "1.3", name: "العطسة المدمرة", req: 6000, img: "images/1.3.png" }, { id: "1.4", name: "البربور الحارق", req: 8000, img: "images/1.4.png" }, { id: "1.5", name: "الشرارة اللغوية", req: 10000, img: "images/1.5.png" } ] },
+        { num: 2, name: "الديناصور الثرثار", start: 10000, end: 30000, img: "images/2.png", desc: "يركب تي-ريكس يعتقد أن الحروف الإنجليزية هي وجبته الخفيفة المفضلة. الطفل يتحدث كثيراً لدرجة أن الديناصور يضطر للاستماع، ومعاً يصنعان انفجاراً صوتياً من المفردات يرعب القواميس.", badges: [ { id: "2.1", name: "تنين الأعور", req: 14000, img: "images/2.1.png" }, { id: "2.2", name: "الخارق الحارق", req: 18000, img: "images/2.2.png" }, { id: "2.3", name: "القدم الثقيلة", req: 22000, img: "images/2.3.png" }, { id: "2.4", name: "هزيم الرعد", req: 26000, img: "images/2.4.png" }, { id: "2.5", name: "الدارع الفارع", req: 30000, img: "images/2.5.png" } ] },
+        { num: 3, name: "نينجا المفردات", start: 30000, end: 70000, img: "images/3.png", desc: "يتحرك غير مرئي بين الجمل المعقدة. يمكنه التوازن تماماً على حرف جر واحد. يضرب بقنابل سياقية دقيقة وأشباح سياقية لإخفاء الارتباك. خَفْه، فإنه سينظم مكتبتك... بصمت.", badges: [ { id: "3.1", name: "السيف الفالق", req: 38000, img: "images/3.1.png" }, { id: "3.2", name: "الشبح السارق", req: 46000, img: "images/3.2.png" }, { id: "3.3", name: "العين الثالثة الذكية", req: 54000, img: "images/3.3.png" }, { id: "3.4", name: "مغناطيس الرعب", req: 62000, img: "images/3.4.png" }, { id: "3.5", name: "القنبلة السنفورية", req: 70000, img: "images/3.5.png" } ] },
+        { num: 4, name: "زومبي المفردات", start: 70000, end: 150000, img: "images/4.png", desc: "لديه الكثير من الكلمات في رأسه لدرجة أن عقله خرج للحصول على بعض الهواء النقي. إنه لا يريد عقولاً؛ إنه يريد مرادفات. خبير في 'استهلاك' قوائم المفردات بلا تفكير. احذر من عضته الفكرية!", badges: [ { id: "4.1", name: "العقل المشع", req: 86000, img: "images/4.1.png" }, { id: "4.2", name: "الأسطورة النمورة", req: 102000, img: "images/4.2.png" }, { id: "4.3", name: "بروسلي الكلمات", req: 118000, img: "images/4.3.png" }, { id: "4.4", name: "أبو الحروف", req: 134000, img: "images/4.4.png" }, { id: "4.5", name: "المعالج الخارق", req: 150000, img: "images/4.5.png" } ] },
+        { num: 5, name: "ساحر الأبجدية", start: 150000, end: 310000, img: "images/5.png", desc: "قرأ كل قاموس من النهاية إلى البداية. تعاويذه مصنوعة من قواعد نحوية معقدة. يمكنه تحويل فقرة مملة إلى عمل فني بصفة واحدة. تحذير: قد يحول قلمك من حين لآخر إلى ببغاء صغير وثرثار.", badges: [ { id: "5.1", name: "الساحرة الشمطاء", req: 182000, img: "images/5.1.png" }, { id: "5.2", name: "البلورة الكركوزية", req: 214000, img: "images/5.2.png" }, { id: "5.3", name: "مستدعي الصقور", req: 246000, img: "images/5.3.png" }, { id: "5.4", name: "بوابة البعد المنفلوطي", req: 278000, img: "images/5.4.png" }, { id: "5.5", name: "اللعنة السنفورية", req: 310000, img: "images/5.5.png" } ] },
+        { num: 6, name: "سايبورغ المفردات", start: 310000, end: 630000, img: "images/6.png", desc: "جزء فتى، جزء كمبيوتر فائق. دماغه لديه سرعة معالجة أسرع من جوجل. ذراعه 'كاسح الجمل' تكسر فعلياً القواعد المعقدة. إنه لا يقرأ الكلمات فقط؛ إنه يحملها، ومفرداته يتم تحديثها أسرع من متجر التطبيقات.", badges: [ { id: "6.1", name: "رادار الليزر الفاقع", req: 374000, img: "images/6.1.png" }, { id: "6.2", name: "القبضة الحديدية المصدية", req: 438000, img: "images/6.2.png" }, { id: "6.3", name: "شريحة الحفظ المنشطح", req: 502000, img: "images/6.3.png" }, { id: "6.4", name: "صدمة الليزر الشلوطية", req: 566000, img: "images/6.4.png" }, { id: "6.5", name: "النفاث الصاروخي المشوي", req: 630000, img: "images/6.5.png" } ] },
+        { num: 7, name: "إنجلش جالاكتوس", start: 630000, end: 1000000, img: "images/7.png", desc: "كيان كوني بأبعاد لغوية. يرتدي زي السنفور الفضائي العملاق لأنه يستطيع. إنه لا يتعلم الكلمات؛ إنه يستهلك لغات كاملة ويبصق روايات ملحمية مثالية ومصقولة. الكون هو مكتبته.", badges: [ { id: "7.1", name: "مستدعي النيازك السنفورية", req: 704000, img: "images/7.1.png" }, { id: "7.2", name: "صاعق شرشبيل الزمني", req: 778000, img: "images/7.2.png" }, { id: "7.3", name: "تاج بابا سنفور المنقور", req: 852000, img: "images/7.3.png" }, { id: "7.4", name: "جاذبية الكواكب", req: 926000, img: "images/7.4.png" }, { id: "7.5", name: "سيد اللانهاية السنفورية", req: 1000000, img: "images/7.5.png" } ] }
     ];
 
     let celebrationQueue = [];
-    let defaultEventData = { isActive: true, days: [5], multiplier: 2 }; // Default Friday, 2x
+    let defaultEventData = { isActive: true, days: [5], multiplier: 2 }; 
 
     window.onload = function() {
         applyGlobalModes();
@@ -346,6 +391,204 @@
             modal.style.display = 'flex';
         }
     }
+
+    // --- نظام التقارير الشامل ---
+    function openReportsModal() {
+        document.getElementById('main-report-type').value = 'points';
+        toggleReportInputs();
+        document.getElementById('report-results').style.display = 'none';
+        toggleModal('reports-modal');
+    }
+
+    function toggleReportInputs() {
+        let type = document.getElementById('main-report-type').value;
+        let timeSelectors = document.getElementById('time-selectors');
+        
+        if (type === 'points') {
+            timeSelectors.style.display = 'flex';
+            updateReportRangeOptions();
+        } else {
+            timeSelectors.style.display = 'none';
+        }
+        document.getElementById('report-results').style.display = 'none';
+    }
+
+    function updateReportRangeOptions() {
+        let type = document.getElementById('report-type').value;
+        let selectNum = document.getElementById('report-num');
+        selectNum.innerHTML = '';
+        
+        let max = 0;
+        if(type === 'hours') max = 24;
+        if(type === 'days') max = 7;
+        if(type === 'weeks') max = 4;
+        if(type === 'months') max = 12;
+
+        for(let i = 1; i <= max; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.text = i;
+            selectNum.appendChild(opt);
+        }
+    }
+
+    function generateSelectedReport() {
+        let type = document.getElementById('main-report-type').value;
+        if (type === 'points') {
+            generatePointsReport();
+        } else if (type === 'progress') {
+            generateProgressReport();
+        } else if (type === 'performance') {
+            generatePerformanceReport();
+        }
+    }
+
+    function generatePointsReport() {
+        let type = document.getElementById('report-type').value;
+        let num = parseInt(document.getElementById('report-num').value);
+        let multiplier = 1;
+
+        if(type === 'hours') multiplier = 60 * 60 * 1000;
+        if(type === 'days') multiplier = 24 * 60 * 60 * 1000;
+        if(type === 'weeks') multiplier = 7 * 24 * 60 * 60 * 1000;
+        if(type === 'months') multiplier = 30 * 24 * 60 * 60 * 1000; 
+
+        let cutoffTime = Date.now() - (num * multiplier);
+        let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
+        let filteredHistory = pointsHistory.filter(item => item.time >= cutoffTime);
+
+        let totals = { total: 0, matchg: 0, listen: 0, missing: 0, scramble: 0, crossword: 0 };
+        filteredHistory.forEach(item => {
+            totals.total += item.points;
+            if(totals[item.game] !== undefined) totals[item.game] += item.points;
+        });
+
+        let gameNames = {
+            matchg: 'لعبة المطابقة والذاكرة 🎴',
+            listen: 'صائد الأمثلة المسموعة 🎧',
+            missing: 'لعبة الحروف الناقصة 🔠',
+            scramble: 'لعبة ترتيب الحروف 🔀',
+            crossword: 'الكلمات المتقاطعة 🧩'
+        };
+
+        let resultHTML = `
+            <div class="report-block">
+                <h4>إجمالي النقاط في الفترة المحددة: <span class="stat-val good">${totals.total}</span></h4>
+            </div>
+            <div class="report-block">
+                <h4>التفصيل حسب الألعاب:</h4>
+        `;
+        for(let key in gameNames) {
+            resultHTML += `<div class="stat-item"><span>${gameNames[key]}</span> <span class="stat-val">${totals[key]} نقطة</span></div>`;
+        }
+        resultHTML += `</div>`;
+        
+        let resultsDiv = document.getElementById('report-results');
+        resultsDiv.innerHTML = resultHTML;
+        resultsDiv.style.display = 'block';
+    }
+
+    function getGameStats(storageKey) {
+        let prog = JSON.parse(localStorage.getItem(storageKey)) || {};
+        let stagesCompleted = 0;
+        let totalStars = 0;
+        let totalTime = 0;
+        
+        for (let lvl in prog) {
+            for (let stg in prog[lvl]) {
+                let data = prog[lvl][stg];
+                if (data.stars > 0 || data.time > 0) {
+                    stagesCompleted++;
+                    totalStars += data.stars || 0;
+                    totalTime += data.time || 0;
+                }
+            }
+        }
+        let avgStars = stagesCompleted > 0 ? (totalStars / stagesCompleted).toFixed(1) : 0;
+        let avgTime = stagesCompleted > 0 ? (totalTime / stagesCompleted).toFixed(1) : 0;
+        return { stagesCompleted, totalStars, avgStars, avgTime };
+    }
+
+    function generateProgressReport() {
+        let gamesData = {
+            'matchg': { name: 'المطابقة والذاكرة 🎴', data: getGameStats('matchGameProgress') },
+            'listen': { name: 'صائد الأمثلة المسموعة 🎧', data: getGameStats('listenGameProgress') },
+            'missing': { name: 'الحروف الناقصة 🔠', data: getGameStats('missingGameProgress') },
+            'scramble': { name: 'ترتيب الحروف 🔀', data: getGameStats('scrambleGameProgress') },
+            'crossword': { name: 'الكلمات المتقاطعة 🧩', data: getGameStats('crosswordGameProgress') }
+        };
+
+        let totalCompletedStages = 0;
+        let totalAcquiredStars = 0;
+
+        let resultHTML = `<div class="report-block"><h4>تفاصيل الإنجاز الشامل (جميع المستويات):</h4>`;
+        
+        for (let key in gamesData) {
+            let stats = gamesData[key].data;
+            totalCompletedStages += stats.stagesCompleted;
+            totalAcquiredStars += stats.totalStars;
+            
+            resultHTML += `
+                <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <div style="color: var(--purple); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div>
+                    <div class="stat-item"><span>المراحل المكتومة:</span> <span class="stat-val good">${stats.stagesCompleted}</span></div>
+                    <div class="stat-item"><span>مجموع النجوم المحصلة:</span> <span class="stat-val">${stats.totalStars} ⭐</span></div>
+                </div>
+            `;
+        }
+        
+        resultHTML = `
+            <div class="report-block" style="background: #e8f5e9; border-color: #c8e6c9;">
+                <h4>إجمالي الإنجاز العام:</h4>
+                <div class="stat-item"><span>المراحل المنجزة كلياً:</span> <span class="stat-val good">${totalCompletedStages} مرحلة</span></div>
+                <div class="stat-item"><span>النجوم الكلية المكتسبة:</span> <span class="stat-val">${totalAcquiredStars} ⭐</span></div>
+            </div>
+        ` + resultHTML + `</div>`;
+
+        let resultsDiv = document.getElementById('report-results');
+        resultsDiv.innerHTML = resultHTML;
+        resultsDiv.style.display = 'block';
+    }
+
+    function generatePerformanceReport() {
+        let gamesData = {
+            'matchg': { name: 'المطابقة والذاكرة 🎴', data: getGameStats('matchGameProgress') },
+            'listen': { name: 'صائد الأمثلة المسموعة 🎧', data: getGameStats('listenGameProgress') },
+            'missing': { name: 'الحروف الناقصة 🔠', data: getGameStats('missingGameProgress') },
+            'scramble': { name: 'ترتيب الحروف 🔀', data: getGameStats('scrambleGameProgress') },
+            'crossword': { name: 'الكلمات المتقاطعة 🧩', data: getGameStats('crosswordGameProgress') }
+        };
+
+        let resultHTML = `
+            <p style="font-size: 13px; color: var(--dark); margin-bottom: 15px; text-align: center; background: #fff3cd; padding: 5px; border-radius: 5px;">
+                💡 <b>ملاحظة لولي الأمر:</b> هذا التقرير يوضح متوسط أداء الطفل في كل مرحلة للتعرف على الألعاب التي يُبدع فيها وتلك التي يحتاج لتدريب أكثر فيها.
+            </p>
+            <div class="report-block"><h4>تحليل السرعة والدقة لكل مرحلة:</h4>
+        `;
+        
+        for (let key in gamesData) {
+            let stats = gamesData[key].data;
+            if (stats.stagesCompleted === 0) continue; // تخطي الألعاب التي لم تُلعب بعد
+
+            resultHTML += `
+                <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <div style="color: var(--primary); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div>
+                    <div class="stat-item"><span>متوسط الدقة (النجوم):</span> <span class="stat-val good">${stats.avgStars} / 5 ⭐</span></div>
+                    <div class="stat-item"><span>متوسط سرعة الإجابة:</span> <span class="stat-val">${stats.avgTime} ثانية</span></div>
+                </div>
+            `;
+        }
+        
+        if (resultHTML.includes('المطابقة') === false && resultHTML.includes('صائد') === false) {
+            resultHTML += `<div style="text-align:center; color:var(--danger); font-weight:bold;">لم يقم الطفل بإنهاء أي مراحل بعد لتحليل أدائه.</div>`;
+        }
+
+        resultHTML += `</div>`;
+        let resultsDiv = document.getElementById('report-results');
+        resultsDiv.innerHTML = resultHTML;
+        resultsDiv.style.display = 'block';
+    }
+    // ----------------------------
 
     function openFullImage(imgSrc) {
         document.getElementById('full-size-img').src = imgSrc;
@@ -516,7 +759,6 @@
         if (state.crossword !== false) { btnCrossword.style.opacity = '1'; btnCrossword.style.pointerEvents = 'auto'; btnCrossword.setAttribute('href', 'crossword.html'); } else { btnCrossword.style.opacity = '0.35'; btnCrossword.style.pointerEvents = 'none'; btnCrossword.removeAttribute('href'); }
     }
 
-    // إعدادات الحدث التلقائي
     function loadEventSettings() {
         let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
         document.querySelectorAll('.event-day-chk').forEach(chk => {
@@ -557,7 +799,6 @@
         toggleModal('event-modal');
     }
 
-    // إعدادات جوائز المراحل الإضافية
     function addStageBonus() {
         let stageSelect = document.getElementById('stage-bonus-select').value;
         let bonusVal = parseFloat(document.getElementById('stage-bonus-val').value);
@@ -585,7 +826,6 @@
         box.style.display = 'block';
     }
 
-    // نظام البنك
     let wheelAngle = 0, isSpinning = false, reqAnim, chosenPrize = 0;
 
     function updateBankUI() {

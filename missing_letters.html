@@ -590,7 +590,7 @@
         }, 1000);
     }
 
-    function endGame() {
+   function endGame() {
         clearInterval(timerInterval);
         let time = secondsElapsed;
         let stars = Math.max(0, getStarsForTime(time) - starPenalty);
@@ -606,6 +606,13 @@
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
+            
+            // --- كود التقارير: إضافة سجل الحصول على النقاط ---
+            let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
+            pointsHistory.push({ time: Date.now(), game: 'missing', points: pointsGained });
+            localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
+            // --------------------------------------------------
+            
         } else if (!levelData[currentStage]) {
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
         }
