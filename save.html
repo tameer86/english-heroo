@@ -20,11 +20,11 @@
     <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     <style>
         :root { --primary: #3498db; --success: #1cc88a; --warning: #f1c40f; --danger: #e74a3b; --dark: #5a5c69; --light: #f8f9fc; --purple: #8540f5; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4fbf9; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4fbf9; padding: 10px; margin: 0; text-align: center; overflow-x: hidden; box-sizing: border-box; }
         * { box-sizing: border-box; }
         
         .top-stats { background: var(--primary); color: white; padding: 15px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-size: clamp(14px, 3vw, 17px); font-weight: bold; max-width: 1100px; margin: 0 auto 15px auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .top-stats div { flex: 1 1 200px; }
+        .top-stats div { flex: 1 1 auto; min-width: 150px; }
 
         .control-panel { background: white; max-width: 1100px; margin: 0 auto 20px auto; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
         .selector-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; }
@@ -57,7 +57,13 @@
 
         /* الشاشات الصغيرة (الجوال والتابلت) */
         @media (max-width: 768px) {
-            .top-stats { flex-direction: column; text-align: center; }
+            body { padding: 5px; } /* تقليص الفراغات الجانبية */
+            
+            /* إصلاح الارتفاع العملاق للمربع الأزرق */
+            .top-stats { flex-direction: column; text-align: center; gap: 5px; padding: 10px; }
+            .top-stats div { flex: 1 1 auto; min-width: 0; padding: 5px 0;}
+
+            .control-panel { padding: 10px; }
             .selector-box { flex-direction: column; border-right: none; border-left: none; padding: 0;}
             .selector-item { border: none !important; padding: 10px 0 !important; width: 100%; border-bottom: 1px dashed #eee !important;}
             .selector-item:last-child { border-bottom: none !important; }
@@ -69,11 +75,11 @@
             /* إخفاء الخلايا الفارغة لتوفير المساحة */
             td:empty { display: none !important; }
 
-            /* تحويل صفوف الكلمة الواحدة إلى بطاقة متكاملة */
+            /* تحويل صفوف الكلمة الواحدة إلى بطاقة متكاملة مع تقليل الفراغات بينها */
             .word-row-1 {
                 background: white;
                 border-radius: 12px 12px 0 0;
-                margin-top: 25px;
+                margin-top: 15px;
                 border: 1px solid #ddd; border-bottom: none;
                 padding: 10px;
                 display: flex; flex-direction: column; gap: 8px;
@@ -88,12 +94,12 @@
             .word-row-feedback {
                 border-radius: 0 0 12px 12px;
                 border: 1px solid #ddd; border-top: none;
-                margin-bottom: 25px; height: auto;
+                margin-bottom: 15px; height: auto;
                 padding: 10px;
                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             }
             
-            td { text-align: right !important; border: none; padding: 8px 0; border-bottom: 1px dashed #eee; display: flex; flex-direction: column; gap: 5px; }
+            td { text-align: right !important; border: none; padding: 5px 0; border-bottom: 1px dashed #eee; display: flex; flex-direction: column; gap: 5px; }
             td:last-child { border-bottom: none; }
 
             /* إضافة نصوص توضيحية أمام العناصر */
@@ -561,3 +567,4 @@
 </script>
 </body>
 </html>
+}
