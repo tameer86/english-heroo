@@ -55,29 +55,35 @@
         
         .hidden { display: none !important; }
 
-        /* تعديلات الشاشات الصغيرة - الكروت المتجاوبة */
+        /* تعديلات الشاشات الصغيرة - الكروت المتجاوبة (تم تقليل الفراغات وإصلاح ارتفاع الكبسات) */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .top-stats { flex-direction: column; text-align: center; padding: 10px; }
-            .selector-item { flex-direction: column; width: 100%; align-items: stretch; border:none !important; padding:0 !important;}
-            .selector-item select, .selector-item button { width: 100%; margin-top: 5px; }
-            .action-btns { flex-direction: column; width: 100%; }
-            .action-btns .btn { max-width: 100%; margin-bottom: 5px; }
+            body { padding: 5px; }
+            .top-stats { flex-direction: row; padding: 10px; gap: 8px; }
+            .top-stats div { flex: 1 1 100%; font-size: 14px; margin-bottom: 0; }
+            .control-panel { padding: 10px; gap: 8px; margin-bottom: 15px; }
+            
+            .selector-box { flex-direction: row; gap: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
+            .selector-item { flex: 1 1 100%; justify-content: center; border: none !important; padding: 0 !important; gap: 5px; }
+            .selector-item select { width: 100%; margin-top: 0; padding: 10px; }
+            
+            /* إصلاح مشكلة الكبسات العملاقة وجعلها بجانب بعضها بشكل جميل */
+            .action-btns { flex-direction: row; flex-wrap: wrap; gap: 8px; width: 100%; }
+            .action-btns .btn, .btn-update { flex: 1 1 45%; max-width: 100%; margin: 0; padding: 10px 5px; font-size: 14px; height: auto; }
             
             .table-responsive { box-shadow: none; overflow: visible; background: transparent;}
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
             thead { display: none; }
-            tr { margin-bottom: 20px; border-radius: 12px; border: 1px solid #e3e6f0; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.08); overflow: hidden; }
+            tr { margin-bottom: 15px; border-radius: 12px; border: 1px solid #e3e6f0; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.08); overflow: hidden; }
             td { text-align: right; padding: 15px; border: none; border-bottom: 1px solid #f1f3f9; position: relative; }
             td:last-child { border-bottom: none; }
             
             /* خلية الاستثناء (Checkbox) */
             td:nth-child(1) { background: #f8f9fc; text-align: left; padding: 12px 15px; display: flex; justify-content: flex-end; align-items: center; border-bottom: 2px solid #e3e6f0; }
-            td:nth-child(1)::before { content: "تحديد كـ كلمة قديمة (مستثناة): "; margin-left: auto; font-weight: bold; color: var(--danger); font-size: 15px;}
+            td:nth-child(1)::before { content: "تحديد كـ كلمة قديمة (مستثناة): "; margin-left: auto; font-weight: bold; color: var(--danger); font-size: 14px;}
             
             /* أزرار الصوت والتسجيل داخل الكروت */
-            td .icon-btn { flex: 1 1 auto; margin: 4px; padding: 10px; font-size: 14px; text-align: center; }
-            .btn-group { display: flex; flex-wrap: wrap; width: 100%; justify-content: center; margin-top: 10px; }
+            td .icon-btn { flex: 1 1 auto; margin: 4px; padding: 8px; font-size: 13px; text-align: center; }
+            .btn-group { display: flex; flex-wrap: wrap; width: 100%; justify-content: center; margin-top: 8px; }
         }
     </style>
     <script>
