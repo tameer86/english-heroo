@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صفحة الحفظ اليومي الذكي</title>
-		<script>
+	<script>
     (function checkActivation() {
         if (!localStorage.getItem('app_is_activated')) {
             alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
@@ -12,7 +12,6 @@
         }
     })();
 </script>
-
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
     <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
@@ -21,7 +20,8 @@
     <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     <style>
         :root { --primary: #3498db; --success: #1cc88a; --warning: #f1c40f; --danger: #e74a3b; --dark: #5a5c69; --light: #f8f9fc; --purple: #8540f5; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4fbf9; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4fbf9; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; box-sizing: border-box; }
+        * { box-sizing: border-box; }
         
         .top-stats { background: var(--primary); color: white; padding: 15px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-size: clamp(14px, 3vw, 17px); font-weight: bold; max-width: 1100px; margin: 0 auto 15px auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .top-stats div { flex: 1 1 200px; }
@@ -29,10 +29,10 @@
         .control-panel { background: white; max-width: 1100px; margin: 0 auto 20px auto; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
         .selector-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; }
         .selector-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
-        select { padding: 8px; border-radius: 6px; font-weight: bold; font-family: inherit; border: 1px solid #ccc; max-width: 100%;}
+        select { padding: 8px; border-radius: 6px; font-weight: bold; font-family: inherit; border: 1px solid #ccc; width: 100%; max-width: 200px;}
         
         .action-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-        .btn { padding: 12px 10px; font-size: clamp(13px, 3vw, 15px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 140px; display: flex; align-items: center; justify-content: center; text-align: center;}
+        .btn { padding: 12px 20px; font-size: clamp(14px, 3vw, 16px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 150px; max-width: 300px; display: flex; align-items: center; justify-content: center; text-align: center;}
         .btn:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-action { background: var(--success); }
         .btn-analyze { background: #36b9cc; }
@@ -41,20 +41,116 @@
         .btn-update { background: var(--primary); }
         .btn-save-all { background: #2e7d32; }
 
-        .table-responsive { width: 100%; max-width: 1100px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #e3e6f0; padding: 8px; text-align: center; font-size: 14px; vertical-align: middle;}
+        .table-responsive { width: 100%; max-width: 1100px; margin: 0 auto; overflow-x: auto; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { border: 1px solid #e3e6f0; padding: 10px; text-align: center; font-size: 15px; }
         thead { background: #36b9cc; color: white; }
-        .feedback-cell { background: #f1f3f9; padding: 10px; font-weight: bold; font-size: 13px; color: #333; }
+        .feedback-cell { background: #f1f3f9; padding: 10px; font-weight: bold; height: 50px; font-size: 14px; color: #333; }
         
-        .icon-btn { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; width: 100%; margin-bottom: 5px;}
+        .icon-btn { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin: 2px; }
         .btn-mic { background: var(--danger); }
         .btn-speaker { background: var(--warning); }
-        .btn-youglish { background: var(--purple); margin-bottom: 0;}
+        .btn-youglish { background: var(--purple); }
         input[type="checkbox"] { transform: scale(1.3); cursor: pointer; margin: 0 5px; }
         
         .hidden { display: none !important; }
+
+        /* الشاشات الصغيرة (الجوال والتابلت) */
+        @media (max-width: 768px) {
+            .top-stats { flex-direction: column; text-align: center; }
+            .selector-box { flex-direction: column; border-right: none; border-left: none; padding: 0;}
+            .selector-item { border: none !important; padding: 10px 0 !important; width: 100%; border-bottom: 1px dashed #eee !important;}
+            .selector-item:last-child { border-bottom: none !important; }
+
+            .table-responsive { border: none; box-shadow: none; background: transparent; overflow-x: visible; }
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead { display: none; }
+            
+            /* إخفاء الخلايا الفارغة لتوفير المساحة */
+            td:empty { display: none !important; }
+
+            /* تحويل صفوف الكلمة الواحدة إلى بطاقة متكاملة */
+            .word-row-1 {
+                background: white;
+                border-radius: 12px 12px 0 0;
+                margin-top: 25px;
+                border: 1px solid #ddd; border-bottom: none;
+                padding: 10px;
+                display: flex; flex-direction: column; gap: 8px;
+                box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+            }
+            .word-row-2 {
+                background: white;
+                border-left: 1px solid #ddd; border-right: 1px solid #ddd;
+                padding: 10px; border-bottom: none;
+                display: flex; flex-direction: column; gap: 8px;
+            }
+            .word-row-feedback {
+                border-radius: 0 0 12px 12px;
+                border: 1px solid #ddd; border-top: none;
+                margin-bottom: 25px; height: auto;
+                padding: 10px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            
+            td { text-align: right !important; border: none; padding: 8px 0; border-bottom: 1px dashed #eee; display: flex; flex-direction: column; gap: 5px; }
+            td:last-child { border-bottom: none; }
+
+            /* إضافة نصوص توضيحية أمام العناصر */
+            .word-row-1 td:nth-child(1)::before { content: "تحديد الكلمة:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-1 td:nth-child(2)::before { content: "استماع:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-1 td:nth-child(3)::before { content: "تسجيل النطق:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-1 td:nth-child(4)::before { content: "الكلمة الإنجليزية:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-1 td:nth-child(6)::before { content: "استماع للمثال:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-1 td:nth-child(7)::before { content: "تسجيل للمثال:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-1 td:nth-child(8)::before { content: "المثال الإنجليزي:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+
+            .word-row-2 td:nth-child(3)::before { content: "المعنى بالعربية:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-2 td:nth-child(4)::before { content: "طريقة النطق:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            .word-row-2 td:nth-child(7)::before { content: "ترجمة المثال:"; color: var(--primary); font-weight: bold; margin-bottom: 5px;}
+            
+            /* ترتيب الأزرار داخلياً في الموبايل */
+            .word-row-1 td:nth-child(1), .word-row-1 td:nth-child(2), .word-row-1 td:nth-child(3), .word-row-1 td:nth-child(6), .word-row-1 td:nth-child(7) {
+                flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px;
+            }
+        }
     </style>
+    <script>
+        const availableLevels = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
+        const allLevelsData = {
+            "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
+            "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
+            "C1": typeof levelC1_Words !== 'undefined' ? levelC1_Words : [], "C2": typeof levelC2_Words !== 'undefined' ? levelC2_Words : [],
+            "CLASS1": typeof levelCLASS1_Words !== 'undefined' ? levelCLASS1_Words : [], "CLASS2": typeof levelCLASS2_Words !== 'undefined' ? levelCLASS2_Words : [],
+            "CLASS3": typeof levelCLASS3_Words !== 'undefined' ? levelCLASS3_Words : [], "CLASS4": typeof levelCLASS4_Words !== 'undefined' ? levelCLASS4_Words : [],
+            "CLASS5": typeof levelCLASS5_Words !== 'undefined' ? levelCLASS5_Words : [], "CLASS6": typeof levelCLASS6_Words !== 'undefined' ? levelCLASS6_Words : [],
+            "CLASS7": typeof levelCLASS7_Words !== 'undefined' ? levelCLASS7_Words : [], "CLASS8": typeof levelCLASS8_Words !== 'undefined' ? levelCLASS8_Words : [],
+            "CLASS9": typeof levelCLASS9_Words !== 'undefined' ? levelCLASS9_Words : [], "CLASS10": typeof levelCLASS10_Words !== 'undefined' ? levelCLASS10_Words : [],
+            "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
+        };
+
+        function getLevelName(code) {
+            if(code.startsWith('CLASS')) {
+                let num = code.replace('CLASS', '');
+                let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'};
+                return 'الصف ' + (ordinals[num] || num);
+            }
+            return 'مستوى ' + code;
+        }
+
+        function formatForSpeech(text, lang) {
+            if(!text) return "";
+            if(lang === 'ar-SA') {
+                return text.replace(/[-\\\/]/g, ' او ');
+            } else {
+                return text.replace(/[-\\\/]/g, ' or ');
+            }
+        }
+
+        function openYouGlish(word) {
+            window.open('https://youglish.com/pronounce/' + encodeURIComponent(word) + '/english', '_blank');
+        }
+    </script>
 </head>
 <body>
 
@@ -71,17 +167,19 @@
             <select id="level-selector" onchange="onLevelChanged()"></select>
         </div>
         <div class="selector-item" style="border-right: 2px solid #ccc; padding-right: 15px; border-left: 2px solid #ccc; padding-left: 15px;">
-            <label style="font-weight:bold;"><input type="checkbox" id="chk-show-ar" checked onchange="applyColumnVisibility()"> عربي</label>
-            <label style="font-weight:bold;"><input type="checkbox" id="chk-show-en" checked onchange="applyColumnVisibility()"> انجليزي</label>
+            <label style="font-weight:bold;"><input type="checkbox" id="chk-show-ar" checked onchange="applyColumnVisibility()"> عرض العربي</label>
+            <label style="font-weight:bold;"><input type="checkbox" id="chk-show-en" checked onchange="applyColumnVisibility()"> عرض الانجليزي</label>
+        </div>
+        <div class="selector-item">
+            <button class="btn btn-update" onclick="updateKnownWords()">🔄 تحديث كقديمة</button>
         </div>
     </div>
     
     <div class="action-btns">
-        <button id="save-btn" class="btn btn-action" onclick="commitPageCompletion()">💾 حفظ والتالي</button>
-        <button id="save-all-btn" class="btn btn-save-all" onclick="saveEntireLevel()">🌟 حفظ الكل</button>
+        <button id="save-btn" class="btn btn-action" onclick="commitPageCompletion()">💾 حفظ كجديدة والتالي</button>
+        <button id="save-all-btn" class="btn btn-save-all" onclick="saveEntireLevel()">🌟 حفظ كل المستوى</button>
         <button id="analyze-btn" class="btn btn-analyze" onclick="analyzeSavePage()">🤖 تحليل النطق</button>
         <button class="btn btn-clear" onclick="resetSaveScreen()">🧹 مسح الشاشة</button>
-        <button class="btn btn-update" onclick="updateKnownWords()">🔄 تحديث كقديمة</button>
         <button class="btn btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة</button>
     </div>
 </div>
@@ -90,11 +188,14 @@
     <table>
         <thead>
             <tr>
-                <th width="5%">✔️</th>
-                <th width="15%">إجراء الكلمة</th>
-                <th width="30%">الكلمة / المعنى</th>
-                <th width="15%">إجراء المثال</th>
-                <th width="35%">المثال وترجمته</th>
+                <th width="5%">مستثناة</th>
+                <th width="15%">الاستماع</th>
+                <th width="8%">تسجيل</th>
+                <th width="15%">الكلمة / المعنى</th>
+                <th width="12%">النطق المكتوب</th>
+                <th width="10%">استماع للمثال</th>
+                <th width="10%">تسجيل للمثال</th>
+                <th width="25%">المثال وترجمته</th>
             </tr>
         </thead>
         <tbody id="save-table-body"></tbody>
@@ -162,7 +263,7 @@
         pageSpokenData = {}; 
 
         if(!lData.activeList || lData.activeList.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='padding:30px; font-size:18px; color:red; font-weight:bold;'>🎉 انتهت جميع كلمات هذا المستوى بالكامل! تم قفل الحفظ.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='8' style='padding:30px; font-size:18px; color:red; font-weight:bold;'>🎉 انتهت جميع كلمات هذا المستوى بالكامل! تم قفل الحفظ.</td></tr>";
             document.getElementById('save-btn').disabled = true;
             document.getElementById('save-all-btn').disabled = true;
             document.getElementById('save-btn').style.opacity = "0.4";
@@ -184,32 +285,39 @@
             pageSpokenData[word.id] = { targetWord: word.en, targetEx: word.ex_en, spokenWord: "", spokenEx: "" };
 
             let r1 = document.createElement('tr');
+            r1.classList.add('word-row-1');
             r1.innerHTML = `
-                <td><input type="checkbox" class="word-chk" value="${wordIdx}"></td>
+                <td rowspan="2"><input type="checkbox" class="word-chk" value="${wordIdx}"></td>
                 <td>
-                    <button class="icon-btn btn-speaker" onclick="speakText('${word.en}', 'word')">🔊 استماع</button>
-                    <button class="icon-btn btn-mic" onclick="startSpeechCapture(${word.id}, '${word.en}', 'word')">🎙️ تسجيل</button>
+                    <button class="icon-btn btn-speaker" onclick="speakText('${word.en}', 'word')">🔊</button>
                     <button class="icon-btn btn-youglish" onclick="openYouGlish('${word.en}')">📺 YG</button>
                 </td>
+                <td><button class="icon-btn btn-mic" onclick="startSpeechCapture(${word.id}, '${word.en}', 'word')">🎙️</button></td>
+                <td class="cell-en-target" style="font-weight:bold; color:#4e73df; font-size:17px;">${word.en}</td>
+                <td></td>
                 <td>
-                    <div class="cell-en-target" style="font-weight:bold; color:#4e73df; font-size:16px; margin-bottom:5px;">${word.en}</div>
-                    <div class="cell-ar-target" style="font-weight:bold; color:#1cc88a; font-size:15px; margin-bottom:5px;">${word.ar}</div>
-                    <div class="cell-ar-target" style="color:#f6c23e; font-weight:bold; font-size:13px;">[ ${word.pronounce} ]</div>
+                    <button class="icon-btn btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊</button>
                 </td>
-                <td>
-                    <button class="icon-btn btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊 استماع</button>
-                    <button class="icon-btn btn-mic" style="margin-bottom:0;" onclick="startSpeechCapture(${word.id}, '${word.ex_en}', 'ex')">🎙️ تسجيل</button>
-                </td>
-                <td style="text-align:right;">
-                    <div class="cell-en-target" style="font-weight:bold; color:#5a5c69; margin-bottom:8px; font-size:14px; line-height:1.4;">${word.ex_en}</div>
-                    <div class="cell-ar-target" style="color:#7f8c8d; font-style:italic; font-size:13px; line-height:1.4;">${word.ar_ex}</div>
-                </td>
+                <td><button class="icon-btn btn-mic" onclick="startSpeechCapture(${word.id}, '${word.ex_en}', 'ex')">🎙️</button></td>
+                <td class="cell-en-target" style="text-align:right; font-weight:500;">${word.ex_en}</td>
+            `;
+
+            let r2 = document.createElement('tr');
+            r2.classList.add('word-row-2');
+            r2.innerHTML = `
+                <td></td><td></td>
+                <td class="cell-ar-target" style="font-weight:bold; color:#1cc88a;">${word.ar}</td>
+                <td class="cell-ar-target" style="color:#f6c23e; font-weight:bold;">[ ${word.pronounce} ]</td>
+                <td></td><td></td>
+                <td class="cell-ar-target" style="text-align:right; color:#5a5c69; font-style:italic;">${word.ar_ex}</td>
             `;
 
             let rFeedback = document.createElement('tr');
-            rFeedback.innerHTML = `<td colspan="5" class="feedback-cell" id="feedback-row-${word.id}">انتظار تسجيل النطق للتحليل والتطابق...</td>`;
+            rFeedback.classList.add('word-row-feedback');
+            rFeedback.innerHTML = `<td colspan="8" class="feedback-cell" id="feedback-row-${word.id}">انتظار تسجيل النطق للتحليل والتطابق...</td>`;
 
             tbody.appendChild(r1);
+            tbody.appendChild(r2);
             tbody.appendChild(rFeedback);
         });
 
@@ -220,8 +328,8 @@
         let showAr = document.getElementById('chk-show-ar').checked;
         let showEn = document.getElementById('chk-show-en').checked;
 
-        document.querySelectorAll('.cell-ar-target').forEach(el => el.style.display = showAr ? 'block' : 'none');
-        document.querySelectorAll('.cell-en-target').forEach(el => el.style.display = showEn ? 'block' : 'none');
+        document.querySelectorAll('.cell-ar-target').forEach(el => el.style.visibility = showAr ? 'visible' : 'hidden');
+        document.querySelectorAll('.cell-en-target').forEach(el => el.style.visibility = showEn ? 'visible' : 'hidden');
     }
 
     function speakText(txt, type) {
@@ -265,7 +373,7 @@
             if(mode === 'word') pageSpokenData[wordId].spokenWord = liveText;
             else pageSpokenData[wordId].spokenEx = liveText;
 
-            box.innerHTML = `🎙️ <span style="color:#5a5c69;">نطق الكلمة:</span> <strong style="color:#4e73df;">${pageSpokenData[wordId].spokenWord}</strong> | <span style="color:#5a5c69;">نطق المثال:</span> <strong style="color:#4e73df;">${pageSpokenData[wordId].spokenEx}</strong>`;
+            box.innerHTML = `🎙️ <span style="color:#5a5c69;">المسجل للكلمة:</span> <strong style="color:#4e73df;">${pageSpokenData[wordId].spokenWord}</strong> | <span style="color:#5a5c69;">المسجل للمثال:</span> <strong style="color:#4e73df;">${pageSpokenData[wordId].spokenEx}</strong>`;
         };
         rec.onerror = function() {
             box.innerHTML = "⚠️ لم أسمع صوتك بوضوح، اضغط على المايك وحاول مجدداً.";
@@ -333,7 +441,7 @@
                 if (box) {
                     box.innerHTML = `
                         <div style="color:#1cc88a; font-weight:bold;">
-                            <span style="color:#4e73df;">🎯 دقة النطق: ${res.wordScore}%</span> | 
+                            <span style="color:#4e73df;">🎯 نتيجة نطق الكلمة التقريبية: ${res.wordScore}%</span> | 
                             💬 <span style="color:#f6c23e;">الكلمة:</span> ${res.wordComment} | 
                             💬 <span style="color:#f6c23e;">المثال:</span> ${res.exComment}
                         </div>

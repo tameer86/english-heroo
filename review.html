@@ -14,21 +14,22 @@
 </script>
     <style>
         :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; --purple: #8540f5; }
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; }
-        .container { background: white; max-width: 1100px; margin: 0 auto; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: var(--primary); font-size: clamp(20px, 4vw, 26px); margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; margin: 0; text-align: center; box-sizing: border-box; }
+        * { box-sizing: border-box; }
+        .container { background: white; max-width: 1100px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: var(--primary); font-size: clamp(20px, 4vw, 28px); margin-bottom: 20px; }
         
         .section-box { border: 2px solid #e3e6f0; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: right; background: var(--light); }
         .section-title { font-size: 18px; font-weight: bold; color: var(--primary); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
-        label { font-weight: bold; margin-left: 10px; font-size: 14px;}
+        label { font-weight: bold; margin-left: 10px; }
         select, input[type="number"], input[type="date"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; }
         
         .controls-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
-        .controls-row > div { flex: 1 1 250px; }
+        .controls-row > div { flex: 1 1 300px; }
         .rev-type-row { margin-bottom: 15px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
         
         .action-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; margin-bottom: 20px;}
-        .btn { padding: 12px 10px; font-size: clamp(13px, 3vw, 15px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 140px; text-align: center; display: flex; align-items: center; justify-content: center;}
+        .btn { padding: 12px 20px; font-size: clamp(14px, 3vw, 16px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 150px; max-width: 300px; text-align: center; display: flex; align-items: center; justify-content: center;}
         .btn:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-action { background: var(--success); }
         .btn-analyze { background: var(--info); }
@@ -38,18 +39,35 @@
         .btn-next { background: var(--primary); }
         
         .table-responsive { width: 100%; overflow-x: auto; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { border: 1px solid #e3e6f0; padding: 10px; text-align: center; font-size: 14px;}
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 700px; }
+        th, td { border: 1px solid #e3e6f0; padding: 12px; text-align: center; }
         thead { background: var(--primary); color: white; }
         .feedback-cell { background: var(--light); text-align: right; padding: 10px; }
-        .editable-input { flex: 1; min-width: 0; padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: bold; box-sizing: border-box;}
+        .editable-input { width: 100%; padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1; margin: 4px 0; font-weight: bold; }
         
-        .icon-btn { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin: 2px; }
+        .icon-btn { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin: 2px; }
         .btn-mic { background: var(--danger); }
         .btn-speaker { background: var(--warning); }
         .btn-youglish { background: var(--purple); }
 
         .hidden { display: none !important; }
+
+        /* الشاشات الصغيرة (الجوال والتابلت) */
+        @media (max-width: 768px) {
+            .table-responsive { box-shadow: none; background: transparent; overflow-x: visible;}
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead { display: none; }
+            tr { background: white; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e3e6f0; padding: 10px; }
+            td { text-align: right; padding: 10px 0; border: none; border-bottom: 1px dashed #eee; display: flex; flex-direction: column; gap: 8px;}
+            td:last-child { border-bottom: none; }
+            td:nth-child(1) { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; justify-content: flex-start; align-items: center; }
+            td:nth-child(1) br { display: none; }
+            
+            .controls-row { flex-direction: column; }
+            .rev-type-row { flex-direction: column; align-items: stretch; }
+            select, input[type="number"], input[type="date"], input[type="text"] { width: 100% !important; max-width: 100%; margin-top: 5px;}
+            #part-inputs, #random-inputs, #last-pages-inputs, #last-days-inputs, #date-range-inputs { display: flex; flex-direction: column; align-items: stretch; margin-top: 10px; gap: 10px;}
+        }
     </style>
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -99,13 +117,13 @@
             <div>
                 <label>اختر النظام:</label>
                 <div style="margin-top: 8px;">
-                    <input type="radio" id="sys-free" name="sys-mode" checked onchange="updateSeqInfo()"> <label for="sys-free">مراجعة حرة (بدون علامات)</label><br>
-                    <input type="radio" id="sys-test" name="sys-mode" onchange="updateSeqInfo()"> <label for="sys-test">اختبار (تسجيل وعلامات)</label>
+                    <input type="radio" id="sys-free" name="sys-mode" checked onchange="updateSeqInfo()"> <label for="sys-free">مراجعة حرة (استماع بدون علامات)</label><br>
+                    <input type="radio" id="sys-test" name="sys-mode" onchange="updateSeqInfo()"> <label for="sys-test">مراجعة باختبار (تسجيل وعلامات)</label>
                 </div>
             </div>
             <div>
                 <label>تحديد المستوى:</label><br>
-                <select id="review-level-select" style="width:100%; max-width: 100%; margin-top: 8px;" onchange="updateSeqInfo()"></select>
+                <select id="review-level-select" style="width:100%; max-width: 250px; margin-top: 8px;" onchange="updateSeqInfo()"></select>
             </div>
             <div>
                 <label>طريقة العرض:</label>
@@ -119,44 +137,44 @@
         <div class="section-title" style="margin-top:15px;">🎯 ثانياً: اختيار نوع المراجعة <small style="color:var(--danger);">(الكلمات القديمة مستثناة)</small></div>
         
         <div class="rev-type-row">
-            <input type="radio" id="type-all" name="rev-type" checked onclick="toggleTypeInputs()"> <label for="type-all">1. المراجعة الشاملة</label>
+            <div><input type="radio" id="type-all" name="rev-type" checked onclick="toggleTypeInputs()"> <label for="type-all">1. المراجعة الشاملة</label></div>
         </div>
         
         <div class="rev-type-row">
-            <input type="radio" id="type-part" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-part">2. المراجعة التتابعية</label>
-            <div id="part-inputs" class="hidden" style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
-                <input type="number" id="part-pages" min="1" value="1" style="width:70px;"> <label>صفحات</label>
-                <span id="remaining-pages-info" style="color: var(--dark); font-size: 13px;"></span>
+            <div><input type="radio" id="type-part" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-part">2. المراجعة التتابعية</label></div>
+            <div id="part-inputs" class="hidden">
+                <label>صفحات:</label> <input type="number" id="part-pages" min="1" value="1" style="width:70px;">
+                <span id="remaining-pages-info" style="color: var(--dark); font-size: 14px;"></span>
                 <button class="icon-btn btn-mic" onclick="resetPartialIndex()">إعادة البدء 🔄</button>
             </div>
         </div>
         
         <div class="rev-type-row">
-            <input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-random">3. المراجعة العشوائية المتقدمة</label>
-            <div id="random-inputs" class="hidden" style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+            <div><input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-random">3. المراجعة العشوائية المتقدمة</label></div>
+            <div id="random-inputs" class="hidden">
                 <label>من صفحة:</label> <input type="number" id="rand-start" min="1" value="1" style="width:60px;">
                 <label>إلى صفحة:</label> <input type="number" id="rand-end" min="1" value="2" style="width:60px;">
-                <label>الكلمات:</label> <input type="number" id="rand-count" min="1" value="10" style="width:60px;">
+                <label>عدد الكلمات:</label> <input type="number" id="rand-count" min="1" value="10" style="width:60px;">
             </div>
         </div>
 
         <div class="rev-type-row">
-            <input type="radio" id="type-last-pages" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-last-pages">4. مراجعة آخر الصفحات المنجزة</label>
+            <div><input type="radio" id="type-last-pages" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-last-pages">4. مراجعة آخر الصفحات المنجزة</label></div>
             <div id="last-pages-inputs" class="hidden">
-                <input type="number" id="last-pages-count" min="1" value="1" style="width:70px;"> <label>صفحات</label>
+                <label>صفحات أخيرة:</label> <input type="number" id="last-pages-count" min="1" value="1" style="width:70px;">
             </div>
         </div>
 
         <div class="rev-type-row">
-            <input type="radio" id="type-last-days" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-last-days">5. مراجعة حسب آخر الأيام</label>
+            <div><input type="radio" id="type-last-days" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-last-days">5. مراجعة حسب آخر الأيام</label></div>
             <div id="last-days-inputs" class="hidden">
-                <input type="number" id="last-days-count" min="1" value="3" style="width:70px;"> <label>أيام</label>
+                <label>أيام أخيرة:</label> <input type="number" id="last-days-count" min="1" value="3" style="width:70px;">
             </div>
         </div>
 
         <div class="rev-type-row">
-            <input type="radio" id="type-date-range" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-date-range">6. مراجعة فترة زمنية محددة</label>
-            <div id="date-range-inputs" class="hidden" style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+            <div><input type="radio" id="type-date-range" name="rev-type" onclick="toggleTypeInputs()"> <label for="type-date-range">6. مراجعة فترة زمنية محددة</label></div>
+            <div id="date-range-inputs" class="hidden">
                 <label>من:</label> <input type="date" id="rev-from-date">
                 <label>إلى:</label> <input type="date" id="rev-to-date">
             </div>
@@ -239,7 +257,7 @@
         let mode = document.getElementById('sys-test').checked ? 'Test' : 'Free';
         let idxKey = 'lastPartialIndex' + mode;
         let startPage = Math.floor((lData[idxKey] || 0) / 10) + 1;
-        document.getElementById('remaining-pages-info').innerText = `توقفت سابقاً عند: ${startPage}`;
+        document.getElementById('remaining-pages-info').innerText = `وصلت سابقاً إلى صفحة: ${startPage}`;
     }
 
     function resetPartialIndex() {
@@ -384,44 +402,38 @@
             let actionHtml = "";
             if (currentSysMode === 'test') {
                 actionHtml = `
-                    <div style="margin-bottom:10px; border-bottom:1px dashed #ccc; padding-bottom:10px;">
-                        <label style="font-size:12px; color:var(--primary); display:block; text-align:right; margin-bottom:5px;">الكلمة:</label>
-                        <div style="display:flex; gap:5px; align-items:center;">
-                            <button id="mic-w-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'word')">🎙️</button>
-                            <input type="text" id="input-word-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedWord=this.value" style="margin:0;">
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; color:var(--primary); display:block; text-align:right; margin-bottom:5px;">المثال:</label>
-                        <div style="display:flex; gap:5px; align-items:center;">
-                            <button id="mic-e-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'ex')">🎙️</button>
-                            <input type="text" id="input-ex-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedEx=this.value" style="margin:0;">
-                        </div>
+                    <label style="font-size:12px; color:var(--primary); display:block; text-align:right;">الكلمة:</label>
+                    <input type="text" id="input-word-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedWord=this.value">
+                    <label style="font-size:12px; color:var(--primary); display:block; text-align:right; margin-top:5px;">المثال:</label>
+                    <input type="text" id="input-ex-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedEx=this.value">
+                    <div style="margin-top:8px; display:flex; gap:5px; justify-content:flex-end;">
+                        <button id="mic-w-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'word')">🎙️ للكلمة</button>
+                        <button id="mic-e-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'ex')">🎙️ للمثال</button>
                     </div>
                     <div id="live-box-${i}" style="color:var(--info); font-size:12px; font-weight:bold; margin-top:5px; text-align:right;"></div>
                 `;
             } else {
                 actionHtml = `
-                    <div style="margin-bottom:15px; border-bottom:1px dashed #ccc; padding-bottom:10px;">
-                        <button class="icon-btn btn-action" style="width:100%; margin-bottom:5px;" onclick="revealFreeAnswer(${i}, 'word', '${isArEn ? w.en : w.ar}', '${isArEn ? 'en-US' : 'ar-SA'}', '${w.pronounce}')">🔊 كشف الكلمة</button>
-                        <div id="free-ans-word-${i}" style="font-weight:bold; color:var(--primary);"></div>
+                    <div style="margin-bottom:10px;">
+                        <button class="icon-btn btn-action" onclick="revealFreeAnswer(${i}, 'word', '${isArEn ? w.en : w.ar}', '${isArEn ? 'en-US' : 'ar-SA'}', '${w.pronounce}')">🔊 كشف الكلمة</button>
+                        <div id="free-ans-word-${i}" style="margin-top:5px; font-weight:bold; color:var(--primary);"></div>
                     </div>
                     <div>
-                        <button class="icon-btn btn-action" style="width:100%; margin-bottom:5px;" onclick="revealFreeAnswer(${i}, 'ex', '${isArEn ? w.ex_en : w.ar_ex}', '${isArEn ? 'en-US' : 'ar-SA'}', '')">🔊 كشف المثال</button>
-                        <div id="free-ans-ex-${i}" style="font-weight:bold; color:var(--primary);"></div>
+                        <button class="icon-btn btn-action" onclick="revealFreeAnswer(${i}, 'ex', '${isArEn ? w.ex_en : w.ar_ex}', '${isArEn ? 'en-US' : 'ar-SA'}', '')">🔊 كشف المثال</button>
+                        <div id="free-ans-ex-${i}" style="margin-top:5px; font-weight:bold; color:var(--primary);"></div>
                     </div>
                 `;
             }
 
             tr.innerHTML = `
-                <td style="vertical-align:middle;">
-                    <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenWordTarget}', '${listenWordLang}')">🔊 كلمة</button><br>
-                    <button class="icon-btn btn-youglish" style="margin:5px 0;" onclick="openYouGlish('${w.en}')">📺</button><br>
+                <td>
+                    <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenWordTarget}', '${listenWordLang}')">🔊 كلمة</button>
+                    <button class="icon-btn btn-youglish" onclick="openYouGlish('${w.en}')">📺 YG</button>
                     <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenExTarget}', '${listenExLang}')">🔊 مثال</button>
                 </td>
-                <td style="text-align:right; font-weight:bold; vertical-align:middle;">
-                    <div style="color:var(--dark); margin-bottom:10px; border-bottom:1px dashed #eee; padding-bottom:10px; line-height: 1.4;">• ${displayTxt}</div>
-                    <div style="color:#7f8c8d; font-size:13px; line-height: 1.4;">• ${displayEx}</div>
+                <td style="text-align:right; font-weight:bold;">
+                    <div style="color:var(--dark);">• ${displayTxt}</div>
+                    <div style="margin-top:10px; color:#7f8c8d; font-size:13px;">• ${displayEx}</div>
                 </td>
                 <td class="feedback-cell">${actionHtml}</td>
             `;
