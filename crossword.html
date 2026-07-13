@@ -569,6 +569,13 @@
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
+            
+            // --- كود التقارير: إضافة سجل الحصول على النقاط ---
+            let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
+            pointsHistory.push({ time: Date.now(), game: 'crossword', points: pointsGained });
+            localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
+            // --------------------------------------------------
+            
         } else if (!levelData[currentStage]) { levelData[currentStage] = { unlocked: true, stars: stars, time: time }; }
 
         if(currentStage < totalStages) { levelData[currentStage + 1] = levelData[currentStage + 1] || { unlocked: true, stars: 0 }; }
