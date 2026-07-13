@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة ترتيب الحروف</title>
-	
 	<script>
-    // نظام حماية الصفحات: يمنع الدخول إذا لم يتم التفعيل
     (function checkActivation() {
         if (!localStorage.getItem('app_is_activated')) {
             alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
-            window.location.replace("index.html"); // الطرد للصفحة الرئيسية
+            window.location.replace("index.html");
         }
     })();
 </script>
-    
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
     <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
@@ -26,16 +23,12 @@
         :root { --primary: #e83e8c; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #fdf5f8; padding: 20px; margin: 0; text-align: center; overflow-x: hidden; }
         h1 { color: var(--primary); margin-bottom: 10px; margin-top: 20px;}
-        
         .header-stats { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; font-size: 18px; font-weight: bold; flex-wrap: wrap; gap: 15px;}
         .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
-        
-        /* تجميعة الأيقونات والنقاط مدمجة في الشريط الأبيض */
         .left-header-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center; }
         .score-text { color: var(--warning); font-size: 20px;}
         .icon-btn { background: none; border: none; font-size: 28px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); text-decoration: none; display: flex; justify-content: center; align-items: center;}
         .icon-btn:hover { transform: scale(1.15); }
-
         #stages-screen { display: block; }
         .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
         .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
@@ -47,63 +40,27 @@
         .modal-content-box { background: #fff; width: 95%; max-width: 500px; padding: 25px; border-radius: 15px; text-align: right; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
         .btn-close-modal { position: absolute; top: 15px; left: 15px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 10;}
         .btn-close-modal:hover { opacity: 0.8; }
-        
         .modal-content-box h3 { color: var(--primary); margin-top: 0; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px;}
         .settings-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
         .settings-row label { font-weight: bold; min-width: 150px; color: var(--dark);}
         .settings-row input[type="number"] { padding: 8px; width: 80px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; text-align: center;}
-        .settings-row input[type="password"] { padding: 10px; flex-grow: 1; border: 1px solid #ccc; border-radius: 5px; font-weight: bold;}
         .action-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 25px; justify-content: center;}
         .action-btns button { padding: 10px 20px; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px; flex-grow: 1;}
         .btn-save { background: var(--success); }
-        .btn-reset-curr { background: var(--warning); color: #333 !important;}
-        .btn-reset-all { background: var(--danger); }
 
         #game-screen { display: none; position: relative; }
         .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
         .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
-        
         .game-area { width: 100%; max-width: 900px; background: #fff; border-radius: 15px; padding: clamp(15px, 4vw, 30px); margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); box-sizing: border-box;}
-        
         .arabic-word { font-size: clamp(24px, 5vw, 36px); color: var(--primary); font-weight: bold; margin-bottom: 30px; border-bottom: 3px dashed #eee; padding-bottom: 15px; }
-        
         .letters-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2vw, 15px); margin-bottom: 40px; min-height: 80px;}
-        
-        .letter-btn { 
-            width: clamp(45px, 8vw, 65px); 
-            height: clamp(45px, 8vw, 65px); 
-            font-size: clamp(20px, 4.5vw, 30px); 
-            font-weight: bold; 
-            border-radius: 10px; 
-            background: #9b59b6; 
-            color: white; 
-            border: none; 
-            cursor: pointer; 
-            box-shadow: 0 4px 0 #8e44ad; 
-            transition: transform 0.1s, box-shadow 0.1s, background 0.3s; 
-            text-transform: lowercase;
-        }
+        .letter-btn { width: clamp(45px, 8vw, 65px); height: clamp(45px, 8vw, 65px); font-size: clamp(20px, 4.5vw, 30px); font-weight: bold; border-radius: 10px; background: #9b59b6; color: white; border: none; cursor: pointer; box-shadow: 0 4px 0 #8e44ad; transition: transform 0.1s, box-shadow 0.1s, background 0.3s; text-transform: lowercase;}
         .letter-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #8e44ad; }
         .letter-btn.wrong { background: var(--danger); box-shadow: 0 4px 0 #c0392b; animation: shake 0.4s; }
         .letter-btn.used { visibility: hidden; pointer-events: none; }
-
-        @keyframes shake {
-            0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); }
-        }
-
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
         .english-word-display { display: flex; justify-content: center; gap: clamp(4px, 1.5vw, 8px); flex-wrap: wrap; direction: ltr; }
-        .char-box { 
-            width: clamp(35px, 6vw, 55px); 
-            height: clamp(45px, 8vw, 65px); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: clamp(22px, 5vw, 34px); 
-            font-weight: bold; 
-            border-bottom: 4px solid var(--dark); 
-            color: var(--dark); 
-            text-transform: lowercase; 
-        }
+        .char-box { width: clamp(35px, 6vw, 55px); height: clamp(45px, 8vw, 65px); display: flex; align-items: center; justify-content: center; font-size: clamp(22px, 5vw, 34px); font-weight: bold; border-bottom: 4px solid var(--dark); color: var(--dark); text-transform: lowercase; }
         .char-box.hidden-char { border-bottom: 4px solid var(--primary); color: transparent; background: #f8f9fc; border-radius: 5px 5px 0 0;}
         .char-box.active-blank { border-bottom: 4px solid var(--warning); background: #fff3cd; transform: scale(1.1); transition: 0.2s;}
         .char-box.filled { color: var(--success); border-bottom: 4px solid var(--success); background: transparent; transform: scale(1);}
@@ -115,9 +72,16 @@
         .stars-display { font-size: clamp(25px, 5vw, 40px); color: #f1c40f; margin: 15px 0; letter-spacing: 5px;}
         .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
         .modal-btn:hover { opacity: 0.9; }
+
+        @keyframes pulseEvent { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } 100% { transform: translateX(-50%) scale(1); } }
+        #event-active-banner { display: none; position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: #1cc88a; color: white; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2); animation: pulseEvent 2s infinite; border: 2px solid #fff; font-size: 14px; }
+        #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
     </style>
 </head>
 <body>
+
+    <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
+    <div id="event-active-banner" onclick="showEventDetails()">🌟 حدث مضاعفة النقاط نشط!</div>
 
     <div class="header-stats">
         <div class="level-selector">
@@ -140,33 +104,41 @@
     <div id="settings-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleSettingsModal()">✖</button>
-            <h3>⚙️ إعدادات الأوقات والتصفير (ترتيب الحروف)</h3>
-            <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" value="60"></div>
-            <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" value="70"></div>
-            <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" value="100"></div>
-            <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" value="140"></div>
-            <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" value="180"></div>
-            <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" value="8"></div>
+            <h3>⚙️ إعدادات الأوقات وإدارة المراحل</h3>
+            
+            <div class="settings-row parent-only-btn" style="background:#e2e8f0; padding:10px; border-radius:8px;">
+                <label style="color:#334155; margin-bottom:5px;">إضافة/إنقاص وقت للجميع:</label>
+                <input type="number" id="bulk-time" placeholder="ثواني" style="width:60px;">
+                <button onclick="adjustBulkTime(1)" style="background:#3b82f6; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">➕ إضافة</button>
+                <button onclick="adjustBulkTime(-1)" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">➖ إنقاص</button>
+            </div>
+
+            <div class="settings-row"><label>الوقت لـ 5 نجوم (ثانية):</label> <input type="number" id="time-5" class="parent-only-inputs" value="60"></div>
+            <div class="settings-row"><label>الوقت لـ 4 نجوم (ثانية):</label> <input type="number" id="time-4" class="parent-only-inputs" value="70"></div>
+            <div class="settings-row"><label>الوقت لـ 3 نجوم (ثانية):</label> <input type="number" id="time-3" class="parent-only-inputs" value="100"></div>
+            <div class="settings-row"><label>الوقت لـ 2 نجوم (ثانية):</label> <input type="number" id="time-2" class="parent-only-inputs" value="140"></div>
+            <div class="settings-row"><label>الوقت لـ 1 نجمة (ثانية):</label> <input type="number" id="time-1" class="parent-only-inputs" value="180"></div>
+            <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" class="parent-only-inputs" value="8"></div>
             
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                 <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات الجديدة:</label>
-                <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">   
-                    <input type="radio" id="apply-current" name="apply-scope" checked> <label for="apply-current" style="min-width:auto; margin-left:20px;">على الصف المحدد</label>
-                </div>
-                <div class="settings-row" style="background:#f8f9fc; padding:5px; margin-bottom:0;">
-                    <input type="radio" id="apply-all" name="apply-scope"> <label for="apply-all" style="min-width:auto;">على جميع الصفوف</label>
+                <div class="settings-row" style="background:transparent; padding:0; margin-bottom:0;">   
+                    <input type="radio" id="apply-current" name="apply-scope" value="current" class="parent-only-inputs" checked> <label for="apply-current" style="min-width:auto; margin-left:15px;">على الصف المحدد</label>
+                    <input type="radio" id="apply-all" name="apply-scope" value="all" class="parent-only-inputs"> <label for="apply-all" style="min-width:auto;">على جميع الصفوف</label>
                 </div>
             </div>
 
-            <div class="settings-row" style="margin-top:20px;">
-                <label style="color: var(--danger);">كلمة المرور للتأكيد:</label>
-                <input type="password" id="settings-password" placeholder="أدخل كلمة المرور لإتمام أي إجراء">
+            <div class="settings-row parent-only-btn" style="background:#fff3cd; padding:15px; border-radius:8px; border: 1px solid #ffeeba;">
+                <label style="display:block; width:100%; margin-bottom:10px; color:#856404;">خيارات التصفير:</label>
+                <div class="settings-row" style="background:transparent; padding:0; margin-bottom:0;">
+                    <input type="radio" id="reset-none" name="reset-opt" value="none" checked> <label for="reset-none" style="min-width:auto; margin-left:15px;">دون تصفير</label>
+                    <input type="radio" id="reset-curr" name="reset-opt" value="current"> <label for="reset-curr" style="min-width:auto; margin-left:15px;">تصفير المستوى الحالي</label>
+                    <input type="radio" id="reset-all" name="reset-opt" value="all"> <label for="reset-all" style="min-width:auto;">تصفير الكل</label>
+                </div>
             </div>
 
-            <div class="action-btns">
-                <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الأوقات</button>
-                <button class="btn-reset-curr" onclick="resetProgress()">تصفير</button>
-                <button class="btn-reset-all" onclick="resetAllProgress()">تصفير الكل</button>
+            <div class="action-btns parent-only-btn">
+                <button class="btn-save" onclick="saveTimeSettings()">💾 حفظ الإعدادات</button>
             </div>
         </div>
     </div>
@@ -182,12 +154,8 @@
         
         <div class="game-area">
             <div class="arabic-word" id="arabic-display">معنى الكلمة بالعربي</div>
-            
-            <div class="english-word-display" id="english-display" style="margin-bottom: 40px;">
-                </div>
-            
-            <div class="letters-pool" id="letters-pool">
-                </div>
+            <div class="english-word-display" id="english-display" style="margin-bottom: 40px;"></div>
+            <div class="letters-pool" id="letters-pool"></div>
         </div>
     </div>
 
@@ -215,16 +183,11 @@
     };
 
     function getLevelName(code) {
-        if(code.startsWith('CLASS')) {
-            let num = code.replace('CLASS', '');
-            let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'};
-            return 'الصف ' + (ordinals[num] || num);
-        }
+        if(code.startsWith('CLASS')) { let num = code.replace('CLASS', ''); let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'}; return 'الصف ' + (ordinals[num] || num); }
         return 'مستوى ' + code;
     }
 
     let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
-    // استخدام مفاتيح خاصة بهذه اللعبة بالذات
     let gameProgress = JSON.parse(localStorage.getItem('scrambleGameProgress')) || {};
     let gameTimeSettings = JSON.parse(localStorage.getItem('scrambleGameSettings')) || {};
     
@@ -243,35 +206,58 @@
     let currentBlanks = []; 
     let activeBlankIndex = 0; 
 
+    // --- متغيرات تتبع الأخطاء للنجوم ---
+    let consecutiveErrors = 0;
+    let totalErrors = 0;
+    let starPenalty = 0;
+
     window.onload = function() {
+        applyGlobalModes();
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
         initializeDropdown();
     };
 
-    // دالة الرجوع الموحدة
+    function applyGlobalModes() {
+        let isParent = localStorage.getItem('isParentMode') === 'true';
+        let banner = document.getElementById('parent-mode-banner');
+        if(banner) banner.style.display = isParent ? 'block' : 'none';
+
+        let defaultEvent = { isActive: true, days: [5], multiplier: 2 };
+        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEvent;
+        let today = new Date().getDay();
+        let eventBanner = document.getElementById('event-active-banner');
+        if(eventBanner) {
+            if(eventData.isActive && eventData.days.includes(today)) {
+                eventBanner.style.display = 'block';
+                window.currentEventMultiplier = eventData.multiplier;
+            } else {
+                eventBanner.style.display = 'none';
+                window.currentEventMultiplier = 1;
+            }
+        }
+    }
+
+    function showEventDetails() {
+        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || { multiplier: 2 };
+        alert('🎉 حدث نشط!\nمضاعفة النقاط بمقدار ' + eventData.multiplier + 'x مرات.');
+    }
+
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal');
         const gameScreen = document.getElementById('game-screen');
-        
-        if(modal.style.display === 'flex') {
-            modal.style.display = 'none';
-        } else if (gameScreen.style.display === 'block') {
-            showStagesScreen();
-        } else {
-            window.location.href = 'game.html';
-        }
+        if(modal.style.display === 'flex') { modal.style.display = 'none'; } 
+        else if (gameScreen.style.display === 'block') { showStagesScreen(); } 
+        else { window.location.href = 'game.html'; }
     }
 
     function initializeDropdown() {
         const selectElement = document.getElementById('level-select');
         selectElement.innerHTML = ''; 
         let hasCompletedLevels = false;
-
         for(let lvl in appProgress.levels) {
             let lData = appProgress.levels[lvl];
             let db = allLevelsData[lvl] || [];
             let isLevelFinished = (db.length > 0) && (lData.mainIndex >= db.length) && (!lData.activeList || lData.activeList.length === 0) && (lData.savedWords && lData.savedWords.length > 0);
-
             if (isLevelFinished) {
                 let option = document.createElement('option');
                 option.value = lvl;
@@ -280,14 +266,12 @@
                 hasCompletedLevels = true;
             }
         }
-
         if (!hasCompletedLevels) {
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
             document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
             selectElement.disabled = true;
             return;
         }
-
         currentLevel = selectElement.value;
         loadGameData();
         loadSettingsUI();
@@ -300,7 +284,7 @@
     }
 
     function getLevelTimes(level) {
-        let defaultTimes = { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180, starPrice: 8 };
+        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 60, t4: 70, t3: 100, t2: 140, t1: 180, starPrice: 8 };
         return gameTimeSettings[level] || defaultTimes;
     }
 
@@ -322,13 +306,22 @@
         } else { 
             modal.style.display = 'flex'; 
             loadSettingsUI(); 
+            let isParent = localStorage.getItem('isParentMode') === 'true';
+            document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
+            document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
+        }
+    }
+
+    function adjustBulkTime(sign) {
+        let val = parseInt(document.getElementById('bulk-time').value) || 0;
+        if(val === 0) return;
+        for(let i=1; i<=5; i++) {
+            let el = document.getElementById('time-' + i);
+            if(el) el.value = Math.max(0, parseInt(el.value) + (val * sign));
         }
     }
 
     function saveTimeSettings() {
-        let passInput = document.getElementById('settings-password').value;
-        if(passInput !== 'T@mer2023') { alert('كلمة المرور غير صحيحة!'); return; }
-        
         let t5 = parseInt(document.getElementById('time-5').value) || 60;
         let t4 = parseInt(document.getElementById('time-4').value) || 70;
         let t3 = parseInt(document.getElementById('time-3').value) || 100;
@@ -337,52 +330,33 @@
         let starPrice = parseInt(document.getElementById('star-price').value) || 8;
         
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب أن يكون الوقت منطقياً بحيث وقت الـ 5 نجوم هو الأقل."); return; }
-        
         let newSettings = { t5, t4, t3, t2, t1, starPrice };
         
-        if(document.getElementById('apply-all').checked) {
+        let applyScope = document.querySelector('input[name="apply-scope"]:checked').value;
+        if(applyScope === 'all') {
+            gameTimeSettings['GLOBAL_DEFAULT'] = newSettings;
             let selectElement = document.getElementById('level-select');
             for (let i = 0; i < selectElement.options.length; i++) {
-                let lvl = selectElement.options[i].value;
-                if(lvl) gameTimeSettings[lvl] = newSettings;
+                if(selectElement.options[i].value) gameTimeSettings[selectElement.options[i].value] = newSettings;
             }
-            alert("تم تطبيق الأوقات على جميع المستويات بنجاح.");
         } else {
-            if(!currentLevel) return;
-            gameTimeSettings[currentLevel] = newSettings;
-            alert(`تم تطبيق الأوقات على (${getLevelName(currentLevel)}) بنجاح.`);
+            if(currentLevel) gameTimeSettings[currentLevel] = newSettings;
         }
-        
         localStorage.setItem('scrambleGameSettings', JSON.stringify(gameTimeSettings));
-        document.getElementById('settings-password').value = '';
-        toggleSettingsModal();
-    }
 
-    function resetProgress() {
-        let passInput = document.getElementById('settings-password').value;
-        if(passInput === 'T@mer2023') { 
-            if(!currentLevel) return;
+        let resetOpt = document.querySelector('input[name="reset-opt"]:checked').value;
+        if(resetOpt === 'current' && currentLevel) {
             gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
             localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
-            document.getElementById('settings-password').value = '';
-            alert(`تم تصفير المراحل لمستوى (${getLevelName(currentLevel)}).`);
             renderStages();
-            toggleSettingsModal();
-        } else { alert('كلمة المرور غير صحيحة!'); }
-    }
-
-    function resetAllProgress() {
-        let passInput = document.getElementById('settings-password').value;
-        if(passInput === 'T@mer2023') { 
-            if (confirm("هل أنت متأكد من تصفير جميع المستويات المفتوحة للعبة ترتيب الحروف؟")) {
-                for(let lvl in gameProgress) { gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; }
-                localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
-                document.getElementById('settings-password').value = '';
-                alert('تم التصفير بنجاح التام.');
-                renderStages();
-                toggleSettingsModal();
-            }
-        } else { alert('كلمة المرور غير صحيحة!'); }
+        } else if (resetOpt === 'all') {
+            for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+            localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
+            renderStages();
+        }
+        
+        alert("تم حفظ الإعدادات بنجاح.");
+        toggleSettingsModal();
     }
 
     function loadGameData() {
@@ -397,14 +371,11 @@
         const container = document.getElementById('stages-container');
         container.innerHTML = '';
         let levelData = gameProgress[currentLevel];
-
         for(let i = 1; i <= totalStages; i++) {
             let btn = document.createElement('button');
             btn.className = 'stage-btn';
-            
             let isUnlocked = levelData[i] && levelData[i].unlocked;
             if(i === 1) isUnlocked = true; 
-
             if(!isUnlocked) {
                 btn.classList.add('locked');
                 btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`;
@@ -427,6 +398,11 @@
         document.getElementById('game-screen').style.display = 'block';
         document.getElementById('current-stage-display').innerText = stageNumber;
         
+        // تصفير عدادات الأخطاء
+        consecutiveErrors = 0;
+        totalErrors = 0;
+        starPenalty = 0;
+
         let startIndex = (stageNumber - 1) * WORDS_PER_STAGE;
         let endIndex = startIndex + WORDS_PER_STAGE;
         stageWords = wordsData.slice(startIndex, endIndex);
@@ -438,72 +414,54 @@
             let extraWords = previousWords.slice(0, needed); 
             stageWords = stageWords.concat(extraWords);
         }
-
         stageWords.sort(() => Math.random() - 0.5);
-
         startTimer();
         loadWord();
     }
 
     function loadWord() {
-        if(currentWordIndex >= WORDS_PER_STAGE) {
-            endGame();
-            return;
-        }
-
+        if(currentWordIndex >= WORDS_PER_STAGE) { endGame(); return; }
         document.getElementById('word-counter').innerText = (currentWordIndex + 1);
         let wordObj = stageWords[currentWordIndex];
         let enWord = wordObj.en.trim();
         let arWord = wordObj.ar;
 
         document.getElementById('arabic-display').innerText = arWord;
-        
         let englishDisplay = document.getElementById('english-display');
         let lettersPool = document.getElementById('letters-pool');
         englishDisplay.innerHTML = '';
         lettersPool.innerHTML = '';
-        
         currentBlanks = [];
         activeBlankIndex = 0;
 
-        let missingChars = []; // سنضع فيه جميع الأحرف (لأن اللعبة هي ترتيب لكل الحروف)
-
+        let missingChars = []; 
         for(let i=0; i<enWord.length; i++) {
             let char = enWord[i];
             let box = document.createElement('div');
             box.className = 'char-box';
             
-            // إذا كان مسافة أو رمز، نتركه ظاهراً ولا نعتبره حرفاً مخفياً
             if(!char.match(/[a-z]/i)) {
                 box.innerText = char;
                 if(char === ' ') box.classList.add('space');
                 englishDisplay.appendChild(box);
                 continue;
             }
-
-            // إخفاء كافة الأحرف الصحيحة
             box.classList.add('hidden-char');
             box.dataset.char = char.toLowerCase();
             missingChars.push(char.toLowerCase());
             currentBlanks.push(box);
-            
             englishDisplay.appendChild(box);
         }
 
         if(currentBlanks.length > 0) {
             currentBlanks[0].classList.add('active-blank');
         } else {
-            // كاحتياط لو لم يكن هناك حروف (مثال فارغ)
             setTimeout(() => { currentWordIndex++; loadWord(); }, 500);
             return;
         }
 
-        // إنشاء أزرار الأحرف المبعثرة بالأسفل بحيث تكون مطابقة تماماً لأحرف الكلمة
         let poolChars = [...missingChars]; 
-        
-        // خلط الأحرف
         poolChars.sort(() => Math.random() - 0.5);
-
         poolChars.forEach(char => {
             let btn = document.createElement('button');
             btn.className = 'letter-btn';
@@ -513,9 +471,28 @@
         });
     }
 
+    // --- دوال معالجة الأخطاء والنجاح ---
+    function handleMistake() {
+        consecutiveErrors++;
+        totalErrors++;
+        if (consecutiveErrors === 2) {
+            starPenalty++;
+            consecutiveErrors = 0;
+            totalErrors = 0;
+        } else if (totalErrors === 3) {
+            starPenalty++;
+            consecutiveErrors = 0;
+            totalErrors = 0;
+        }
+        updateLiveStars(secondsElapsed);
+    }
+
+    function handleCorrect() {
+        consecutiveErrors = 0;
+    }
+
     function onLetterClick(char, btnElement) {
         if (activeBlankIndex >= currentBlanks.length || btnElement.classList.contains('used')) return;
-
         let activeBlank = currentBlanks[activeBlankIndex];
         let expectedChar = activeBlank.dataset.char;
 
@@ -524,8 +501,8 @@
             activeBlank.classList.remove('hidden-char', 'active-blank');
             activeBlank.classList.add('filled');
             activeBlank.innerText = char;
-
             activeBlankIndex++;
+            handleCorrect(); // تم النقر بشكل صحيح
 
             if (activeBlankIndex < currentBlanks.length) {
                 currentBlanks[activeBlankIndex].classList.add('active-blank');
@@ -534,8 +511,9 @@
             }
         } else {
             btnElement.classList.remove('wrong'); 
-            void btnElement.offsetWidth; // حيلة تقنية لإعادة الـ animation
+            void btnElement.offsetWidth; 
             btnElement.classList.add('wrong');
+            handleMistake(); // نقر خاطئ
         }
     }
 
@@ -550,7 +528,7 @@
     }
 
     function updateLiveStars(time) {
-        let currentStars = getStarsForTime(time);
+        let currentStars = Math.max(0, getStarsForTime(time) - starPenalty);
         document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars);
     }
 
@@ -569,47 +547,36 @@
     function endGame() {
         clearInterval(timerInterval);
         let time = secondsElapsed;
-        let stars = getStarsForTime(time);
-
+        let stars = Math.max(0, getStarsForTime(time) - starPenalty);
+        
         let levelData = gameProgress[currentLevel];
         let previousStars = levelData[currentStage]?.stars || 0;
         let pointsGained = 0;
-        
         let t = getLevelTimes(currentLevel);
         let starPrice = t.starPrice !== undefined ? t.starPrice : 8;
 
         if(stars > previousStars) {
-            pointsGained = (stars - previousStars) * starPrice;
+            pointsGained = (stars - previousStars) * starPrice * (window.currentEventMultiplier || 1);
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
-            
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
         } else if (!levelData[currentStage]) {
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
         }
 
-        if(currentStage < totalStages) {
-            levelData[currentStage + 1] = levelData[currentStage + 1] || { unlocked: true, stars: 0 };
-        }
-
+        if(currentStage < totalStages) { levelData[currentStage + 1] = levelData[currentStage + 1] || { unlocked: true, stars: 0 }; }
         gameProgress[currentLevel] = levelData;
         localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
-
         showResultModal(stars, time, pointsGained);
     }
 
     function showResultModal(stars, time, points) {
         document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
         document.getElementById('modal-time').innerText = time;
-        
         let msgElement = document.getElementById('modal-points-msg');
-        if(points > 0) {
-            msgElement.innerText = `رائع! كسبت ${points} نقطة إضافية للعلامة التراكمية! 🏆`;
-        } else {
-            msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع لرفع نجومك! 💪`;
-        }
-        
+        if(points > 0) { msgElement.innerText = `رائع! كسبت ${points} نقطة إضافية للعلامة التراكمية! 🏆`; } 
+        else { msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع وبأخطاء أقل لرفع نجومك! 💪`; }
         document.getElementById('result-modal').style.display = 'flex';
     }
 
