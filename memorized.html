@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>الكلمات المخزنة والمحفوظة</title>
 	<script>
     (function checkActivation() {
@@ -14,35 +14,67 @@
 </script>
     <style>
         :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --dark: #5a5c69; --light: #f8f9fc; }
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; text-align: center; margin: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; text-align: center; margin: 0; overflow-x: hidden; }
+        * { box-sizing: border-box; }
         
-        .header-box { background: var(--success); color: white; padding: 15px; border-radius: 10px; max-width: 1000px; margin: 0 auto 15px auto; font-size: clamp(16px, 3vw, 20px); font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header-box { background: var(--success); color: white; padding: 15px; border-radius: 10px; max-width: 1000px; width: 100%; margin: 0 auto 15px auto; font-size: clamp(16px, 3vw, 20px); font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        .control-panel { background: white; padding: 20px; border-radius: 10px; max-width: 1000px; margin: 0 auto 20px auto; font-weight: bold; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
+        .control-panel { background: white; padding: 20px; border-radius: 10px; max-width: 1000px; width: 100%; margin: 0 auto 20px auto; font-weight: bold; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
         
         .filter-row { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: center; border-bottom: 1px dashed #eee; padding-bottom: 15px; }
         .filter-item { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         
         .summary-box { background: #e8f5e9; padding: 12px; border-radius: 8px; border: 1px solid #c8e6c9; font-size: 15px; font-weight: bold; color: #2e7d32; }
         
-        select, input[type="number"], input[type="date"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; }
+        select, input[type="number"], input[type="date"] { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; max-width: 100%;}
         
         .action-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
-        .btn { padding: 10px 15px; font-size: clamp(14px, 3vw, 16px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 180px; max-width: 300px; display: flex; align-items: center; justify-content: center; text-align: center;}
+        .btn { padding: 12px 15px; font-size: clamp(14px, 3vw, 16px); border-radius: 8px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.2s; flex: 1 1 180px; max-width: 300px; display: flex; align-items: center; justify-content: center; text-align: center; width: 100%;}
         .btn:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-action { background: var(--primary); }
         .btn-danger { background: var(--danger); }
         .btn-back { background: var(--dark); }
 
-        .table-responsive { width: 100%; max-width: 1000px; margin: 0 auto; overflow-x: auto; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .table-responsive { width: 100%; max-width: 1000px; margin: 0 auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;}
+        table { width: 100%; border-collapse: collapse; background: white; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
         thead { background: var(--primary); color: white; }
         
         .hidden { display: none !important; }
         .badge-old { background: var(--warning); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
         .badge-new { background: var(--success); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
-        input[type="checkbox"] { transform: scale(1.3); cursor: pointer; margin: 0 5px; }
+        input[type="checkbox"] { transform: scale(1.4); cursor: pointer; margin: 0 5px; }
+
+        /* تلوين الكلمات القديمة حسب الطلب */
+        .old-word-text { color: #8B4513 !important; }
+        .old-word-label { color: #8B4513 !important; font-weight: bold; cursor:pointer; }
+
+        /* الشاشات الصغيرة - إخفاء وإعادة الترتيب */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .control-panel { padding: 15px 10px; }
+            .filter-row { flex-direction: column; align-items: flex-start; width: 100%; }
+            .filter-item { width: 100%; justify-content: flex-start; }
+            .filter-item select, .filter-item input { width: 100%; }
+            .action-btns { flex-direction: column; width: 100%; }
+            .action-btns .btn { max-width: 100%; margin-bottom: 5px; }
+            
+            /* إخفاء الأعمدة في الجوال */
+            .hide-on-mobile { display: none !important; }
+            
+            .table-responsive { box-shadow: none; background: transparent; }
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead { display: none; }
+            
+            /* تنسيق كل كلمة كبطاقة (Card) في الجوال */
+            tr { margin-bottom: 15px; background: white; border-radius: 12px; border: 1px solid #e3e6f0; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: stretch; }
+            td { text-align: right; padding: 8px 0; border: none; border-bottom: 1px dashed #eee; display: flex; align-items: center; justify-content: space-between; }
+            td:last-child { border-bottom: none; }
+            
+            td:nth-child(1)::before { content: "الرقم: "; font-weight: bold; color: var(--dark); margin-left: 10px; }
+            td:nth-child(2) { direction: ltr; text-align: left; font-size: 18px !important; justify-content: flex-start; }
+            td:nth-child(3) { font-size: 17px !important; justify-content: flex-start; }
+        }
     </style>
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
@@ -76,8 +108,8 @@
             </select>
         </div>
         <div class="filter-item">
-            <label><input type="checkbox" id="chk-new" checked onchange="applyFilters()"> حديثة (حفظ)</label>
-            <label><input type="checkbox" id="chk-old" checked onchange="applyFilters()"> قديمة (مستثناة)</label>
+            <label style="font-weight:bold; cursor:pointer;"><input type="checkbox" id="chk-new" checked onchange="applyFilters()"> حديثة (حفظ)</label>
+            <label class="old-word-label"><input type="checkbox" id="chk-old" checked onchange="applyFilters()"> قديمة (مستثناة)</label>
         </div>
     </div>
 
@@ -96,8 +128,8 @@
         </div>
         
         <div id="mem-range-inputs" class="filter-item hidden">
-            من: <input type="date" id="filter-from"> 
-            إلى: <input type="date" id="filter-to">
+            <label>من:</label> <input type="date" id="filter-from"> 
+            <label>إلى:</label> <input type="date" id="filter-to">
         </div>
     </div>
     
@@ -118,8 +150,8 @@
                 <th width="10%">الرقم</th>
                 <th width="25%">الإنجليزية</th>
                 <th width="30%">العربية</th>
-                <th width="20%">التاريخ</th>
-                <th width="15%">الحالة</th>
+                <th class="hide-on-mobile" width="20%">التاريخ</th>
+                <th class="hide-on-mobile" width="15%">الحالة</th>
             </tr>
         </thead>
         <tbody id="saved-body"></tbody>
@@ -201,13 +233,16 @@
 
         filtered.forEach((word, index) => {
             let badge = word.isOld ? `<span class="badge-old">قديمة</span>` : `<span class="badge-new">حديثة</span>`;
+            // تلوين الكلمة القديمة بناءً على المتغير isOld
+            let textClass = word.isOld ? 'old-word-text' : '';
+            
             let row = document.createElement('tr');
             row.innerHTML = `
-                <td style="font-weight:bold; font-size:14px;">${index + 1}</td>
-                <td style="font-weight:bold; color:var(--primary); font-size:16px;">${word.en}</td>
-                <td style="font-weight:bold; font-size:14px;">${word.ar}</td>
-                <td style="color:var(--danger); font-weight:bold; font-size:13px;">${word.date || '---'}</td>
-                <td>${badge}</td>
+                <td class="${textClass}" style="font-weight:bold; font-size:14px;">${index + 1}</td>
+                <td class="${textClass}" style="font-weight:bold; color:var(--primary); font-size:16px;">${word.en}</td>
+                <td class="${textClass}" style="font-weight:bold; font-size:14px;">${word.ar}</td>
+                <td class="hide-on-mobile" style="color:var(--danger); font-weight:bold; font-size:13px;">${word.date || '---'}</td>
+                <td class="hide-on-mobile">${badge}</td>
             `;
             tbody.appendChild(row);
         });
