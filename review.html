@@ -16,7 +16,7 @@
         :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; --purple: #8540f5; }
         body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; }
         * { box-sizing: border-box; }
-        .container { background: white; max-width: 1100px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; }
+        .container { background: white; max-width: 1100px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; position: relative;}
         h1 { color: var(--primary); font-size: clamp(20px, 4vw, 28px); margin-bottom: 20px; }
         
         .section-box { border: 2px solid #e3e6f0; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: right; background: var(--light); }
@@ -37,6 +37,7 @@
         .btn-clear { background: var(--danger); }
         .btn-retry { background: var(--warning); }
         .btn-next { background: var(--primary); }
+        .btn-advice { background: var(--purple); color: white; width: auto; max-width: 100%; margin: 0 auto 20px auto; padding: 10px 20px; font-size: 15px; border-radius: 20px; display: inline-flex;}
         
         .table-responsive { width: 100%; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden;}
         table { width: 100%; border-collapse: collapse; background: white; }
@@ -51,6 +52,15 @@
         .btn-youglish { background: var(--purple); }
 
         .hidden { display: none !important; }
+
+        /* نافذة النصيحة المنبثقة */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 15px; padding: 25px; text-align: right; box-shadow: 0 5px 20px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-content h3 { color: var(--purple); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .modal-content p { line-height: 1.6; font-size: 15px; margin-bottom: 15px; color: #333; }
+        .modal-content ul { padding-right: 20px; line-height: 1.8; font-size: 15px; color: #444; }
+        .modal-content .highlight { color: var(--danger); font-weight: bold; }
+        .close-modal-btn { background: var(--danger); color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 15px; }
 
         /* الشاشات الصغيرة (الجوال والتابلت) */
         @media (max-width: 768px) {
@@ -114,8 +124,34 @@
 </head>
 <body>
 
+<!-- نافذة المراجعة الذكية -->
+<div id="advice-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3>💡 خطة المراجعة الذكية المقترحة</h3>
+        <p>عزيزي ولي الأمر، المراجعة لا تقل أهمية أبداً عن حفظ الكلمات الجديدة! لضمان ترسيخ الكلمات في الذاكرة طويلة الأمد للطفل، نوصيك بتطبيق هذه الاستراتيجية الذهبية يومياً:</p>
+        
+        <ul>
+            <li><strong style="color:var(--primary);">أولاً (قاعدة الـ 7 أيام):</strong> يجب أن يقوم الطفل بمراجعة كل صفحة جديدة حفظها لمدة 7 أيام متتالية.
+                <br>الآلية: استخدم خيار <strong>(مراجعة آخر الصفحات التي تم حفظها)</strong>، وقم بضرب عدد الصفحات التي يحفظها الطفل يومياً في الرقم 7.
+                <br><em>مثال:</em> إذا كان يحفظ 3 صفحات يومياً، اجعله يراجع (21 صفحة).
+                <br><span class="highlight">⚠️ شرط هام:</span> الحد الأدنى للمراجعة يجب ألا يقل عن <strong>15 صفحة يومياً</strong> مهما كانت كمية حفظه (حتى لو كان يحفظ صفحة واحدة يومياً).
+            </li>
+            <li style="margin-top:10px;"><strong style="color:var(--primary);">ثانياً (تنشيط الدماغ العكسي):</strong> يجب التنويع في طريقة العرض يومياً لكسر الروتين والتأكد من قوة الاستدعاء:
+                <br>- <em>اليوم الأول:</em> اختر العرض (عربي 👈 إنجليزي).
+                <br>- <em>اليوم الثاني:</em> اختر العرض بالعكس (إنجليزي 👈 عربي).
+                <br><small style="color:var(--dark);">* النظام سيذكرك تلقائياً بآخر طريقة استخدمتها لتسهيل التبديل.</small>
+            </li>
+        </ul>
+        <button class="close-modal-btn" onclick="document.getElementById('advice-modal').classList.add('hidden')">فهمت ذلك، إغلاق النافذة</button>
+    </div>
+</div>
+
 <div class="container">
     <h1>🧠 منصة المراجعة والاختبارات الذكية</h1>
+    
+    <button class="btn btn-advice" onclick="document.getElementById('advice-modal').classList.remove('hidden')">
+        💡 استراتيجية المراجعة الذكية (نصيحة لولي الأمر)
+    </button>
     
     <div id="setup-area" class="section-box">
         <div class="section-title">⚙️ أولاً: إعدادات وتخصيص الجلسة</div>
@@ -166,9 +202,10 @@
         </div>
 
         <div class="rev-type-row">
-            <label><input type="radio" id="type-last-pages" name="rev-type" onclick="toggleTypeInputs()"> 4. مراجعة آخر الصفحات المنجزة</label>
+            <label><input type="radio" id="type-last-pages" name="rev-type" onclick="toggleTypeInputs()"> 4. مراجعة آخر الصفحات التي تم حفظها</label>
             <div id="last-pages-inputs" class="hidden">
-                <input type="number" id="last-pages-count" min="1" value="1"> <label>صفحات أخيرة</label>
+                <input type="number" id="last-pages-count" min="1" value="15"> <label>صفحات أخيرة</label>
+                <div id="last-mode-display" style="margin-top: 8px; font-size: 13px; font-weight: bold; background: #e8f5e9; padding: 8px; border-radius: 6px; border: 1px dashed #c8e6c9;"></div>
             </div>
         </div>
 
@@ -236,7 +273,7 @@
         "CLASS11": typeof levelCLASS11_Words !== 'undefined' ? levelCLASS11_Words : [], "CLASS12": typeof levelCLASS12_Words !== 'undefined' ? levelCLASS12_Words : []
     };
 
-    let appProgress = JSON.parse(localStorage.getItem('appProgress'));
+    let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { levels: {} };
     let selectedLevel = "";
     let testWordsChunks = [];
     let currentChunkIdx = 0;
@@ -287,9 +324,22 @@
         
         if(document.getElementById('type-part').checked) document.getElementById('part-inputs').classList.remove('hidden');
         if(document.getElementById('type-random').checked) document.getElementById('random-inputs').classList.remove('hidden');
-        if(document.getElementById('type-last-pages').checked) document.getElementById('last-pages-inputs').classList.remove('hidden');
         if(document.getElementById('type-last-days').checked) document.getElementById('last-days-inputs').classList.remove('hidden');
         if(document.getElementById('type-date-range').checked) document.getElementById('date-range-inputs').classList.remove('hidden');
+        
+        if(document.getElementById('type-last-pages').checked) {
+            document.getElementById('last-pages-inputs').classList.remove('hidden');
+            let displayDiv = document.getElementById('last-mode-display');
+            let lastMode = appProgress.lastViewModeType4;
+            
+            if(lastMode === 'ar-en') {
+                displayDiv.innerHTML = '📌 <span style="color:#2e7d32;">آخر طريقة عرض استخدمت: (عربي 👈 إنجليزي)</span> <br> <span style="color:var(--danger);">يُنصح اليوم باختيار العكس (إنجليزي 👈 عربي).</span>';
+            } else if(lastMode === 'en-ar') {
+                displayDiv.innerHTML = '📌 <span style="color:#2e7d32;">آخر طريقة عرض استخدمت: (إنجليزي 👈 عربي)</span> <br> <span style="color:var(--danger);">يُنصح اليوم باختيار العكس (عربي 👈 إنجليزي).</span>';
+            } else {
+                displayDiv.innerHTML = '📌 <span style="color:var(--dark);">لم تقم باستخدام هذا النوع من المراجعة من قبل.</span>';
+            }
+        }
     }
 
     function startReviewSession() {
@@ -305,6 +355,12 @@
         let savedDbWords = fullDb.filter(w => validIds.includes(w.id));
 
         if(savedDbWords.length === 0) { alert("⚠️ لا توجد كلمات جديدة محفوظة في هذا المستوى."); return; }
+
+        // حفظ طريقة العرض للنوع الرابع
+        if(document.getElementById('type-last-pages').checked) {
+            appProgress.lastViewModeType4 = document.getElementById('mode-ar-en').checked ? 'ar-en' : 'en-ar';
+            localStorage.setItem('appProgress', JSON.stringify(appProgress));
+        }
 
         testWordsChunks = [];
         currentChunkIdx = 0;
