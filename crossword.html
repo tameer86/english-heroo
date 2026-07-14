@@ -240,11 +240,10 @@
     let gameTimeSettings = JSON.parse(localStorage.getItem('crosswordGameSettings')) || {};
     
     let currentLevel = "";
-    let wordsData = [];
+    let globalStagesList = [];
     const WORDS_PER_STAGE = 10;
-    let totalStages = 0;
     
-    let currentStage = 1;
+    let activeStage = null;
     let timerInterval;
     let secondsElapsed = 0;
     
@@ -363,7 +362,8 @@
 
     function onLevelChange() {
         currentLevel = document.getElementById('level-select').value;
-        loadGameData(); loadSettingsUI();
+        renderStages();
+        loadSettingsUI();
     }
 
     function getLevelTimes(level) {
@@ -430,11 +430,11 @@
         localStorage.setItem('crosswordGameSettings', JSON.stringify(gameTimeSettings));
 
         let resetOpt = document.querySelector('input[name="reset-opt"]:checked').value;
-        if(resetOpt === 'current' && currentLevel) {
+        if(resetOpt === 'current' && currentLevel && currentLevel !== "ALL") {
             gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
             localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
             renderStages();
-        } else if (resetOpt === 'all') {
+        } else if (resetOpt === 'all' || (resetOpt === 'current' && currentLevel === "ALL")) {
             for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
             localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
             renderStages();
@@ -445,75 +445,102 @@
     }
 
     function loadGameData() {
-        wordsData = [];
-        if (currentLevel === "ALL") {
-            let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => {
-                let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b);
-                return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
-            });
-            availableLevelsList.forEach(lvl => {
-                let savedWordsCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0;
-                wordsData = wordsData.concat((allLevelsData[lvl] || []).slice(0, savedWordsCount));
-            });
-        } else {
-            let savedWordsCount = appProgress.levels[currentLevel] && appProgress.levels[currentLevel].savedWords ? appProgress.levels[currentLevel].savedWords.length : 0;
-            wordsData = (allLevelsData[currentLevel] || []).slice(0, savedWordsCount);
-        }
+        globalStagesList = [];
+        let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => {
+            let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b);
+            return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+        });
 
-        if(wordsData.length === 0) { totalStages = 0; renderStages(); return; }
-        totalStages = Math.ceil(wordsData.length / WORDS_PER_STAGE);
-        if(!gameProgress[currentLevel]) gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } };
-        
-        updateRandomHotStages();
+        let absoluteId = 1;
+        availableLevelsList.forEach(lvl => {
+            let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0;
+            let levelWords = (allLevelsData[lvl] || []).slice(0, savedCount);
+            if(levelWords.length === 0) return;
+            
+            let tStages = Math.ceil(levelWords.length / WORDS_PER_STAGE);
+            for(let s = 1; s <= tStages; s++) {
+                let startIndex = (s - 1) * WORDS_PER_STAGE;
+                let endIndex = startIndex + WORDS_PER_STAGE;
+                let stageWords = levelWords.slice(startIndex, endIndex);
+
+                if (stageWords.length < WORDS_PER_STAGE && levelWords.length >= WORDS_PER_STAGE) {
+                    let needed = WORDS_PER_STAGE - stageWords.length;
+                    let previousWords = levelWords.slice(0, startIndex);
+                    previousWords.sort(() => Math.random() - 0.5);
+                    stageWords = stageWords.concat(previousWords.slice(0, needed));
+                }
+
+                globalStagesList.push({
+                    id: absoluteId++,
+                    level: lvl,
+                    localStage: s,
+                    words: stageWords
+                });
+            }
+        });
+
+        updateGlobalHotStages('crossword');
         renderStages();
     }
 
-    function updateRandomHotStages() {
-        if (totalStages === 0) return;
+    function updateGlobalHotStages(gameKey) {
         let now = new Date().getTime();
-        let savedData = JSON.parse(localStorage.getItem('randomHotData_crossword')) || {};
-        
-        if (!savedData.expiry || now > savedData.expiry || savedData.level !== currentLevel || savedData.totalStages !== totalStages) {
-            let allStages = Array.from({length: totalStages}, (_, i) => i + 1);
-            let poolEnd = Math.max(0, totalStages - 10);
-            let poolStart = Math.floor(poolEnd * 0.3);
-            let pool = allStages.slice(poolStart, poolEnd);
-            
-            let picked = [];
-            let pickCount = Math.min(10, pool.length);
-            while(picked.length < pickCount) {
-                let randIdx = Math.floor(Math.random() * pool.length);
-                let stg = pool.splice(randIdx, 1)[0];
-                picked.push(stg);
+        let savedData = JSON.parse(localStorage.getItem('hotStagesData_' + gameKey)) || {};
+
+        if (!savedData.expiry || now > savedData.expiry || savedData.totalStages !== globalStagesList.length) {
+            let last10 = [];
+            let random10 = [];
+
+            if (globalStagesList.length > 0) {
+                last10 = globalStagesList.slice(-10).map(s => s.id);
+
+                let pool = globalStagesList.filter(s => !last10.includes(s.id));
+                let poolWithStars = pool.map(s => {
+                    let prog = (gameProgress[s.level] && gameProgress[s.level][s.localStage]) ? gameProgress[s.level][s.localStage].stars : 0;
+                    return { id: s.id, stars: prog };
+                });
+
+                poolWithStars.sort((a, b) => a.stars - b.stars);
+                let eligible = poolWithStars.filter(s => s.stars < 5);
+                
+                let selectedRandom = [];
+                let currentStarLevel = 0;
+
+                while(selectedRandom.length < 10 && currentStarLevel <= 5 && eligible.length > 0) {
+                    let tierStages = eligible.filter(s => s.stars === currentStarLevel);
+                    tierStages.sort(() => Math.random() - 0.5);
+                    while(tierStages.length > 0 && selectedRandom.length < 10) {
+                        selectedRandom.push(tierStages.pop().id);
+                    }
+                    currentStarLevel++;
+                }
+                random10 = selectedRandom;
             }
-            
-            savedData = {
-                stages: picked,
-                expiry: now + (24 * 60 * 60 * 1000),
-                level: currentLevel,
-                totalStages: totalStages
-            };
-            localStorage.setItem('randomHotData_crossword', JSON.stringify(savedData));
+
+            savedData = { last10, random10, expiry: now + (24 * 60 * 60 * 1000), totalStages: globalStagesList.length };
+            localStorage.setItem('hotStagesData_' + gameKey, JSON.stringify(savedData));
         }
-        window.currentRandomHotStages = savedData.stages || [];
+
+        window.currentHotLast10 = savedData.last10 || [];
+        window.currentHotRandom10 = savedData.random10 || [];
         window.randomHotExpiry = savedData.expiry;
-        startRandomHotCountdown();
+        startRandomHotCountdown(gameKey);
     }
 
-    function startRandomHotCountdown() {
+    function startRandomHotCountdown(gameKey) {
         clearInterval(countdownInterval);
-        updateCountdownDisplay();
-        countdownInterval = setInterval(updateCountdownDisplay, 1000);
+        updateCountdownDisplay(gameKey);
+        countdownInterval = setInterval(() => updateCountdownDisplay(gameKey), 1000);
     }
 
-    function updateCountdownDisplay() {
+    function updateCountdownDisplay(gameKey) {
         let el = document.getElementById('random-hot-countdown');
         if(!el) return;
         if(!window.randomHotExpiry) { el.innerText = ''; return; }
         let diff = window.randomHotExpiry - new Date().getTime();
         if(diff <= 0) {
             el.innerText = 'جاري التحديث...';
-            updateRandomHotStages();
+            updateGlobalHotStages(gameKey);
             renderStages();
             return;
         }
@@ -523,78 +550,57 @@
         el.innerHTML = `⏳ تجديد البطاقات العشوائية الملتهبة خلال: <b style="color:var(--danger)">${h}س ${m}د ${s}ث</b>`;
     }
 
-    function getHotStages() {
-        let allUnlockedStages = [];
-        let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => {
-            let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b);
-            return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
-        });
-        availableLevelsList.forEach(lvl => {
-            let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0;
-            let tStages = Math.ceil(savedCount / 10);
-            for(let s=1; s<=tStages; s++) {
-                allUnlockedStages.push({level: lvl, stage: s});
-            }
-        });
-        return allUnlockedStages.slice(-10);
-    }
-
     function renderStages() {
         const container = document.getElementById('stages-container'); container.innerHTML = '';
-        let levelData = gameProgress[currentLevel] || {};
-        let hotStages = getHotStages();
-        let randomHotStages = window.currentRandomHotStages || [];
+        
+        if(globalStagesList.length === 0) return;
 
-        for(let i = 1; i <= totalStages; i++) {
+        let renderedStages = currentLevel === "ALL" ? globalStagesList : globalStagesList.filter(s => s.level === currentLevel);
+
+        renderedStages.forEach(stage => {
             let btn = document.createElement('button'); btn.className = 'stage-btn';
             
-            let isUnlocked = true; // المراحل غير تتابعية
-            
-            let isLastHot = false;
-            if(currentLevel === "ALL") {
-                isLastHot = (i > totalStages - 10);
-            } else {
-                isLastHot = hotStages.some(h => h.level === currentLevel && h.stage === i);
-            }
-            
-            let isRandomHot = randomHotStages.includes(i);
+            let isLastHot = window.currentHotLast10.includes(stage.id);
+            let isRandomHot = window.currentHotRandom10.includes(stage.id);
             let isHot = isLastHot || isRandomHot;
 
-            let starsCount = levelData[i]?.stars || 0; let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';
+            let levelData = gameProgress[stage.level] || {};
+            let starsCount = levelData[stage.localStage]?.stars || 0; 
+            let timeSpent = levelData[stage.localStage]?.time ? ` | ${levelData[stage.localStage].time}ث` : '';
             let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
+            
+            let prefix = stage.level.startsWith('CLASS') ? stage.level.replace('CLASS', '') : stage.level;
+            let displayName = currentLevel === "ALL" ? `${prefix}.${stage.localStage}` : `مرحلة ${stage.localStage}`;
             
             if(isHot) {
                 btn.classList.add('hot-stage');
-                btn.innerHTML = `مرحلة ${i} <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                btn.innerHTML = `${displayName} <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
             } else {
-                btn.innerHTML = `مرحلة ${i} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                btn.innerHTML = `${displayName} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
             }
             
             btn.onclick = () => {
                 window.currentStageIsHot = isHot;
-                startGame(i);
+                startGame(stage);
             };
             container.appendChild(btn);
-        }
+        });
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
     }
 
-    function startGame(stageNumber) {
-        currentStage = stageNumber;
+    function startGame(stageObj) {
+        activeStage = stageObj;
         document.getElementById('stages-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'block';
-        document.getElementById('current-stage-display').innerText = stageNumber;
         
-        let startIndex = (stageNumber - 1) * WORDS_PER_STAGE;
-        let endIndex = startIndex + WORDS_PER_STAGE;
-        let stageWords = wordsData.slice(startIndex, endIndex);
-
-        if(stageWords.length < WORDS_PER_STAGE && wordsData.length >= WORDS_PER_STAGE) {
-            let needed = WORDS_PER_STAGE - stageWords.length;
-            let previousWords = wordsData.slice(0, startIndex).sort(() => Math.random() - 0.5);
-            stageWords = stageWords.concat(previousWords.slice(0, needed));
-        }
-        generateCrosswordAlgorithm(stageWords); startTimer();
+        let prefix = activeStage.level.startsWith('CLASS') ? activeStage.level.replace('CLASS', '') : activeStage.level;
+        let displayStr = currentLevel === "ALL" ? `${prefix}.${activeStage.localStage}` : activeStage.localStage;
+        document.getElementById('current-stage-display').innerText = displayStr;
+        
+        let stageWords = [...activeStage.words];
+        stageWords.sort(() => Math.random() - 0.5);
+        generateCrosswordAlgorithm(stageWords); 
+        startTimer();
     }
 
     function generateCrosswordAlgorithm(wordsArray) {
@@ -735,7 +741,7 @@
     }
 
     function getStarsForTime(time) {
-        let t = getLevelTimes(currentLevel); let letters = window.currentStageTotalLetters || 10;
+        let t = getLevelTimes(activeStage.level); let letters = window.currentStageTotalLetters || 10;
         if(time <= (t.t5 * letters)) return 5;
         if(time <= (t.t4 * letters)) return 4;
         if(time <= (t.t3 * letters)) return 3;
@@ -754,8 +760,11 @@
     function endGame() {
         clearInterval(timerInterval);
         let time = secondsElapsed; let stars = getStarsForTime(time);
-        let levelData = gameProgress[currentLevel] || {}; let previousStars = levelData[currentStage]?.stars || 0; let pointsGained = 0;
-        let t = getLevelTimes(currentLevel); let starPrice = t.starPrice !== undefined ? t.starPrice : 10;
+        let levelData = gameProgress[activeStage.level] || {}; 
+        let previousStars = levelData[activeStage.localStage]?.stars || 0; 
+        let pointsGained = 0;
+        let t = getLevelTimes(activeStage.level); 
+        let starPrice = t.starPrice !== undefined ? t.starPrice : 10;
 
         if(stars > previousStars) {
             let hotMult = window.currentStageIsHot ? 1.5 : 1;
@@ -763,16 +772,18 @@
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
-            levelData[currentStage] = { unlocked: true, stars: stars, time: time };
+            levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time };
             
             let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
             pointsHistory.push({ time: Date.now(), game: 'crossword', points: pointsGained });
             localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
             
-        } else if (!levelData[currentStage]) { levelData[currentStage] = { unlocked: true, stars: stars, time: time }; }
+        } else if (!levelData[activeStage.localStage]) { 
+            levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time }; 
+        }
 
-        if(currentStage < totalStages) { levelData[currentStage + 1] = levelData[currentStage + 1] || { unlocked: true, stars: 0 }; }
-        gameProgress[currentLevel] = levelData; localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
+        gameProgress[activeStage.level] = levelData; 
+        localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
         showResultModal(stars, time, pointsGained);
     }
 
