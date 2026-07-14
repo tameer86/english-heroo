@@ -183,7 +183,7 @@
                 <select id="review-level-select" style="width:100%; max-width: 250px; margin-top: 8px;" onchange="updateSeqInfo(); toggleTypeInputs();"></select>
             </div>
             
-            <div class="rev-type-row">
+            <div class="rev-type-row" id="row-type-all">
                 <label><input type="radio" id="type-all" name="rev-type" onclick="toggleTypeInputs()"> 1. المراجعة الشاملة</label>
                 <span class="help-icon" onclick="showHelp('all')">❔</span>
             </div>
@@ -191,17 +191,17 @@
             <div class="rev-type-row" id="type-part-row">
                 <label><input type="radio" id="type-part" name="rev-type" onclick="toggleTypeInputs()"> 2. المراجعة التتابعية</label>
                 <span class="help-icon" onclick="showHelp('part')">❔</span>
-                <div id="part-inputs" class="hidden">
+                <div id="part-inputs" class="hidden" style="width: 100%;">
                     <input type="number" id="part-pages" min="1" value="1"> <label>صفحات</label>
                     <div id="remaining-pages-info" style="margin: 5px 0; color: var(--dark); font-size: 14px;"></div>
                     <button class="icon-btn btn-clear" onclick="resetPartialIndex()" style="width:100%; padding:10px; border-radius: 8px; margin-top: 5px;">إعادة البدء من الصفحة الأولى 🔄</button>
                 </div>
             </div>
             
-            <div class="rev-type-row">
+            <div class="rev-type-row" id="row-type-random">
                 <label><input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> 3. المراجعة العشوائية المتقدمة</label>
                 <span class="help-icon" onclick="showHelp('random')">❔</span>
-                <div id="random-inputs" class="hidden">
+                <div id="random-inputs" class="hidden" style="width: 100%;">
                     <span id="random-page-range-container">
                         <label>من صفحة:</label> <input type="number" id="rand-start" min="1" value="1">
                         <label>إلى صفحة:</label> <input type="number" id="rand-end" min="1" value="2">
@@ -210,25 +210,25 @@
                 </div>
             </div>
 
-            <div class="rev-type-row">
+            <div class="rev-type-row" id="row-type-days">
                 <label><input type="radio" id="type-last-days" name="rev-type" onclick="toggleTypeInputs()"> 4. مراجعة كلمات الأيام الأخيرة</label>
                 <span class="help-icon" onclick="showHelp('days')">❔</span>
-                <div id="last-days-inputs" class="hidden">
+                <div id="last-days-inputs" class="hidden" style="width: 100%;">
                     <input type="number" id="last-days-count" min="1" value="3"> <label>أيام أخيرة</label>
                 </div>
             </div>
 
-            <div class="rev-type-row">
+            <div class="rev-type-row" id="row-type-date">
                 <label><input type="radio" id="type-date-range" name="rev-type" onclick="toggleTypeInputs()"> 5. مراجعة كلمات فترة زمنية مختارة</label>
                 <span class="help-icon" onclick="showHelp('date')">❔</span>
-                <div id="date-range-inputs" class="hidden">
+                <div id="date-range-inputs" class="hidden" style="width: 100%;">
                     <label>من تاريخ:</label> <input type="date" id="rev-from-date">
                     <label>إلى تاريخ:</label> <input type="date" id="rev-to-date">
                 </div>
             </div>
         </div>
         
-        <div class="action-btns">
+        <div class="action-btns" id="main-action-btns">
             <button class="btn btn-action" onclick="startReviewSession()">🚀 ابدأ المراجعة</button>
             <button class="btn btn-back" onclick="window.location.href='index.html?screen=dashboard'">🔙 العودة</button>
         </div>
@@ -277,7 +277,6 @@
     let testWordsChunks = [];
     let currentChunkIdx = 0;
     let currentReviewType = 1;
-    let currentSessionLastPagesCount = null;
 
     window.onload = function() {
         let sel = document.getElementById('review-level-select');
@@ -293,12 +292,14 @@
                 let opt = document.createElement('option'); opt.value = l; opt.text = getLevelName(l); sel.appendChild(opt);
             }
         });
+        
+        if (appProgress.defaultLastPagesCount) document.getElementById('last-pages-count').value = appProgress.defaultLastPagesCount;
+        if (appProgress.defaultPartPages) document.getElementById('part-pages').value = appProgress.defaultPartPages;
+        if (appProgress.defaultRandCount) document.getElementById('rand-count').value = appProgress.defaultRandCount;
+        if (appProgress.defaultLastDays) document.getElementById('last-days-count').value = appProgress.defaultLastDays;
+        
         updateSeqInfo();
         toggleTypeInputs();
-
-        if (appProgress.defaultLastPagesCount) {
-            document.getElementById('last-pages-count').value = appProgress.defaultLastPagesCount;
-        }
     };
 
     function toggleAdvancedReview() {
@@ -380,11 +381,8 @@
         document.getElementById('date-range-inputs').classList.add('hidden');
         document.getElementById('last-pages-inputs').classList.add('hidden');
         
-        let levelContainer = document.getElementById('level-select-container');
-        
         if(document.getElementById('type-last-pages').checked) {
             document.getElementById('last-pages-inputs').classList.remove('hidden');
-            if(levelContainer) levelContainer.style.display = 'none';
             
             let displayDiv = document.getElementById('last-mode-display');
             let lastMode = appProgress.lastViewModeType4;
@@ -396,8 +394,6 @@
             } else {
                 displayDiv.innerHTML = '📌 <span style="color:var(--dark);">لم تقم باستخدام هذه المراجعة من قبل، اختر طريقة العرض المناسبة.</span>';
             }
-        } else {
-            if(levelContainer) levelContainer.style.display = 'block';
         }
         
         if(document.getElementById('type-part').checked) {
@@ -415,6 +411,15 @@
         }
         if(document.getElementById('type-last-days').checked) document.getElementById('last-days-inputs').classList.remove('hidden');
         if(document.getElementById('type-date-range').checked) document.getElementById('date-range-inputs').classList.remove('hidden');
+
+        // تحريك أزرار البدء ديناميكياً أسفل نوع المراجعة المحدد
+        let checkedRadio = document.querySelector('input[name="rev-type"]:checked');
+        if (checkedRadio) {
+            let row = checkedRadio.closest('.rev-type-row');
+            if (row) {
+                row.appendChild(document.getElementById('main-action-btns'));
+            }
+        }
     }
 
     function startReviewSession() {
@@ -428,14 +433,12 @@
 
         testWordsChunks = [];
         currentChunkIdx = 0;
-        currentSessionLastPagesCount = null;
 
         const orderedLevels = ["CLASS1", "CLASS2", "CLASS3", "CLASS4", "CLASS5", "CLASS6", "CLASS7", "CLASS8", "CLASS9", "CLASS10", "CLASS11", "CLASS12", "A1", "A2", "B1", "B2", "C1", "C2"];
 
         if (isGlobalReview) {
             currentReviewType = 4;
             appProgress.lastViewModeType4 = document.getElementById('mode-ar-en').checked ? 'ar-en' : 'en-ar';
-            localStorage.setItem('appProgress', JSON.stringify(appProgress));
 
             let reqPages = parseInt(document.getElementById('last-pages-count').value) || 15;
             let allGlobalValidWords = [];
@@ -469,8 +472,6 @@
                 alert("⚠️ خطأ: عدد الصفحات المطلوبة (" + reqPages + ") أكبر من إجمالي الصفحات المحفوظة في جميع المستويات (" + totalSavedPages + " صفحة)!"); 
                 return; 
             }
-            
-            currentSessionLastPagesCount = reqPages;
             
             let startIdx = Math.max(0, allGlobalValidWords.length - (reqPages * 10));
             let sliced = allGlobalValidWords.slice(startIdx);
@@ -646,6 +647,13 @@
             }
         }
 
+        // حفظ الأرقام لتصبح قيماً افتراضية مستقبلاً
+        appProgress.defaultLastPagesCount = parseInt(document.getElementById('last-pages-count').value) || 15;
+        appProgress.defaultPartPages = parseInt(document.getElementById('part-pages').value) || 1;
+        appProgress.defaultRandCount = parseInt(document.getElementById('rand-count').value) || 10;
+        appProgress.defaultLastDays = parseInt(document.getElementById('last-days-count').value) || 3;
+        localStorage.setItem('appProgress', JSON.stringify(appProgress));
+
         document.getElementById('setup-area').classList.add('hidden');
         document.getElementById('test-area').classList.remove('hidden');
         renderTestPage();
@@ -734,11 +742,6 @@
     }
 
     function finishSessionReport() {
-        if (currentReviewType === 4 && currentSessionLastPagesCount !== null) {
-            appProgress.defaultLastPagesCount = currentSessionLastPagesCount;
-            localStorage.setItem('appProgress', JSON.stringify(appProgress));
-        }
-
         if (currentReviewType === 2) {
             let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
             
