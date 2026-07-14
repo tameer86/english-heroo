@@ -38,7 +38,7 @@
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
         /* تنسيق المراحل النارية - آخر 20 مرحلة */
-        .hot-stage { background: linear-gradient(45deg, #e74a3b, #f6c23e) !important; animation: pulseHot 1.5s infinite; border: 2px solid #fff;}
+        .hot-stage { background: linear-gradient(45deg, #e74a3b, #f6c23e) !important; color: white !important; animation: pulseHot 1.5s infinite; border: 2px solid #fff;}
         @keyframes pulseHot { 
             0% {box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7);} 
             70% {box-shadow: 0 0 0 10px rgba(231, 74, 59, 0);} 
@@ -280,7 +280,6 @@
 
         availableLevels.forEach(lvl => {
             let lData = appProgress.levels[lvl];
-            let db = allLevelsData[lvl] || [];
             let isLevelFinished = lData.savedWords && lData.savedWords.length > 0;
             
             if (isLevelFinished) {
@@ -448,7 +447,12 @@
 
             if(!isUnlocked) { 
                 btn.classList.add('locked'); 
-                btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`; 
+                if(isHot) {
+                    btn.classList.add('hot-stage');
+                    btn.innerHTML = `مرحلة ${i} 🔒 <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars" style="color:#fff;">☆☆☆☆☆</span>`;
+                } else {
+                    btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`; 
+                }
             } else {
                 let starsCount = levelData[i]?.stars || 0; 
                 let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';

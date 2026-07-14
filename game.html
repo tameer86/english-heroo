@@ -27,7 +27,9 @@
         .game-btn { color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block; font-weight: bold; width: 80%; max-width: 400px; }
         .game-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-        .top-icons { position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 50; flex-wrap: wrap;}
+        /* تعديل التموضع لحل مشكلة التداخل مع إضافة مسافات مرنة */
+        .top-icons { position: relative; display: flex; justify-content: center; gap: 20px; z-index: 50; flex-wrap: wrap; margin-top: 50px; margin-bottom: 30px; }
+        
         .btn-top-action { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         .btn-top-action:hover { transform: scale(1.2); }
 
@@ -124,6 +126,7 @@
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
     </div>
 
+    <!-- نافذة الأخبار -->
     <div id="news-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
@@ -132,6 +135,7 @@
         </div>
     </div>
 
+    <!-- نافذة التقارير الشاملة -->
     <div id="reports-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('reports-modal')">✖</button>
@@ -146,6 +150,7 @@
                 </select>
             </div>
 
+            <!-- خيارات تقرير النقاط (يظهر فقط عند اختياره) -->
             <div id="time-selectors" class="report-selectors">
                 <select id="report-type" onchange="updateReportRangeOptions()">
                     <option value="hours">في آخر عدد ساعات</option>
@@ -162,6 +167,7 @@
         </div>
     </div>
 
+    <!-- نافذة الإعدادات الإدارية -->
     <div id="admin-modal" class="custom-modal">
         <div class="modal-content-box" style="background: white;">
             <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
@@ -206,6 +212,7 @@
         </div>
     </div>
 
+    <!-- نافذة الأحداث -->
     <div id="event-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('event-modal')">✖</button>
@@ -229,6 +236,7 @@
         </div>
     </div>
 
+    <!-- نافذة البنك -->
     <div id="bank-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
@@ -261,6 +269,7 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة الشرف -->
     <div id="fame-modal" class="custom-modal">
         <div class="modal-content-box" id="fame-content">
             <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
@@ -309,7 +318,7 @@
     };
 
     function openNewsModal() {
-        fetch('news.txt')
+        fetch('news.text')
             .then(response => {
                 if(!response.ok) throw new Error('لا يوجد أخبار حالياً');
                 return response.text();
@@ -715,13 +724,16 @@
             let progressPercent = 0;
             if (score >= stage.end) { progressPercent = 100; } 
             else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
-            let imgClickAction = isStageUnlocked ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;"` : '';
             
             let stageReward = 15 * stage.num * stage.num + (parseFloat(stageBonuses[stage.num]) || 0);
+            
+            let imgClickAction = isStageUnlocked 
+                ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"` 
+                : `onclick="alert('قيمة الجائزة عند ختم هذه المرحلة: ${stageReward} جنيه فلسطيني')" style="cursor: pointer;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"`;
 
             let html = `
                 <div class="stage-card ${stageClass}">
-                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction} title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني">
+                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction}>
                     <h3 class="stage-title">
                         مرحلة ${stage.num}: ${stage.name}
                         <span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span>
@@ -737,7 +749,7 @@
                 let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>';
                 let badgeReward = badgeGlobalIndex;
                 html += `
-                    <div class="badge-item ${badgeClass}" title="جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني">
+                    <div class="badge-item ${badgeClass}" title="جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني" onclick="alert('قيمة جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني')">
                         <div class="badge-img-wrapper"><img src="${badge.img}" class="badge-img" onerror="this.src='images/mon.jpeg'">${lockOverlay}</div>
                         <div class="badge-title">${badge.name}</div>
                         <div class="badge-req">${badge.req.toLocaleString()}</div>

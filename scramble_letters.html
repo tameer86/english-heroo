@@ -37,7 +37,7 @@
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
         /* تنسيق المراحل النارية - آخر 20 مرحلة */
-        .hot-stage { background: linear-gradient(45deg, #e74a3b, #f6c23e) !important; animation: pulseHot 1.5s infinite; border: 2px solid #fff;}
+        .hot-stage { background: linear-gradient(45deg, #e74a3b, #f6c23e) !important; color: white !important; animation: pulseHot 1.5s infinite; border: 2px solid #fff;}
         @keyframes pulseHot { 
             0% {box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7);} 
             70% {box-shadow: 0 0 0 10px rgba(231, 74, 59, 0);} 
@@ -92,7 +92,26 @@
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
     <div id="event-active-banner" onclick="showEventDetails()">🌟 حدث مضاعفة النقاط نشط!</div>
 
-    <div class="header-stats">
+    <div class="top-icons" style="position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 50; flex-wrap: wrap;">
+        <button class="icon-btn btn-top-action" onclick="window.location.href='index.html?screen=dashboard'" title="العودة للوحة التحكم">🔙</button>
+        <button class="icon-btn btn-top-action" onclick="toggleModal('admin-modal')" title="إعدادات الألعاب لولي الأمر">⚙️</button>
+        <button class="icon-btn btn-top-action" onclick="toggleModal('event-modal')" title="إعدادات الأحداث">📅</button>
+        <button class="icon-btn btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
+        <button class="icon-btn btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
+        <button class="icon-btn btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
+        <button class="icon-btn btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
+    </div>
+
+    <!-- نافذة الأخبار -->
+    <div id="news-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
+            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📰 أخبار وتحديثات اللعبة</h3>
+            <div id="news-content" style="text-align: right; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; min-height: 100px; max-height: 350px; overflow-y: auto; line-height: 1.6; white-space: pre-wrap; font-weight:bold; color:var(--dark);">جاري التحميل...</div>
+        </div>
+    </div>
+
+    <div class="header-stats" style="margin-top: 80px;">
         <div class="level-selector">
             <label for="level-select">اختر المستوى للعب: </label>
             <select id="level-select" onchange="onLevelChange()"></select>
@@ -100,7 +119,6 @@
         <div class="left-header-group">
             <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
             <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
-            <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
         </div>
     </div>
 
@@ -232,6 +250,22 @@
         initializeDropdown();
     };
 
+    function openNewsModal() {
+        fetch('news.text')
+            .then(response => {
+                if(!response.ok) throw new Error('لا يوجد أخبار حالياً');
+                return response.text();
+            })
+            .then(text => {
+                document.getElementById('news-content').innerText = text;
+                toggleModal('news-modal');
+            })
+            .catch(err => {
+                document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.';
+                toggleModal('news-modal');
+            });
+    }
+
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         let banner = document.getElementById('parent-mode-banner');
@@ -249,6 +283,15 @@
                 eventBanner.style.display = 'none';
                 window.currentEventMultiplier = 1;
             }
+        }
+    }
+
+    function toggleModal(id) {
+        const modal = document.getElementById(id);
+        if(modal.style.display === 'flex') {
+            modal.style.display = 'none';
+        } else {
+            modal.style.display = 'flex';
         }
     }
 
@@ -424,7 +467,12 @@
 
             if(!isUnlocked) {
                 btn.classList.add('locked');
-                btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`;
+                if(isHot) {
+                    btn.classList.add('hot-stage');
+                    btn.innerHTML = `مرحلة ${i} 🔒 <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars" style="color:#fff;">☆☆☆☆☆</span>`;
+                } else {
+                    btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`; 
+                }
             } else {
                 let starsCount = levelData[i]?.stars || 0;
                 let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';
@@ -600,7 +648,7 @@
         }, 1000);
     }
 
-function endGame() {
+    function endGame() {
         clearInterval(timerInterval);
         let time = secondsElapsed;
         let stars = Math.max(0, getStarsForTime(time) - starPenalty);
