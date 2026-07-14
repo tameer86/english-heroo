@@ -19,6 +19,8 @@
         .container { background: white; max-width: 1100px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; position: relative;}
         h1 { color: var(--primary); font-size: clamp(20px, 4vw, 28px); margin-bottom: 20px; }
         
+        #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
+
         .section-box { border: 2px solid #e3e6f0; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: right; background: var(--light); }
         .section-title { font-size: 18px; font-weight: bold; color: var(--primary); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
         label { font-weight: bold; margin-left: 10px; }
@@ -35,6 +37,7 @@
         .btn-dark { background: var(--dark); color: white; border-radius: 10px; margin: 15px 0; }
         .btn-back { background: var(--dark); }
         .btn-clear { background: var(--danger); }
+        .btn-clear:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-next { background: var(--primary); }
         .btn-advice { background: var(--purple); color: white; width: auto; max-width: 100%; margin: 0 auto 20px auto; padding: 10px 20px; font-size: 15px; border-radius: 20px; display: inline-flex;}
         
@@ -110,6 +113,8 @@
 </head>
 <body>
 
+<div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
+
 <div id="advice-modal" class="modal-overlay hidden">
     <div class="modal-content">
         <h3>💡 خطة المراجعة الذكية المقترحة</h3>
@@ -136,6 +141,7 @@
         <p id="help-desc" style="font-weight: bold;"></p>
         <p style="color:var(--dark); font-size:14px; background: var(--light); padding: 10px; border-radius: 8px;">
             * <strong>ملاحظة هامة:</strong> جميع أنواع المراجعات تعتمد بشكل مباشر على (طريقة العرض) التي قمت باختيارها في الشاشة الرئيسية (عربي-إنجليزي أو العكس).
+            <br><em>باستثناء المراجعة التتابعية حيث تقوم بتنظيم دورات التبديل تلقائياً.</em>
         </p>
         <button class="close-modal-btn" onclick="document.getElementById('help-modal').classList.add('hidden')">إغلاق</button>
     </div>
@@ -153,7 +159,7 @@
         
         <div class="controls-row">
             <div>
-                <label>طريقة العرض:</label>
+                <label>طريقة العرض (للمراجعات المفتوحة):</label>
                 <div style="margin-top: 8px;">
                     <input type="radio" id="mode-ar-en" name="view-mode" checked> <label for="mode-ar-en">عربي 👈 إنجليزي</label><br>
                     <input type="radio" id="mode-en-ar" name="view-mode"> <label for="mode-en-ar">إنجليزي 👈 عربي</label>
@@ -192,9 +198,10 @@
                 <label><input type="radio" id="type-part" name="rev-type" onclick="toggleTypeInputs()"> 2. المراجعة التتابعية</label>
                 <span class="help-icon" onclick="showHelp('part')">❔</span>
                 <div id="part-inputs" class="hidden" style="width: 100%;">
-                    <input type="number" id="part-pages" min="1" value="1"> <label>صفحات</label>
-                    <div id="remaining-pages-info" style="margin: 5px 0; color: var(--dark); font-size: 14px;"></div>
-                    <button class="icon-btn btn-clear" onclick="resetPartialIndex()" style="width:100%; padding:10px; border-radius: 8px; margin-top: 5px;">إعادة البدء من الصفحة الأولى 🔄</button>
+                    <label>عدد الصفحات التتابعية في كل مرة:</label> <input type="number" id="part-pages" min="1" value="1">
+                    <div id="remaining-pages-info" style="margin: 5px 0; color: var(--dark); font-size: 14px; font-weight: bold;"></div>
+                    <div id="seq-cycle-info" style="margin: 5px 0; font-size: 13px; background: #fff; padding: 8px; border-radius: 6px; border: 1px dashed #ccc;"></div>
+                    <button class="icon-btn btn-clear" id="btn-reset-seq" onclick="resetPartialIndex()" style="width:100%; padding:10px; border-radius: 8px; margin-top: 5px;">إعادة البدء من الصفحة الأولى 🔄</button>
                 </div>
             </div>
             
@@ -214,7 +221,7 @@
                 <label><input type="radio" id="type-last-days" name="rev-type" onclick="toggleTypeInputs()"> 4. مراجعة كلمات الأيام الأخيرة</label>
                 <span class="help-icon" onclick="showHelp('days')">❔</span>
                 <div id="last-days-inputs" class="hidden" style="width: 100%;">
-                    <input type="number" id="last-days-count" min="1" value="3"> <label>أيام أخيرة</label>
+                    <label>عدد الأيام التي ستراجع كلماتها:</label> <input type="number" id="last-days-count" min="1" value="3">
                 </div>
             </div>
 
@@ -279,8 +286,9 @@
     let currentReviewType = 1;
 
     window.onload = function() {
+        applyGlobalModes();
+
         let sel = document.getElementById('review-level-select');
-        
         let allOpt = document.createElement('option');
         allOpt.value = "ALL_LEVELS";
         allOpt.text = "جميع المستويات";
@@ -302,34 +310,31 @@
         toggleTypeInputs();
     };
 
+    function applyGlobalModes() {
+        let isParent = localStorage.getItem('isParentMode') === 'true';
+        let banner = document.getElementById('parent-mode-banner');
+        if(banner) banner.style.display = isParent ? 'block' : 'none';
+
+        let resetSeqBtn = document.getElementById('btn-reset-seq');
+        if (resetSeqBtn) {
+            resetSeqBtn.disabled = !isParent;
+            if(!isParent) resetSeqBtn.title = "هذه الخاصية متاحة فقط في وضع ولي الأمر";
+            else resetSeqBtn.title = "";
+        }
+    }
+
     function toggleAdvancedReview() {
         document.getElementById('advanced-review-section').classList.toggle('hidden');
     }
 
     function showHelp(type) {
-        let title = "";
-        let desc = "";
+        let title = ""; let desc = "";
         switch(type) {
-            case 'all':
-                title = "المراجعة الشاملة";
-                desc = "تقوم بمراجعة جميع الكلمات التي قمت بحفظها منذ البداية وحتى الآن بشكل متسلسل. ممتازة للاختبار الشامل للذاكرة.";
-                break;
-            case 'part':
-                title = "المراجعة التتابعية";
-                desc = "تقوم بمراجعة عدد محدد من الصفحات بالترتيب. الميزة هنا أن النظام سيحفظ المكان الذي توقفت عنده ليُكمل منه في الجلسة القادمة مباشرة (سواء لمستوى واحد أو لجميع المستويات دمجاً).";
-                break;
-            case 'random':
-                title = "المراجعة العشوائية المتقدمة";
-                desc = "تختار عدد معين من الكلمات بشكل عشوائي. ممتازة لكسر الروتين واختبار قوة الحفظ العشوائي والمفاجئ.";
-                break;
-            case 'days':
-                title = "مراجعة كلمات الأيام الأخيرة";
-                desc = "تقوم بجلب ومراجعة الكلمات التي تم حفظها في آخر عدد من الأيام تحدده أنت (مثلاً الكلمات المحفوظة في آخر 3 أيام فقط).";
-                break;
-            case 'date':
-                title = "مراجعة كلمات فترة زمنية مختارة";
-                desc = "تتيح لك تحديد تاريخ بداية ونهاية، ليقوم النظام باختبار الطفل في الكلمات التي تم حفظها ضمن هذه الفترة الزمنية فقط.";
-                break;
+            case 'all': title = "المراجعة الشاملة"; desc = "تقوم بمراجعة جميع الكلمات التي قمت بحفظها منذ البداية وحتى الآن بشكل متسلسل. ممتازة للاختبار الشامل للذاكرة."; break;
+            case 'part': title = "المراجعة التتابعية"; desc = "تقوم بمراجعة عدد محدد من الصفحات بالترتيب. النظام سيحفظ المكان ويُكمل في الجلسة القادمة. والمميز هنا أنه سيقوم بتبديل العرض (عربي-إنجليزي) تلقائياً في كل دورة لتنشيط الذاكرة."; break;
+            case 'random': title = "المراجعة العشوائية المتقدمة"; desc = "تختار عدد معين من الكلمات بشكل عشوائي. ممتازة لكسر الروتين واختبار قوة الحفظ العشوائي والمفاجئ."; break;
+            case 'days': title = "مراجعة كلمات الأيام الأخيرة"; desc = "تقوم بجلب ومراجعة الكلمات التي تم حفظها في آخر عدد من الأيام تحدده أنت."; break;
+            case 'date': title = "مراجعة كلمات فترة زمنية مختارة"; desc = "تتيح لك تحديد تاريخ بداية ونهاية، ليقوم النظام باختبار الطفل في الكلمات التي تم حفظها ضمن هذه الفترة الزمنية فقط."; break;
         }
         document.getElementById('help-title').innerText = "❔ " + title;
         document.getElementById('help-desc').innerText = desc;
@@ -339,37 +344,34 @@
     function updateSeqInfo() {
         let lvl = document.getElementById('review-level-select').value;
         let remInfo = document.getElementById('remaining-pages-info');
+        let cycleInfo = document.getElementById('seq-cycle-info');
         if(!lvl) return;
         
         let startPage = 1;
-        if(lvl === "ALL_LEVELS") {
-            startPage = Math.floor((appProgress.globalPartialIndexFree || 0) / 10) + 1;
-        } else {
+        if(lvl === "ALL_LEVELS") { startPage = Math.floor((appProgress.globalPartialIndexFree || 0) / 10) + 1; } 
+        else {
             let lData = appProgress.levels[lvl];
-            if(lData) {
-                let idxKey = 'lastPartialIndexFree';
-                startPage = Math.floor((lData[idxKey] || 0) / 10) + 1;
-            }
+            if(lData) startPage = Math.floor((lData.lastPartialIndexFree || 0) / 10) + 1;
         }
         if(remInfo) remInfo.innerText = `وصلت سابقاً إلى صفحة: ${startPage}`;
+
+        let cycle = appProgress.seqCycleState || 'ar-en';
+        let cycleText = cycle === 'ar-en' ? 'عربي 👈 إنجليزي' : 'إنجليزي 👈 عربي';
+        if(cycleInfo) cycleInfo.innerHTML = `نوع العرض لهذه الدورة التتابعية هو: <strong style="color:var(--danger);">${cycleText}</strong>`;
     }
 
     function resetPartialIndex() {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
         let lvl = document.getElementById('review-level-select').value;
         if(!lvl) { alert("يرجى تحديد الخيار أولاً."); return; }
         
-        if (lvl === "ALL_LEVELS") {
-            appProgress.globalPartialIndexFree = 0;
-        } else {
-            let idxKey = 'lastPartialIndexFree';
-            if (appProgress.levels[lvl]) {
-                appProgress.levels[lvl][idxKey] = 0;
-            }
-        }
+        if (lvl === "ALL_LEVELS") { appProgress.globalPartialIndexFree = 0; } 
+        else { if (appProgress.levels[lvl]) appProgress.levels[lvl].lastPartialIndexFree = 0; }
         
+        appProgress.seqCycleState = 'ar-en';
         localStorage.setItem('appProgress', JSON.stringify(appProgress));
         updateSeqInfo();
-        alert("تم إرجاع العداد التتابعي إلى الصفحة الأولى بنجاح.");
+        alert("تم إرجاع العداد التتابعي إلى الصفحة الأولى وضبط العرض الافتراضي بنجاح.");
     }
 
     function toggleTypeInputs() {
@@ -383,53 +385,34 @@
         
         if(document.getElementById('type-last-pages').checked) {
             document.getElementById('last-pages-inputs').classList.remove('hidden');
-            
             let displayDiv = document.getElementById('last-mode-display');
             let lastMode = appProgress.lastViewModeType4;
             
-            if(lastMode === 'ar-en') {
-                displayDiv.innerHTML = ' <span style="color:var(--danger);">يُنصح اليوم باختيار  (إنجليزي 👈 عربي).</span>';
-            } else if(lastMode === 'en-ar') {
-                displayDiv.innerHTML = ' <span style="color:var(--danger);">يُنصح اليوم باختيار  (عربي 👈 إنجليزي).</span>';
-            } else {
-                displayDiv.innerHTML = '📌 <span style="color:var(--dark);">لم تقم باستخدام هذه المراجعة من قبل، اختر طريقة العرض المناسبة.</span>';
-            }
+            if(lastMode === 'ar-en') displayDiv.innerHTML = ' <span style="color:var(--danger);">يُنصح اليوم باختيار  (إنجليزي 👈 عربي).</span>';
+            else if(lastMode === 'en-ar') displayDiv.innerHTML = ' <span style="color:var(--danger);">يُنصح اليوم باختيار  (عربي 👈 إنجليزي).</span>';
+            else displayDiv.innerHTML = '📌 <span style="color:var(--dark);">لم تقم باستخدام هذه المراجعة من قبل، اختر طريقة العرض المناسبة.</span>';
         }
         
-        if(document.getElementById('type-part').checked) {
-            document.getElementById('part-inputs').classList.remove('hidden');
-        }
+        if(document.getElementById('type-part').checked) { document.getElementById('part-inputs').classList.remove('hidden'); updateSeqInfo(); }
         
         if(document.getElementById('type-random').checked) {
             document.getElementById('random-inputs').classList.remove('hidden');
             let rangeContainer = document.getElementById('random-page-range-container');
-            if (lvl === "ALL_LEVELS") {
-                if(rangeContainer) rangeContainer.classList.add('hidden');
-            } else {
-                if(rangeContainer) rangeContainer.classList.remove('hidden');
-            }
+            if (lvl === "ALL_LEVELS") { if(rangeContainer) rangeContainer.classList.add('hidden'); } 
+            else { if(rangeContainer) rangeContainer.classList.remove('hidden'); }
         }
         if(document.getElementById('type-last-days').checked) document.getElementById('last-days-inputs').classList.remove('hidden');
         if(document.getElementById('type-date-range').checked) document.getElementById('date-range-inputs').classList.remove('hidden');
 
-        // تحريك أزرار البدء ديناميكياً أسفل نوع المراجعة المحدد
         let checkedRadio = document.querySelector('input[name="rev-type"]:checked');
-        if (checkedRadio) {
-            let row = checkedRadio.closest('.rev-type-row');
-            if (row) {
-                row.appendChild(document.getElementById('main-action-btns'));
-            }
-        }
+        if (checkedRadio) { let row = checkedRadio.closest('.rev-type-row'); if (row) row.appendChild(document.getElementById('main-action-btns')); }
     }
 
     function startReviewSession() {
         let isGlobalReview = document.getElementById('type-last-pages').checked;
         selectedLevel = document.getElementById('review-level-select').value;
         
-        if(!isGlobalReview && !selectedLevel) { 
-            alert("لا توجد مستويات محفوظة للمراجعة."); 
-            return; 
-        }
+        if(!isGlobalReview && !selectedLevel) { alert("لا توجد مستويات محفوظة للمراجعة."); return; }
 
         testWordsChunks = [];
         currentChunkIdx = 0;
@@ -450,34 +433,21 @@
                     let db = allLevelsData[lvl] || [];
                     vWords.forEach(w => {
                         let dbWord = db.find(dbw => dbw.id == w.id);
-                        if(dbWord) {
-                            allGlobalValidWords.push({...dbWord, unixTime: w.unixTime || 0, gIdx: gIdx++});
-                        }
+                        if(dbWord) allGlobalValidWords.push({...dbWord, unixTime: w.unixTime || 0, gIdx: gIdx++});
                     });
                 }
             });
 
-            if(allGlobalValidWords.length === 0) {
-                alert("⚠️ لا توجد كلمات جديدة محفوظة في أي مستوى.");
-                return;
-            }
+            if(allGlobalValidWords.length === 0) { alert("⚠️ لا توجد كلمات جديدة محفوظة في أي مستوى."); return; }
 
-            allGlobalValidWords.sort((a, b) => {
-                if (a.unixTime !== b.unixTime) return a.unixTime - b.unixTime;
-                return a.gIdx - b.gIdx;
-            });
+            allGlobalValidWords.sort((a, b) => { if (a.unixTime !== b.unixTime) return a.unixTime - b.unixTime; return a.gIdx - b.gIdx; });
             
             let totalSavedPages = Math.ceil(allGlobalValidWords.length / 10);
-            if(reqPages > totalSavedPages) { 
-                alert("⚠️ خطأ: عدد الصفحات المطلوبة (" + reqPages + ") أكبر من إجمالي الصفحات المحفوظة في جميع المستويات (" + totalSavedPages + " صفحة)!"); 
-                return; 
-            }
+            if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة (" + reqPages + ") أكبر من إجمالي الصفحات المحفوظة (" + totalSavedPages + " صفحة)!"); return; }
             
             let startIdx = Math.max(0, allGlobalValidWords.length - (reqPages * 10));
             let sliced = allGlobalValidWords.slice(startIdx);
-            for(let i=0; i<sliced.length; i+=10) { 
-                testWordsChunks.push(sliced.slice(i, i+10)); 
-            }
+            for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
         } 
         else {
             if(document.getElementById('type-all').checked) {
@@ -488,10 +458,7 @@
                         if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
                             let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
                             let db = allLevelsData[lvl] || [];
-                            vWords.forEach(w => {
-                                let dbWord = db.find(dbw => dbw.id == w.id);
-                                if(dbWord) targetWords.push(dbWord);
-                            });
+                            vWords.forEach(w => { let dbWord = db.find(dbw => dbw.id == w.id); if(dbWord) targetWords.push(dbWord); });
                         }
                     });
                 } else {
@@ -516,35 +483,28 @@
                         if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
                             let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
                             let db = allLevelsData[lvl] || [];
-                            vWords.forEach(w => {
-                                let dbWord = db.find(dbw => dbw.id == w.id);
-                                if(dbWord) targetWords.push(dbWord);
-                            });
+                            vWords.forEach(w => { let dbWord = db.find(dbw => dbw.id == w.id); if(dbWord) targetWords.push(dbWord); });
                         }
                     });
-                    
                     if(targetWords.length === 0) { alert("⚠️ لا توجد كلمات محفوظة للمراجعة."); return; }
                     let totalSavedPages = Math.ceil(targetWords.length / 10);
                     if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من إجمالي المحفوظ (" + totalSavedPages + " صفحة)!"); return; }
-                    
                     startW = appProgress.globalPartialIndexFree || 0;
                     if(startW >= targetWords.length) startW = 0;
-                    
                 } else {
                     let lData = appProgress.levels[selectedLevel];
                     let fullDb = allLevelsData[selectedLevel] || [];
                     let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
                     let validIds = validSavedWords.map(w => w.id);
                     targetWords = fullDb.filter(w => validIds.includes(w.id));
-
                     if(targetWords.length === 0) { alert("⚠️ لا توجد كلمات محفوظة للمراجعة."); return; }
                     let totalSavedPages = Math.ceil(targetWords.length / 10);
                     if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من المحفوظة!"); return; }
-                    
-                    let idxKey = 'lastPartialIndexFree';
-                    startW = (lData[idxKey] || 0);
+                    startW = (lData.lastPartialIndexFree || 0);
                     if(startW >= targetWords.length) startW = 0; 
                 }
+
+                appProgress.currentActiveSeqCycle = appProgress.seqCycleState || 'ar-en';
 
                 let sliced = targetWords.slice(startW, startW + (reqPages * 10));
                 for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
@@ -559,10 +519,7 @@
                         if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
                             let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
                             let db = allLevelsData[lvl] || [];
-                            vWords.forEach(w => {
-                                let dbWord = db.find(dbw => dbw.id == w.id);
-                                if(dbWord) pool.push(dbWord);
-                            });
+                            vWords.forEach(w => { let dbWord = db.find(dbw => dbw.id == w.id); if(dbWord) pool.push(dbWord); });
                         }
                     });
                     if(pool.length === 0) { alert("⚠️ لا توجد كلمات محفوظة في جميع المستويات!"); return; }
@@ -573,7 +530,6 @@
                     let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
                     let validIds = validSavedWords.map(w => w.id);
                     let savedDbWords = fullDb.filter(w => validIds.includes(w.id));
-
                     let sP = parseInt(document.getElementById('rand-start').value) || 1;
                     let eP = parseInt(document.getElementById('rand-end').value) || 1;
 
@@ -598,10 +554,7 @@
                         if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
                             let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً" && w.unixTime && w.unixTime >= cutoff);
                             let db = allLevelsData[lvl] || [];
-                            vWords.forEach(w => {
-                                let dbWord = db.find(dbw => dbw.id == w.id);
-                                if(dbWord) targetWords.push(dbWord);
-                            });
+                            vWords.forEach(w => { let dbWord = db.find(dbw => dbw.id == w.id); if(dbWord) targetWords.push(dbWord); });
                         }
                     });
                 } else {
@@ -628,10 +581,7 @@
                         if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
                             let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً" && w.unixTime && w.unixTime >= dF && w.unixTime <= dT.getTime());
                             let db = allLevelsData[lvl] || [];
-                            vWords.forEach(w => {
-                                let dbWord = db.find(dbw => dbw.id == w.id);
-                                if(dbWord) targetWords.push(dbWord);
-                            });
+                            vWords.forEach(w => { let dbWord = db.find(dbw => dbw.id == w.id); if(dbWord) targetWords.push(dbWord); });
                         }
                     });
                 } else {
@@ -647,7 +597,6 @@
             }
         }
 
-        // حفظ الأرقام لتصبح قيماً افتراضية مستقبلاً
         appProgress.defaultLastPagesCount = parseInt(document.getElementById('last-pages-count').value) || 15;
         appProgress.defaultPartPages = parseInt(document.getElementById('part-pages').value) || 1;
         appProgress.defaultRandCount = parseInt(document.getElementById('rand-count').value) || 10;
@@ -661,27 +610,26 @@
 
     function renderTestPage() {
         document.getElementById('test-page-title').innerText = `الصفحة ${currentChunkIdx + 1} من أصل ${testWordsChunks.length}`;
-        
         const tbody = document.getElementById('test-table-body');
         tbody.innerHTML = "";
         
         let words = testWordsChunks[currentChunkIdx];
         let isArEn = document.getElementById('mode-ar-en').checked;
+        if(currentReviewType === 2) {
+            isArEn = (appProgress.currentActiveSeqCycle === 'ar-en');
+        }
                 
         words.forEach((w, i) => {
             let displayTxt = isArEn ? `الكلمة:👈 ${w.ar}` : `Word:👉 ${w.en}`;
             let displayEx = isArEn ? `المثال:👈 ${w.ar_ex}` : `Example:👉 ${w.ex_en}`;
-            
             let listenWordTarget = isArEn ? w.ar : w.en;
             let listenWordLang = isArEn ? 'ar-SA' : 'en-US';
             let listenExTarget = isArEn ? w.ar_ex : w.ex_en;
             let listenExLang = isArEn ? 'ar-SA' : 'en-US';
-
             let textAlign = isArEn ? 'right' : 'left';
             let textDirection = isArEn ? 'rtl' : 'ltr';
 
             let tr = document.createElement('tr');
-            
             let actionHtml = `
                 <div style="margin-bottom:10px;">
                     <button class="icon-btn btn-action" onclick="revealFreeAnswer(${i}, 'word', '${isArEn ? w.en : w.ar}', '${isArEn ? 'en-US' : 'ar-SA'}', '${w.pronounce}')" style="width:100%; padding:10px;">🔊 كشف الكلمة</button>
@@ -712,11 +660,8 @@
         document.getElementById('btn-finish').classList.add('hidden');
         document.getElementById('btn-clear-free').classList.remove('hidden');
 
-        if(currentChunkIdx < testWordsChunks.length - 1) {
-            document.getElementById('btn-next').classList.remove('hidden');
-        } else {
-            document.getElementById('btn-finish').classList.remove('hidden');
-        }
+        if(currentChunkIdx < testWordsChunks.length - 1) document.getElementById('btn-next').classList.remove('hidden');
+        else document.getElementById('btn-finish').classList.remove('hidden');
     }
 
     function playReviewAudio(txt, lang) {
@@ -729,17 +674,11 @@
     function revealFreeAnswer(idx, type, text, lang, pronounce) {
         playReviewAudio(text, lang);
         let box = document.getElementById(`free-ans-${type}-${idx}`);
-        if(type === 'word') {
-            box.innerHTML = `${text} <br><small style="color:var(--warning);">[ ${pronounce} ]</small>`;
-        } else {
-            box.innerHTML = `${text}`;
-        }
+        if(type === 'word') box.innerHTML = `${text} <br><small style="color:var(--warning);">[ ${pronounce} ]</small>`;
+        else box.innerHTML = `${text}`;
     }
 
-    function moveToNextTestPage() { 
-        currentChunkIdx++; 
-        renderTestPage(); 
-    }
+    function moveToNextTestPage() { currentChunkIdx++; renderTestPage(); }
 
     function finishSessionReport() {
         if (currentReviewType === 2) {
@@ -754,11 +693,9 @@
                         totalTargetLen += validSavedWords.length;
                     }
                 });
-                
                 let startW = appProgress.globalPartialIndexFree || 0;
                 let nextIndex = startW + (reqPages * 10);
                 if (nextIndex >= totalTargetLen) nextIndex = 0;
-                
                 appProgress.globalPartialIndexFree = nextIndex;
                 
             } else {
@@ -767,21 +704,18 @@
                 let nextIndex = (lData[idxKey] || 0) + (reqPages * 10);
                 let savedIds = lData.savedWords.filter(w => !w.isOld && w.isOld !== "true" && w.date !== "تم حفظها قديماً").map(w => w.id);
                 let savedDbWords = (allLevelsData[selectedLevel] || []).filter(w => savedIds.includes(w.id));
-                
                 if(nextIndex >= savedDbWords.length) nextIndex = 0;
                 lData[idxKey] = nextIndex; 
             }
             
+            appProgress.seqCycleState = (appProgress.seqCycleState === 'ar-en') ? 'en-ar' : 'ar-en';
             localStorage.setItem('appProgress', JSON.stringify(appProgress)); 
             updateSeqInfo();
         }
-
         window.location.href = "index.html?screen=dashboard";
     }
 
-    function returnToMenu() {
-        window.location.href = "index.html?screen=dashboard";
-    }
+    function returnToMenu() { window.location.href = "index.html?screen=dashboard"; }
 </script>
 </body>
 </html>

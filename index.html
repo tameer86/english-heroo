@@ -32,10 +32,13 @@
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
         .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
 
-        /* تنسيقات شاشة التفعيل */
         #activation-screen { background: #fff; padding: 30px; border-radius: 20px; width: 100%; }
         .serial-box { display: flex; justify-content: center; gap: 10px; margin: 20px 0; direction: ltr; }
         .serial-input { width: 150px !important; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; }
+
+        #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
+        .stat-card { background: #f8f9fc; border: 1px solid #e3e6f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: right; }
+        .stat-card h4 { margin: 0 0 10px 0; color: var(--primary); }
     </style>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
@@ -66,13 +69,14 @@
             return 'مستوى ' + code;
         }
 
-        // إنشاء معرف فريد للجهاز ليتم استخدامه في التفعيل (بديل الماك أدرس)
         if(!localStorage.getItem('device_uuid')) {
             localStorage.setItem('device_uuid', 'dev_' + Math.random().toString(36).substr(2, 9));
         }
     </script>
 </head>
 <body>
+
+<div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
 
 <div class="container">
     
@@ -133,6 +137,9 @@
                 <button class="dashboard-btn" style="background: #f6c23e;" onclick="window.location.href='game.html'">
                     <span>🎮</span> الألعاب
                 </button>
+                <button class="dashboard-btn" style="background: #e83e8c;" onclick="showReports()">
+                    <span>📊</span> التقارير
+                </button>
                 <button class="dashboard-btn" style="background: var(--warning);" onclick="showSettings()">
                     <span>⚙️</span> الإعدادات 
                 </button>
@@ -140,15 +147,18 @@
             <button style="background: var(--dark); margin-top: 20px; width: 60%;" onclick="goHome()">🔙 العودة للشاشة الرئيسية</button>
         </div>
 
+        <div id="reports-screen" class="hidden">
+            <h1>إحصائيات وتقارير الإنجاز 📊</h1>
+            <div id="reports-content"></div>
+            <button style="background: var(--dark); margin-top: 20px;" onclick="showDashboard()">🔙 العودة للوحة التحكم</button>
+        </div>
+
         <div id="about-screen" class="hidden">
             <h1>حول التطبيق ℹ️</h1>
             <p style="text-align: right; line-height: 1.6;">    النسخة :  1.8 V <br>المطور و المبرمج : المهندس تامر خطيب <br><br>الوصف: <br>هذا التطبيق هو نظام ذكي مصمم لمساعدتك على حفظ الكلمات والمصطلحات الإنجليزية الأساسية لكل مستوى بالترتيب، واختبار جودة نطقك بدقة، ومتابعة تقدمك التعليمي خطوة بخطوة بالنجوم والتقارير المتقدمة.<br>وهو يتكون من كلمات المنهاج الفلسطيني من الصف الأول حتى الصف الثاني عشر ، بالإضافة الى المستويات الستة المعتمدة من نظام  CEFR (الإطار الأوروبي المرجعي الموحد للغات)، وهو المقياس الأساسي لتحديد مستوى أي شخص في اللغات الأجنبية.</p>
-            
-            
             <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
         </div>
 
-        <!-- شاشة اتصل بنا الجديدة -->
         <div id="contact-screen" class="hidden">
             <h1>اتصل بنا 📞</h1>
             <div class="settings-field">
@@ -189,27 +199,39 @@
         <div id="settings-screen" class="hidden">
             <h1>الإعدادات العامة ⚙️</h1>
             
-            <div class="settings-field" style="background: #fff3cd; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba;">
-                <label style="color: #856404;">مفتاح Gemini API (للذكاء الاصطناعي):</label>
-                <input type="password" id="gemini-api-key" placeholder="أدخل المفتاح هنا للتفعيل (مثال: AIzaSy...)" onchange="saveSettings()">
-                <p style="font-size: 12px; color: #856404; margin-top: 5px; margin-bottom: 0;">يستخدم هذا المفتاح لتقييم النطق في الحفظ والمراجعة.</p>
-                <button style="background: var(--info); color: white; border: none; padding: 8px 15px; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;" onclick="window.open('https://aistudio.google.com/api-keys', '_blank')">🔑 الحصول على مفتاح Gemini API جديد</button>
+            <div style="background: var(--light); padding: 15px; border-radius: 12px; border: 2px solid #e3e6f0; margin-bottom: 20px;">
+                <input type="password" id="admin-password-global" placeholder="أدخل كلمة المرور (لولي الأمر)" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box; margin-bottom: 10px;">
+                <button id="btn-parent-login-global" style="background:var(--primary); margin: 0; width: 100%;" onclick="toggleParentModeGlobal()">تسجيل دخول كولي أمر</button>
             </div>
 
-            <div class="settings-field"><label>سرعة القراءة والصوت:</label><input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1" onchange="saveSettings()"></div>
+            <div class="settings-field"><label>سرعة القراءة والصوت:</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="voice-speed" min="0.1" max="3" step="0.1" value="1" oninput="updateSpeedVal(this.value)" onchange="saveSettings()" style="flex-grow: 1;">
+                    <span id="speed-val-display" style="font-weight: bold; color: var(--danger); min-width: 45px; text-align: left;">1.0x</span>
+                </div>
+            </div>
             <div class="settings-field"><label>جنس القارئ والصوت المتاح:</label><select id="voice-gender" onchange="saveSettings()"></select></div>
             <div class="settings-field">
                 <label>نص تجريبي لاختبار تنظيم القراءة وعلامات الترقيم:</label>
                 <textarea class="test-textarea" id="test-text" readonly>Hello my friend! Welcome to your smart app, where you can learn English perfectly.</textarea>
             </div>
-            <button style="background: var(--success);" onclick="testVoiceOutput()">🔊 تجربة الاستماع للنص</button>
-            <button style="background: var(--dark); margin-top: 10px;" onclick="showDashboard()">🔙 العودة للوحة التحكم</button>
+            <button id="btn-test-voice" style="background: var(--success);" onclick="testVoiceOutput()">🔊 تجربة الاستماع للنص</button>
+            
+            <div id="gemini-api-box" class="hidden" style="margin-top: 25px;">
+                <div class="settings-field" style="background: #fff3cd; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba;">
+                    <label style="color: #856404;">مفتاح Gemini API (للذكاء الاصطناعي):</label>
+                    <input type="password" id="gemini-api-key" placeholder="أدخل المفتاح هنا للتفعيل (مثال: AIzaSy...)" onchange="saveSettings()">
+                    <p style="font-size: 12px; color: #856404; margin-top: 5px; margin-bottom: 0;">يستخدم هذا المفتاح لتقييم النطق في الحفظ والمراجعة.</p>
+                    <button style="background: var(--info); color: white; border: none; padding: 8px 15px; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;" onclick="window.open('https://aistudio.google.com/api-keys', '_blank')">🔑 الحصول على مفتاح Gemini API جديد</button>
+                </div>
+            </div>
+
+            <button style="background: var(--dark); margin-top: 15px;" onclick="showDashboard()">🔙 العودة للوحة التحكم</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ================== نظام التفعيل ==================
     function checkAppActivation() {
         if (localStorage.getItem('app_is_activated') === 'true') {
             document.getElementById('activation-screen').classList.add('hidden');
@@ -233,17 +255,13 @@
         }
 
         try {
-            // جلب السيريالات من ملف JSON
             const response = await fetch('serials.json');
             const serials = await response.json();
-            
-            // البحث عن السيريال المدخل
             const isValid = serials.some(item => item.serial === serialInput);
 
             if (isValid) {
-                // تفعيل ناجح
                 localStorage.setItem('app_is_activated', 'true');
-                localStorage.setItem('app_serial_used', serialInput); // للحفظ كمرجع
+                localStorage.setItem('app_serial_used', serialInput);
                 alert('🎉 تم تفعيل البرنامج بنجاح! أهلاً بك.');
                 checkAppActivation();
             } else {
@@ -256,7 +274,6 @@
             errorMsg.style.display = 'block';
         }
     }
-    // ==================================================
 
     const availableKeys = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
 
@@ -270,21 +287,6 @@
 
     if(!localStorage.getItem('appProgress')) {
         localStorage.setItem('appProgress', JSON.stringify(getCleanProgress()));
-    } else {
-        let progress = JSON.parse(localStorage.getItem('appProgress'));
-        let needsUpdate = false;
-        for(let l in progress.levels) {
-            if(progress.levels[l].lastPartialIndex !== undefined) {
-                progress.levels[l].lastPartialIndexFree = progress.levels[l].lastPartialIndex;
-                progress.levels[l].lastPartialIndexTest = progress.levels[l].lastPartialIndex;
-                delete progress.levels[l].lastPartialIndex;
-                needsUpdate = true;
-            } else {
-                if (progress.levels[l].lastPartialIndexFree === undefined) { progress.levels[l].lastPartialIndexFree = 0; needsUpdate = true; }
-                if (progress.levels[l].lastPartialIndexTest === undefined) { progress.levels[l].lastPartialIndexTest = 0; needsUpdate = true; }
-            }
-        }
-        if(needsUpdate) localStorage.setItem('appProgress', JSON.stringify(progress));
     }
 
     if(!localStorage.getItem('audioSettings')) {
@@ -292,20 +294,57 @@
     }
 
     window.onload = function () {
-        checkAppActivation(); // فحص التفعيل أولاً
-        
+        checkAppActivation();
         if (localStorage.getItem('app_is_activated') === 'true') {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('screen') === 'dashboard') {
                 hideAllScreens();
                 document.getElementById('dashboard-screen').classList.remove('hidden');
             }
-
             loadVoiceOptions();
             if (window.speechSynthesis.onvoiceschanged !== undefined) { window.speechSynthesis.onvoiceschanged = loadVoiceOptions; }
             updateLevelStats();
+            applyGlobalModes();
         }
     };
+
+    function applyGlobalModes() {
+        let isParent = localStorage.getItem('isParentMode') === 'true';
+        let banner = document.getElementById('parent-mode-banner');
+        if(banner) banner.style.display = isParent ? 'block' : 'none';
+
+        let loginBtn = document.getElementById('btn-parent-login-global');
+        let passInput = document.getElementById('admin-password-global');
+        let apiBox = document.getElementById('gemini-api-box');
+
+        if (isParent) {
+            if(loginBtn) { loginBtn.innerText = 'تسجيل خروج من حساب ولي الأمر'; loginBtn.style.backgroundColor = 'var(--danger)'; }
+            if(passInput) passInput.style.display = 'none';
+            if(apiBox) apiBox.classList.remove('hidden');
+        } else {
+            if(loginBtn) { loginBtn.innerText = 'تسجيل دخول كولي أمر'; loginBtn.style.backgroundColor = 'var(--primary)'; }
+            if(passInput) { passInput.style.display = 'block'; passInput.value = ''; }
+            if(apiBox) apiBox.classList.add('hidden');
+        }
+    }
+
+    function toggleParentModeGlobal() {
+        let isParent = localStorage.getItem('isParentMode') === 'true';
+        if (isParent) {
+            localStorage.setItem('isParentMode', 'false');
+            alert('تم تسجيل الخروج من وضع ولي الأمر بنجاح.');
+            applyGlobalModes();
+        } else {
+            let pass = document.getElementById('admin-password-global').value;
+            if (pass === 'T@mer2023') {
+                localStorage.setItem('isParentMode', 'true');
+                alert('تم تفعيل وضع ولي الأمر بنجاح!');
+                applyGlobalModes();
+            } else {
+                alert('كلمة المرور غير صحيحة!');
+            }
+        }
+    }
 
     function updateLevelStats() {
         let progress = JSON.parse(localStorage.getItem('appProgress'));
@@ -348,24 +387,65 @@
     function goHome() { hideAllScreens(); document.getElementById('home-screen').classList.remove('hidden'); }
     function showAbout() { hideAllScreens(); document.getElementById('about-screen').classList.remove('hidden'); }
     function showContact() { hideAllScreens(); document.getElementById('contact-screen').classList.remove('hidden'); }
+    
+    function showReports() {
+        hideAllScreens();
+        document.getElementById('reports-screen').classList.remove('hidden');
+        let progress = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let totalSaved = 0;
+        let totalSystem = 0;
+        let completedLevels = [];
+        
+        for(let lvl in progress.levels) {
+            let saved = progress.levels[lvl].savedWords ? progress.levels[lvl].savedWords.length : 0;
+            let total = allLevelsData[lvl] ? allLevelsData[lvl].length : 0;
+            totalSaved += saved;
+            totalSystem += total;
+            if(saved >= total && total > 0) completedLevels.push(getLevelName(lvl));
+        }
+
+        let bankBalance = progress.bankBalance || 0;
+        let cumulativeScore = Math.floor(progress.cumulativeScore || 0);
+
+        document.getElementById('reports-content').innerHTML = `
+            <div class="stat-card">
+                <h4>📚 إحصائيات الحفظ العامة</h4>
+                <p>إجمالي الكلمات المحفوظة: <strong style="color:var(--success); font-size:18px;">${totalSaved}</strong> كلمة</p>
+                <p>الكلمات المتبقية في المنهاج: <strong style="color:var(--danger); font-size:18px;">${totalSystem - totalSaved}</strong> كلمة</p>
+            </div>
+            <div class="stat-card">
+                <h4>🏆 الإنجازات والمستويات</h4>
+                <p>المستويات المختومة بالكامل: <strong style="color:var(--info); font-size:16px;">${completedLevels.length > 0 ? completedLevels.join('، ') : 'لم يتم ختم أي مستوى بالكامل بعد.'}</strong></p>
+            </div>
+            <div class="stat-card">
+                <h4>💰 الرصيد والبنك</h4>
+                <p>النقاط الكلية المكتسبة: <strong style="color:var(--primary); font-size:18px;">${cumulativeScore}</strong> نقطة</p>
+                <p>الرصيد المالي المتاح: <strong style="color:var(--warning); font-size:18px;">${bankBalance}</strong> جنيه فلسطيني</p>
+            </div>
+        `;
+    }
+
     function showSettings() {
         hideAllScreens(); document.getElementById('settings-screen').classList.remove('hidden');
         let settings = JSON.parse(localStorage.getItem('audioSettings'));
         document.getElementById('voice-speed').value = settings.speed || 1;
+        updateSpeedVal(settings.speed || 1);
         document.getElementById('voice-gender').value = settings.voiceName || "";
         document.getElementById('gemini-api-key').value = settings.geminiApiKey || "";
+        applyGlobalModes();
     }
+    
     function hideAllScreens() { 
         document.getElementById('home-screen').classList.add('hidden'); 
         document.getElementById('dashboard-screen').classList.add('hidden'); 
         document.getElementById('about-screen').classList.add('hidden'); 
         document.getElementById('settings-screen').classList.add('hidden'); 
         document.getElementById('contact-screen').classList.add('hidden'); 
+        document.getElementById('reports-screen').classList.add('hidden'); 
     }
 
     function clearProgressData() { 
         if (confirm("تنبيه: سيتم مسح تقدمك والكلمات المحفوظة.\nيرجى تصدير بياناتك أولاً إذا أردت الاحتفاظ بها.\nهل أنت متأكد؟")) { 
-            // الاحتفاظ بحالة التفعيل عند مسح البيانات
             let isAct = localStorage.getItem('app_is_activated');
             let uuid = localStorage.getItem('device_uuid');
             localStorage.clear(); 
@@ -409,12 +489,52 @@
         const select = document.getElementById('voice-gender'); if(!select) return; select.innerHTML = "";
         let voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
         if(voices.length === 0) { select.innerHTML = "<option value=''>الصوت الافتراضي</option>"; return; }
+        
+        let customOptions = [];
+        let mUS = 0, mUK = 0, fUS = 0, fUK = 0;
+        
         voices.forEach(v => {
-            let opt = document.createElement('option');
-            let gender = (v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('hazel')) ? "أنثى" : "ذكر";
-            opt.text = `${v.name} (${gender})`; opt.value = v.name; select.appendChild(opt);
+            let name = v.name.toLowerCase();
+            let lang = v.lang.toLowerCase();
+            let isFemale = name.includes('zira') || name.includes('female') || name.includes('samantha') || name.includes('victoria') || name.includes('karen') || name.includes('hazel');
+            let isMale = name.includes('david') || name.includes('male') || name.includes('daniel') || name.includes('aaron') || name.includes('arthur');
+            if(!isFemale && !isMale) { if(name.includes('google') || name.includes('apple')) isFemale = true; else isMale = true; }
+            
+            let isUK = lang.includes('gb') || lang.includes('uk');
+            let isUS = lang.includes('us');
+
+            if (isMale) {
+                if(isUS && mUS < 2) { customOptions.push({voice: v, label: `ذكر - أمريكي (${mUS+1})`}); mUS++; }
+                else if(isUK && mUK < 1) { customOptions.push({voice: v, label: `ذكر - بريطاني`}); mUK++; }
+            } else if (isFemale) {
+                if(isUS && fUS < 2) { customOptions.push({voice: v, label: `أنثى - أمريكي (${fUS+1})`}); fUS++; }
+                else if(isUK && fUK < 1) { customOptions.push({voice: v, label: `أنثى - بريطاني`}); fUK++; }
+            }
         });
+
+        voices.forEach(v => {
+            if(customOptions.length < 6 && !customOptions.find(o => o.voice.name === v.name)) {
+                customOptions.push({voice: v, label: v.name});
+            }
+        });
+
+        customOptions.forEach(opt => {
+            let el = document.createElement('option');
+            el.text = opt.label;
+            el.value = opt.voice.name;
+            select.appendChild(el);
+        });
+
+        let saved = JSON.parse(localStorage.getItem('audioSettings'));
+        if(saved && saved.voiceName && Array.from(select.options).some(o => o.value === saved.voiceName)) {
+            select.value = saved.voiceName;
+        }
     }
+
+    function updateSpeedVal(val) {
+        document.getElementById('speed-val-display').innerText = parseFloat(val).toFixed(1) + 'x';
+    }
+
     function saveSettings() {
         localStorage.setItem('audioSettings', JSON.stringify({ 
             speed: parseFloat(document.getElementById('voice-speed').value), 
@@ -422,20 +542,41 @@
             geminiApiKey: document.getElementById('gemini-api-key').value
         }));
     }
+
+    let isPlayingAudio = false;
     function testVoiceOutput() {
+        let btn = document.getElementById('btn-test-voice');
+        if (isPlayingAudio) {
+            window.speechSynthesis.cancel();
+            isPlayingAudio = false;
+            btn.innerText = '🔊 تجربة الاستماع للنص';
+            btn.style.background = 'var(--success)';
+            return;
+        }
+
         let settings = JSON.parse(localStorage.getItem('audioSettings'));
         let ut = new SpeechSynthesisUtterance(document.getElementById('test-text').value);
         ut.lang = 'en-US'; ut.rate = settings.speed || 1;
         let v = window.speechSynthesis.getVoices().find(v => v.name === settings.voiceName);
-        if(v) ut.voice = v; window.speechSynthesis.speak(ut);
+        if(v) ut.voice = v;
+        
+        ut.onend = function() {
+            isPlayingAudio = false;
+            btn.innerText = '🔊 تجربة الاستماع للنص';
+            btn.style.background = 'var(--success)';
+        };
+
+        window.speechSynthesis.speak(ut);
+        isPlayingAudio = true;
+        btn.innerText = '⏹️ إيقاف الاستماع';
+        btn.style.background = 'var(--danger)';
     }
 
-    // ================== دوال قسم اتصل بنا ==================
     function checkFileSize(input) {
         if (input.files && input.files[0]) {
-            if (input.files[0].size > 10 * 1024 * 1024) { // 10 ميجابايت
+            if (input.files[0].size > 10 * 1024 * 1024) { 
                 alert("⚠️ عذراً، حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميجابايت).");
-                input.value = ""; // تفريغ الحقل
+                input.value = ""; 
             }
         }
     }
@@ -451,25 +592,17 @@
             alert("يرجى تعبئة جميع الحقول المطلوبة قبل الإرسال.");
             return;
         }
-
         let subject = encodeURIComponent("تطبيق الحفظ الذكي - طلب " + type);
         let body = encodeURIComponent("الاسم: " + name + "\nالإيميل: " + email + "\nالمدينة/البلد: " + loc + "\nنوع الطلب: " + type + "\n\nنص الرسالة:\n" + msg);
-        
-        // فتح تطبيق البريد المتاح في الجهاز لنقل البيانات فعلياً
         window.location.href = `mailto:hero.app.help@gmail.com?subject=${subject}&body=${body}`;
 
-        // إظهار رسالة النجاح وإغلاق النافذة (حسب المطلوب)
         setTimeout(() => {
             alert("✅ تم تجهيز وإرسال رسالتك بنجاح! شكراً لتواصلك معنا.");
-            
-            // تنظيف الحقول
             document.getElementById('contact-name').value = "";
             document.getElementById('contact-email').value = "";
             document.getElementById('contact-location').value = "";
             document.getElementById('contact-message').value = "";
             document.getElementById('contact-file').value = "";
-            
-            // العودة للصفحة الرئيسية (إغلاق نافذة الإرسال)
             goHome();
         }, 800);
     }
