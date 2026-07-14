@@ -88,6 +88,7 @@
     <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
     <script>
         function getLevelName(code) {
+            if(code === 'ALL_LEVELS') return 'جميع المستويات';
             if(code.startsWith('CLASS')) {
                 let num = code.replace('CLASS', '');
                 let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'};
@@ -151,10 +152,6 @@
         <div class="section-title">⚙️ أولاً: الإعدادات الأساسية</div>
         
         <div class="controls-row">
-            <div id="level-select-container">
-                <label>تحديد المستوى (للمراجعات المتقدمة):</label><br>
-                <select id="review-level-select" style="width:100%; max-width: 250px; margin-top: 8px;" onchange="updateSeqInfo()"></select>
-            </div>
             <div>
                 <label>طريقة العرض:</label>
                 <div style="margin-top: 8px;">
@@ -180,13 +177,18 @@
 
         <div id="advanced-review-section" class="hidden section-box" style="background: white;">
             <div class="section-title">أنواع المراجعات المتقدمة</div>
+
+            <div id="level-select-container" style="margin-bottom: 20px; background: var(--light); padding: 12px; border-radius: 8px; border: 1px dashed var(--primary);">
+                <label style="color: var(--primary);">تحديد المستوى المستهدف للمراجعة المتقدمة:</label><br>
+                <select id="review-level-select" style="width:100%; max-width: 250px; margin-top: 8px;" onchange="updateSeqInfo(); toggleTypeInputs();"></select>
+            </div>
             
             <div class="rev-type-row">
                 <label><input type="radio" id="type-all" name="rev-type" onclick="toggleTypeInputs()"> 1. المراجعة الشاملة</label>
                 <span class="help-icon" onclick="showHelp('all')">❔</span>
             </div>
             
-            <div class="rev-type-row">
+            <div class="rev-type-row" id="type-part-row">
                 <label><input type="radio" id="type-part" name="rev-type" onclick="toggleTypeInputs()"> 2. المراجعة التتابعية</label>
                 <span class="help-icon" onclick="showHelp('part')">❔</span>
                 <div id="part-inputs" class="hidden">
@@ -200,14 +202,16 @@
                 <label><input type="radio" id="type-random" name="rev-type" onclick="toggleTypeInputs()"> 3. المراجعة العشوائية المتقدمة</label>
                 <span class="help-icon" onclick="showHelp('random')">❔</span>
                 <div id="random-inputs" class="hidden">
-                    <label>من صفحة:</label> <input type="number" id="rand-start" min="1" value="1">
-                    <label>إلى صفحة:</label> <input type="number" id="rand-end" min="1" value="2">
-                    <label>عدد الكلمات:</label> <input type="number" id="rand-count" min="1" value="10">
+                    <span id="random-page-range-container">
+                        <label>من صفحة:</label> <input type="number" id="rand-start" min="1" value="1">
+                        <label>إلى صفحة:</label> <input type="number" id="rand-end" min="1" value="2">
+                    </span>
+                    <label>عدد الكلمات العشوائية المطلوبة:</label> <input type="number" id="rand-count" min="1" value="10">
                 </div>
             </div>
 
             <div class="rev-type-row">
-                <label><input type="radio" id="type-last-days" name="rev-type" onclick="toggleTypeInputs()"> 4. مراجعة حسب آخر الأيام</label>
+                <label><input type="radio" id="type-last-days" name="rev-type" onclick="toggleTypeInputs()"> 4. مراجعة كلمات الأيام الأخيرة</label>
                 <span class="help-icon" onclick="showHelp('days')">❔</span>
                 <div id="last-days-inputs" class="hidden">
                     <input type="number" id="last-days-count" min="1" value="3"> <label>أيام أخيرة</label>
@@ -215,11 +219,11 @@
             </div>
 
             <div class="rev-type-row">
-                <label><input type="radio" id="type-date-range" name="rev-type" onclick="toggleTypeInputs()"> 5. مراجعة فترة زمنية محددة</label>
+                <label><input type="radio" id="type-date-range" name="rev-type" onclick="toggleTypeInputs()"> 5. مراجعة كلمات فترة زمنية مختارة</label>
                 <span class="help-icon" onclick="showHelp('date')">❔</span>
                 <div id="date-range-inputs" class="hidden">
-                    <label>من:</label> <input type="date" id="rev-from-date">
-                    <label>إلى:</label> <input type="date" id="rev-to-date">
+                    <label>من تاريخ:</label> <input type="date" id="rev-from-date">
+                    <label>إلى تاريخ:</label> <input type="date" id="rev-to-date">
                 </div>
             </div>
         </div>
@@ -277,6 +281,12 @@
 
     window.onload = function() {
         let sel = document.getElementById('review-level-select');
+        
+        let allOpt = document.createElement('option');
+        allOpt.value = "ALL_LEVELS";
+        allOpt.text = "جميع المستويات";
+        sel.appendChild(allOpt);
+
         const orderedLevels = ["CLASS1", "CLASS2", "CLASS3", "CLASS4", "CLASS5", "CLASS6", "CLASS7", "CLASS8", "CLASS9", "CLASS10", "CLASS11", "CLASS12", "A1", "A2", "B1", "B2", "C1", "C2"];
         orderedLevels.forEach(l => {
             if(appProgress.levels[l] && appProgress.levels[l].savedWords && appProgress.levels[l].savedWords.length > 0) {
@@ -301,7 +311,7 @@
         switch(type) {
             case 'all':
                 title = "المراجعة الشاملة";
-                desc = "تقوم بمراجعة جميع الكلمات التي قمت بحفظها في هذا المستوى منذ البداية وحتى الآن بشكل متسلسل. ممتازة للاختبار الشامل للذاكرة.";
+                desc = "تقوم بمراجعة جميع الكلمات التي قمت بحفظها منذ البداية وحتى الآن بشكل متسلسل. ممتازة للاختبار الشامل للذاكرة.";
                 break;
             case 'part':
                 title = "المراجعة التتابعية";
@@ -309,14 +319,14 @@
                 break;
             case 'random':
                 title = "المراجعة العشوائية المتقدمة";
-                desc = "تختار عدد معين من الكلمات بشكل عشوائي ضمن نطاق صفحات تحدده أنت. ممتازة لكسر الروتين واختبار قوة الحفظ العشوائي والمفاجئ.";
+                desc = "تختار عدد معين من الكلمات بشكل عشوائي. ممتازة لكسر الروتين واختبار قوة الحفظ العشوائي والمفاجئ.";
                 break;
             case 'days':
-                title = "مراجعة حسب آخر الأيام";
+                title = "مراجعة كلمات الأيام الأخيرة";
                 desc = "تقوم بجلب ومراجعة الكلمات التي تم حفظها في آخر عدد من الأيام تحدده أنت (مثلاً الكلمات المحفوظة في آخر 3 أيام فقط).";
                 break;
             case 'date':
-                title = "مراجعة فترة زمنية محددة";
+                title = "مراجعة كلمات فترة زمنية مختارة";
                 desc = "تتيح لك تحديد تاريخ بداية ونهاية، ليقوم النظام باختبار الطفل في الكلمات التي تم حفظها ضمن هذه الفترة الزمنية فقط.";
                 break;
         }
@@ -327,17 +337,21 @@
 
     function updateSeqInfo() {
         let lvl = document.getElementById('review-level-select').value;
-        if(!lvl) return;
+        let remInfo = document.getElementById('remaining-pages-info');
+        if(!lvl || lvl === "ALL_LEVELS") {
+            if(remInfo) remInfo.innerText = "";
+            return;
+        }
         let lData = appProgress.levels[lvl];
         if(!lData) return;
         let idxKey = 'lastPartialIndexFree';
         let startPage = Math.floor((lData[idxKey] || 0) / 10) + 1;
-        document.getElementById('remaining-pages-info').innerText = `وصلت سابقاً إلى صفحة: ${startPage}`;
+        if(remInfo) remInfo.innerText = `وصلت سابقاً إلى صفحة: ${startPage}`;
     }
 
     function resetPartialIndex() {
         let lvl = document.getElementById('review-level-select').value;
-        if(!lvl) { alert("يرجى اختيار المستوى أولاً."); return; }
+        if(!lvl || lvl === "ALL_LEVELS") { alert("يرجى اختيار مستوى محدد أولاً."); return; }
         let idxKey = 'lastPartialIndexFree';
         appProgress.levels[lvl][idxKey] = 0;
         localStorage.setItem('appProgress', JSON.stringify(appProgress));
@@ -346,18 +360,26 @@
     }
 
     function toggleTypeInputs() {
+        let lvl = document.getElementById('review-level-select').value;
+        let partRow = document.getElementById('type-part-row');
+        
+        if (lvl === "ALL_LEVELS") {
+            if (partRow) partRow.classList.add('hidden');
+            if (document.getElementById('type-part').checked) {
+                document.getElementById('type-all').checked = true;
+            }
+        } else {
+            if (partRow) partRow.classList.remove('hidden');
+        }
+
         document.getElementById('part-inputs').classList.add('hidden');
         document.getElementById('random-inputs').classList.add('hidden');
         document.getElementById('last-days-inputs').classList.add('hidden');
         document.getElementById('date-range-inputs').classList.add('hidden');
         document.getElementById('last-pages-inputs').classList.add('hidden');
         
-        let levelContainer = document.getElementById('level-select-container');
-        
         if(document.getElementById('type-last-pages').checked) {
             document.getElementById('last-pages-inputs').classList.remove('hidden');
-            if(levelContainer) levelContainer.style.display = 'none'; // إخفاء تحديد المستوى في المراجعة الذكية
-            
             let displayDiv = document.getElementById('last-mode-display');
             let lastMode = appProgress.lastViewModeType4;
             
@@ -368,12 +390,21 @@
             } else {
                 displayDiv.innerHTML = '📌 <span style="color:var(--dark);">لم تقم باستخدام هذه المراجعة من قبل، اختر طريقة العرض المناسبة.</span>';
             }
-        } else {
-            if(levelContainer) levelContainer.style.display = 'block'; // إظهار تحديد المستوى للمراجعات المتقدمة
         }
         
-        if(document.getElementById('type-part').checked) document.getElementById('part-inputs').classList.remove('hidden');
-        if(document.getElementById('type-random').checked) document.getElementById('random-inputs').classList.remove('hidden');
+        if(document.getElementById('type-part').checked && lvl !== "ALL_LEVELS") {
+            document.getElementById('part-inputs').classList.remove('hidden');
+        }
+        
+        if(document.getElementById('type-random').checked) {
+            document.getElementById('random-inputs').classList.remove('hidden');
+            let rangeContainer = document.getElementById('random-page-range-container');
+            if (lvl === "ALL_LEVELS") {
+                if(rangeContainer) rangeContainer.classList.add('hidden');
+            } else {
+                if(rangeContainer) rangeContainer.classList.remove('hidden');
+            }
+        }
         if(document.getElementById('type-last-days').checked) document.getElementById('last-days-inputs').classList.remove('hidden');
         if(document.getElementById('type-date-range').checked) document.getElementById('date-range-inputs').classList.remove('hidden');
     }
@@ -391,6 +422,8 @@
         currentChunkIdx = 0;
         currentSessionLastPagesCount = null;
 
+        const orderedLevels = ["CLASS1", "CLASS2", "CLASS3", "CLASS4", "CLASS5", "CLASS6", "CLASS7", "CLASS8", "CLASS9", "CLASS10", "CLASS11", "CLASS12", "A1", "A2", "B1", "B2", "C1", "C2"];
+
         if (isGlobalReview) {
             currentReviewType = 4;
             appProgress.lastViewModeType4 = document.getElementById('mode-ar-en').checked ? 'ar-en' : 'en-ar';
@@ -399,11 +432,10 @@
             let reqPages = parseInt(document.getElementById('last-pages-count').value) || 15;
             let allGlobalValidWords = [];
             let gIdx = 0;
-            const orderedLevels = ["CLASS1", "CLASS2", "CLASS3", "CLASS4", "CLASS5", "CLASS6", "CLASS7", "CLASS8", "CLASS9", "CLASS10", "CLASS11", "CLASS12", "A1", "A2", "B1", "B2", "C1", "C2"];
             
             orderedLevels.forEach(lvl => {
                 if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
-                    let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.date !== "تم حفظها قديماً");
+                    let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
                     let db = allLevelsData[lvl] || [];
                     vWords.forEach(w => {
                         let dbWord = db.find(dbw => dbw.id == w.id);
@@ -421,7 +453,7 @@
 
             allGlobalValidWords.sort((a, b) => {
                 if (a.unixTime !== b.unixTime) return a.unixTime - b.unixTime;
-                return a.gIdx - b.gIdx; // لضمان ترتيب الكلمات المحفوظة بنفس اللحظة (نفس الصفحة)
+                return a.gIdx - b.gIdx;
             });
             
             let totalSavedPages = Math.ceil(allGlobalValidWords.length / 10);
@@ -439,21 +471,41 @@
             }
         } 
         else {
-            let lData = appProgress.levels[selectedLevel];
-            let fullDb = allLevelsData[selectedLevel] || [];
-            
-            let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.date !== "تم حفظها قديماً");
-            let validIds = validSavedWords.map(w => w.id);
-            let savedDbWords = fullDb.filter(w => validIds.includes(w.id));
-
-            if(savedDbWords.length === 0) { alert("⚠️ لا توجد كلمات جديدة محفوظة في هذا المستوى."); return; }
-
             if(document.getElementById('type-all').checked) {
                 currentReviewType = 1;
-                for(let i=0; i<savedDbWords.length; i+=10) { testWordsChunks.push(savedDbWords.slice(i, i+10)); }
+                let targetWords = [];
+                if (selectedLevel === "ALL_LEVELS") {
+                    orderedLevels.forEach(lvl => {
+                        if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
+                            let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                            let db = allLevelsData[lvl] || [];
+                            vWords.forEach(w => {
+                                let dbWord = db.find(dbw => dbw.id == w.id);
+                                if(dbWord) targetWords.push(dbWord);
+                            });
+                        }
+                    });
+                } else {
+                    let lData = appProgress.levels[selectedLevel];
+                    let fullDb = allLevelsData[selectedLevel] || [];
+                    let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                    let validIds = validSavedWords.map(w => w.id);
+                    targetWords = fullDb.filter(w => validIds.includes(w.id));
+                }
+
+                if(targetWords.length === 0) { alert("⚠️ لا توجد كلمات محفوظة للمراجعة الشاملة."); return; }
+                for(let i=0; i<targetWords.length; i+=10) { testWordsChunks.push(targetWords.slice(i, i+10)); }
             }
             else if(document.getElementById('type-part').checked) {
                 currentReviewType = 2;
+                if (selectedLevel === "ALL_LEVELS") { alert("⚠️ المراجعة التتابعية تتطلب اختيار مستوى محدد."); return; }
+                
+                let lData = appProgress.levels[selectedLevel];
+                let fullDb = allLevelsData[selectedLevel] || [];
+                let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                let validIds = validSavedWords.map(w => w.id);
+                let savedDbWords = fullDb.filter(w => validIds.includes(w.id));
+
                 let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
                 let totalSavedPages = Math.ceil(savedDbWords.length / 10);
                 if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من المحفوظة!"); return; }
@@ -467,14 +519,37 @@
             }
             else if(document.getElementById('type-random').checked) {
                 currentReviewType = 3;
-                let sP = parseInt(document.getElementById('rand-start').value) || 1;
-                let eP = parseInt(document.getElementById('rand-end').value) || 1;
                 let rW = parseInt(document.getElementById('rand-count').value) || 10;
+                let pool = [];
 
-                if(sP > eP) { alert("⚠️ خطأ: صفحة البداية أكبر من النهاية!"); return; }
-                let pool = savedDbWords.slice((sP-1)*10, eP*10);
-                if(pool.length === 0) { alert("⚠️ الفترة خارج المدى المحفوظ!"); return; }
-                if(rW > pool.length) { alert("⚠️ خطأ: الكلمات المطلوبة أكبر من المتوفرة في الفترة!"); return; }
+                if (selectedLevel === "ALL_LEVELS") {
+                    orderedLevels.forEach(lvl => {
+                        if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
+                            let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                            let db = allLevelsData[lvl] || [];
+                            vWords.forEach(w => {
+                                let dbWord = db.find(dbw => dbw.id == w.id);
+                                if(dbWord) pool.push(dbWord);
+                            });
+                        }
+                    });
+                    if(pool.length === 0) { alert("⚠️ لا توجد كلمات محفوظة في جميع المستويات!"); return; }
+                    if(rW > pool.length) { alert("⚠️ خطأ: الكلمات المطلوبة أكبر من المتوفرة كلياً (" + pool.length + ")!"); return; }
+                } else {
+                    let lData = appProgress.levels[selectedLevel];
+                    let fullDb = allLevelsData[selectedLevel] || [];
+                    let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                    let validIds = validSavedWords.map(w => w.id);
+                    let savedDbWords = fullDb.filter(w => validIds.includes(w.id));
+
+                    let sP = parseInt(document.getElementById('rand-start').value) || 1;
+                    let eP = parseInt(document.getElementById('rand-end').value) || 1;
+
+                    if(sP > eP) { alert("⚠️ خطأ: صفحة البداية أكبر من النهاية!"); return; }
+                    pool = savedDbWords.slice((sP-1)*10, eP*10);
+                    if(pool.length === 0) { alert("⚠️ الفترة خارج المدى المحفوظ!"); return; }
+                    if(rW > pool.length) { alert("⚠️ خطأ: الكلمات المطلوبة أكبر من المتوفرة في الفترة!"); return; }
+                }
                 
                 pool.sort(() => 0.5 - Math.random());
                 let sliced = pool.slice(0, rW);
@@ -484,8 +559,26 @@
                 currentReviewType = 5;
                 let days = parseInt(document.getElementById('last-days-count').value) || 1;
                 let cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
-                let timeFiltered = validSavedWords.filter(w => w.unixTime && w.unixTime >= cutoff).map(w => w.id);
-                let targetWords = fullDb.filter(w => timeFiltered.includes(w.id));
+                let targetWords = [];
+
+                if (selectedLevel === "ALL_LEVELS") {
+                    orderedLevels.forEach(lvl => {
+                        if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
+                            let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً" && w.unixTime && w.unixTime >= cutoff);
+                            let db = allLevelsData[lvl] || [];
+                            vWords.forEach(w => {
+                                let dbWord = db.find(dbw => dbw.id == w.id);
+                                if(dbWord) targetWords.push(dbWord);
+                            });
+                        }
+                    });
+                } else {
+                    let lData = appProgress.levels[selectedLevel];
+                    let fullDb = allLevelsData[selectedLevel] || [];
+                    let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                    let timeFiltered = validSavedWords.filter(w => w.unixTime && w.unixTime >= cutoff).map(w => w.id);
+                    targetWords = fullDb.filter(w => timeFiltered.includes(w.id));
+                }
                 
                 if(targetWords.length === 0) { alert("⚠️ لم يتم حفظ أي كلمات جديدة في آخر " + days + " أيام."); return; }
                 for(let i=0; i<targetWords.length; i+=10) { testWordsChunks.push(targetWords.slice(i, i+10)); }
@@ -496,9 +589,26 @@
                 let dT = new Date(document.getElementById('rev-to-date').value);
                 if(isNaN(dF) || isNaN(dT.getTime())) { alert("⚠️ يرجى تحديد فترة زمنية صحيحة!"); return; }
                 dT.setHours(23,59,59,999);
-                
-                let timeFiltered = validSavedWords.filter(w => w.unixTime && w.unixTime >= dF && w.unixTime <= dT.getTime()).map(w => w.id);
-                let targetWords = fullDb.filter(w => timeFiltered.includes(w.id));
+                let targetWords = [];
+
+                if (selectedLevel === "ALL_LEVELS") {
+                    orderedLevels.forEach(lvl => {
+                        if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
+                            let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً" && w.unixTime && w.unixTime >= dF && w.unixTime <= dT.getTime());
+                            let db = allLevelsData[lvl] || [];
+                            vWords.forEach(w => {
+                                let dbWord = db.find(dbw => dbw.id == w.id);
+                                if(dbWord) targetWords.push(dbWord);
+                            });
+                        }
+                    });
+                } else {
+                    let lData = appProgress.levels[selectedLevel];
+                    let fullDb = allLevelsData[selectedLevel] || [];
+                    let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                    let timeFiltered = validSavedWords.filter(w => w.unixTime && w.unixTime >= dF && w.unixTime <= dT.getTime()).map(w => w.id);
+                    targetWords = fullDb.filter(w => timeFiltered.includes(w.id));
+                }
                 
                 if(targetWords.length === 0) { alert("⚠️ لا توجد كلمات محفوظة في هذه الفترة الزمنية."); return; }
                 for(let i=0; i<targetWords.length; i+=10) { testWordsChunks.push(targetWords.slice(i, i+10)); }
