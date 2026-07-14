@@ -192,7 +192,7 @@
                 </div>
             </div>
 
-            <div class="admin-row" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
+            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
                 <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">🎁 جوائز المراحل الإضافية</h4>
                 <select id="stage-bonus-select" class="parent-only-inputs">
                     <option value="1">مرحلة 1: الحفاضة الفولاذية</option>
@@ -208,11 +208,7 @@
                 <button class="btn-admin-action parent-only-btn" style="background:var(--warning); color:#000;" onclick="showBonusReport()">📊 تقرير جوائز المراحل</button>
                 <div id="bonus-report-box" style="display:none; text-align:right; font-size:14px; background:#f1f1f1; padding:10px; border-radius:5px; margin-top:10px; max-height:150px; overflow-y:auto; font-weight:bold; color:var(--dark);"></div>
             </div>
-
-            <div style="margin-top:25px; padding-top:15px; border-top:2px solid #eee;">
-                <input type="password" id="admin-password" placeholder="أدخل كلمة المرور (لولي الأمر)" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box;">
-                <button class="btn-admin-action" id="btn-parent-login" style="background:var(--primary)" onclick="toggleParentMode()">تسجيل دخول كولي أمر</button>
-            </div>
+            
         </div>
     </div>
 
@@ -354,37 +350,8 @@
         updateParentModeUI();
     }
 
-    function toggleParentMode() {
-        let isParent = localStorage.getItem('isParentMode') === 'true';
-        if (isParent) {
-            localStorage.setItem('isParentMode', 'false');
-            updateParentModeUI();
-        } else {
-            let pass = document.getElementById('admin-password').value;
-            if (pass === 'T@mer2023') {
-                localStorage.setItem('isParentMode', 'true');
-                document.getElementById('admin-password').value = '';
-                updateParentModeUI();
-            } else {
-                alert('كلمة المرور غير صحيحة!');
-            }
-        }
-    }
-
     function updateParentModeUI() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
-        
-        let loginBtn = document.getElementById('btn-parent-login');
-        let passInput = document.getElementById('admin-password');
-        if (isParent) {
-            loginBtn.innerText = 'تسجيل خروج من حساب ولي الأمر';
-            loginBtn.style.backgroundColor = 'var(--danger)';
-            if(passInput) passInput.style.display = 'none';
-        } else {
-            loginBtn.innerText = 'تسجيل دخول كولي أمر';
-            loginBtn.style.backgroundColor = 'var(--primary)';
-            if(passInput) passInput.style.display = 'block';
-        }
 
         document.querySelectorAll('.parent-only-inputs').forEach(el => {
             if(el.tagName === 'INPUT' || el.tagName === 'SELECT') {
@@ -421,7 +388,6 @@
         }
     }
 
-    // --- نظام التقارير الشامل ---
     function openReportsModal() {
         document.getElementById('main-report-type').value = 'points';
         toggleReportInputs();
@@ -463,13 +429,9 @@
 
     function generateSelectedReport() {
         let type = document.getElementById('main-report-type').value;
-        if (type === 'points') {
-            generatePointsReport();
-        } else if (type === 'progress') {
-            generateProgressReport();
-        } else if (type === 'performance') {
-            generatePerformanceReport();
-        }
+        if (type === 'points') generatePointsReport();
+        else if (type === 'progress') generateProgressReport();
+        else if (type === 'performance') generatePerformanceReport();
     }
 
     function generatePointsReport() {
@@ -881,7 +843,6 @@
         box.style.display = 'block';
     }
     
-    // --- دوال إضافة وخصم النقاط (لولي الأمر) ---
     function addManualPoints() {
         let pts = parseInt(document.getElementById('manual-points-val').value);
         if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للمكافأة!"); return; }
@@ -893,7 +854,6 @@
         document.getElementById('manual-points-val').value = '';
         alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة للطفل! 🎉`);
         
-        // التحقق من فتح أوسمة أو مراحل جديدة بعد الإضافة
         checkNewFameAchievements();
         updateBankUI();
         if(document.getElementById('fame-modal').style.display === 'flex') {
@@ -908,13 +868,12 @@
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         let currentScore = Math.floor(appProg.cumulativeScore || 0);
         
-        if(pts > currentScore) pts = currentScore; // لا تجعل النقاط تحت الصفر
+        if(pts > currentScore) pts = currentScore; 
         appProg.cumulativeScore -= pts;
         let newScore = appProg.cumulativeScore;
         
         let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
         
-        // سحب الأوسمة التي لم يعد يستحقها
         let newNotifiedBadges = [];
         let badgesValueLost = 0;
         let absoluteBadgeIndex = 1;
@@ -923,9 +882,9 @@
             stage.badges.forEach(badge => {
                 if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) {
                     if(newScore >= badge.req) {
-                        newNotifiedBadges.push(badge.id); // يستحقها
+                        newNotifiedBadges.push(badge.id);
                     } else {
-                        badgesValueLost += absoluteBadgeIndex; // تم سحبها
+                        badgesValueLost += absoluteBadgeIndex; 
                     }
                 }
                 absoluteBadgeIndex++;
@@ -933,25 +892,23 @@
         });
         appProg.notifiedBadges = newNotifiedBadges;
 
-        // سحب المراحل التي لم يعد يستحقها
         let newClaimedStages = [];
         let stagesValueLost = 0;
         fameStages.forEach(stage => {
             if(appProg.claimedStagesFame && appProg.claimedStagesFame.includes(stage.num)) {
                 if(newScore >= stage.end) {
-                    newClaimedStages.push(stage.num); // يستحقها
+                    newClaimedStages.push(stage.num); 
                 } else {
                     let baseReward = 15 * stage.num * stage.num;
                     let bonusReward = parseFloat(stageBonuses[stage.num]) || 0;
-                    stagesValueLost += (baseReward + bonusReward); // تم سحبها
+                    stagesValueLost += (baseReward + bonusReward); 
                 }
             }
         });
         appProg.claimedStagesFame = newClaimedStages;
 
-        // خصم المبالغ من البنك
         let totalLostMoney = badgesValueLost + stagesValueLost;
-        appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; // قد يصبح بالسالب وهذا مطلوب
+        appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; 
         
         localStorage.setItem('appProgress', JSON.stringify(appProg));
         document.getElementById('manual-points-val').value = '';
@@ -967,7 +924,6 @@
             renderHallOfFame();
         }
     }
-    // ---------------------------------------------
 
     let wheelAngle = 0, isSpinning = false, reqAnim, chosenPrize = 0;
 
