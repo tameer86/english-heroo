@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة المراجعة والاختبارات الذكية</title>
-		<script>
+	<script>
     (function checkActivation() {
         if (!localStorage.getItem('app_is_activated')) {
             alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
@@ -12,7 +12,6 @@
         }
     })();
 </script>
-
     <style>
         :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; --purple: #8540f5; }
         body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; }
@@ -452,8 +451,10 @@
         let words = testWordsChunks[currentChunkIdx];
         let isArEn = document.getElementById('mode-ar-en').checked;
         currentAnswers = [];
-
-       words.forEach((w, i) => {
+		
+		
+                
+  words.forEach((w, i) => {
     currentAnswers.push({ wordId: w.id, targetWord: isArEn ? w.en : w.ar, targetEx: isArEn ? w.ex_en : w.ar_ex, typedWord: "", typedEx: "" });
     
     let displayTxt = isArEn ? `الكلمة:👈 ${w.ar}` : `Word:👉 ${w.en}`;
@@ -464,7 +465,7 @@
     let listenExTarget = isArEn ? w.ar_ex : w.ex_en;
     let listenExLang = isArEn ? 'ar-SA' : 'en-US';
 
-    // المتغيرات الجديدة للتحكم في المحاذاة والاتجاه
+    // المتغيرات للتحكم في المحاذاة والاتجاه بناءً على اللغة
     let textAlign = isArEn ? 'right' : 'left';
     let textDirection = isArEn ? 'rtl' : 'ltr';
 
@@ -502,14 +503,18 @@
             <button class="icon-btn btn-youglish" onclick="openYouGlish('${w.en}')">📺 YG</button><br>
             <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenExTarget}', '${listenExLang}')">🔊 مثال</button>
         </td>
-        <td style="text-align:${textAlign}; direction:${textDirection}; font-weight:bold;">
-            <div style="color:var(--dark); font-size:16px;">• ${displayTxt}</div>
-            <div style="margin-top:10px; color:#7f8c8d; font-size:14px;">• ${displayEx}</div>
+        <td style="direction:${textDirection} !important; font-weight:bold;">
+            <div style="text-align:${textAlign} !important; color:var(--dark); font-size:16px;">• ${displayTxt}</div>
+            <div style="text-align:${textAlign} !important; margin-top:10px; color:#7f8c8d; font-size:14px;">• ${displayEx}</div>
         </td>
         <td class="feedback-cell">${actionHtml}</td>
     `;
     tbody.appendChild(tr);
 });
+
+
+
+
 
         document.getElementById('btn-analyze').classList.add('hidden');
         document.getElementById('btn-retry').classList.add('hidden');
