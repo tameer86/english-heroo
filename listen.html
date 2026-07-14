@@ -31,11 +31,21 @@
         .level-selector select { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid var(--primary); cursor: pointer; font-family: inherit; min-width: 200px; font-weight: bold;}
         #stages-screen { display: block; }
         .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
+        
         .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
-        
+
+        /* تنسيق المراحل النارية - آخر 20 مرحلة */
+        .hot-stage { background: linear-gradient(45deg, #e74a3b, #f6c23e) !important; animation: pulseHot 1.5s infinite; border: 2px solid #fff;}
+        @keyframes pulseHot { 
+            0% {box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7);} 
+            70% {box-shadow: 0 0 0 10px rgba(231, 74, 59, 0);} 
+            100% {box-shadow: 0 0 0 0 rgba(231, 74, 59, 0);} 
+        }
+        .hot-badge { font-size:12px; color:#ffeb3b; background:rgba(0,0,0,0.5); padding:2px 5px; border-radius:4px; margin-right: 5px; }
+
         .settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
         .settings-content { background: #fff; width: 95%; max-width: 550px; padding: 25px; border-radius: 15px; text-align: right; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .btn-close-modal { position: absolute; top: 15px; left: 15px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; }
@@ -77,7 +87,7 @@
 
     <div class="header-stats">
         <div class="level-selector">
-            <label for="level-select">اختر المستوى المكتمل للعب: </label>
+            <label for="level-select">اختر المستوى للعب: </label>
             <select id="level-select" onchange="onLevelChange()"></select>
         </div>
         <div class="left-header-group">
@@ -171,6 +181,12 @@
     </div>
 
 <script>
+    const LEVEL_ORDER = [
+        'CLASS1', 'CLASS2', 'CLASS3', 'CLASS4', 'CLASS5', 'CLASS6',
+        'CLASS7', 'CLASS8', 'CLASS9', 'CLASS10', 'CLASS11', 'CLASS12',
+        'A1', 'A2', 'B1', 'B2', 'C1', 'C2'
+    ];
+
     const allLevelsData = {
         "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
         "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
@@ -184,7 +200,11 @@
     };
 
     function getLevelName(code) {
-        if(code.startsWith('CLASS')) { let num = code.replace('CLASS', ''); let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'}; return 'الصف ' + (ordinals[num] || num); }
+        if(code.startsWith('CLASS')) { 
+            let num = code.replace('CLASS', ''); 
+            let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'}; 
+            return 'الصف ' + (ordinals[num] || num); 
+        }
         return 'مستوى ' + code;
     }
 
@@ -251,21 +271,36 @@
         const selectElement = document.getElementById('level-select');
         selectElement.innerHTML = ''; 
         let hasCompletedLevels = false;
-        for(let lvl in appProgress.levels) {
+        
+        let availableLevels = Object.keys(appProgress.levels).sort((a, b) => {
+            let idxA = LEVEL_ORDER.indexOf(a);
+            let idxB = LEVEL_ORDER.indexOf(b);
+            return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+        });
+
+        availableLevels.forEach(lvl => {
             let lData = appProgress.levels[lvl];
             let db = allLevelsData[lvl] || [];
-            let isLevelFinished = (db.length > 0) && (lData.mainIndex >= db.length) && (!lData.activeList || lData.activeList.length === 0) && (lData.savedWords && lData.savedWords.length > 0);
+            let isLevelFinished = lData.savedWords && lData.savedWords.length > 0;
+            
             if (isLevelFinished) {
-                let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl);
-                selectElement.appendChild(option); hasCompletedLevels = true;
+                let option = document.createElement('option'); 
+                option.value = lvl; 
+                option.textContent = getLevelName(lvl);
+                selectElement.appendChild(option); 
+                hasCompletedLevels = true;
             }
-        }
+        });
+        
         if (!hasCompletedLevels) {
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
             document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
-            selectElement.disabled = true; document.querySelector('.top-left-controls button:nth-child(2)').style.display = 'none'; return;
+            selectElement.disabled = true; 
+            return;
         }
-        currentLevel = selectElement.value; loadGameData(); loadSettingsUI();
+        currentLevel = selectElement.value; 
+        loadGameData(); 
+        loadSettingsUI();
     }
 
     function onLevelChange() { currentLevel = document.getElementById('level-select').value; loadGameData(); loadSettingsUI(); }
@@ -372,24 +407,64 @@
     }
 
     function loadGameData() {
-        wordsData = allLevelsData[currentLevel] || []; if(wordsData.length === 0) return;
+        let savedWordsCount = appProgress.levels[currentLevel] && appProgress.levels[currentLevel].savedWords ? appProgress.levels[currentLevel].savedWords.length : 0;
+        wordsData = (allLevelsData[currentLevel] || []).slice(0, savedWordsCount);
+        if(wordsData.length === 0) return;
         totalStages = Math.ceil(wordsData.length / WORDS_PER_STAGE);
         if(!gameProgress[currentLevel]) { gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } }; }
         renderStages();
     }
 
+    function getHotStages() {
+        let allUnlockedStages = [];
+        let availableLevels = Object.keys(appProgress.levels).sort((a, b) => {
+            let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b);
+            return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+        });
+        availableLevels.forEach(lvl => {
+            let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0;
+            let tStages = Math.ceil(savedCount / 10);
+            for(let s=1; s<=tStages; s++) {
+                allUnlockedStages.push({level: lvl, stage: s});
+            }
+        });
+        return allUnlockedStages.slice(-20);
+    }
+
     function renderStages() {
-        const container = document.getElementById('stages-container'); container.innerHTML = '';
+        const container = document.getElementById('stages-container'); 
+        container.innerHTML = '';
         let levelData = gameProgress[currentLevel];
+        let hotStages = getHotStages();
+
         for(let i = 1; i <= totalStages; i++) {
-            let btn = document.createElement('button'); btn.className = 'stage-btn';
-            let isUnlocked = levelData[i] && levelData[i].unlocked; if(i === 1) isUnlocked = true; 
-            if(!isUnlocked) { btn.classList.add('locked'); btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`; } 
-            else {
-                let starsCount = levelData[i]?.stars || 0; let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';
+            let btn = document.createElement('button'); 
+            btn.className = 'stage-btn';
+            
+            let isUnlocked = levelData[i] && levelData[i].unlocked; 
+            if(i === 1) isUnlocked = true; 
+            
+            let isHot = hotStages.some(h => h.level === currentLevel && h.stage === i);
+
+            if(!isUnlocked) { 
+                btn.classList.add('locked'); 
+                btn.innerHTML = `مرحلة ${i} 🔒<br><span class="stage-stars" style="color:#94a3b8;">☆☆☆☆☆</span>`; 
+            } else {
+                let starsCount = levelData[i]?.stars || 0; 
+                let timeSpent = levelData[i]?.time ? ` | ${levelData[i].time}ث` : '';
                 let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
-                btn.innerHTML = `مرحلة ${i} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
-                btn.onclick = () => startGame(i);
+                
+                if(isHot) {
+                    btn.classList.add('hot-stage');
+                    btn.innerHTML = `مرحلة ${i} <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                } else {
+                    btn.innerHTML = `مرحلة ${i} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                }
+                
+                btn.onclick = () => {
+                    window.currentStageIsHot = isHot;
+                    startGame(i);
+                };
             }
             container.appendChild(btn);
         }
@@ -462,17 +537,16 @@
         let t = getLevelTimes(currentLevel); let starPrice = t.starPrice !== undefined ? t.starPrice : 5;
 
         if(stars > previousStars) {
-            pointsGained = (stars - previousStars) * starPrice * (window.currentEventMultiplier || 1);
+            let hotMult = window.currentStageIsHot ? 1.5 : 1;
+            pointsGained = Math.round((stars - previousStars) * starPrice * (window.currentEventMultiplier || 1) * hotMult);
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + pointsGained;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
             levelData[currentStage] = { unlocked: true, stars: stars, time: time };
             
-            // --- كود التقارير: إضافة سجل الحصول على النقاط ---
             let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
             pointsHistory.push({ time: Date.now(), game: 'listen', points: pointsGained });
             localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
-            // --------------------------------------------------
             
         } else if (!levelData[currentStage]) { levelData[currentStage] = { unlocked: true, stars: stars, time: time }; }
 

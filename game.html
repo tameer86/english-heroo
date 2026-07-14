@@ -27,7 +27,7 @@
         .game-btn { color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block; font-weight: bold; width: 80%; max-width: 400px; }
         .game-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-        .top-icons { position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 50; }
+        .top-icons { position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 50; flex-wrap: wrap;}
         .btn-top-action { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         .btn-top-action:hover { transform: scale(1.2); }
 
@@ -65,7 +65,7 @@
         .progress-bar-container { width: 100%; height: 12px; background: #1a252f; border-radius: 6px; margin: 15px 0; overflow: hidden; position: relative; border: 1px solid #455a64;}
         .progress-fill { height: 100%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.5s ease; width: 0%;}
         .badges-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 15px; clear: both;}
-        .badge-item { width: 90px; text-align: center; position: relative; }
+        .badge-item { width: 90px; text-align: center; position: relative; cursor: help; }
         .badge-img-wrapper { position: relative; width: 70px; height: 70px; margin: 0 auto; }
         .badge-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); transition: all 0.3s;}
         .badge-title { font-size: 11px; font-weight: bold; margin-top: 5px; color: #ecf0f1; line-height: 1.2; }
@@ -110,6 +110,7 @@
         <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
         <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
         <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
+        <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
     </div>
 
     <h1> مرحباً بك في قسم الألعاب </h1>
@@ -123,7 +124,14 @@
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
     </div>
 
-    <!-- نافذة التقارير الشاملة -->
+    <div id="news-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
+            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📰 أخبار وتحديثات اللعبة</h3>
+            <div id="news-content" style="text-align: right; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; min-height: 100px; max-height: 350px; overflow-y: auto; line-height: 1.6; white-space: pre-wrap; font-weight:bold; color:var(--dark);">جاري التحميل...</div>
+        </div>
+    </div>
+
     <div id="reports-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('reports-modal')">✖</button>
@@ -138,7 +146,6 @@
                 </select>
             </div>
 
-            <!-- خيارات تقرير النقاط (يظهر فقط عند اختياره) -->
             <div id="time-selectors" class="report-selectors">
                 <select id="report-type" onchange="updateReportRangeOptions()">
                     <option value="hours">في آخر عدد ساعات</option>
@@ -155,7 +162,6 @@
         </div>
     </div>
 
-    <!-- نافذة الإعدادات الإدارية -->
     <div id="admin-modal" class="custom-modal">
         <div class="modal-content-box" style="background: white;">
             <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
@@ -187,7 +193,7 @@
                     <option value="6">مرحلة 6: السايبورغ اللغوي</option>
                     <option value="7">مرحلة 7: حاكم مجرة الأنجلو سنفورية</option>
                 </select>
-                <input type="number" id="stage-bonus-val" class="parent-only-inputs" placeholder="المبلغ المضاف (جنيه)">
+                <input type="number" id="stage-bonus-val" class="parent-only-inputs" placeholder="المبلغ المضاف (جنيه فلسطيني)">
                 <button class="btn-admin-action parent-only-btn" style="background:var(--info);" onclick="addStageBonus()">➕ إضافة الجائزة</button>
                 <button class="btn-admin-action parent-only-btn" style="background:var(--warning); color:#000;" onclick="showBonusReport()">📊 تقرير جوائز المراحل</button>
                 <div id="bonus-report-box" style="display:none; text-align:right; font-size:14px; background:#f1f1f1; padding:10px; border-radius:5px; margin-top:10px; max-height:150px; overflow-y:auto; font-weight:bold; color:var(--dark);"></div>
@@ -200,7 +206,6 @@
         </div>
     </div>
 
-    <!-- نافذة الأحداث -->
     <div id="event-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('event-modal')">✖</button>
@@ -224,7 +229,6 @@
         </div>
     </div>
 
-    <!-- نافذة البنك -->
     <div id="bank-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
@@ -233,7 +237,7 @@
             <div class="bank-stats">
                 <div>النقاط التراكمية: <span id="stat-total">0</span></div>
                 <div>النقاط المستبدلة باللعب: <span id="stat-exch">0</span></div>
-                <div>الرصيد البنكي الحالي: <span id="stat-bank" style="color: var(--success);">0</span> جنيه</div>
+                <div>الرصيد البنكي الحالي: <span id="stat-bank" style="color: var(--success);">0</span> جنيه فلسطيني</div>
             </div>
 
             <div class="wheel-box">
@@ -257,7 +261,6 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة الشرف -->
     <div id="fame-modal" class="custom-modal">
         <div class="modal-content-box" id="fame-content">
             <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
@@ -304,6 +307,22 @@
         loadGamesState();
         checkNewFameAchievements(); 
     };
+
+    function openNewsModal() {
+        fetch('news.txt')
+            .then(response => {
+                if(!response.ok) throw new Error('لا يوجد أخبار حالياً');
+                return response.text();
+            })
+            .then(text => {
+                document.getElementById('news-content').innerText = text;
+                toggleModal('news-modal');
+            })
+            .catch(err => {
+                document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.';
+                toggleModal('news-modal');
+            });
+    }
 
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
@@ -568,7 +587,7 @@
         
         for (let key in gamesData) {
             let stats = gamesData[key].data;
-            if (stats.stagesCompleted === 0) continue; // تخطي الألعاب التي لم تُلعب بعد
+            if (stats.stagesCompleted === 0) continue; 
 
             resultHTML += `
                 <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
@@ -588,7 +607,6 @@
         resultsDiv.innerHTML = resultHTML;
         resultsDiv.style.display = 'block';
     }
-    // ----------------------------
 
     function openFullImage(imgSrc) {
         document.getElementById('full-size-img').src = imgSrc;
@@ -609,17 +627,34 @@
         appProg.notifiedBadges = appProg.notifiedBadges || [];
         appProg.claimedStagesFame = appProg.claimedStagesFame || [];
         let needsSave = false;
+        let absoluteBadgeIndex = 1;
+
+        if(!appProg.retroactiveBadgesAwarded) {
+            let retroReward = 0;
+            let currentBadgeCount = appProg.notifiedBadges ? appProg.notifiedBadges.length : 0;
+            for(let i=1; i<=currentBadgeCount; i++) retroReward += i;
+            
+            if(retroReward > 0) {
+                appProg.bankBalance = (appProg.bankBalance || 0) + retroReward;
+                alert(`تمت إضافة ${retroReward} جنيه فلسطيني لرصيدك البنكي بأثر رجعي كمكافأة على أوسمتك السابقة! 🎉`);
+            }
+            appProg.retroactiveBadgesAwarded = true;
+            needsSave = true;
+        }
 
         fameStages.forEach(stage => {
             stage.badges.forEach(badge => {
+                let currentBadgeVal = absoluteBadgeIndex;
                 if (score >= badge.req && !appProg.notifiedBadges.includes(badge.id)) {
                     appProg.notifiedBadges.push(badge.id);
+                    appProg.bankBalance = (appProg.bankBalance || 0) + currentBadgeVal;
                     needsSave = true;
                     celebrationQueue.push({
                         type: 'badge', title: "مبروك! تم فتح وسام", name: badge.name,
-                        desc: `لقد تخطيت ${badge.req.toLocaleString()} نقطة!`, img: badge.img
+                        desc: `لقد تخطيت ${badge.req.toLocaleString()} نقطة! وحصلت على ${currentBadgeVal} جنيه فلسطيني 💰`, img: badge.img
                     });
                 }
+                absoluteBadgeIndex++;
             });
 
             if (score >= stage.end && !appProg.claimedStagesFame.includes(stage.num)) {
@@ -632,7 +667,7 @@
                 needsSave = true;
                 celebrationQueue.push({
                     type: 'stage', title: "إنجاز أسطوري! 🏆", name: `ختم مرحلة: ${stage.name}`,
-                    desc: `تخطيت ${stage.end.toLocaleString()} نقطة! تمت إضافة ${totalReward} جنيه لرصيدك البنكي 💰`, img: stage.img
+                    desc: `تخطيت ${stage.end.toLocaleString()} نقطة! تمت إضافة ${totalReward} جنيه فلسطيني لرصيدك البنكي 💰`, img: stage.img
                 });
             }
         });
@@ -667,9 +702,12 @@
     function renderHallOfFame() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         let score = Math.floor(appProg.cumulativeScore || 0);
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
         document.getElementById('fame-total-points').innerText = score.toLocaleString();
         const wrapper = document.getElementById('stages-wrapper');
         wrapper.innerHTML = '';
+
+        let badgeGlobalIndex = 1;
 
         fameStages.forEach(stage => {
             let isStageUnlocked = score >= stage.start;
@@ -677,11 +715,13 @@
             let progressPercent = 0;
             if (score >= stage.end) { progressPercent = 100; } 
             else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
-            let imgClickAction = isStageUnlocked ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="اضغط لتكبير الصورة"` : '';
+            let imgClickAction = isStageUnlocked ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;"` : '';
+            
+            let stageReward = 15 * stage.num * stage.num + (parseFloat(stageBonuses[stage.num]) || 0);
 
             let html = `
                 <div class="stage-card ${stageClass}">
-                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction}>
+                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction} title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني">
                     <h3 class="stage-title">
                         مرحلة ${stage.num}: ${stage.name}
                         <span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span>
@@ -695,13 +735,15 @@
                 let isBadgeUnlocked = score >= badge.req;
                 let badgeClass = isBadgeUnlocked ? '' : 'locked-badge';
                 let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>';
+                let badgeReward = badgeGlobalIndex;
                 html += `
-                    <div class="badge-item ${badgeClass}">
+                    <div class="badge-item ${badgeClass}" title="جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني">
                         <div class="badge-img-wrapper"><img src="${badge.img}" class="badge-img" onerror="this.src='images/mon.jpeg'">${lockOverlay}</div>
                         <div class="badge-title">${badge.name}</div>
                         <div class="badge-req">${badge.req.toLocaleString()}</div>
                     </div>
                 `;
+                badgeGlobalIndex++;
             });
             html += `</div></div>`;
             wrapper.innerHTML += html;
@@ -808,7 +850,7 @@
         stageBonuses[stageSelect] = (parseFloat(stageBonuses[stageSelect]) || 0) + bonusVal;
         localStorage.setItem('stageBonuses', JSON.stringify(stageBonuses));
         document.getElementById('stage-bonus-val').value = '';
-        alert(`تم إضافة ${bonusVal} جنيه إلى المرحلة ${stageSelect} بنجاح!`);
+        alert(`تم إضافة ${bonusVal} جنيه فلسطيني إلى المرحلة ${stageSelect} بنجاح!`);
         if(document.getElementById('bonus-report-box').style.display === 'block') showBonusReport();
     }
 
@@ -819,7 +861,7 @@
         for(let i=1; i<=7; i++) {
             let base = 15 * i * i;
             let bonus = parseFloat(stageBonuses[i]) || 0;
-            html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه</span></li>`;
+            html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه فلسطيني</span></li>`;
         }
         html += '</ul>';
         box.innerHTML = html;
@@ -884,7 +926,7 @@
             let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
             appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize;
             localStorage.setItem('appProgress', JSON.stringify(appProg));
-            updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه. أضيفت لرصيدك!`);
+            updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه فلسطيني. أضيفت لرصيدك!`);
             document.getElementById('btn-spin').disabled = false;
         }, 3500);
     }
@@ -897,7 +939,7 @@
         appProg.bankBalance -= amount;
         localStorage.setItem('appProgress', JSON.stringify(appProg));
         document.getElementById('withdraw-amount').value = '';
-        updateBankUI(); alert(`تم سحب ${amount} جنيه بنجاح.`);
+        updateBankUI(); alert(`تم سحب ${amount} جنيه فلسطيني بنجاح.`);
     }
 </script>
 

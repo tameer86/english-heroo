@@ -45,11 +45,9 @@
         .badge-new { background: var(--success); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
         input[type="checkbox"] { transform: scale(1.4); cursor: pointer; margin: 0 5px; }
 
-        /* تلوين الكلمات القديمة حسب الطلب */
         .old-word-text { color: #8B4513 !important; }
         .old-word-label { color: #8B4513 !important; font-weight: bold; cursor:pointer; }
 
-        /* الشاشات الصغيرة - عرض 3 أعمدة (الرقم، الكلمة، المعنى) وتنسيق الكبسات */
         @media (max-width: 768px) {
             body { padding: 5px; }
             .control-panel { padding: 10px; gap: 8px; margin-bottom: 15px;}
@@ -58,25 +56,21 @@
             .filter-item { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; }
             .filter-item select, .filter-item input { flex: 1 1 auto; margin-top: 5px;}
             
-            /* إصلاح مشكلة الكبسات العملاقة وجعلها بجانب بعضها */
             .action-btns { flex-direction: row; flex-wrap: wrap; gap: 8px; width: 100%; }
             .action-btns .btn { flex: 1 1 45%; max-width: 100%; margin: 0; padding: 10px 5px; font-size: 14px; height: auto; }
             
-            /* إخفاء الأعمدة في الجوال */
             .hide-on-mobile { display: none !important; }
             
-            /* إرجاع الجدول ليأخذ شكل 3 أعمدة (الرقم، الكلمة، المعنى) مع إلغاء وضع البطاقات */
             .table-responsive { box-shadow: none; border-radius: 5px; background: transparent; }
             table { min-width: 100% !important; border-collapse: collapse; }
-            table, thead, tbody, th, td, tr { display: revert; } /* إلغاء خاصية block المسببة للمشاكل */
+            table, thead, tbody, th, td, tr { display: revert; } 
             thead { display: table-header-group; }
             tr { display: table-row; }
             th, td { display: table-cell; padding: 10px 5px !important; font-size: 13px !important; border: 1px solid #ddd; text-align: center; }
             
-            /* توزيع نسبي للأعمدة الثلاثة المتبقية */
-            th:nth-child(1), td:nth-child(1) { width: 15%; } /* الرقم */
-            th:nth-child(2), td:nth-child(2) { width: 40%; direction: ltr; } /* الانجليزية */
-            th:nth-child(3), td:nth-child(3) { width: 45%; } /* العربية */
+            th:nth-child(1), td:nth-child(1) { width: 15%; } 
+            th:nth-child(2), td:nth-child(2) { width: 40%; direction: ltr; } 
+            th:nth-child(3), td:nth-child(3) { width: 45%; } 
         }
     </style>
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
@@ -168,11 +162,12 @@
 
     window.onload = function() {
         let sel = document.getElementById('filter-level');
-        for(let l in appProgress.levels) {
-            if(appProgress.levels[l].savedWords && appProgress.levels[l].savedWords.length > 0) {
+        const orderedLevels = ["CLASS1", "CLASS2", "CLASS3", "CLASS4", "CLASS5", "CLASS6", "CLASS7", "CLASS8", "CLASS9", "CLASS10", "CLASS11", "CLASS12", "A1", "A2", "B1", "B2", "C1", "C2"];
+        orderedLevels.forEach(l => {
+            if(appProgress.levels[l] && appProgress.levels[l].savedWords && appProgress.levels[l].savedWords.length > 0) {
                 let opt = document.createElement('option'); opt.value = l; opt.text = getLevelName(l); sel.appendChild(opt);
             }
-        }
+        });
         toggleDateInputs();
         applyFilters();
     };
@@ -236,7 +231,6 @@
 
         filtered.forEach((word, index) => {
             let badge = word.isOld ? `<span class="badge-old">قديمة</span>` : `<span class="badge-new">حديثة</span>`;
-            // تلوين الكلمة القديمة بناءً على المتغير isOld
             let textClass = word.isOld ? 'old-word-text' : '';
             
             let row = document.createElement('tr');

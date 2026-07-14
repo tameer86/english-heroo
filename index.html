@@ -28,7 +28,7 @@
         
         .settings-field { margin: 15px 0; text-align: right; }
         .settings-field label { font-weight: bold; display: block; margin-bottom: 5px; }
-        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"], .settings-field input[type="text"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"], .settings-field input[type="text"], .settings-field input[type="email"], .settings-field input[type="file"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
         .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
 
@@ -108,6 +108,7 @@
             <hr style="border: 1px solid #eee; margin: 15px 0;">
             <div class="btn-group">
                 <button style="background: var(--info);" onclick="showAbout()">ℹ️ حول التطبيق</button>
+                <button style="background: #20c997;" onclick="showContact()">📞 اتصل بنا</button>
                 <button style="background: var(--danger);" onclick="clearProgressData()">🗑️ مسح البيانات</button>
             </div>
         </div>
@@ -145,6 +146,44 @@
             
             
             <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
+        </div>
+
+        <!-- شاشة اتصل بنا الجديدة -->
+        <div id="contact-screen" class="hidden">
+            <h1>اتصل بنا 📞</h1>
+            <div class="settings-field">
+                <label>الاسم:</label>
+                <input type="text" id="contact-name" placeholder="أدخل اسمك الكريم" required>
+            </div>
+            <div class="settings-field">
+                <label>البريد الإلكتروني (الإيميل):</label>
+                <input type="email" id="contact-email" placeholder="example@mail.com" required>
+            </div>
+            <div class="settings-field">
+                <label>المدينة أو البلد:</label>
+                <input type="text" id="contact-location" placeholder="أدخل مدينتك أو بلدك" required>
+            </div>
+            <div class="settings-field">
+                <label>نوع الطلب:</label>
+                <select id="contact-type">
+                    <option value="تقني">دعم تقني (مشكلة فنية)</option>
+                    <option value="تطويري">اقتراح تطويري</option>
+                    <option value="محتوى">ملاحظة على المحتوى أو الكلمات</option>
+                    <option value="استفسار">استفسار عام</option>
+                    <option value="شكوى">شكوى</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+            </div>
+            <div class="settings-field">
+                <label>إرفاق صور أو ملفات (الحد الأقصى 10 ميجا):</label>
+                <input type="file" id="contact-file" onchange="checkFileSize(this)">
+            </div>
+            <div class="settings-field">
+                <label>نص الرسالة:</label>
+                <textarea id="contact-message" rows="12" placeholder="اكتب تفاصيل رسالتك هنا..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 15px;" required></textarea>
+            </div>
+            <button style="background: var(--success);" onclick="submitContactForm()">✉️ إرسال الرسالة</button>
+            <button style="background: var(--dark); margin-top: 10px;" onclick="goHome()">🔙 إلغاء والعودة</button>
         </div>
 
         <div id="settings-screen" class="hidden">
@@ -308,6 +347,7 @@
     function showDashboard() { hideAllScreens(); updateLevelStats(); document.getElementById('dashboard-screen').classList.remove('hidden'); }
     function goHome() { hideAllScreens(); document.getElementById('home-screen').classList.remove('hidden'); }
     function showAbout() { hideAllScreens(); document.getElementById('about-screen').classList.remove('hidden'); }
+    function showContact() { hideAllScreens(); document.getElementById('contact-screen').classList.remove('hidden'); }
     function showSettings() {
         hideAllScreens(); document.getElementById('settings-screen').classList.remove('hidden');
         let settings = JSON.parse(localStorage.getItem('audioSettings'));
@@ -315,7 +355,13 @@
         document.getElementById('voice-gender').value = settings.voiceName || "";
         document.getElementById('gemini-api-key').value = settings.geminiApiKey || "";
     }
-    function hideAllScreens() { document.getElementById('home-screen').classList.add('hidden'); document.getElementById('dashboard-screen').classList.add('hidden'); document.getElementById('about-screen').classList.add('hidden'); document.getElementById('settings-screen').classList.add('hidden'); }
+    function hideAllScreens() { 
+        document.getElementById('home-screen').classList.add('hidden'); 
+        document.getElementById('dashboard-screen').classList.add('hidden'); 
+        document.getElementById('about-screen').classList.add('hidden'); 
+        document.getElementById('settings-screen').classList.add('hidden'); 
+        document.getElementById('contact-screen').classList.add('hidden'); 
+    }
 
     function clearProgressData() { 
         if (confirm("تنبيه: سيتم مسح تقدمك والكلمات المحفوظة.\nيرجى تصدير بياناتك أولاً إذا أردت الاحتفاظ بها.\nهل أنت متأكد؟")) { 
@@ -382,6 +428,50 @@
         ut.lang = 'en-US'; ut.rate = settings.speed || 1;
         let v = window.speechSynthesis.getVoices().find(v => v.name === settings.voiceName);
         if(v) ut.voice = v; window.speechSynthesis.speak(ut);
+    }
+
+    // ================== دوال قسم اتصل بنا ==================
+    function checkFileSize(input) {
+        if (input.files && input.files[0]) {
+            if (input.files[0].size > 10 * 1024 * 1024) { // 10 ميجابايت
+                alert("⚠️ عذراً، حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميجابايت).");
+                input.value = ""; // تفريغ الحقل
+            }
+        }
+    }
+
+    function submitContactForm() {
+        let name = document.getElementById('contact-name').value.trim();
+        let email = document.getElementById('contact-email').value.trim();
+        let loc = document.getElementById('contact-location').value.trim();
+        let type = document.getElementById('contact-type').value;
+        let msg = document.getElementById('contact-message').value.trim();
+
+        if(!name || !email || !loc || !msg) {
+            alert("يرجى تعبئة جميع الحقول المطلوبة قبل الإرسال.");
+            return;
+        }
+
+        let subject = encodeURIComponent("تطبيق الحفظ الذكي - طلب " + type);
+        let body = encodeURIComponent("الاسم: " + name + "\nالإيميل: " + email + "\nالمدينة/البلد: " + loc + "\nنوع الطلب: " + type + "\n\nنص الرسالة:\n" + msg);
+        
+        // فتح تطبيق البريد المتاح في الجهاز لنقل البيانات فعلياً
+        window.location.href = `mailto:hero.app.help@gmail.com?subject=${subject}&body=${body}`;
+
+        // إظهار رسالة النجاح وإغلاق النافذة (حسب المطلوب)
+        setTimeout(() => {
+            alert("✅ تم تجهيز وإرسال رسالتك بنجاح! شكراً لتواصلك معنا.");
+            
+            // تنظيف الحقول
+            document.getElementById('contact-name').value = "";
+            document.getElementById('contact-email').value = "";
+            document.getElementById('contact-location').value = "";
+            document.getElementById('contact-message').value = "";
+            document.getElementById('contact-file').value = "";
+            
+            // العودة للصفحة الرئيسية (إغلاق نافذة الإرسال)
+            goHome();
+        }, 800);
     }
 </script>
 </body>

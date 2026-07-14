@@ -53,7 +53,6 @@
 
         .hidden { display: none !important; }
 
-        /* نافذة النصيحة المنبثقة */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 15px; }
         .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 15px; padding: 25px; text-align: right; box-shadow: 0 5px 20px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { color: var(--purple); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
@@ -62,7 +61,6 @@
         .modal-content .highlight { color: var(--danger); font-weight: bold; }
         .close-modal-btn { background: var(--danger); color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 15px; }
 
-        /* الشاشات الصغيرة (الجوال والتابلت) */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 15px 10px; }
@@ -73,13 +71,10 @@
             tr { margin-bottom: 20px; background: white; border-radius: 12px; border: 1px solid #e3e6f0; box-shadow: 0 4px 8px rgba(0,0,0,0.08); overflow: hidden; }
             td { text-align: right !important; padding: 15px !important; border: none; border-bottom: 1px solid #f1f3f9; }
             td:last-child { border-bottom: none; background: #f8f9fc; }
-            /* جعل أزرار الاستماع بشكل أفقي جميل في الموبايل */
             td:first-child { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; background: #f8f9fc; padding: 10px !important; }
             td:first-child .icon-btn { flex: 1 1 auto; margin: 0; padding: 10px; font-size: 14px; }
             td:first-child br { display: none; }
-            /* تعديل حقول الإدخال */
             .editable-input { padding: 12px; font-size: 16px; margin-bottom: 8px; }
-            /* أزرار التسجيل */
             .feedback-cell > div > button { padding: 10px; font-size: 14px; flex: 1; }
             .rev-type-row { align-items: flex-start; flex-direction: column; background: white; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 10px; width: 100%;}
             .rev-type-row > div { width: 100%; margin-top: 5px; }
@@ -124,7 +119,6 @@
 </head>
 <body>
 
-<!-- نافذة المراجعة الذكية -->
 <div id="advice-modal" class="modal-overlay hidden">
     <div class="modal-content">
         <h3>💡 خطة المراجعة الذكية المقترحة</h3>
@@ -282,16 +276,22 @@
     let isFirstAttemptOfThisPage = true;
     let currentSysMode = 'free';
     let currentReviewType = 1;
+    let currentSessionLastPagesCount = null;
 
     window.onload = function() {
         let sel = document.getElementById('review-level-select');
-        for(let l in appProgress.levels) {
-            if(appProgress.levels[l].savedWords && appProgress.levels[l].savedWords.length > 0) {
+        const orderedLevels = ["CLASS1", "CLASS2", "CLASS3", "CLASS4", "CLASS5", "CLASS6", "CLASS7", "CLASS8", "CLASS9", "CLASS10", "CLASS11", "CLASS12", "A1", "A2", "B1", "B2", "C1", "C2"];
+        orderedLevels.forEach(l => {
+            if(appProgress.levels[l] && appProgress.levels[l].savedWords && appProgress.levels[l].savedWords.length > 0) {
                 let opt = document.createElement('option'); opt.value = l; opt.text = getLevelName(l); sel.appendChild(opt);
             }
-        }
+        });
         toggleTypeInputs();
         updateSeqInfo();
+
+        if (appProgress.defaultLastPagesCount) {
+            document.getElementById('last-pages-count').value = appProgress.defaultLastPagesCount;
+        }
     };
 
     function updateSeqInfo() {
@@ -356,7 +356,6 @@
 
         if(savedDbWords.length === 0) { alert("⚠️ لا توجد كلمات جديدة محفوظة في هذا المستوى."); return; }
 
-        // حفظ طريقة العرض للنوع الرابع
         if(document.getElementById('type-last-pages').checked) {
             appProgress.lastViewModeType4 = document.getElementById('mode-ar-en').checked ? 'ar-en' : 'en-ar';
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
@@ -365,6 +364,7 @@
         testWordsChunks = [];
         currentChunkIdx = 0;
         sessionFirstAttemptScores = [];
+        currentSessionLastPagesCount = null;
 
         if(document.getElementById('type-all').checked) {
             currentReviewType = 1;
@@ -400,9 +400,11 @@
         }
         else if(document.getElementById('type-last-pages').checked) {
             currentReviewType = 4;
-            let reqPages = parseInt(document.getElementById('last-pages-count').value) || 1;
+            let reqPages = parseInt(document.getElementById('last-pages-count').value) || 15;
             let totalSavedPages = Math.ceil(savedDbWords.length / 10);
             if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من المحفوظة!"); return; }
+            
+            currentSessionLastPagesCount = reqPages;
             
             let startIdx = Math.max(0, savedDbWords.length - (reqPages * 10));
             let sliced = savedDbWords.slice(startIdx);
@@ -632,6 +634,11 @@
     function moveToNextTestPage() { currentChunkIdx++; renderTestPage(); }
 
     function finishSessionReport() {
+        if (currentReviewType === 4 && currentSessionLastPagesCount !== null) {
+            appProgress.defaultLastPagesCount = currentSessionLastPagesCount;
+            localStorage.setItem('appProgress', JSON.stringify(appProgress));
+        }
+
         if (currentReviewType === 2) {
             let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
             let lData = appProgress.levels[selectedLevel];
