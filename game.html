@@ -318,7 +318,7 @@
     };
 
     function openNewsModal() {
-        fetch('news.text')
+        fetch('news.txt')
             .then(response => {
                 if(!response.ok) throw new Error('لا يوجد أخبار حالياً');
                 return response.text();
