@@ -293,8 +293,8 @@
                 let opt = document.createElement('option'); opt.value = l; opt.text = getLevelName(l); sel.appendChild(opt);
             }
         });
-        toggleTypeInputs();
         updateSeqInfo();
+        toggleTypeInputs();
 
         if (appProgress.defaultLastPagesCount) {
             document.getElementById('last-pages-count').value = appProgress.defaultLastPagesCount;
@@ -315,7 +315,7 @@
                 break;
             case 'part':
                 title = "المراجعة التتابعية";
-                desc = "تقوم بمراجعة عدد محدد من الصفحات بالترتيب. الميزة هنا أن النظام سيحفظ المكان الذي توقفت عنده ليُكمل منه في الجلسة القادمة مباشرة.";
+                desc = "تقوم بمراجعة عدد محدد من الصفحات بالترتيب. الميزة هنا أن النظام سيحفظ المكان الذي توقفت عنده ليُكمل منه في الجلسة القادمة مباشرة (سواء لمستوى واحد أو لجميع المستويات دمجاً).";
                 break;
             case 'random':
                 title = "المراجعة العشوائية المتقدمة";
@@ -338,22 +338,34 @@
     function updateSeqInfo() {
         let lvl = document.getElementById('review-level-select').value;
         let remInfo = document.getElementById('remaining-pages-info');
-        if(!lvl || lvl === "ALL_LEVELS") {
-            if(remInfo) remInfo.innerText = "";
-            return;
+        if(!lvl) return;
+        
+        let startPage = 1;
+        if(lvl === "ALL_LEVELS") {
+            startPage = Math.floor((appProgress.globalPartialIndexFree || 0) / 10) + 1;
+        } else {
+            let lData = appProgress.levels[lvl];
+            if(lData) {
+                let idxKey = 'lastPartialIndexFree';
+                startPage = Math.floor((lData[idxKey] || 0) / 10) + 1;
+            }
         }
-        let lData = appProgress.levels[lvl];
-        if(!lData) return;
-        let idxKey = 'lastPartialIndexFree';
-        let startPage = Math.floor((lData[idxKey] || 0) / 10) + 1;
         if(remInfo) remInfo.innerText = `وصلت سابقاً إلى صفحة: ${startPage}`;
     }
 
     function resetPartialIndex() {
         let lvl = document.getElementById('review-level-select').value;
-        if(!lvl || lvl === "ALL_LEVELS") { alert("يرجى اختيار مستوى محدد أولاً."); return; }
-        let idxKey = 'lastPartialIndexFree';
-        appProgress.levels[lvl][idxKey] = 0;
+        if(!lvl) { alert("يرجى تحديد الخيار أولاً."); return; }
+        
+        if (lvl === "ALL_LEVELS") {
+            appProgress.globalPartialIndexFree = 0;
+        } else {
+            let idxKey = 'lastPartialIndexFree';
+            if (appProgress.levels[lvl]) {
+                appProgress.levels[lvl][idxKey] = 0;
+            }
+        }
+        
         localStorage.setItem('appProgress', JSON.stringify(appProgress));
         updateSeqInfo();
         alert("تم إرجاع العداد التتابعي إلى الصفحة الأولى بنجاح.");
@@ -361,25 +373,19 @@
 
     function toggleTypeInputs() {
         let lvl = document.getElementById('review-level-select').value;
-        let partRow = document.getElementById('type-part-row');
         
-        if (lvl === "ALL_LEVELS") {
-            if (partRow) partRow.classList.add('hidden');
-            if (document.getElementById('type-part').checked) {
-                document.getElementById('type-all').checked = true;
-            }
-        } else {
-            if (partRow) partRow.classList.remove('hidden');
-        }
-
         document.getElementById('part-inputs').classList.add('hidden');
         document.getElementById('random-inputs').classList.add('hidden');
         document.getElementById('last-days-inputs').classList.add('hidden');
         document.getElementById('date-range-inputs').classList.add('hidden');
         document.getElementById('last-pages-inputs').classList.add('hidden');
         
+        let levelContainer = document.getElementById('level-select-container');
+        
         if(document.getElementById('type-last-pages').checked) {
             document.getElementById('last-pages-inputs').classList.remove('hidden');
+            if(levelContainer) levelContainer.style.display = 'none';
+            
             let displayDiv = document.getElementById('last-mode-display');
             let lastMode = appProgress.lastViewModeType4;
             
@@ -390,9 +396,11 @@
             } else {
                 displayDiv.innerHTML = '📌 <span style="color:var(--dark);">لم تقم باستخدام هذه المراجعة من قبل، اختر طريقة العرض المناسبة.</span>';
             }
+        } else {
+            if(levelContainer) levelContainer.style.display = 'block';
         }
         
-        if(document.getElementById('type-part').checked && lvl !== "ALL_LEVELS") {
+        if(document.getElementById('type-part').checked) {
             document.getElementById('part-inputs').classList.remove('hidden');
         }
         
@@ -498,23 +506,46 @@
             }
             else if(document.getElementById('type-part').checked) {
                 currentReviewType = 2;
-                if (selectedLevel === "ALL_LEVELS") { alert("⚠️ المراجعة التتابعية تتطلب اختيار مستوى محدد."); return; }
-                
-                let lData = appProgress.levels[selectedLevel];
-                let fullDb = allLevelsData[selectedLevel] || [];
-                let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
-                let validIds = validSavedWords.map(w => w.id);
-                let savedDbWords = fullDb.filter(w => validIds.includes(w.id));
-
+                let targetWords = [];
+                let startW = 0;
                 let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
-                let totalSavedPages = Math.ceil(savedDbWords.length / 10);
-                if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من المحفوظة!"); return; }
-                
-                let idxKey = 'lastPartialIndexFree';
-                let startW = (lData[idxKey] || 0);
-                if(startW >= savedDbWords.length) startW = 0; 
-                
-                let sliced = savedDbWords.slice(startW, startW + (reqPages * 10));
+
+                if (selectedLevel === "ALL_LEVELS") {
+                    orderedLevels.forEach(lvl => {
+                        if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
+                            let vWords = appProgress.levels[lvl].savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                            let db = allLevelsData[lvl] || [];
+                            vWords.forEach(w => {
+                                let dbWord = db.find(dbw => dbw.id == w.id);
+                                if(dbWord) targetWords.push(dbWord);
+                            });
+                        }
+                    });
+                    
+                    if(targetWords.length === 0) { alert("⚠️ لا توجد كلمات محفوظة للمراجعة."); return; }
+                    let totalSavedPages = Math.ceil(targetWords.length / 10);
+                    if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من إجمالي المحفوظ (" + totalSavedPages + " صفحة)!"); return; }
+                    
+                    startW = appProgress.globalPartialIndexFree || 0;
+                    if(startW >= targetWords.length) startW = 0;
+                    
+                } else {
+                    let lData = appProgress.levels[selectedLevel];
+                    let fullDb = allLevelsData[selectedLevel] || [];
+                    let validSavedWords = lData.savedWords.filter(w => w.isOld !== true && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                    let validIds = validSavedWords.map(w => w.id);
+                    targetWords = fullDb.filter(w => validIds.includes(w.id));
+
+                    if(targetWords.length === 0) { alert("⚠️ لا توجد كلمات محفوظة للمراجعة."); return; }
+                    let totalSavedPages = Math.ceil(targetWords.length / 10);
+                    if(reqPages > totalSavedPages) { alert("⚠️ خطأ: عدد الصفحات المطلوبة أكبر من المحفوظة!"); return; }
+                    
+                    let idxKey = 'lastPartialIndexFree';
+                    startW = (lData[idxKey] || 0);
+                    if(startW >= targetWords.length) startW = 0; 
+                }
+
+                let sliced = targetWords.slice(startW, startW + (reqPages * 10));
                 for(let i=0; i<sliced.length; i+=10) { testWordsChunks.push(sliced.slice(i, i+10)); }
             }
             else if(document.getElementById('type-random').checked) {
@@ -710,13 +741,34 @@
 
         if (currentReviewType === 2) {
             let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
-            let lData = appProgress.levels[selectedLevel];
-            let idxKey = 'lastPartialIndexFree';
-            let nextIndex = (lData[idxKey] || 0) + (reqPages * 10);
-            let savedIds = lData.savedWords.filter(w => !w.isOld).map(w => w.id);
-            let savedDbWords = (allLevelsData[selectedLevel] || []).filter(w => savedIds.includes(w.id));
-            if(nextIndex >= savedDbWords.length) nextIndex = 0;
-            lData[idxKey] = nextIndex; 
+            
+            if (selectedLevel === "ALL_LEVELS") {
+                const orderedLevels = ["CLASS1", "CLASS2", "CLASS3", "CLASS4", "CLASS5", "CLASS6", "CLASS7", "CLASS8", "CLASS9", "CLASS10", "CLASS11", "CLASS12", "A1", "A2", "B1", "B2", "C1", "C2"];
+                let totalTargetLen = 0;
+                orderedLevels.forEach(lvl => {
+                    if (appProgress.levels[lvl] && appProgress.levels[lvl].savedWords) {
+                        let validSavedWords = appProgress.levels[lvl].savedWords.filter(w => !w.isOld && w.isOld !== "true" && w.date !== "تم حفظها قديماً");
+                        totalTargetLen += validSavedWords.length;
+                    }
+                });
+                
+                let startW = appProgress.globalPartialIndexFree || 0;
+                let nextIndex = startW + (reqPages * 10);
+                if (nextIndex >= totalTargetLen) nextIndex = 0;
+                
+                appProgress.globalPartialIndexFree = nextIndex;
+                
+            } else {
+                let lData = appProgress.levels[selectedLevel];
+                let idxKey = 'lastPartialIndexFree';
+                let nextIndex = (lData[idxKey] || 0) + (reqPages * 10);
+                let savedIds = lData.savedWords.filter(w => !w.isOld && w.isOld !== "true" && w.date !== "تم حفظها قديماً").map(w => w.id);
+                let savedDbWords = (allLevelsData[selectedLevel] || []).filter(w => savedIds.includes(w.id));
+                
+                if(nextIndex >= savedDbWords.length) nextIndex = 0;
+                lData[idxKey] = nextIndex; 
+            }
+            
             localStorage.setItem('appProgress', JSON.stringify(appProgress)); 
             updateSeqInfo();
         }
