@@ -388,9 +388,9 @@
             let lastMode = appProgress.lastViewModeType4;
             
             if(lastMode === 'ar-en') {
-                displayDiv.innerHTML = '📌 <span style="color:#2e7d32;">آخر طريقة عرض استخدمت: (عربي 👈 إنجليزي)</span> <br> <span style="color:var(--danger);">يُنصح اليوم باختيار العكس (إنجليزي 👈 عربي).</span>';
+                displayDiv.innerHTML = ' <span style="color:var(--danger);">يُنصح اليوم باختيار  (إنجليزي 👈 عربي).</span>';
             } else if(lastMode === 'en-ar') {
-                displayDiv.innerHTML = '📌 <span style="color:#2e7d32;">آخر طريقة عرض استخدمت: (إنجليزي 👈 عربي)</span> <br> <span style="color:var(--danger);">يُنصح اليوم باختيار العكس (عربي 👈 إنجليزي).</span>';
+                displayDiv.innerHTML = ' <span style="color:var(--danger);">يُنصح اليوم باختيار  (عربي 👈 إنجليزي).</span>';
             } else {
                 displayDiv.innerHTML = '📌 <span style="color:var(--dark);">لم تقم باستخدام هذه المراجعة من قبل، اختر طريقة العرض المناسبة.</span>';
             }
