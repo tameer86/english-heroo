@@ -27,7 +27,6 @@
         .game-btn { color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block; font-weight: bold; width: 80%; max-width: 400px; }
         .game-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-        /* تعديل التموضع لحل مشكلة التداخل مع إضافة مسافات مرنة */
         .top-icons { position: relative; display: flex; justify-content: center; gap: 20px; z-index: 50; flex-wrap: wrap; margin-top: 50px; margin-bottom: 30px; }
         
         .btn-top-action { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
@@ -126,7 +125,6 @@
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
     </div>
 
-    <!-- نافذة الأخبار -->
     <div id="news-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
@@ -135,7 +133,6 @@
         </div>
     </div>
 
-    <!-- نافذة التقارير الشاملة -->
     <div id="reports-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('reports-modal')">✖</button>
@@ -150,7 +147,6 @@
                 </select>
             </div>
 
-            <!-- خيارات تقرير النقاط (يظهر فقط عند اختياره) -->
             <div id="time-selectors" class="report-selectors">
                 <select id="report-type" onchange="updateReportRangeOptions()">
                     <option value="hours">في آخر عدد ساعات</option>
@@ -167,7 +163,6 @@
         </div>
     </div>
 
-    <!-- نافذة الإعدادات الإدارية -->
     <div id="admin-modal" class="custom-modal">
         <div class="modal-content-box" style="background: white;">
             <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
@@ -187,6 +182,15 @@
             </div>
 
             <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
+
+            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
+                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">⚖️ إدارة نقاط الطفل (مكافأة / خصم)</h4>
+                <input type="number" id="manual-points-val" class="parent-only-inputs" placeholder="أدخل عدد النقاط (مثال: 5000)">
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top:0;" onclick="addManualPoints()">➕ إضافة كمكافأة</button>
+                    <button class="btn-admin-action parent-only-btn" style="background:var(--danger); margin-top:0;" onclick="subtractManualPoints()">➖ خصم كعقاب</button>
+                </div>
+            </div>
 
             <div class="admin-row" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
                 <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">🎁 جوائز المراحل الإضافية</h4>
@@ -212,7 +216,6 @@
         </div>
     </div>
 
-    <!-- نافذة الأحداث -->
     <div id="event-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('event-modal')">✖</button>
@@ -236,7 +239,6 @@
         </div>
     </div>
 
-    <!-- نافذة البنك -->
     <div id="bank-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
@@ -269,7 +271,6 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة الشرف -->
     <div id="fame-modal" class="custom-modal">
         <div class="modal-content-box" id="fame-content">
             <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
@@ -879,6 +880,94 @@
         box.innerHTML = html;
         box.style.display = 'block';
     }
+    
+    // --- دوال إضافة وخصم النقاط (لولي الأمر) ---
+    function addManualPoints() {
+        let pts = parseInt(document.getElementById('manual-points-val').value);
+        if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للمكافأة!"); return; }
+        
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        appProg.cumulativeScore = (appProg.cumulativeScore || 0) + pts;
+        localStorage.setItem('appProgress', JSON.stringify(appProg));
+        
+        document.getElementById('manual-points-val').value = '';
+        alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة للطفل! 🎉`);
+        
+        // التحقق من فتح أوسمة أو مراحل جديدة بعد الإضافة
+        checkNewFameAchievements();
+        updateBankUI();
+        if(document.getElementById('fame-modal').style.display === 'flex') {
+            renderHallOfFame();
+        }
+    }
+
+    function subtractManualPoints() {
+        let pts = parseInt(document.getElementById('manual-points-val').value);
+        if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للخصم!"); return; }
+        
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let currentScore = Math.floor(appProg.cumulativeScore || 0);
+        
+        if(pts > currentScore) pts = currentScore; // لا تجعل النقاط تحت الصفر
+        appProg.cumulativeScore -= pts;
+        let newScore = appProg.cumulativeScore;
+        
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
+        
+        // سحب الأوسمة التي لم يعد يستحقها
+        let newNotifiedBadges = [];
+        let badgesValueLost = 0;
+        let absoluteBadgeIndex = 1;
+        
+        fameStages.forEach(stage => {
+            stage.badges.forEach(badge => {
+                if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) {
+                    if(newScore >= badge.req) {
+                        newNotifiedBadges.push(badge.id); // يستحقها
+                    } else {
+                        badgesValueLost += absoluteBadgeIndex; // تم سحبها
+                    }
+                }
+                absoluteBadgeIndex++;
+            });
+        });
+        appProg.notifiedBadges = newNotifiedBadges;
+
+        // سحب المراحل التي لم يعد يستحقها
+        let newClaimedStages = [];
+        let stagesValueLost = 0;
+        fameStages.forEach(stage => {
+            if(appProg.claimedStagesFame && appProg.claimedStagesFame.includes(stage.num)) {
+                if(newScore >= stage.end) {
+                    newClaimedStages.push(stage.num); // يستحقها
+                } else {
+                    let baseReward = 15 * stage.num * stage.num;
+                    let bonusReward = parseFloat(stageBonuses[stage.num]) || 0;
+                    stagesValueLost += (baseReward + bonusReward); // تم سحبها
+                }
+            }
+        });
+        appProg.claimedStagesFame = newClaimedStages;
+
+        // خصم المبالغ من البنك
+        let totalLostMoney = badgesValueLost + stagesValueLost;
+        appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; // قد يصبح بالسالب وهذا مطلوب
+        
+        localStorage.setItem('appProgress', JSON.stringify(appProg));
+        document.getElementById('manual-points-val').value = '';
+        
+        let msg = `تم خصم ${pts} نقطة بنجاح كعقاب.`;
+        if (totalLostMoney > 0) {
+            msg += `\nنظراً لتراجع مستوى النقاط، تم سحب جوائز من البنك بقيمة ${totalLostMoney} جنيه فلسطيني.`;
+        }
+        alert(msg);
+        
+        updateBankUI();
+        if(document.getElementById('fame-modal').style.display === 'flex') {
+            renderHallOfFame();
+        }
+    }
+    // ---------------------------------------------
 
     let wheelAngle = 0, isSpinning = false, reqAnim, chosenPrize = 0;
 

@@ -117,6 +117,21 @@
         function openYouGlish(word) {
             window.open('https://youglish.com/pronounce/' + encodeURIComponent(word) + '/english', '_blank');
         }
+
+        // دالة لتحويل النصوص الانجليزية لأحرف عربية كنطق أولي و تقريبي 
+        function transliterateEnToArabic(text) {
+            if (!text) return "";
+            const map = {
+                'tion':'شن', 'sion':'شن', 'th':'ث', 'sh':'ش', 'ch':'تش', 'ph':'ف', 'ou':'او', 'oo':'و', 'ee':'ي', 'ea':'ي',
+                'a':'ا', 'b':'ب', 'c':'ك', 'd':'د', 'e':'ي', 'f':'ف', 'g':'غ', 'h':'ه',
+                'i':'ي', 'j':'ج', 'k':'ك', 'l':'ل', 'm':'م', 'n':'ن', 'o':'و', 'p':'ب',
+                'q':'ك', 'r':'ر', 's':'س', 't':'ت', 'u':'و', 'v':'ف', 'w':'و', 'x':'كس',
+                'y':'ي', 'z':'ز', ' ': ' '
+            };
+            let lower = text.toLowerCase();
+            lower = lower.replace(/tion|sion|th|sh|ch|ph|ou|oo|ee|ea/g, m => map[m]);
+            return lower.split('').map(char => map[char] || char).join('');
+        }
     </script>
 </head>
 <body>
@@ -253,7 +268,7 @@
                 <td>
                     <div class="cell-en-target" style="font-weight:bold; color:#4e73df; font-size:18px; margin-bottom:5px; direction:ltr; text-align:center;">${word.en}</div>
                     <div class="cell-ar-target" style="font-weight:bold; color:#1cc88a; font-size:16px; margin-bottom:5px; text-align:center;">${word.ar}</div>
-                    <div class="cell-ar-target" style="color:#f6c23e; font-weight:bold; margin-bottom:12px; font-size:14px; text-align:center;">[ ${word.pronounce} ]</div>
+                    <div class="pronunciation-target" style="color:#f6c23e; font-weight:bold; margin-bottom:12px; font-size:14px; text-align:center;">[ ${word.pronounce} ]</div>
                     <div class="btn-group">
                         <button class="icon-btn btn-speaker" onclick="speakText('${word.en}', 'word')">🔊 استماع</button>
                         <button class="icon-btn btn-youglish" onclick="openYouGlish('${word.en}')">📺 YG</button>
@@ -263,6 +278,7 @@
                 <td>
                     <div class="cell-en-target" style="text-align:center; font-weight:500; font-size:15px; margin-bottom:8px; direction:ltr;">${word.ex_en}</div>
                     <div class="cell-ar-target" style="text-align:center; color:#5a5c69; font-style:italic; margin-bottom:12px; font-size:14px;">${word.ar_ex}</div>
+                    <div class="pronunciation-target" style="color:#f6c23e; font-weight:bold; margin-bottom:12px; font-size:14px; text-align:center;">[ ${transliterateEnToArabic(word.ex_en)} ]</div>
                     <div class="btn-group">
                         <button class="icon-btn btn-speaker" onclick="speakText('${word.ex_en}', 'ex')">🔊 استماع</button>
                         <button class="icon-btn btn-mic" onclick="startSpeechCapture(${word.id}, '${word.ex_en}', 'ex')">🎙️ تسجيل</button>
@@ -283,6 +299,7 @@
 
         document.querySelectorAll('.cell-ar-target').forEach(el => el.style.display = showAr ? 'block' : 'none');
         document.querySelectorAll('.cell-en-target').forEach(el => el.style.display = showEn ? 'block' : 'none');
+        document.querySelectorAll('.pronunciation-target').forEach(el => el.style.display = showEn ? 'block' : 'none');
     }
 
     function speakText(txt, type) {

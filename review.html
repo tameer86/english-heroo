@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة المراجعة والاختبارات الذكية</title>
-	<script>
+		<script>
     (function checkActivation() {
         if (!localStorage.getItem('app_is_activated')) {
             alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
@@ -12,6 +12,7 @@
         }
     })();
 </script>
+
     <style>
         :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --info: #36b9cc; --dark: #5a5c69; --light: #f8f9fc; --purple: #8540f5; }
         body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 15px; margin: 0; text-align: center; overflow-x: hidden; }
@@ -452,58 +453,63 @@
         let isArEn = document.getElementById('mode-ar-en').checked;
         currentAnswers = [];
 
-        words.forEach((w, i) => {
-            currentAnswers.push({ wordId: w.id, targetWord: isArEn ? w.en : w.ar, targetEx: isArEn ? w.ex_en : w.ar_ex, typedWord: "", typedEx: "" });
-            let displayTxt = isArEn ? `الكلمة: ${w.ar}` : `Word: ${w.en}`;
-            let displayEx = isArEn ? `المثال: ${w.ar_ex}` : `Example: ${w.ex_en}`;
-            
-            let listenWordTarget = isArEn ? w.ar : w.en;
-            let listenWordLang = isArEn ? 'ar-SA' : 'en-US';
-            let listenExTarget = isArEn ? w.ar_ex : w.ex_en;
-            let listenExLang = isArEn ? 'ar-SA' : 'en-US';
+       words.forEach((w, i) => {
+    currentAnswers.push({ wordId: w.id, targetWord: isArEn ? w.en : w.ar, targetEx: isArEn ? w.ex_en : w.ar_ex, typedWord: "", typedEx: "" });
+    
+    let displayTxt = isArEn ? `الكلمة:👈 ${w.ar}` : `Word:👉 ${w.en}`;
+    let displayEx = isArEn ? `المثال:👈 ${w.ar_ex}` : `Example:👉 ${w.ex_en}`;
+    
+    let listenWordTarget = isArEn ? w.ar : w.en;
+    let listenWordLang = isArEn ? 'ar-SA' : 'en-US';
+    let listenExTarget = isArEn ? w.ar_ex : w.ex_en;
+    let listenExLang = isArEn ? 'ar-SA' : 'en-US';
 
-            let tr = document.createElement('tr');
-            
-            let actionHtml = "";
-            if (currentSysMode === 'test') {
-                actionHtml = `
-                    <label style="font-size:12px; color:var(--primary); display:block; text-align:right;">الكلمة:</label>
-                    <input type="text" id="input-word-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedWord=this.value">
-                    <label style="font-size:12px; color:var(--primary); display:block; text-align:right; margin-top:5px;">المثال:</label>
-                    <input type="text" id="input-ex-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedEx=this.value">
-                    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap: wrap;">
-                        <button id="mic-w-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'word')" style="flex:1;">🎙️ للكلمة</button>
-                        <button id="mic-e-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'ex')" style="flex:1;">🎙️ للمثال</button>
-                    </div>
-                    <div id="live-box-${i}" style="color:var(--info); font-size:13px; font-weight:bold; margin-top:8px; text-align:right; padding:5px;"></div>
-                `;
-            } else {
-                actionHtml = `
-                    <div style="margin-bottom:10px;">
-                        <button class="icon-btn btn-action" onclick="revealFreeAnswer(${i}, 'word', '${isArEn ? w.en : w.ar}', '${isArEn ? 'en-US' : 'ar-SA'}', '${w.pronounce}')" style="width:100%; padding:10px;">🔊 كشف الكلمة</button>
-                        <div id="free-ans-word-${i}" style="margin-top:5px; font-weight:bold; color:var(--primary); font-size:16px;"></div>
-                    </div>
-                    <div>
-                        <button class="icon-btn btn-action" onclick="revealFreeAnswer(${i}, 'ex', '${isArEn ? w.ex_en : w.ar_ex}', '${isArEn ? 'en-US' : 'ar-SA'}', '')" style="width:100%; padding:10px;">🔊 كشف المثال</button>
-                        <div id="free-ans-ex-${i}" style="margin-top:5px; font-weight:bold; color:var(--primary); font-size:15px;"></div>
-                    </div>
-                `;
-            }
+    // المتغيرات الجديدة للتحكم في المحاذاة والاتجاه
+    let textAlign = isArEn ? 'right' : 'left';
+    let textDirection = isArEn ? 'rtl' : 'ltr';
 
-            tr.innerHTML = `
-                <td>
-                    <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenWordTarget}', '${listenWordLang}')">🔊 كلمة</button><br>
-                    <button class="icon-btn btn-youglish" onclick="openYouGlish('${w.en}')">📺 YG</button><br>
-                    <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenExTarget}', '${listenExLang}')">🔊 مثال</button>
-                </td>
-                <td style="text-align:right; font-weight:bold;">
-                    <div style="color:var(--dark); font-size:16px;">• ${displayTxt}</div>
-                    <div style="margin-top:10px; color:#7f8c8d; font-size:14px;">• ${displayEx}</div>
-                </td>
-                <td class="feedback-cell">${actionHtml}</td>
-            `;
-            tbody.appendChild(tr);
-        });
+    let tr = document.createElement('tr');
+    
+    let actionHtml = "";
+    if (currentSysMode === 'test') {
+        actionHtml = `
+            <label style="font-size:12px; color:var(--primary); display:block; text-align:right;">الكلمة:</label>
+            <input type="text" id="input-word-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedWord=this.value">
+            <label style="font-size:12px; color:var(--primary); display:block; text-align:right; margin-top:5px;">المثال:</label>
+            <input type="text" id="input-ex-${i}" class="editable-input" placeholder="اكتب أو سجل" oninput="currentAnswers[${i}].typedEx=this.value">
+            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap: wrap;">
+                <button id="mic-w-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'word')" style="flex:1;">🎙️ للكلمة</button>
+                <button id="mic-e-${i}" class="icon-btn btn-mic" onclick="triggerMicCapture(${i}, 'ex')" style="flex:1;">🎙️ للمثال</button>
+            </div>
+            <div id="live-box-${i}" style="color:var(--info); font-size:13px; font-weight:bold; margin-top:8px; text-align:right; padding:5px;"></div>
+        `;
+    } else {
+        actionHtml = `
+            <div style="margin-bottom:10px;">
+                <button class="icon-btn btn-action" onclick="revealFreeAnswer(${i}, 'word', '${isArEn ? w.en : w.ar}', '${isArEn ? 'en-US' : 'ar-SA'}', '${w.pronounce}')" style="width:100%; padding:10px;">🔊 كشف الكلمة</button>
+                <div id="free-ans-word-${i}" style="margin-top:5px; font-weight:bold; color:var(--primary); font-size:16px;"></div>
+            </div>
+            <div>
+                <button class="icon-btn btn-action" onclick="revealFreeAnswer(${i}, 'ex', '${isArEn ? w.ex_en : w.ar_ex}', '${isArEn ? 'en-US' : 'ar-SA'}', '')" style="width:100%; padding:10px;">🔊 كشف المثال</button>
+                <div id="free-ans-ex-${i}" style="margin-top:5px; font-weight:bold; color:var(--primary); font-size:15px;"></div>
+            </div>
+        `;
+    }
+
+    tr.innerHTML = `
+        <td>
+            <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenWordTarget}', '${listenWordLang}')">🔊 كلمة</button><br>
+            <button class="icon-btn btn-youglish" onclick="openYouGlish('${w.en}')">📺 YG</button><br>
+            <button class="icon-btn btn-speaker" onclick="playReviewAudio('${listenExTarget}', '${listenExLang}')">🔊 مثال</button>
+        </td>
+        <td style="text-align:${textAlign}; direction:${textDirection}; font-weight:bold;">
+            <div style="color:var(--dark); font-size:16px;">• ${displayTxt}</div>
+            <div style="margin-top:10px; color:#7f8c8d; font-size:14px;">• ${displayEx}</div>
+        </td>
+        <td class="feedback-cell">${actionHtml}</td>
+    `;
+    tbody.appendChild(tr);
+});
 
         document.getElementById('btn-analyze').classList.add('hidden');
         document.getElementById('btn-retry').classList.add('hidden');
