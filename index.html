@@ -28,7 +28,7 @@
         
         .settings-field { margin: 15px 0; text-align: right; }
         .settings-field label { font-weight: bold; display: block; margin-bottom: 5px; }
-        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"], .settings-field input[type="text"], .settings-field input[type="email"], .settings-field input[type="file"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"], .settings-field input[type="text"], .settings-field input[type="email"], .settings-field input[type="file"], .settings-field input[type="number"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
         .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
 
@@ -152,7 +152,20 @@
 
         <div id="reports-screen" class="hidden">
             <h1>إحصائيات وتقارير الإنجاز 📊</h1>
-            <div id="reports-content"></div>
+            <div class="settings-field" style="background: #f8f9fc; padding: 15px; border-radius: 10px; border: 1px solid #e3e6f0; text-align: center;">
+                <label style="color:var(--primary); font-size:16px;">حدد الفترة الزمنية لعرض تقرير الحفظ والمراجعة:</label>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap;">
+                    <input type="number" id="report-time-value" min="1" value="1" style="width: 100px; padding: 8px;">
+                    <select id="report-time-unit" style="width: 180px; padding: 8px;">
+                        <option value="hours">ساعات (حد أقصى 24)</option>
+                        <option value="days">أيام (حد أقصى 30)</option>
+                        <option value="months">أشهر (حد أقصى 12)</option>
+                    </select>
+                </div>
+                <button style="background: var(--success); margin-top: 15px; width: auto; padding: 10px 20px;" onclick="generateCustomReports()">📋 عرض التقرير</button>
+            </div>
+            
+            <div id="reports-content" style="margin-top: 15px;"></div>
             <button style="background: var(--dark); margin-top: 20px;" onclick="showDashboard()">🔙 العودة للوحة التحكم</button>
         </div>
 
@@ -281,7 +294,7 @@
     const availableKeys = ["A1","A2","B1","B2","C1","C2","CLASS1","CLASS2","CLASS3","CLASS4","CLASS5","CLASS6","CLASS7","CLASS8","CLASS9","CLASS10","CLASS11","CLASS12"];
 
     function getCleanProgress() {
-        let structure = { cumulativeScore: 0, levels: {} };
+        let structure = { cumulativeScore: 0, reviewHistory: [], levels: {} };
         availableKeys.forEach(k => {
             structure.levels[k] = { mainIndex: 0, activeList: [], savedWords: [], pagesCompleted: 0, lastPartialIndexFree: 0, lastPartialIndexTest: 0 };
         });
@@ -394,36 +407,76 @@
     function showReports() {
         hideAllScreens();
         document.getElementById('reports-screen').classList.remove('hidden');
-        let progress = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let totalSaved = 0;
-        let totalSystem = 0;
-        let completedLevels = [];
-        
-        for(let lvl in progress.levels) {
-            let saved = progress.levels[lvl].savedWords ? progress.levels[lvl].savedWords.length : 0;
-            let total = allLevelsData[lvl] ? allLevelsData[lvl].length : 0;
-            totalSaved += saved;
-            totalSystem += total;
-            if(saved >= total && total > 0) completedLevels.push(getLevelName(lvl));
+        document.getElementById('reports-content').innerHTML = '<p style="text-align:center; color:var(--dark);">يرجى تحديد الفترة الزمنية والضغط على زر "عرض التقرير".</p>';
+    }
+
+    function generateCustomReports() {
+        let val = parseInt(document.getElementById('report-time-value').value);
+        let unit = document.getElementById('report-time-unit').value;
+        if (!val || val < 1) return alert("الرجاء إدخال رقم صحيح.");
+
+        let maxMap = { 'hours': 24, 'days': 30, 'months': 12 };
+        if (val > maxMap[unit]) {
+            alert(`الحد الأقصى لهذا الخيار هو ${maxMap[unit]}`);
+            val = maxMap[unit];
+            document.getElementById('report-time-value').value = val;
         }
 
-        let bankBalance = progress.bankBalance || 0;
-        let cumulativeScore = Math.floor(progress.cumulativeScore || 0);
+        let timeLimitMs = 0;
+        let now = Date.now();
+        if (unit === 'hours') timeLimitMs = now - (val * 60 * 60 * 1000);
+        else if (unit === 'days') timeLimitMs = now - (val * 24 * 60 * 60 * 1000);
+        else if (unit === 'months') timeLimitMs = now - (val * 30 * 24 * 60 * 60 * 1000);
+
+        let progress = JSON.parse(localStorage.getItem('appProgress')) || {};
+        
+        let savedWordsInPeriod = 0;
+        for (let lvl in progress.levels) {
+            if (progress.levels[lvl].savedWords) {
+                progress.levels[lvl].savedWords.forEach(w => {
+                    if (w.unixTime && w.unixTime >= timeLimitMs && !w.isOld) {
+                        savedWordsInPeriod++;
+                    }
+                });
+            }
+        }
+        let savedPages = Math.floor(savedWordsInPeriod / 10);
+
+        let reviewedPagesCount = 0;
+        let reviewTypesCount = {};
+        
+        if (progress.reviewHistory && Array.isArray(progress.reviewHistory)) {
+            progress.reviewHistory.forEach(rev => {
+                if (rev.unixTime && rev.unixTime >= timeLimitMs) {
+                    reviewedPagesCount += (rev.pages || 0);
+                    let rType = rev.type || 'مراجعة عامة';
+                    reviewTypesCount[rType] = (reviewTypesCount[rType] || 0) + (rev.pages || 0);
+                }
+            });
+        }
+
+        let typesHtml = '';
+        for (let t in reviewTypesCount) {
+            typesHtml += `<li style="margin-bottom: 5px;">نوع [${t}]: <strong>${reviewTypesCount[t]}</strong> صفحات</li>`;
+        }
+        if (typesHtml === '') typesHtml = '<li style="color:#777; font-style:italic;">لم يتم إجراء أي مراجعات في هذه الفترة.</li>';
+
+        let periodText = val + ' ' + (unit === 'hours' ? 'ساعة' : unit === 'days' ? 'يوم' : 'شهر');
 
         document.getElementById('reports-content').innerHTML = `
             <div class="stat-card">
-                <h4>📚 إحصائيات الحفظ العامة</h4>
-                <p>إجمالي الكلمات المحفوظة: <strong style="color:var(--success); font-size:18px;">${totalSaved}</strong> كلمة</p>
-                <p>الكلمات المتبقية في المنهاج: <strong style="color:var(--danger); font-size:18px;">${totalSystem - totalSaved}</strong> كلمة</p>
+                <h4>📚 تقرير الحفظ خلال آخر (${periodText})</h4>
+                <p>عدد الصفحات التي تم حفظها: <strong style="color:var(--success); font-size:18px;">${savedPages}</strong> صفحة</p>
             </div>
             <div class="stat-card">
-                <h4>🏆 الإنجازات والمستويات</h4>
-                <p>المستويات المختومة بالكامل: <strong style="color:var(--info); font-size:16px;">${completedLevels.length > 0 ? completedLevels.join('، ') : 'لم يتم ختم أي مستوى بالكامل بعد.'}</strong></p>
-            </div>
-            <div class="stat-card">
-                <h4>💰 الرصيد والبنك</h4>
-                <p>النقاط الكلية المكتسبة: <strong style="color:var(--primary); font-size:18px;">${cumulativeScore}</strong> نقطة</p>
-                <p>الرصيد المالي المتاح: <strong style="color:var(--warning); font-size:18px;">${bankBalance}</strong> جنيه فلسطيني</p>
+                <h4>🧠 تقرير المراجعة خلال آخر (${periodText})</h4>
+                <p>إجمالي الصفحات التي تمت مراجعتها: <strong style="color:var(--primary); font-size:18px;">${reviewedPagesCount}</strong> صفحة</p>
+                <div style="text-align: right; margin-top: 10px;">
+                    <strong>تفصيل أنواع المراجعات:</strong>
+                    <ul style="line-height: 1.8; margin-top: 5px; background: #fff; padding: 10px 25px; border-radius: 8px; border: 1px solid #eee;">
+                        ${typesHtml}
+                    </ul>
+                </div>
             </div>
         `;
     }

@@ -345,12 +345,12 @@
             
             if (timeAvailable > remainingTime) {
                 let link = generateYTLink(currentVid.videoId, tempTime);
-                planText += `<li style="margin-bottom:10px;">راجعي من <strong>${currentVid.name}</strong> <br><small>(من ${formatTime(tempTime)} إلى ${formatTime(tempTime + remainingTime)})</small><br>${link}</li>`;
+                planText += `<li style="margin-bottom:10px;">راجع من <strong>${currentVid.name}</strong> <br><small>(من ${formatTime(tempTime)} إلى ${formatTime(tempTime + remainingTime)})</small><br>${link}</li>`;
                 tempTime += remainingTime;
                 remainingTime = 0;
             } else {
                 let link = generateYTLink(currentVid.videoId, tempTime);
-                planText += `<li style="margin-bottom:10px;">راجعي من <strong>${currentVid.name}</strong> <br><small>(من ${formatTime(tempTime)} إلى النهاية ${formatTime(currentVid.length)})</small><br>${link}</li>`;
+                planText += `<li style="margin-bottom:10px;">راجع من <strong>${currentVid.name}</strong> <br><small>(من ${formatTime(tempTime)} إلى النهاية ${formatTime(currentVid.length)})</small><br>${link}</li>`;
                 remainingTime -= timeAvailable;
                 
                 tempTime = 0;
@@ -358,7 +358,7 @@
                 
                 if (tempIndex >= db.oldVideos.length) {
                     reachedEnd = true;
-                    planText += `<li style="color:var(--danger); font-weight:bold; list-style:none;">🎉 (لقد وصلتِ إلى نهاية الفيديوهات القديمة، اكتملت الدورة!)</li>`;
+                    planText += `<li style="color:var(--danger); font-weight:bold; list-style:none;">🎉 (لقد وصلت إلى نهاية الفيديوهات القديمة، اكتملت الدورة!)</li>`;
                     break; 
                 }
             }
@@ -496,7 +496,7 @@
 
         if (db.oldVideos.length > 0) {
             if (db.reviewState.isCycleFinished) {
-                reviewTaskDiv.innerHTML = "<div class='completion-box'>🎉 لقد أتممتِ مراجعة جميع الفيديوهات في هذه الدورة! بانتظار ولي الأمر للبدء بدورة جديدة.</div>";
+                reviewTaskDiv.innerHTML = "<div class='completion-box'>🎉 لقد أتممت مراجعة جميع الفيديوهات في هذه الدورة! بانتظار ولي الأمر للبدء بدورة جديدة.</div>";
                 btnFinishReview.style.display = 'none';
                 btnNewCycle.style.display = 'block';
                 btnNewCycle.disabled = !isParent;
@@ -530,7 +530,7 @@
             let btnNewVideo = document.getElementById('btn-new-video');
 
             if (db.memorizePlan.isFinished) {
-                memTaskDiv.innerHTML = "<div class='completion-box'>🎉 رائع جداً! لقد أتممتِ حفظ المقطع وتكراره بالكامل. بانتظار ولي الأمر للانتقال لفيديو جديد.</div>";
+                memTaskDiv.innerHTML = "<div class='completion-box'>🎉 رائع جداً! لقد أتممت حفظ المقطع وتكراره بالكامل. بانتظار ولي الأمر للانتقال لفيديو جديد.</div>";
                 btnFinishMem.style.display = 'none';
                 btnNewVideo.style.display = 'block';
                 btnNewVideo.disabled = !isParent;
