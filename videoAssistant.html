@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المساعد الذكي لحفظ المقاطع</title>
+    <style>
+        :root { 
+            --primary: #4e73df; 
+            --success: #1cc88a; 
+            --warning: #f6c23e; 
+            --danger: #e74a3b; 
+            --info: #36b9cc; 
+            --dark: #5a5c69; 
+            --light: #f8f9fc; 
+            --yt-red: #ff0000;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #eef2f7; 
+            padding: 10px; 
+            margin: 0; 
+            overflow-x: hidden; 
+        }
+
+        .container { 
+            background: white; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 15px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            position: relative;
+        }
+
+        header { text-align: center; margin-bottom: 20px; }
+        h1 { color: var(--primary); font-size: clamp(18px, 4.5vw, 26px); margin: 10px 0; }
+        
+        #parent-mode-banner { 
+            display: none; background: var(--warning); color: #333; padding: 8px 15px; 
+            border-radius: 10px; font-weight: bold; text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 14px;
+        }
+
+        .tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; }
+        .tab-btn {
+            flex: 1 1 30%; padding: 10px 5px; border: 2px solid #e3e6f0;
+            background: var(--light); font-size: clamp(13px, 3.5vw, 16px);
+            font-weight: bold; cursor: pointer; color: var(--dark);
+            border-radius: 8px; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .section-box { border: 2px solid #e3e6f0; border-radius: 10px; padding: 15px; margin-bottom: 20px; background: var(--light); }
+        .section-title { font-size: 17px; font-weight: bold; color: var(--primary); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+
+        label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold; color: var(--dark); }
+        input[type="text"], input[type="number"], input[type="url"] { 
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; 
+            font-weight: bold; font-family: inherit; margin-bottom: 15px; font-size: 15px;
+        }
+        input:disabled { background-color: #eaeaea; color: #888; }
+
+        .btn { 
+            width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; 
+            cursor: pointer; font-weight: bold; border: none; color: white; 
+            transition: 0.2s; margin-bottom: 10px; font-family: inherit;
+            display: inline-block; text-align: center; text-decoration: none;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .btn-primary { background: var(--primary); }
+        .btn-success { background: var(--success); font-size: 18px; padding: 15px; }
+        .btn-danger { background: var(--danger); }
+        .btn-warning { background: var(--warning); color: #333; }
+        .btn-dark { background: var(--dark); }
+        .btn-yt { background: var(--yt-red); width: auto; padding: 6px 12px; font-size: 14px; margin-top: 8px; margin-bottom: 5px; }
+
+        .task-box {
+            background-color: #e8f5e9; border-right: 5px solid var(--success);
+            padding: 15px; border-radius: 8px; margin-bottom: 15px;
+            font-size: 15px; line-height: 1.7; color: #2e7d32; font-weight: bold;
+        }
+        
+        .completion-box {
+            background-color: #fff3cd; border-right: 5px solid #ffc107;
+            padding: 15px; border-radius: 8px; margin-bottom: 15px;
+            font-size: 16px; line-height: 1.7; color: #856404; font-weight: bold; text-align:center;
+        }
+
+        ul { padding-right: 20px; margin: 0; }
+        .list-container { list-style: none; padding: 0; margin: 0; }
+        .list-container li {
+            background: white; margin-bottom: 10px; padding: 12px;
+            border-radius: 8px; font-size: 15px; border: 1px solid #e3e6f0;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .item-details { display: flex; justify-content: space-between; align-items: center; }
+        .item-actions { display: flex; gap: 5px; }
+        .item-actions .btn { margin-bottom: 0; padding: 8px; font-size: 14px; flex: 1;}
+        
+        .date-badge { background: var(--info); color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; align-self: flex-start; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="btn btn-dark" onclick="window.location.href='index.html?screen=dashboard'" style="margin-bottom: 15px; width: auto; padding: 8px 15px; font-size: 14px;">🔙 العودة للوحة التحكم</button>
+
+    <div id="parent-mode-banner">🛡️ أنت الآن في وضع ولي الأمر (صلاحيات كاملة)</div>
+
+    <header>
+        <h1>🧠 المساعد الذكي لحفظ المقاطع</h1>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('review')">🔄 المراجعة</button>
+        <button class="tab-btn" onclick="switchTab('memorize')">📖 الحفظ</button>
+        <button class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات</button>
+    </div>
+
+    <div id="review" class="section active">
+        
+        <div class="section-box">
+            <h3 class="section-title">⏱️ مهمة المراجعة لهذا اليوم (<span id="display-rev-total">20</span> دقيقة)</h3>
+            <div id="today-review-task"></div>
+            
+            <button class="btn btn-success" id="btn-finish-review" onclick="finishReviewTask()">أنهيت مراجعة اليوم بنجاح ✔️</button>
+            <button class="btn btn-warning" id="btn-new-cycle" onclick="startNewReviewCycle()" style="display:none; font-size: 18px; padding: 15px;">🔄 بدأ دورة مراجعة جديدة</button>
+        </div>
+
+        <div class="section-box">
+            <h3 class="section-title">➕ إضافة مقطع قديم يدوياً</h3>
+            <input type="url" id="old-vid-url" placeholder="رابط فيديو يوتيوب (يتم جلب الاسم تلقائياً)" onchange="fetchYTTitle(this, 'old-vid-name')">
+            <input type="text" id="old-vid-name" placeholder="اسم المقطع (متاح للتعديل)">
+            <input type="number" id="old-vid-len" placeholder="طول المقطع بالدقائق (إدخال يدوي)">
+            <button class="btn btn-primary" onclick="addOldVideo()">إضافة إلى قائمة المراجعة</button>
+        </div>
+
+        <div class="section-box">
+            <h3 class="section-title">📂 المقاطع القديمة (<span id="old-count">0</span>)</h3>
+            <ul class="list-container" id="old-videos-list"></ul>
+        </div>
+
+        <div class="section-box">
+            <h3 class="section-title">📜 سجل إنجازات دورة المراجعة الحالية</h3>
+            <ul class="list-container" id="review-history-list"></ul>
+        </div>
+    </div>
+
+    <div id="memorize" class="section">
+        
+        <div class="section-box" id="new-video-setup">
+            <h3 class="section-title">🎯 إعداد خطة حفظ مقطع جديد</h3>
+            <input type="url" id="new-vid-url" placeholder="رابط فيديو يوتيوب (يتم جلب الاسم تلقائياً)" onchange="fetchYTTitle(this, 'new-vid-name')">
+            <input type="text" id="new-vid-name" placeholder="اسم المقطع (متاح للتعديل)">
+            <input type="number" id="new-vid-len" placeholder="طول المقطع بالدقائق (إدخال يدوي)">
+            <button class="btn btn-primary" onclick="calculateNewPlan()">حساب خطة الحفظ والبدء 🚀</button>
+        </div>
+
+        <div class="section-box" id="new-video-active" style="display: none;">
+            <h3 class="section-title">📈 خطة الحفظ الحالية: <span id="active-plan-name" style="color:var(--dark);"></span></h3>
+            <p id="plan-progress-info" style="font-size: 16px; font-weight:bold;">اليوم <span id="active-plan-day" style="color:var(--danger); font-size:20px;"></span> من أصل <span id="active-plan-total"></span> أيام</p>
+            <div id="today-memorize-task"></div>
+            
+            <button class="btn btn-success" id="btn-finish-memorize" onclick="finishMemorizeTask()">أنجزت مهمة اليوم بنجاح ✔️</button>
+            <button class="btn btn-warning" id="btn-new-video" onclick="startNewVideoPlan()" style="display:none; font-size: 18px; padding: 15px;">⏭️ الانتقال إلى فيديو جديد</button>
+        </div>
+
+        <div class="section-box">
+            <h3 class="section-title">📜 سجل إنجازات الحفظ للمقطع الحالي</h3>
+            <ul class="list-container" id="memorize-history-list"></ul>
+        </div>
+    </div>
+
+    <div id="settings" class="section">
+        <div class="section-box">
+            <h3 class="section-title">⏱️ إعدادات فترة المراجعة</h3>
+            <label>طول فترة المراجعة الإجمالية بالدقائق</label>
+            <input type="number" id="set-rev-total" min="1">
+            <label>طول مقطع المراجعة بالدقائق</label>
+            <input type="number" id="set-rev-chunk" min="1">
+            <button id="btn-save-rev-set" class="btn btn-primary" onclick="saveReviewSettings()">💾 حفظ إعدادات المراجعة</button>
+        </div>
+
+        <div class="section-box">
+            <h3 class="section-title">⏱️ إعدادات فترة الحفظ</h3>
+            <label>طول فترة الحفظ الإجمالية بالدقائق</label>
+            <input type="number" id="set-mem-total" min="1">
+            <label>طول مقطع الحفظ بالدقائق</label>
+            <input type="number" id="set-mem-chunk" min="1">
+            <button id="btn-save-mem-set" class="btn btn-primary" onclick="saveMemorizeSettings()">💾 حفظ إعدادات الحفظ</button>
+        </div>
+
+        <div class="section-box" style="border-color: var(--danger); background: #fdf3f2;">
+            <h3 class="section-title" style="color: var(--danger); border-bottom-color: var(--danger);">🗑️ منطقة الخطر</h3>
+            <button id="btn-clear-all" class="btn btn-danger" onclick="resetApp()">مسح جميع بيانات التطبيق (إعادة ضبط المصنع)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ================= التخزين المحلي وإدارة البيانات =================
+    let db = {
+        oldVideos: [],
+        reviewState: { index: 0, time: 0, history: [], isCycleFinished: false },
+        memorizePlan: null, 
+        settings: { reviewTotal: 20, reviewChunk: 5, memorizeTotal: 20, memorizeChunk: 5 }
+    };
+
+    function loadData() {
+        let saved = localStorage.getItem('smartAssistantDB');
+        if (saved) {
+            let parsed = JSON.parse(saved);
+            db = { ...db, ...parsed };
+            if (!db.settings) db.settings = { reviewTotal: 20, reviewChunk: 5, memorizeTotal: 20, memorizeChunk: 5 };
+            if (db.reviewState.isCycleFinished === undefined) db.reviewState.isCycleFinished = false;
+        }
+        if(!localStorage.getItem('isParentMode')) localStorage.setItem('isParentMode', 'false');
+        renderAll();
+    }
+
+    function saveData() { localStorage.setItem('smartAssistantDB', JSON.stringify(db)); }
+
+    // ================= جلب بيانات ومعرف يوتيوب =================
+    function getYTVideoId(url) {
+        let match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})/);
+        return (match && match[1]) ? match[1] : null;
+    }
+
+    async function fetchYTTitle(inputElem, titleElemId) {
+        let url = inputElem.value.trim();
+        if(!url) return;
+        let titleElem = document.getElementById(titleElemId);
+        titleElem.placeholder = "جاري جلب الاسم من يوتيوب...";
+        try {
+            let res = await fetch('https://noembed.com/embed?url=' + encodeURIComponent(url));
+            let data = await res.json();
+            if(data.title) titleElem.value = data.title;
+        } catch(e) {}
+        titleElem.placeholder = "اسم المقطع (متاح للتعديل)";
+    }
+
+    // ================= حفظ الإعدادات =================
+    function saveReviewSettings() {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
+        let t = parseFloat(document.getElementById('set-rev-total').value) || 20;
+        let c = parseFloat(document.getElementById('set-rev-chunk').value) || 5;
+        db.settings.reviewTotal = t; db.settings.reviewChunk = c;
+        saveData(); renderAll(); alert("تم حفظ إعدادات المراجعة بنجاح!");
+    }
+
+    function saveMemorizeSettings() {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
+        let t = parseFloat(document.getElementById('set-mem-total').value) || 20;
+        let c = parseFloat(document.getElementById('set-mem-chunk').value) || 5;
+        db.settings.memorizeTotal = t; db.settings.memorizeChunk = c;
+        saveData(); renderAll(); alert("تم حفظ إعدادات الحفظ بنجاح!");
+    }
+
+    function resetApp() {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
+        if (confirm("تحذير: هل أنت متأكد من مسح جميع البيانات؟")) {
+            localStorage.removeItem('smartAssistantDB');
+            location.reload();
+        }
+    }
+
+    // ================= دوال مساعدة =================
+    function formatTime(minutes) {
+        let m = Math.floor(minutes);
+        let s = Math.round((minutes - m) * 60);
+        if (s === 60) { m++; s = 0; }
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function generateYTLink(videoId, startMinutes) {
+        if (!videoId) return "";
+        let seconds = Math.floor(startMinutes * 60);
+        return `<a href="https://youtu.be/${videoId}?t=${seconds}" target="_blank" class="btn btn-yt">📺 مشاهدة من الدقيقة ${formatTime(startMinutes)}</a>`;
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function getCurrentDate() { return new Date().toLocaleDateString('ar-EG'); }
+
+    // ================= قسم المراجعة =================
+    function addOldVideo() {
+        let url = document.getElementById('old-vid-url').value.trim();
+        let name = document.getElementById('old-vid-name').value.trim();
+        let len = parseFloat(document.getElementById('old-vid-len').value);
+        if (!name || isNaN(len) || len <= 0) return alert("الرجاء إدخال اسم وطول صحيح للمقطع");
+        
+        db.oldVideos.push({ id: Date.now(), name, length: len, videoId: getYTVideoId(url), url: url });
+        document.getElementById('old-vid-url').value = ''; document.getElementById('old-vid-name').value = ''; document.getElementById('old-vid-len').value = '';
+        saveData(); renderAll();
+    }
+
+    function deleteOldVideo(id) {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
+        if(!confirm("هل أنت متأكد من حذف هذا المقطع؟")) return;
+        db.oldVideos = db.oldVideos.filter(v => v.id !== id);
+        if (db.reviewState.index >= db.oldVideos.length) { db.reviewState.index = 0; db.reviewState.time = 0; }
+        saveData(); renderAll();
+    }
+
+    function editOldVideo(id) {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
+        let vid = db.oldVideos.find(v => v.id === id);
+        let newName = prompt("تعديل اسم المقطع:", vid.name);
+        let newLen = prompt("تعديل طول المقطع بالدقائق:", vid.length);
+        if (newName && newLen && !isNaN(newLen)) {
+            vid.name = newName; vid.length = parseFloat(newLen);
+            saveData(); renderAll();
+        }
+    }
+
+    let pendingReviewState = null; 
+
+    function generateTodayReviewTask() {
+        if (db.oldVideos.length === 0) return "لا يوجد مقاطع قديمة للمراجعة حالياً. أضف مقاطع لتبدأ.";
+        
+        let planText = "<ul style='padding-right:15px;'>";
+        let remainingTime = db.settings.reviewChunk; 
+        let tempIndex = db.reviewState.index;
+        let tempTime = db.reviewState.time;
+        let reachedEnd = false; 
+        
+        while (remainingTime > 0.01) { 
+            let currentVid = db.oldVideos[tempIndex];
+            let timeAvailable = currentVid.length - tempTime;
+            
+            if (timeAvailable > remainingTime) {
+                let link = generateYTLink(currentVid.videoId, tempTime);
+                planText += `<li style="margin-bottom:10px;">راجعي من <strong>${currentVid.name}</strong> <br><small>(من ${formatTime(tempTime)} إلى ${formatTime(tempTime + remainingTime)})</small><br>${link}</li>`;
+                tempTime += remainingTime;
+                remainingTime = 0;
+            } else {
+                let link = generateYTLink(currentVid.videoId, tempTime);
+                planText += `<li style="margin-bottom:10px;">راجعي من <strong>${currentVid.name}</strong> <br><small>(من ${formatTime(tempTime)} إلى النهاية ${formatTime(currentVid.length)})</small><br>${link}</li>`;
+                remainingTime -= timeAvailable;
+                
+                tempTime = 0;
+                tempIndex++; 
+                
+                if (tempIndex >= db.oldVideos.length) {
+                    reachedEnd = true;
+                    planText += `<li style="color:var(--danger); font-weight:bold; list-style:none;">🎉 (لقد وصلتِ إلى نهاية الفيديوهات القديمة، اكتملت الدورة!)</li>`;
+                    break; 
+                }
+            }
+        }
+        planText += `</ul><div style='margin-top:10px; color:#555; font-size:14px;'>* تكرر هذه المقاطع طوال الـ ${db.settings.reviewTotal} دقيقة المخصصة.</div>`;
+        pendingReviewState = { index: tempIndex, time: tempTime, desc: planText.replace(/<a.*?>.*?<\/a>/g, ''), reachedEnd: reachedEnd };
+        return planText;
+    }
+
+    function finishReviewTask() {
+        if (!pendingReviewState) return;
+        
+        db.reviewState.history.unshift({ date: getCurrentDate(), desc: pendingReviewState.desc });
+        db.reviewState.index = pendingReviewState.index; 
+        db.reviewState.time = pendingReviewState.time;
+        
+        if (pendingReviewState.reachedEnd) {
+            db.reviewState.isCycleFinished = true; 
+        }
+        
+        saveData(); renderAll();
+    }
+
+    function startNewReviewCycle() {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
+        if(confirm("هل أنت متأكد من مسح بيانات الدورة السابقة وبدء دورة مراجعة جديدة من البداية؟")) {
+            db.reviewState.index = 0;
+            db.reviewState.time = 0;
+            db.reviewState.history = []; 
+            db.reviewState.isCycleFinished = false;
+            saveData(); renderAll();
+        }
+    }
+
+    // ================= قسم الحفظ =================
+    function calculateNewPlan() {
+        let url = document.getElementById('new-vid-url').value.trim();
+        let name = document.getElementById('new-vid-name').value.trim();
+        let len = parseFloat(document.getElementById('new-vid-len').value);
+        if (!name || isNaN(len) || len < 1) return alert("الرجاء إدخال بيانات صحيحة");
+        
+        let ytId = url ? getYTVideoId(url) : null;
+        let memTotal = db.settings.memorizeTotal; let memChunk = db.settings.memorizeChunk; let halfMem = memTotal / 2; 
+        
+        let n_parts = Math.round(len / memChunk);
+        if (n_parts === 0) n_parts = 1;
+        let part_length = len / n_parts;
+        let tasks = [];
+        
+        for (let i = 1; i <= n_parts; i++) {
+            let start = (i - 1) * part_length; let end = i * part_length;
+            if (i === 1) {
+                let txt1 = `تخصيص ${memTotal} دقيقة بالكامل لحفظ الجزء الأول (من البداية إلى ${formatTime(end)})`;
+                let txt2 = `تكرار الجزء الأول في الجلسة المخصصة (من البداية إلى ${formatTime(end)})`;
+                tasks.push({ text: txt1, startMin: 0 }); tasks.push({ text: txt2, startMin: 0 }); tasks.push({ text: txt2, startMin: 0 });
+            } else {
+                let prevEnd = formatTime(start);
+                let txtSave = `حفظ الجزء رقم ${i} (من ${formatTime(start)} إلى ${formatTime(end)}) في وقت الجلسة المخصص`;
+                let txtRev = `${halfMem} دقيقة لمراجعة السابق (من البداية إلى ${prevEnd}) <br>+ ${halfMem} دقيقة لتكرار الجزء الجديد (من ${formatTime(start)} إلى ${formatTime(end)})`;
+                tasks.push({ text: txtSave, startMin: start }); tasks.push({ text: txtRev, startMin: start }); tasks.push({ text: txtRev, startMin: start });
+            }
+        }
+        for (let j = 1; j <= n_parts; j++) {
+            tasks.push({ text: `مراجعة المقطع كامل (من البداية إلى ${formatTime(len)}) في الجلسة المخصصة [${memTotal} دقيقة]`, startMin: 0 });
+        }
+        
+        db.memorizePlan = { name: name, length: len, videoId: ytId, url: url, tasks: tasks, currentIndex: 0, history: [], isFinished: false };
+        saveData(); renderAll();
+    }
+
+    function finishMemorizeTask() {
+        let plan = db.memorizePlan;
+        let currentTaskObj = plan.tasks[plan.currentIndex];
+        
+        plan.history.unshift({ date: getCurrentDate(), dayNum: plan.currentIndex + 1, desc: currentTaskObj.text });
+        plan.currentIndex++;
+        
+        if (plan.currentIndex >= plan.tasks.length) {
+            plan.isFinished = true; 
+        }
+        saveData(); renderAll();
+    }
+
+    function startNewVideoPlan() {
+        if (localStorage.getItem('isParentMode') !== 'true') return;
+        if(confirm("سيتم الآن نقل المقطع إلى قائمة 'المقاطع القديمة' ومسح الخطة الحالية. هل أنت متأكد؟")) {
+            let plan = db.memorizePlan;
+            db.oldVideos.push({ id: Date.now(), name: plan.name, length: plan.length, videoId: plan.videoId, url: plan.url });
+            db.memorizePlan = null;
+            saveData(); renderAll();
+        }
+    }
+
+    // ================= عرض وتحديث الواجهة =================
+    function renderAll() {
+        let isParent = localStorage.getItem('isParentMode') === 'true';
+
+        // 1. شريط ولي الأمر والإعدادات (مربوط بلوحة التحكم الرئيسية)
+        document.getElementById('parent-mode-banner').style.display = isParent ? 'block' : 'none';
+
+        document.getElementById('set-rev-total').value = db.settings.reviewTotal;
+        document.getElementById('set-rev-chunk').value = db.settings.reviewChunk;
+        document.getElementById('set-mem-total').value = db.settings.memorizeTotal;
+        document.getElementById('set-mem-chunk').value = db.settings.memorizeChunk;
+        
+        ['set-rev-total', 'set-rev-chunk', 'set-mem-total', 'set-mem-chunk'].forEach(id => { document.getElementById(id).disabled = !isParent; });
+        document.getElementById('btn-save-rev-set').disabled = !isParent;
+        document.getElementById('btn-save-mem-set').disabled = !isParent;
+        document.getElementById('btn-clear-all').disabled = !isParent;
+
+        // 2. تحديث قسم المراجعة
+        document.getElementById('display-rev-total').innerText = db.settings.reviewTotal;
+        document.getElementById('old-count').innerText = db.oldVideos.length;
+        
+        let oldList = document.getElementById('old-videos-list');
+        oldList.innerHTML = '';
+        db.oldVideos.forEach(v => {
+            let actionBtns = isParent 
+                ? `<button class="btn btn-dark" onclick="editOldVideo(${v.id})">تعديل</button>
+                   <button class="btn btn-danger" onclick="deleteOldVideo(${v.id})">حذف</button>`
+                : `<button class="btn btn-dark" disabled>تعديل 🔒</button>
+                   <button class="btn btn-danger" disabled>حذف 🔒</button>`;
+            let watchLink = v.videoId ? `<a href="https://youtu.be/${v.videoId}" target="_blank" style="color:var(--yt-red); text-decoration:none; font-size:14px; margin-top:5px; display:block;">📺 فتح المقطع</a>` : '';
+            oldList.innerHTML += `<li>
+                <div class="item-details" style="display:block;">
+                    <strong>${v.name}</strong> <span style="color:var(--primary); font-weight:bold; float:left;">${v.length} دقيقة</span>${watchLink}
+                </div>
+                <div class="item-actions" style="margin-top:10px;">${actionBtns}</div>
+            </li>`;
+        });
+
+        let reviewTaskDiv = document.getElementById('today-review-task');
+        let btnFinishReview = document.getElementById('btn-finish-review');
+        let btnNewCycle = document.getElementById('btn-new-cycle');
+
+        if (db.oldVideos.length > 0) {
+            if (db.reviewState.isCycleFinished) {
+                reviewTaskDiv.innerHTML = "<div class='completion-box'>🎉 لقد أتممتِ مراجعة جميع الفيديوهات في هذه الدورة! بانتظار ولي الأمر للبدء بدورة جديدة.</div>";
+                btnFinishReview.style.display = 'none';
+                btnNewCycle.style.display = 'block';
+                btnNewCycle.disabled = !isParent;
+                btnNewCycle.title = isParent ? "" : "مغلق: يحتاج ولي الأمر";
+            } else {
+                reviewTaskDiv.innerHTML = `<div class="task-box">${generateTodayReviewTask()}</div>`;
+                btnFinishReview.style.display = 'block';
+                btnNewCycle.style.display = 'none';
+            }
+        } else {
+            reviewTaskDiv.innerHTML = "<div class='task-box' style='background:#f8f9fc; border-color:#ccc; color:#777;'>لا يوجد مقاطع.</div>";
+            btnFinishReview.style.display = 'none';
+            btnNewCycle.style.display = 'none';
+        }
+
+        let reviewHistoryList = document.getElementById('review-history-list');
+        reviewHistoryList.innerHTML = '';
+        db.reviewState.history.forEach(h => { reviewHistoryList.innerHTML += `<li><span class="date-badge">${h.date}</span><div>${h.desc}</div></li>`; });
+
+        // 3. تحديث قسم الحفظ
+        if (db.memorizePlan) {
+            document.getElementById('new-video-setup').style.display = 'none';
+            document.getElementById('new-video-active').style.display = 'block';
+            
+            document.getElementById('active-plan-name').innerText = db.memorizePlan.name;
+            document.getElementById('active-plan-day').innerText = Math.min((db.memorizePlan.currentIndex + 1), db.memorizePlan.tasks.length);
+            document.getElementById('active-plan-total').innerText = db.memorizePlan.tasks.length;
+            
+            let memTaskDiv = document.getElementById('today-memorize-task');
+            let btnFinishMem = document.getElementById('btn-finish-memorize');
+            let btnNewVideo = document.getElementById('btn-new-video');
+
+            if (db.memorizePlan.isFinished) {
+                memTaskDiv.innerHTML = "<div class='completion-box'>🎉 رائع جداً! لقد أتممتِ حفظ المقطع وتكراره بالكامل. بانتظار ولي الأمر للانتقال لفيديو جديد.</div>";
+                btnFinishMem.style.display = 'none';
+                btnNewVideo.style.display = 'block';
+                btnNewVideo.disabled = !isParent;
+                btnNewVideo.title = isParent ? "" : "مغلق: يحتاج ولي الأمر";
+            } else {
+                let curTask = db.memorizePlan.tasks[db.memorizePlan.currentIndex];
+                let memLink = generateYTLink(db.memorizePlan.videoId, curTask.startMin);
+                memTaskDiv.innerHTML = `<div class="task-box">${curTask.text} <br> ${memLink}</div>`;
+                btnFinishMem.style.display = 'block';
+                btnNewVideo.style.display = 'none';
+            }
+
+            let memHistoryList = document.getElementById('memorize-history-list');
+            memHistoryList.innerHTML = '';
+            db.memorizePlan.history.forEach(h => { memHistoryList.innerHTML += `<li><span class="date-badge">${h.date}</span><div><strong>اليوم ${h.dayNum}:</strong> <br>${h.desc}</div></li>`; });
+        } else {
+            document.getElementById('new-video-setup').style.display = 'block';
+            document.getElementById('new-video-active').style.display = 'none';
+            document.getElementById('memorize-history-list').innerHTML = '';
+            document.getElementById('new-vid-url').value = '';
+            document.getElementById('new-vid-name').value = '';
+            document.getElementById('new-vid-len').value = '';
+        }
+    }
+
+    window.onload = loadData;
+</script>
+</body>
+</html>
