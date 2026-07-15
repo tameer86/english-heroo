@@ -28,7 +28,7 @@
         
         .settings-field { margin: 15px 0; text-align: right; }
         .settings-field label { font-weight: bold; display: block; margin-bottom: 5px; }
-        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"], .settings-field input[type="text"], .settings-field input[type="email"], .settings-field input[type="file"], .settings-field input[type="number"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        .settings-field select, .settings-field input[type="range"], .settings-field input[type="password"], .settings-field input[type="text"], .settings-field input[type="email"], .settings-field input[type="file"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         .test-textarea { width: 100%; height: 60px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; resize: none; direction: ltr; box-sizing: border-box; font-size: 15px; }
         .sync-box { background: #e3f2fd; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #b3e5fc; }
 
@@ -38,7 +38,7 @@
 
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
         .stat-card { background: #f8f9fc; border: 1px solid #e3e6f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: right; }
-        .stat-card h4 { margin: 0 0 10px 0; color: var(--primary); }
+        .stat-card h4 { margin: 0 0 10px 0; color: var(--primary); border-bottom: 2px dashed #eee; padding-bottom: 5px; }
     </style>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
@@ -152,20 +152,30 @@
 
         <div id="reports-screen" class="hidden">
             <h1>إحصائيات وتقارير الإنجاز 📊</h1>
-            <div class="settings-field" style="background: #f8f9fc; padding: 15px; border-radius: 10px; border: 1px solid #e3e6f0; text-align: center;">
-                <label style="color:var(--primary); font-size:16px;">حدد الفترة الزمنية لعرض تقرير الحفظ والمراجعة:</label>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap;">
-                    <input type="number" id="report-time-value" min="1" value="1" style="width: 100px; padding: 8px;">
-                    <select id="report-time-unit" style="width: 180px; padding: 8px;">
-                        <option value="hours">ساعات (حد أقصى 24)</option>
-                        <option value="days">أيام (حد أقصى 30)</option>
-                        <option value="months">أشهر (حد أقصى 12)</option>
+            
+            <div class="settings-field" style="background: #f8f9fc; padding: 15px; border-radius: 10px; border: 1px solid #e3e6f0; text-align: right;">
+                <label style="font-weight: bold; color: var(--dark); display: block; margin-bottom: 10px;">اختر نوع التقرير المطلوب:</label>
+                <select id="main-report-type" onchange="toggleReportInputs()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--primary); font-weight: bold; font-family: inherit; margin-bottom: 15px;">
+                    <option value="save">1. تقرير إنجاز الحفظ (فترة زمنية)</option>
+                    <option value="review">2. تقرير إنجاز المراجعة (فترة زمنية)</option>
+                    <option value="general">3. الإحصائيات العامة والبنك (مطلق)</option>
+                </select>
+
+                <div id="time-selectors" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <select id="report-type" onchange="updateReportRangeOptions()" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; min-width: 150px;">
+                        <option value="hours">في آخر عدد ساعات</option>
+                        <option value="days">في آخر عدد أيام</option>
+                        <option value="weeks">في آخر عدد أسابيع</option>
+                        <option value="months">في آخر عدد أشهر</option>
                     </select>
+                    <select id="report-num" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; min-width: 150px;"></select>
                 </div>
-                <button style="background: var(--success); margin-top: 15px; width: auto; padding: 10px 20px;" onclick="generateCustomReports()">📋 عرض التقرير</button>
+                
+                <button style="background: var(--info); width: 100%; margin: 0; padding: 12px; font-size: 16px; border-radius: 8px;" onclick="generateSelectedReport()">عرض التقرير 🔍</button>
             </div>
             
-            <div id="reports-content" style="margin-top: 15px;"></div>
+            <div id="report-results" style="display: none; background: #fff; padding: 15px; border-radius: 10px; text-align: right; max-height: 400px; overflow-y: auto; margin-top: 15px; border: 1px solid #e3e6f0;"></div>
+
             <button style="background: var(--dark); margin-top: 20px;" onclick="showDashboard()">🔙 العودة للوحة التحكم</button>
         </div>
 
@@ -399,98 +409,6 @@
         }
     }
 
-    function showDashboard() { hideAllScreens(); updateLevelStats(); document.getElementById('dashboard-screen').classList.remove('hidden'); }
-    function goHome() { hideAllScreens(); document.getElementById('home-screen').classList.remove('hidden'); }
-    function showAbout() { hideAllScreens(); document.getElementById('about-screen').classList.remove('hidden'); }
-    function showContact() { hideAllScreens(); document.getElementById('contact-screen').classList.remove('hidden'); }
-    
-    function showReports() {
-        hideAllScreens();
-        document.getElementById('reports-screen').classList.remove('hidden');
-        document.getElementById('reports-content').innerHTML = '<p style="text-align:center; color:var(--dark);">يرجى تحديد الفترة الزمنية والضغط على زر "عرض التقرير".</p>';
-    }
-
-    function generateCustomReports() {
-        let val = parseInt(document.getElementById('report-time-value').value);
-        let unit = document.getElementById('report-time-unit').value;
-        if (!val || val < 1) return alert("الرجاء إدخال رقم صحيح.");
-
-        let maxMap = { 'hours': 24, 'days': 30, 'months': 12 };
-        if (val > maxMap[unit]) {
-            alert(`الحد الأقصى لهذا الخيار هو ${maxMap[unit]}`);
-            val = maxMap[unit];
-            document.getElementById('report-time-value').value = val;
-        }
-
-        let timeLimitMs = 0;
-        let now = Date.now();
-        if (unit === 'hours') timeLimitMs = now - (val * 60 * 60 * 1000);
-        else if (unit === 'days') timeLimitMs = now - (val * 24 * 60 * 60 * 1000);
-        else if (unit === 'months') timeLimitMs = now - (val * 30 * 24 * 60 * 60 * 1000);
-
-        let progress = JSON.parse(localStorage.getItem('appProgress')) || {};
-        
-        let savedWordsInPeriod = 0;
-        for (let lvl in progress.levels) {
-            if (progress.levels[lvl].savedWords) {
-                progress.levels[lvl].savedWords.forEach(w => {
-                    if (w.unixTime && w.unixTime >= timeLimitMs && !w.isOld) {
-                        savedWordsInPeriod++;
-                    }
-                });
-            }
-        }
-        let savedPages = Math.floor(savedWordsInPeriod / 10);
-
-        let reviewedPagesCount = 0;
-        let reviewTypesCount = {};
-        
-        if (progress.reviewHistory && Array.isArray(progress.reviewHistory)) {
-            progress.reviewHistory.forEach(rev => {
-                if (rev.unixTime && rev.unixTime >= timeLimitMs) {
-                    reviewedPagesCount += (rev.pages || 0);
-                    let rType = rev.type || 'مراجعة عامة';
-                    reviewTypesCount[rType] = (reviewTypesCount[rType] || 0) + (rev.pages || 0);
-                }
-            });
-        }
-
-        let typesHtml = '';
-        for (let t in reviewTypesCount) {
-            typesHtml += `<li style="margin-bottom: 5px;">نوع [${t}]: <strong>${reviewTypesCount[t]}</strong> صفحات</li>`;
-        }
-        if (typesHtml === '') typesHtml = '<li style="color:#777; font-style:italic;">لم يتم إجراء أي مراجعات في هذه الفترة.</li>';
-
-        let periodText = val + ' ' + (unit === 'hours' ? 'ساعة' : unit === 'days' ? 'يوم' : 'شهر');
-
-        document.getElementById('reports-content').innerHTML = `
-            <div class="stat-card">
-                <h4>📚 تقرير الحفظ خلال آخر (${periodText})</h4>
-                <p>عدد الصفحات التي تم حفظها: <strong style="color:var(--success); font-size:18px;">${savedPages}</strong> صفحة</p>
-            </div>
-            <div class="stat-card">
-                <h4>🧠 تقرير المراجعة خلال آخر (${periodText})</h4>
-                <p>إجمالي الصفحات التي تمت مراجعتها: <strong style="color:var(--primary); font-size:18px;">${reviewedPagesCount}</strong> صفحة</p>
-                <div style="text-align: right; margin-top: 10px;">
-                    <strong>تفصيل أنواع المراجعات:</strong>
-                    <ul style="line-height: 1.8; margin-top: 5px; background: #fff; padding: 10px 25px; border-radius: 8px; border: 1px solid #eee;">
-                        ${typesHtml}
-                    </ul>
-                </div>
-            </div>
-        `;
-    }
-
-    function showSettings() {
-        hideAllScreens(); document.getElementById('settings-screen').classList.remove('hidden');
-        let settings = JSON.parse(localStorage.getItem('audioSettings'));
-        document.getElementById('voice-speed').value = settings.speed || 1;
-        updateSpeedVal(settings.speed || 1);
-        document.getElementById('voice-gender').value = settings.voiceName || "";
-        document.getElementById('gemini-api-key').value = settings.geminiApiKey || "";
-        applyGlobalModes();
-    }
-    
     function hideAllScreens() { 
         document.getElementById('home-screen').classList.add('hidden'); 
         document.getElementById('dashboard-screen').classList.add('hidden'); 
@@ -499,6 +417,190 @@
         document.getElementById('contact-screen').classList.add('hidden'); 
         document.getElementById('reports-screen').classList.add('hidden'); 
     }
+
+    function showDashboard() { hideAllScreens(); updateLevelStats(); document.getElementById('dashboard-screen').classList.remove('hidden'); }
+    function goHome() { hideAllScreens(); document.getElementById('home-screen').classList.remove('hidden'); }
+    function showAbout() { hideAllScreens(); document.getElementById('about-screen').classList.remove('hidden'); }
+    function showContact() { hideAllScreens(); document.getElementById('contact-screen').classList.remove('hidden'); }
+    
+    // ================== نظام التقارير المطور ==================
+    function showReports() {
+        hideAllScreens();
+        document.getElementById('reports-screen').classList.remove('hidden');
+        document.getElementById('main-report-type').value = 'save';
+        toggleReportInputs();
+    }
+
+    function toggleReportInputs() {
+        let type = document.getElementById('main-report-type').value;
+        let timeSelectors = document.getElementById('time-selectors');
+        
+        if (type === 'save' || type === 'review') {
+            timeSelectors.style.display = 'flex';
+            updateReportRangeOptions();
+        } else {
+            timeSelectors.style.display = 'none';
+        }
+        document.getElementById('report-results').style.display = 'none';
+    }
+
+    function updateReportRangeOptions() {
+        let type = document.getElementById('report-type').value;
+        let selectNum = document.getElementById('report-num');
+        if(!selectNum) return;
+        selectNum.innerHTML = '';
+        
+        let max = 0;
+        if(type === 'hours') max = 24;
+        if(type === 'days') max = 7;
+        if(type === 'weeks') max = 4;
+        if(type === 'months') max = 12;
+
+        for(let i = 1; i <= max; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.text = i;
+            selectNum.appendChild(opt);
+        }
+    }
+
+    function generateSelectedReport() {
+        let type = document.getElementById('main-report-type').value;
+        if (type === 'save') generateSaveReport();
+        else if (type === 'review') generateReviewReport();
+        else if (type === 'general') generateGeneralReport();
+    }
+    
+    function getCutoffTime() {
+        let type = document.getElementById('report-type').value;
+        let num = parseInt(document.getElementById('report-num').value);
+        let multiplier = 1;
+
+        if(type === 'hours') multiplier = 60 * 60 * 1000;
+        if(type === 'days') multiplier = 24 * 60 * 60 * 1000;
+        if(type === 'weeks') multiplier = 7 * 24 * 60 * 60 * 1000;
+        if(type === 'months') multiplier = 30 * 24 * 60 * 60 * 1000; 
+
+        return Date.now() - (num * multiplier);
+    }
+
+    function generateSaveReport() {
+        let cutoffTime = getCutoffTime();
+        let progress = JSON.parse(localStorage.getItem('appProgress')) || {};
+        
+        let savedWordsInPeriod = 0;
+        let newWordsCount = 0;
+        let oldWordsCount = 0;
+
+        for (let lvl in progress.levels) {
+            if (progress.levels[lvl].savedWords) {
+                progress.levels[lvl].savedWords.forEach(w => {
+                    if (w.unixTime && w.unixTime >= cutoffTime) {
+                        savedWordsInPeriod++;
+                        if (w.isOld) oldWordsCount++;
+                        else newWordsCount++;
+                    }
+                });
+            }
+        }
+        
+        let savedPages = Math.floor(savedWordsInPeriod / 10);
+
+        let resultHTML = `
+            <div class="stat-card">
+                <h4>📚 تقرير الحفظ للفترة المحددة</h4>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:bold; color:var(--dark);"><span>عدد الصفحات التي تم حفظها:</span> <span style="color:var(--success); font-size:18px;">${savedPages} صفحة</span></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:bold; color:var(--dark);"><span>إجمالي الكلمات التي تم حفظها:</span> <span style="color:var(--primary); font-size:18px;">${savedWordsInPeriod} كلمة</span></div>
+                <hr style="border:1px dashed #eee; margin:10px 0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; font-weight:bold;"><span>منها كلمات جديدة:</span> <span style="color:var(--info);">${newWordsCount} كلمة</span></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; font-weight:bold;"><span>منها كلمات قديمة (مستثناة):</span> <span style="color:var(--warning);">${oldWordsCount} كلمة</span></div>
+            </div>
+        `;
+        let resultsDiv = document.getElementById('report-results');
+        resultsDiv.innerHTML = resultHTML;
+        resultsDiv.style.display = 'block';
+    }
+
+    function generateReviewReport() {
+        let cutoffTime = getCutoffTime();
+        let progress = JSON.parse(localStorage.getItem('appProgress')) || {};
+        
+        let reviewedPagesCount = 0;
+        let reviewTypesCount = {};
+        
+        if (progress.reviewHistory && Array.isArray(progress.reviewHistory)) {
+            progress.reviewHistory.forEach(rev => {
+                if (rev.unixTime && rev.unixTime >= cutoffTime) {
+                    let p = rev.pages || 0;
+                    if (p === 0 && rev.desc) p = 1; 
+                    
+                    reviewedPagesCount += p;
+                    let rType = rev.type || 'مراجعة عامة';
+                    reviewTypesCount[rType] = (reviewTypesCount[rType] || 0) + p;
+                }
+            });
+        }
+
+        let typesHtml = '';
+        for (let t in reviewTypesCount) {
+            typesHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; background:#f8f9fc; padding:8px; border-radius:6px; border:1px solid #eee;"><span>نوع [${t}]:</span> <strong style="color:var(--info)">${reviewTypesCount[t]} صفحات</strong></div>`;
+        }
+        if (typesHtml === '') typesHtml = '<div style="color:#777; font-style:italic; text-align:center;">لم يتم إجراء أي مراجعات في هذه الفترة.</div>';
+
+        let resultHTML = `
+            <div class="stat-card">
+                <h4>🧠 تقرير المراجعة للفترة المحددة</h4>
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold; color:var(--dark);"><span>إجمالي الصفحات التي تمت مراجعتها:</span> <span style="color:var(--purple); font-size:18px;">${reviewedPagesCount} صفحة</span></div>
+                <div style="text-align: right; margin-top: 15px;">
+                    <strong style="color:var(--dark); border-bottom:2px dashed #eee; display:block; padding-bottom:5px; margin-bottom:10px;">تفصيل أنواع المراجعات:</strong>
+                    ${typesHtml}
+                </div>
+            </div>
+        `;
+        let resultsDiv = document.getElementById('report-results');
+        resultsDiv.innerHTML = resultHTML;
+        resultsDiv.style.display = 'block';
+    }
+
+    function generateGeneralReport() {
+        let progress = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let totalSaved = 0;
+        let totalSystem = 0;
+        let completedLevels = [];
+        
+        for(let lvl in progress.levels) {
+            let saved = progress.levels[lvl].savedWords ? progress.levels[lvl].savedWords.length : 0;
+            let total = allLevelsData[lvl] ? allLevelsData[lvl].length : 0;
+            totalSaved += saved;
+            totalSystem += total;
+            if(saved >= total && total > 0) completedLevels.push(getLevelName(lvl));
+        }
+
+        let bankBalance = progress.bankBalance || 0;
+        let cumulativeScore = Math.floor(progress.cumulativeScore || 0);
+
+        let resultHTML = `
+            <div class="stat-card">
+                <h4>📚 إحصائيات الحفظ العامة</h4>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:bold;"><span>إجمالي الكلمات المحفوظة الكلي:</span> <strong style="color:var(--success); font-size:16px;">${totalSaved} كلمة</strong></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:bold;"><span>الكلمات المتبقية في المنهاج:</span> <strong style="color:var(--danger); font-size:16px;">${totalSystem - totalSaved} كلمة</strong></div>
+            </div>
+            <div class="stat-card">
+                <h4>🏆 الإنجازات والمستويات</h4>
+                <p style="margin:5px 0; font-weight:bold;">المستويات المختومة بالكامل: <br><strong style="color:var(--info); font-size:15px; display:block; margin-top:8px; line-height:1.6;">${completedLevels.length > 0 ? completedLevels.join('، ') : 'لم يتم ختم أي مستوى بالكامل بعد.'}</strong></p>
+            </div>
+            <div class="stat-card">
+                <h4>💰 الرصيد والبنك</h4>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:bold;"><span>النقاط التراكمية الكلية:</span> <strong style="color:var(--primary); font-size:16px;">${cumulativeScore} نقطة</strong></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:bold;"><span>الرصيد المالي المتاح:</span> <strong style="color:var(--warning); font-size:16px;">${bankBalance} جنيه فلسطيني</strong></div>
+            </div>
+        `;
+        
+        let resultsDiv = document.getElementById('report-results');
+        resultsDiv.innerHTML = resultHTML;
+        resultsDiv.style.display = 'block';
+    }
+    // ==========================================================
 
     function clearProgressData() { 
         if (confirm("تنبيه: سيتم مسح تقدمك والكلمات المحفوظة.\nيرجى تصدير بياناتك أولاً إذا أردت الاحتفاظ بها.\nهل أنت متأكد؟")) { 
