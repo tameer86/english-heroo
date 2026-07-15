@@ -681,6 +681,7 @@
     function moveToNextTestPage() { currentChunkIdx++; renderTestPage(); }
 
     function finishSessionReport() {
+        // إدارة المراجعة التتابعية
         if (currentReviewType === 2) {
             let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
             
@@ -709,9 +710,39 @@
             }
             
             appProgress.seqCycleState = (appProgress.seqCycleState === 'ar-en') ? 'en-ar' : 'ar-en';
-            localStorage.setItem('appProgress', JSON.stringify(appProgress)); 
+        }
+
+        // --- الكود الجديد المضاف لتسجيل بيانات المراجعة في التقارير ---
+        let typeNames = {
+            1: "المراجعة الشاملة",
+            2: "المراجعة التتابعية",
+            3: "المراجعة العشوائية المتقدمة",
+            4: "المراجعة اليومية الذكية",
+            5: "مراجعة كلمات الأيام الأخيرة",
+            6: "مراجعة كلمات فترة زمنية مختارة"
+        };
+        let revTypeName = typeNames[currentReviewType] || "مراجعة عامة";
+
+        if (!appProgress.reviewHistory) {
+            appProgress.reviewHistory = [];
+        }
+
+        // تسجيل عدد الصفحات المنجزة، الوقت، ونوع المراجعة في الذاكرة
+        appProgress.reviewHistory.push({
+            unixTime: Date.now(),
+            pages: testWordsChunks.length,
+            type: revTypeName
+        });
+
+        // حفظ جميع التغييرات دفعة واحدة
+        localStorage.setItem('appProgress', JSON.stringify(appProgress)); 
+        
+        // تحديث العدادات إذا كانت مراجعة تتابعية
+        if (currentReviewType === 2) {
             updateSeqInfo();
         }
+        // -------------------------------------------------------------
+
         window.location.href = "index.html?screen=dashboard";
     }
 
