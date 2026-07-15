@@ -681,26 +681,6 @@
     function moveToNextTestPage() { currentChunkIdx++; renderTestPage(); }
 
     function finishSessionReport() {
-        // --- هذه الإضافة الجوهرية لحفظ المراجعة في الذاكرة لكي يقرأها التقرير ---
-        if (!appProgress.reviewHistory) {
-            appProgress.reviewHistory = [];
-        }
-        
-        let typeName = "مراجعة عامة";
-        if (currentReviewType === 1) typeName = "المراجعة الشاملة";
-        else if (currentReviewType === 2) typeName = "المراجعة التتابعية";
-        else if (currentReviewType === 3) typeName = "المراجعة العشوائية المتقدمة";
-        else if (currentReviewType === 4) typeName = "المراجعة اليومية الذكية";
-        else if (currentReviewType === 5) typeName = "مراجعة كلمات الأيام الأخيرة";
-        else if (currentReviewType === 6) typeName = "مراجعة كلمات فترة زمنية مختارة";
-
-        appProgress.reviewHistory.push({
-            unixTime: Date.now(),
-            pages: testWordsChunks.length,
-            type: typeName
-        });
-        // ---------------------------------------------------------------------
-
         if (currentReviewType === 2) {
             let reqPages = parseInt(document.getElementById('part-pages').value) || 1;
             
@@ -729,11 +709,9 @@
             }
             
             appProgress.seqCycleState = (appProgress.seqCycleState === 'ar-en') ? 'en-ar' : 'ar-en';
+            localStorage.setItem('appProgress', JSON.stringify(appProgress)); 
             updateSeqInfo();
         }
-        
-        // حفظ تعديلات الذاكرة ليتم نقلها للوحة التحكم
-        localStorage.setItem('appProgress', JSON.stringify(appProgress)); 
         window.location.href = "index.html?screen=dashboard";
     }
 
