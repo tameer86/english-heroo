@@ -35,11 +35,9 @@
         .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
-        /* تنسيقات البطاقات السحرية */
         .hot-stage-last10 { background: linear-gradient(45deg, #e74a3b, #c0392b) !important; color: white !important; border: 2px solid #ff9ff3; }
         .hot-stage-daily { background: linear-gradient(45deg, #3498db, #2980b9) !important; color: white !important; border: 2px solid #81ecec; animation: pulseDaily 2s infinite;}
         .hot-stage-hareef { background: linear-gradient(45deg, #8e44ad, #9b59b6) !important; color: white !important; border: 2px solid #f1c40f; animation: pulseHareef 1.5s infinite;}
-        
         @keyframes pulseDaily { 0% {box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);} 100% {box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);} }
         @keyframes pulseHareef { 0% {box-shadow: 0 0 0 0 rgba(142, 68, 173, 0.8);} 70% {box-shadow: 0 0 0 15px rgba(142, 68, 173, 0);} 100% {box-shadow: 0 0 0 0 rgba(142, 68, 173, 0);} }
         .hot-badge { font-size:12px; color:#ffeb3b; background:rgba(0,0,0,0.5); padding:2px 5px; border-radius:4px; margin-right: 5px; }
@@ -57,24 +55,36 @@
         .btn-save { background: var(--success); }
 
         #game-screen { display: none; position: relative; }
-        .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
+        .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
         .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
+        
         .cw-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 1100px; margin: 0 auto;}
         @media (min-width: 900px) { .cw-layout { flex-direction: row-reverse; align-items: flex-start; justify-content: center; } }
+        
+        /* تصميم الشريط الذكي العائم */
+        .sticky-clue-bar { position: sticky; top: 10px; background: #2c3e50; color: #f1c40f; padding: 12px 20px; border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.3); z-index: 100; font-size: clamp(18px, 4vw, 22px); font-weight: bold; text-align: center; border: 2px solid #f1c40f; transition: all 0.3s; width: 90%; max-width: 500px; margin: 0 auto 15px auto; line-height: 1.4; display: none; }
+        .sticky-clue-bar span { display: block; font-size: 14px; color: #bdc3c7; margin-bottom: 5px; }
+
         .cw-board-container { background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow: auto; max-width: 100%; direction: ltr;}
         .cw-grid { display: grid; gap: 2px; background: #2c3e50; padding: 2px; border-radius: 5px; width: max-content; margin: 0 auto; }
         .cw-cell { position: relative; width: clamp(35px, 7vw, 45px); height: clamp(35px, 7vw, 45px); background: transparent; }
-        .cw-input { width: 100%; height: 100%; border: none; text-align: center; font-size: clamp(20px, 4vw, 26px); font-weight: bold; text-transform: lowercase; color: #2c3e50; background: #fff; border-radius: 3px; caret-color: var(--danger);}
-        .cw-input:focus { outline: 2px solid var(--warning); z-index: 10; background: #fffdf5;}
-        .cw-input.correct { background: var(--success); color: white; border: none; pointer-events: none;}
+        .cw-input { width: 100%; height: 100%; border: none; text-align: center; font-size: clamp(20px, 4vw, 26px); font-weight: bold; text-transform: lowercase; color: #2c3e50; background: #fff; border-radius: 3px; caret-color: var(--danger); transition: background 0.2s;}
+        
+        .cw-input:focus { outline: 2px solid var(--danger); z-index: 10; background: #fffdf5;}
+        .cw-input.active-word { background: #d1ecf1 !important; }
+        .cw-input.active-cell { background: #ffeeba !important; outline: 2px solid #e67e22; z-index: 11; }
+        .cw-input.correct { background: var(--success) !important; color: white; border: none; pointer-events: none;}
+        
         .cw-cell.empty { background: transparent; }
         .cw-number { position: absolute; top: 2px; left: 3px; font-size: 11px; font-weight: bold; color: #7f8c8d; pointer-events: none; z-index: 5;}
         .cw-input.correct + .cw-number { color: #ecf0f1; }
+        
         .cw-clues { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: right; box-sizing: border-box;}
         .clues-section h3 { color: var(--primary); border-bottom: 2px dashed #eee; padding-bottom: 5px; margin-top: 0;}
         .clues-list { list-style: none; padding: 0; margin: 0 0 20px 0; }
-        .clues-list li { margin-bottom: 8px; font-size: clamp(14px, 3vw, 16px); color: var(--dark); font-weight: bold; line-height: 1.4; transition: 0.2s;}
-        .clues-list li.completed { text-decoration: line-through; color: #bdc3c7; }
+        .clues-list li { margin-bottom: 8px; font-size: clamp(14px, 3vw, 16px); color: var(--dark); font-weight: bold; line-height: 1.4; transition: 0.2s; padding: 5px; border-radius: 5px;}
+        .clues-list li.completed { text-decoration: line-through; color: #bdc3c7; background: transparent !important; }
+        .clues-list li.highlight-clue { background: #fdf3d8; color: var(--danger); border-right: 4px solid var(--warning); padding-right: 8px; }
         .clues-list li span.num-badge { display: inline-block; background: var(--dark); color: white; width: 22px; height: 22px; text-align: center; border-radius: 50%; margin-left: 5px; font-size: 14px;}
 
         #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 2500; }
@@ -90,7 +100,6 @@
 
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
 
-        /* صندوق الكنز للحريف */
         #chest-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 3000; flex-direction: column; }
         .chest-container { cursor: pointer; animation: chestBounce 1s infinite; position: relative; }
         .chest-emoji { font-size: 120px; user-select: none; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
@@ -191,6 +200,11 @@
             </div>
         </div>
         
+        <div id="sticky-clue-bar" class="sticky-clue-bar">
+            <span>التلميح الحالي</span>
+            أختر مربعاً لتبدأ الحل...
+        </div>
+
         <div class="cw-layout">
             <div class="cw-clues">
                 <div class="clues-section">
@@ -432,6 +446,7 @@
     function startGame(stageObj) {
         activeStage = stageObj;
         document.getElementById('stages-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('sticky-clue-bar').style.display = 'none'; // إخفاء الشريط حتى يضغط
         let prefix = activeStage.level.startsWith('CLASS') ? activeStage.level.replace('CLASS', '') : activeStage.level; let displayStr = currentLevel === "ALL" ? `${prefix}.${activeStage.localStage}` : activeStage.localStage; document.getElementById('current-stage-display').innerText = displayStr;
         let stageWords = [...activeStage.words]; stageWords.sort(() => Math.random() - 0.5);
         generateCrosswordAlgorithm(stageWords); startTimer();
@@ -506,6 +521,7 @@
                 if(cellData) {
                     let input = document.createElement('input'); input.className = 'cw-input'; input.maxLength = 1; input.dataset.x = c; input.dataset.y = r; input.dataset.expected = cellData.char;
                     input.onkeydown = (e) => onCellKeydown(e, input); input.oninput = (e) => onCellInput(e, input);
+                    input.onfocus = () => updateActiveClue(input); // إضافة حدث التركيز
                     cellDiv.appendChild(input);
                     if(cellData.displayNum) { let numSpan = document.createElement('span'); numSpan.className = 'cw-number'; numSpan.innerText = cellData.displayNum; cellDiv.appendChild(numSpan); }
                 } else { cellDiv.classList.add('empty'); }
@@ -516,9 +532,53 @@
         placedWordsInfo.forEach(pw => { let li = document.createElement('li'); li.innerHTML = `<span class="num-badge">${pw.displayNum}</span> ${pw.ar}`; li.id = `clue-${pw.id}`; if(pw.isHoriz) ulAcross.appendChild(li); else ulDown.appendChild(li); });
     }
 
+    // الشريط الذكي العائم
+    function updateActiveClue(inputEl) {
+        if(!inputEl) return;
+        let x = parseInt(inputEl.dataset.x); let y = parseInt(inputEl.dataset.y);
+        let cellData = cwGridData[`${x},${y}`]; if(!cellData) return;
+        
+        let words = placedWordsInfo.filter(pw => cellData.words.includes(pw.id)); if(words.length === 0) return;
+        
+        let activeWord = words[0];
+        if(words.length > 1 && window.typingDirection) {
+            let isHorizDir = (window.typingDirection === 'h' || window.typingDirection === '-h');
+            let matchDir = words.find(w => w.isHoriz === isHorizDir);
+            if(matchDir) activeWord = matchDir;
+        } else if (words.length > 1) {
+           let horiz = words.find(w => w.isHoriz); if(horiz) activeWord = horiz;
+        }
+
+        // تحديث الشريط العلوي العائم
+        let bar = document.getElementById('sticky-clue-bar');
+        bar.style.display = 'block';
+        let dirIcon = activeWord.isHoriz ? '➡️ أُفقي' : '⬇️ عمودي';
+        bar.innerHTML = `<span>${dirIcon} (${activeWord.displayNum})</span>${activeWord.ar}`;
+        
+        // تلوين المربعات والقوائم
+        document.querySelectorAll('.cw-input').forEach(inp => inp.classList.remove('active-word', 'active-cell'));
+        document.querySelectorAll('.clues-list li').forEach(li => li.classList.remove('highlight-clue'));
+        
+        let dx = activeWord.isHoriz ? 1 : 0; let dy = activeWord.isHoriz ? 0 : 1;
+        for(let i=0; i<activeWord.len; i++) {
+            let wp = document.querySelector(`.cw-input[data-x="${activeWord.x + i*dx}"][data-y="${activeWord.y + i*dy}"]`);
+            if(wp) wp.classList.add('active-word');
+        }
+        inputEl.classList.add('active-cell');
+        let activeLi = document.getElementById(`clue-${activeWord.id}`);
+        if(activeLi && !activeLi.classList.contains('completed')) activeLi.classList.add('highlight-clue');
+    }
+
     function getNextInput(x, y, dir) { let nX = x, nY = y; if(dir === 'h') nX++; else if(dir === '-h') nX--; else if(dir === 'v') nY++; else if(dir === '-v') nY--; return document.querySelector(`.cw-input[data-x="${nX}"][data-y="${nY}"]:not(.correct)`); }
 
-    function onCellKeydown(e, inputEl) { if(e.key === 'ArrowRight') { window.typingDirection = '-h'; } else if(e.key === 'ArrowLeft') { window.typingDirection = 'h'; } else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; } else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; } }
+    function onCellKeydown(e, inputEl) { 
+        let oldDir = window.typingDirection;
+        if(e.key === 'ArrowRight') { window.typingDirection = '-h'; } 
+        else if(e.key === 'ArrowLeft') { window.typingDirection = 'h'; } 
+        else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; } 
+        else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; } 
+        if(oldDir !== window.typingDirection) updateActiveClue(inputEl);
+    }
 
     function onCellInput(e, inputEl) {
         let val = inputEl.value.toLowerCase(); let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y);
@@ -528,7 +588,7 @@
                 let rightHas = getNextInput(curX, curY, 'h'); let leftHas = getNextInput(curX, curY, '-h'); let downHas = getNextInput(curX, curY, 'v'); let upHas = getNextInput(curX, curY, '-v');
                 if(downHas) { window.typingDirection = 'v'; nextInput = downHas; } else if(upHas && !downHas && !rightHas && !leftHas) { window.typingDirection = '-v'; nextInput = upHas; } else if(rightHas) { window.typingDirection = 'h'; nextInput = rightHas; } else if(leftHas && !rightHas && !downHas && !upHas) { window.typingDirection = '-h'; nextInput = leftHas; }
             }
-            if(nextInput) nextInput.focus();
+            if(nextInput) { nextInput.focus(); updateActiveClue(nextInput); }
         } else { inputEl.value = ''; }
         checkWordsCompletion();
     }
@@ -586,7 +646,6 @@
             localStorage.setItem('hareefWins_crossword', winTracker);
         } else { localStorage.setItem('hareefWins_crossword', 0); }
 
-        // تنظيف بطاقة الحريف
         if(window.currentStageCardInfo.type === 'hareef') {
             let hObj = window.currentStageCardInfo.hareefCardObj; let hData = JSON.parse(localStorage.getItem('hareefCardsData')) || [];
             let index = hData.findIndex(c => c.expiry === hObj.expiry && c.game === hObj.game);
