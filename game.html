@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صفحة الألعاب التعليمية</title>
-	    <script>
-        (function checkActivation() {
-            if (!localStorage.getItem('app_is_activated')) {
-                alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
-                window.location.replace("index.html"); 
-            }
-        })();
-    </script>
-
+	<script>
+    (function checkActivation() {
+        if (!localStorage.getItem('app_is_activated')) {
+            alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
+            window.location.replace("index.html"); 
+        }
+    })();
+</script>
     <style>
         :root {
             --primary: #3498db; --purple: #8e44ad; --danger: #e74a3b; 
@@ -215,12 +214,21 @@
             </div>
 
             <div class="admin-row parent-only-inputs" style="margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 6px;">
-                <label><input type="checkbox" id="chk-reset-all"> تصفير جميع ألعاب البرنامج (سيتم مسح التقدم)</label>
+                <label><input type="checkbox" id="chk-reset-all" disabled> تصفير جميع ألعاب البرنامج (سيتم مسح التقدم)</label>
             </div>
 
             <div class="admin-row parent-only-inputs" style="margin-top: 15px; background: #e8f5e9; padding: 10px; border-radius: 6px;">
-                <label>النقاط اللازمة للفة عجلة الحظ:</label>
-                <input type="number" id="wheel-cost-val" value="3000" min="500">
+                <h4 style="color:var(--success); margin-top:0; margin-bottom:10px;">إعدادات عجلة الحظ</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div>
+                        <label style="font-size: 14px;">تكلفة إضافة محاولة العجلة (تراكمياً):</label>
+                        <input type="number" id="wheel-cost-val" value="3000" min="500" disabled>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; padding-top: 8px;">
+                        <label style="font-size: 14px; color: var(--danger);">تعديل يدوي: نقطة التوقف الحالية للصرف:</label>
+                        <input type="number" id="wheel-exchange-val" placeholder="مثال: 12000" disabled>
+                    </div>
+                </div>
             </div>
 
             <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
@@ -311,6 +319,7 @@
             <div class="bank-stats">
                 <div>النقاط التراكمية: <span id="stat-total">0</span></div>
                 <div>النقاط المستبدلة باللعب: <span id="stat-exch">0</span></div>
+                <div style="font-size: 13px; color: var(--primary);">* النقطة المطلوبة للعبة القادمة: <span id="stat-next-spin">0</span></div>
                 <div>الرصيد البنكي الحالي: <span id="stat-bank" style="color: var(--success);">0</span> جنيه فلسطيني</div>
             </div>
 
@@ -449,13 +458,11 @@
 
     function updateCardsTimersDisplay() {
         let now = new Date();
-        // 1. Daily Timer (until next midnight)
         let tomorrow = new Date(now);
         tomorrow.setHours(24, 0, 0, 0);
         let diffDaily = tomorrow - now;
         document.getElementById('daily-timer').innerText = formatTimeDiff(diffDaily) + ' وتتجدد البطاقات';
 
-        // 2. Friday Timer
         let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
         let fCard = document.getElementById('friday-card');
         let fTimer = document.getElementById('friday-timer');
@@ -482,7 +489,6 @@
             }
         }
 
-        // 3. Update Hareef Timers
         document.querySelectorAll('.hareef-timer-span').forEach(el => {
             let expiry = parseInt(el.getAttribute('data-expiry'));
             let diff = expiry - now.getTime();
@@ -526,7 +532,6 @@
             container.innerHTML += html;
         });
     }
-    /* -------------------------------------- */
 
     function openReportsModal() {
         document.getElementById('main-report-type').value = 'points';
@@ -726,13 +731,17 @@
         applyGamesState(gameState);
 
         let wheelCost = parseInt(document.getElementById('wheel-cost-val').value) || 3000;
+        let wheelExchange = parseInt(document.getElementById('wheel-exchange-val').value) || 0;
+        
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         appProg.wheelCost = wheelCost;
+        if(wheelExchange >= 0) appProg.exchangedPoints = wheelExchange;
+
         localStorage.setItem('appProgress', JSON.stringify(appProg));
 
         if (document.getElementById('chk-reset-all').checked) {
             if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟')) {
-                let pList = ['matchGameProgress', 'listenGameProgress', 'missingGameProgress', 'arrangeGameProgress', 'crosswordProgress'];
+                let pList = ['matchGameProgress', 'listenGameProgress', 'missingGameProgress', 'scrambleGameProgress', 'crosswordGameProgress'];
                 pList.forEach(key => {
                     let prog = JSON.parse(localStorage.getItem(key)) || {};
                     for (let lvl in prog) prog[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
@@ -757,6 +766,7 @@
 
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         document.getElementById('wheel-cost-val').value = appProg.wheelCost || 3000;
+        document.getElementById('wheel-exchange-val').value = appProg.exchangedPoints || 0;
     }
 
     function applyGamesState(state) {
@@ -777,7 +787,6 @@
         if(eventData.isActive) { btn.innerText = 'إيقاف الحدث التلقائي'; btn.style.backgroundColor = 'var(--warning)'; btn.style.color = '#000'; } 
         else { btn.innerText = 'بدء الحدث التلقائي'; btn.style.backgroundColor = 'var(--success)'; btn.style.color = '#fff'; }
 
-        // تحميل إعدادات الحريف
         let hareef = JSON.parse(localStorage.getItem('hareefSettings')) || defaultHareefSettings;
         document.getElementById('hareef-name').value = hareef.name;
         document.getElementById('hareef-mults').value = hareef.mults.join(',');
@@ -804,7 +813,6 @@
         eventData.days = days; eventData.multiplier = mult;
         localStorage.setItem('gameEventData', JSON.stringify(eventData));
 
-        // حفظ الحريف
         let minH = parseInt(document.getElementById('hareef-min-h').value) || 1;
         let maxH = parseInt(document.getElementById('hareef-max-h').value) || 5;
         if(minH > maxH) { alert("تنبيه: الحد الأدنى للزمن يجب أن يكون أقل من أو يساوي الحد الأعلى!"); return; }
@@ -889,8 +897,13 @@
 
     function updateBankUI() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        document.getElementById('stat-total').innerText = Math.floor(appProg.cumulativeScore || 0);
-        document.getElementById('stat-exch').innerText = appProg.exchangedPoints || 0;
+        let total = Math.floor(appProg.cumulativeScore || 0);
+        let exch = appProg.exchangedPoints || 0;
+        let cost = appProg.wheelCost || 3000;
+        
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-exch').innerText = exch;
+        document.getElementById('stat-next-spin').innerText = exch + cost;
         document.getElementById('stat-bank').innerText = appProg.bankBalance || 0;
     }
 
@@ -905,7 +918,7 @@
             let exch = appProg.exchangedPoints || 0;
             let wheelCost = appProg.wheelCost || 3000;
 
-            if (total - exch < wheelCost) { alert(`رصيد نقاطك لا يكفي! تحتاج الوصول إلى ${exch + wheelCost} نقطة للمحاولة.`); return; }
+            if (total < exch + wheelCost) { alert(`رصيد نقاطك لا يكفي! تحتاج الوصول إلى ${exch + wheelCost} نقطة للمحاولة.`); return; }
             appProg.exchangedPoints = exch + wheelCost;
             localStorage.setItem('appProgress', JSON.stringify(appProg));
             updateBankUI();
