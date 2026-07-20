@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صفحة الألعاب التعليمية</title>
-	<script>
-    (function checkActivation() {
-        if (!localStorage.getItem('app_is_activated')) {
-            alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
-            window.location.replace("index.html"); 
-        }
-    })();
-</script>
+	    <script>
+        (function checkActivation() {
+            if (!localStorage.getItem('app_is_activated')) {
+                alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
+                window.location.replace("index.html"); 
+            }
+        })();
+    </script>
+
     <style>
         :root {
             --primary: #3498db; --purple: #8e44ad; --danger: #e74a3b; 
             --success: #1cc88a; --warning: #f1c40f; --dark: #5a5c69; 
-            --light: #f8f9fc; --gold: #ffd700;
+            --light: #f8f9fc; --gold: #ffd700; --silver: #bdc3c7;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f8ff; text-align: center; padding: 40px 20px; margin: 0; overflow-x: hidden; }
         h1 { color: #2c3e50; margin-bottom: 5px; }
@@ -86,8 +87,6 @@
         .full-size-image { max-width: 95%; max-height: 90vh; border-radius: 15px; border: 4px solid var(--gold); box-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: popIn 0.3s ease-out; object-fit: contain; cursor: default; }
         .game-image { margin-top: 35px; width: clamp(240px, 42vw, 480px); height: auto; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 
-        @keyframes pulseEvent { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } 100% { transform: translateX(-50%) scale(1); } }
-        #event-active-banner { display: none; position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: #1cc88a; color: white; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2); animation: pulseEvent 2s infinite; border: 2px solid #fff; font-size: 14px; }
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
 
         .report-selectors { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
@@ -97,12 +96,25 @@
         .stat-item { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--dark); font-weight: bold; font-size: 15px;}
         .stat-val { color: var(--danger); font-size: 16px;}
         .stat-val.good { color: var(--success); }
+
+        /* تنسيق البطاقات السحرية */
+        .magic-card { padding: 15px; border-radius: 12px; margin-bottom: 15px; color: white; text-align: center; font-weight: bold; position: relative; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .magic-card h4 { margin: 0 0 10px 0; font-size: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .magic-card p { margin: 0 0 10px 0; font-size: 14px; line-height: 1.4; }
+        .magic-card .timer { background: rgba(0,0,0,0.4); display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 16px; }
+        .card-last10 { background: linear-gradient(45deg, #e74a3b, #c0392b); border: 2px solid #ff9ff3; }
+        .card-daily { background: linear-gradient(45deg, #3498db, #2980b9); border: 2px solid #81ecec; }
+        .card-friday { background: linear-gradient(45deg, #1cc88a, #16a085); border: 2px solid #55efc4; }
+        .card-friday.disabled { filter: grayscale(100%); opacity: 0.7; }
+        .card-hareef { background: linear-gradient(45deg, #8e44ad, #9b59b6); border: 2px solid #f1c40f; }
+
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .settings-grid input { width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
-    <div id="event-active-banner" onclick="showEventDetails()">🌟 حدث مضاعفة النقاط نشط!</div>
 
     <div class="top-icons">
         <button class="btn-top-action" onclick="window.location.href='index.html?screen=dashboard'" title="العودة للوحة التحكم">🔙</button>
@@ -112,6 +124,7 @@
         <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
         <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
         <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
+        <button class="btn-top-action" onclick="openCardsModal()" title="البطاقات السحرية والأحداث">🃏</button>
     </div>
 
     <h1> مرحباً بك في قسم الألعاب </h1>
@@ -123,6 +136,34 @@
         <a href="missing_letters.html" id="link-missing" class="game-btn" style="background-color: var(--success);">لعبة الحروف الناقصة 🔠</a>
         <a href="scramble_letters.html" id="link-arrange" class="game-btn" style="background-color: var(--warning); color: #2c3e50;">لعبة ترتيب الحروف 🔀</a>
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
+    </div>
+
+    <div id="cards-modal" class="custom-modal">
+        <div class="modal-content-box" style="background: #2c3e50;">
+            <button class="btn-close-modal" onclick="toggleModal('cards-modal')">✖</button>
+            <h3 style="color: var(--gold); margin-top:0; border-bottom: 2px solid #34495e; padding-bottom: 10px;">🃏 البطاقات السحرية 🃏</h3>
+            <div id="cards-container" style="text-align: right; max-height: 60vh; overflow-y: auto; padding-right: 5px;">
+                <div class="magic-card card-last10">
+                    <h4>🔥 بطاقات التحدي المستمر</h4>
+                    <p>مراحل نارية مخصصة لآخر 10 دروس لعبتها لتبقى دائماً في قمة تركيزك. (مضاعف 1.5x)</p>
+                    <div class="timer">دائماً فعالة</div>
+                </div>
+                
+                <div class="magic-card card-daily">
+                    <h4>⚡ البطاقات العشوائية اليومية</h4>
+                    <p>10 بطاقات عشوائية يومية لم تلعبها من قبل لتحفيز ذاكرتك! (مضاعف 1.5x)</p>
+                    <div class="timer" id="daily-timer">جاري الحساب...</div>
+                </div>
+
+                <div class="magic-card card-friday" id="friday-card">
+                    <h4>🌟 حدث الجمعة العظيم</h4>
+                    <p>نقاط مضاعفة لجميع المراحل خلال وقت الحدث!</p>
+                    <div class="timer" id="friday-timer">جاري الحساب...</div>
+                </div>
+
+                <div id="hareef-cards-container"></div>
+            </div>
+        </div>
     </div>
 
     <div id="news-modal" class="custom-modal">
@@ -137,7 +178,6 @@
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('reports-modal')">✖</button>
             <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📊 تقارير الأداء والإنجاز</h3>
-            
             <div style="margin-bottom: 15px; text-align: right;">
                 <label style="font-weight: bold; color: var(--dark); display: block; margin-bottom: 5px;">اختر نوع التقرير:</label>
                 <select id="main-report-type" onchange="toggleReportInputs()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--primary); font-weight: bold; font-family: inherit;">
@@ -146,7 +186,6 @@
                     <option value="performance">3. تقرير تحليل الأداء (السرعة والدقة)</option>
                 </select>
             </div>
-
             <div id="time-selectors" class="report-selectors">
                 <select id="report-type" onchange="updateReportRangeOptions()">
                     <option value="hours">في آخر عدد ساعات</option>
@@ -156,9 +195,7 @@
                 </select>
                 <select id="report-num"></select>
             </div>
-            
             <button class="btn-admin-action" style="background: var(--info); margin-bottom: 15px;" onclick="generateSelectedReport()">عرض التقرير 🔍</button>
-            
             <div id="report-results" style="display: none; background: #f8f9fc; padding: 10px; border-radius: 8px; text-align: right; max-height: 400px; overflow-y: auto;"></div>
         </div>
     </div>
@@ -179,6 +216,11 @@
 
             <div class="admin-row parent-only-inputs" style="margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 6px;">
                 <label><input type="checkbox" id="chk-reset-all"> تصفير جميع ألعاب البرنامج (سيتم مسح التقدم)</label>
+            </div>
+
+            <div class="admin-row parent-only-inputs" style="margin-top: 15px; background: #e8f5e9; padding: 10px; border-radius: 6px;">
+                <label>النقاط اللازمة للفة عجلة الحظ:</label>
+                <input type="number" id="wheel-cost-val" value="3000" min="500">
             </div>
 
             <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
@@ -208,7 +250,6 @@
                 <button class="btn-admin-action parent-only-btn" style="background:var(--warning); color:#000;" onclick="showBonusReport()">📊 تقرير جوائز المراحل</button>
                 <div id="bonus-report-box" style="display:none; text-align:right; font-size:14px; background:#f1f1f1; padding:10px; border-radius:5px; margin-top:10px; max-height:150px; overflow-y:auto; font-weight:bold; color:var(--dark);"></div>
             </div>
-            
         </div>
     </div>
 
@@ -217,7 +258,7 @@
             <button class="btn-close-modal" onclick="toggleModal('event-modal')">✖</button>
             <h3 style="color: var(--primary); margin-top:0;">📅 إعدادات الأحداث التلقائية</h3>
             <div class="admin-checkbox-group parent-only-inputs">
-                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">أيام تفعيل الحدث:</strong>
+                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">أيام تفعيل الحدث (حدث الجمعة):</strong>
                 <label><input type="checkbox" class="event-day-chk" value="0"> الأحد</label>
                 <label><input type="checkbox" class="event-day-chk" value="1"> الإثنين</label>
                 <label><input type="checkbox" class="event-day-chk" value="2"> الثلاثاء</label>
@@ -227,9 +268,36 @@
                 <label><input type="checkbox" class="event-day-chk" value="6"> السبت</label>
             </div>
             <div class="admin-row parent-only-inputs" style="margin-top: 15px;">
-                <label>نسبة المضاعفة (مثال: 1.5 أو 2):</label>
+                <label>نسبة المضاعفة للحدث التلقائي:</label>
                 <input type="number" id="event-multiplier" step="0.1" min="1" value="2">
             </div>
+            
+            <h4 style="color: var(--purple); margin-top:20px; border-top: 2px dashed #ccc; padding-top: 15px;">🃏 إعدادات بطاقة الحريف (اللعب المستمر)</h4>
+            <div class="admin-row parent-only-inputs">
+                <label>اسم البطاقة:</label>
+                <input type="text" id="hareef-name" value="الحريف">
+                
+                <div class="settings-grid">
+                    <div><label>الحد الأدنى للزمن (ساعة):</label><input type="number" id="hareef-min-h" value="1" min="1" max="24"></div>
+                    <div><label>الحد الأعلى للزمن (ساعة):</label><input type="number" id="hareef-max-h" value="5" min="1" max="24"></div>
+                    <div><label>الحد الأقصى للبطاقات:</label><input type="number" id="hareef-max-cards" value="4" min="1"></div>
+                    <div><label>عدد مرات الفوز المتتالية:</label><input type="number" id="hareef-target-wins" value="5" min="1"></div>
+                </div>
+
+                <label style="margin-top: 10px;">مضاعفات النقاط المحتملة (مفصولة بفاصلة):</label>
+                <input type="text" id="hareef-mults" value="3,4,5,6" placeholder="مثال: 3,4,5,6">
+
+                <div class="admin-checkbox-group" style="margin-top: 10px;">
+                    <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تطبيق بطاقة الحريف على الألعاب:</strong>
+                    <label><input type="checkbox" class="hareef-game-chk" value="matchg" checked> المطابقة والذاكرة</label>
+                    <label><input type="checkbox" class="hareef-game-chk" value="listen" checked> صائد الأمثلة المسموعة</label>
+                    <label><input type="checkbox" class="hareef-game-chk" value="missing" checked> الحروف الناقصة</label>
+                    <label><input type="checkbox" class="hareef-game-chk" value="scramble" checked> ترتيب الحروف</label>
+                    <label><input type="checkbox" class="hareef-game-chk" value="crossword" checked> الكلمات المتقاطعة</label>
+                    <button class="btn-admin-action" style="background:#5a5c69; padding:5px; font-size:14px; margin-top:5px;" onclick="document.querySelectorAll('.hareef-game-chk').forEach(c=>c.checked=true)">تحديد الكل</button>
+                </div>
+            </div>
+
             <button class="btn-admin-action parent-only-btn" id="btn-toggle-event" onclick="toggleEventStatus()" style="margin-top: 15px;"></button>
             <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveEventSettings()">💾 حفظ الإعدادات</button>
         </div>
@@ -307,73 +375,44 @@
 
     let celebrationQueue = [];
     let defaultEventData = { isActive: true, days: [5], multiplier: 2 }; 
+    let defaultHareefSettings = { name: "الحريف", mults: [3,4,5,6], minH: 1, maxH: 5, maxCards: 4, targetWins: 5, games: ["matchg", "listen", "missing", "scramble", "crossword"] };
+    let cardsTimerInterval;
 
     window.onload = function() {
         applyGlobalModes();
         loadGamesState();
         checkNewFameAchievements(); 
+        startCardsTimers();
     };
 
     function openNewsModal() {
         fetch('news.txt')
-            .then(response => {
-                if(!response.ok) throw new Error('لا يوجد أخبار حالياً');
-                return response.text();
-            })
-            .then(text => {
-                document.getElementById('news-content').innerText = text;
-                toggleModal('news-modal');
-            })
-            .catch(err => {
-                document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.';
-                toggleModal('news-modal');
-            });
+            .then(response => { if(!response.ok) throw new Error('لا يوجد أخبار'); return response.text(); })
+            .then(text => { document.getElementById('news-content').innerText = text; toggleModal('news-modal'); })
+            .catch(err => { document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.'; toggleModal('news-modal'); });
     }
 
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         let banner = document.getElementById('parent-mode-banner');
         if(banner) banner.style.display = isParent ? 'block' : 'none';
-
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        let today = new Date().getDay();
-        let eventBanner = document.getElementById('event-active-banner');
-        if(eventBanner) {
-            if(eventData.isActive && eventData.days.includes(today)) {
-                eventBanner.style.display = 'block';
-                window.currentEventMultiplier = eventData.multiplier;
-            } else {
-                eventBanner.style.display = 'none';
-                window.currentEventMultiplier = 1;
-            }
-        }
         updateParentModeUI();
     }
 
     function updateParentModeUI() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
-
         document.querySelectorAll('.parent-only-inputs').forEach(el => {
-            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') {
-                if(el.type === 'checkbox') el.disabled = !isParent;
-                else el.disabled = !isParent;
-            } else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box')) {
-                let inputs = el.querySelectorAll('input, select');
-                inputs.forEach(inp => inp.disabled = !isParent);
+            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') { el.disabled = !isParent; } 
+            else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box')) {
+                el.querySelectorAll('input, select').forEach(inp => inp.disabled = !isParent);
             }
         });
-
         document.querySelectorAll('.parent-only-btn').forEach(btn => {
             if (btn.tagName === 'BUTTON') {
                 btn.style.display = isParent ? 'inline-block' : 'none';
                 if(isParent) btn.style.width = '100%';
             }
         });
-    }
-
-    function showEventDetails() {
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        alert('🎉 حدث نشط!\nمضاعفة النقاط بمقدار ' + eventData.multiplier + 'x مرات.');
     }
 
     function toggleModal(id) {
@@ -388,6 +427,107 @@
         }
     }
 
+    /* --- وظائف أيقونة البطاقات السحرية --- */
+    function openCardsModal() {
+        updateCardsUI();
+        toggleModal('cards-modal');
+    }
+
+    function startCardsTimers() {
+        clearInterval(cardsTimerInterval);
+        cardsTimerInterval = setInterval(() => {
+            if(document.getElementById('cards-modal').style.display === 'flex') {
+                updateCardsTimersDisplay();
+            }
+        }, 1000);
+    }
+
+    function updateCardsUI() {
+        updateCardsTimersDisplay();
+        renderHareefCards();
+    }
+
+    function updateCardsTimersDisplay() {
+        let now = new Date();
+        // 1. Daily Timer (until next midnight)
+        let tomorrow = new Date(now);
+        tomorrow.setHours(24, 0, 0, 0);
+        let diffDaily = tomorrow - now;
+        document.getElementById('daily-timer').innerText = formatTimeDiff(diffDaily) + ' وتتجدد البطاقات';
+
+        // 2. Friday Timer
+        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
+        let fCard = document.getElementById('friday-card');
+        let fTimer = document.getElementById('friday-timer');
+        
+        if (!eventData.isActive || eventData.days.length === 0) {
+            fCard.classList.add('disabled');
+            fTimer.innerText = "الحدث غير مفعل حالياً";
+        } else {
+            let todayIdx = now.getDay();
+            if(eventData.days.includes(todayIdx)) {
+                fCard.classList.remove('disabled');
+                fTimer.innerText = "فعال وينتهي خلال: " + formatTimeDiff(diffDaily); 
+            } else {
+                fCard.classList.add('disabled');
+                let nextEventDays = eventData.days.map(d => (d - todayIdx + 7) % 7).filter(d => d > 0).sort();
+                if(nextEventDays.length > 0) {
+                    let nextDayDate = new Date(now);
+                    nextDayDate.setDate(now.getDate() + nextEventDays[0]);
+                    nextDayDate.setHours(0,0,0,0);
+                    fTimer.innerText = "يبدأ خلال: " + formatTimeDiff(nextDayDate - now);
+                } else {
+                    fTimer.innerText = "مجدول لأيام غير معروفة";
+                }
+            }
+        }
+
+        // 3. Update Hareef Timers
+        document.querySelectorAll('.hareef-timer-span').forEach(el => {
+            let expiry = parseInt(el.getAttribute('data-expiry'));
+            let diff = expiry - now.getTime();
+            if(diff <= 0) {
+                el.innerText = "انتهى الوقت!";
+                el.parentElement.classList.add('disabled');
+            } else {
+                el.innerText = formatTimeDiff(diff);
+            }
+        });
+    }
+
+    function formatTimeDiff(ms) {
+        if(ms <= 0) return "00:00:00";
+        let h = Math.floor(ms / (1000 * 60 * 60));
+        let m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+        let s = Math.floor((ms % (1000 * 60)) / 1000);
+        return `${h}س ${m}د ${s}ث`;
+    }
+
+    function renderHareefCards() {
+        let container = document.getElementById('hareef-cards-container');
+        container.innerHTML = '';
+        let hareefCards = JSON.parse(localStorage.getItem('hareefCardsData')) || [];
+        let activeCards = hareefCards.filter(c => c.expiry > new Date().getTime());
+        
+        if (activeCards.length !== hareefCards.length) {
+            localStorage.setItem('hareefCardsData', JSON.stringify(activeCards));
+        }
+
+        let gameNames = { matchg: "المطابقة والذاكرة", listen: "صائد الأمثلة", missing: "الحروف الناقصة", scramble: "ترتيب الحروف", crossword: "المتقاطعة" };
+
+        activeCards.forEach(card => {
+            let html = `
+                <div class="magic-card card-hareef">
+                    <h4>✨ بطاقة ${card.name} (${gameNames[card.game] || card.game})</h4>
+                    <p>لديك ${card.stages.length} بطاقات عشوائية جاهزة! العبها الآن لتحصل على نقاط مضاعفة ${card.multiplier}x</p>
+                    <div class="timer">تنتهي خلال: <span class="hareef-timer-span" data-expiry="${card.expiry}">...</span></div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+    }
+    /* -------------------------------------- */
+
     function openReportsModal() {
         document.getElementById('main-report-type').value = 'points';
         toggleReportInputs();
@@ -398,13 +538,8 @@
     function toggleReportInputs() {
         let type = document.getElementById('main-report-type').value;
         let timeSelectors = document.getElementById('time-selectors');
-        
-        if (type === 'points') {
-            timeSelectors.style.display = 'flex';
-            updateReportRangeOptions();
-        } else {
-            timeSelectors.style.display = 'none';
-        }
+        if (type === 'points') { timeSelectors.style.display = 'flex'; updateReportRangeOptions(); } 
+        else { timeSelectors.style.display = 'none'; }
         document.getElementById('report-results').style.display = 'none';
     }
 
@@ -412,19 +547,9 @@
         let type = document.getElementById('report-type').value;
         let selectNum = document.getElementById('report-num');
         selectNum.innerHTML = '';
-        
         let max = 0;
-        if(type === 'hours') max = 24;
-        if(type === 'days') max = 7;
-        if(type === 'weeks') max = 4;
-        if(type === 'months') max = 12;
-
-        for(let i = 1; i <= max; i++) {
-            let opt = document.createElement('option');
-            opt.value = i;
-            opt.text = i;
-            selectNum.appendChild(opt);
-        }
+        if(type === 'hours') max = 24; if(type === 'days') max = 7; if(type === 'weeks') max = 4; if(type === 'months') max = 12;
+        for(let i = 1; i <= max; i++) { let opt = document.createElement('option'); opt.value = i; opt.text = i; selectNum.appendChild(opt); }
     }
 
     function generateSelectedReport() {
@@ -438,61 +563,31 @@
         let type = document.getElementById('report-type').value;
         let num = parseInt(document.getElementById('report-num').value);
         let multiplier = 1;
-
-        if(type === 'hours') multiplier = 60 * 60 * 1000;
-        if(type === 'days') multiplier = 24 * 60 * 60 * 1000;
-        if(type === 'weeks') multiplier = 7 * 24 * 60 * 60 * 1000;
-        if(type === 'months') multiplier = 30 * 24 * 60 * 60 * 1000; 
+        if(type === 'hours') multiplier = 60 * 60 * 1000; if(type === 'days') multiplier = 24 * 60 * 60 * 1000;
+        if(type === 'weeks') multiplier = 7 * 24 * 60 * 60 * 1000; if(type === 'months') multiplier = 30 * 24 * 60 * 60 * 1000; 
 
         let cutoffTime = Date.now() - (num * multiplier);
         let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
         let filteredHistory = pointsHistory.filter(item => item.time >= cutoffTime);
 
         let totals = { total: 0, matchg: 0, listen: 0, missing: 0, scramble: 0, crossword: 0 };
-        filteredHistory.forEach(item => {
-            totals.total += item.points;
-            if(totals[item.game] !== undefined) totals[item.game] += item.points;
-        });
+        filteredHistory.forEach(item => { totals.total += item.points; if(totals[item.game] !== undefined) totals[item.game] += item.points; });
 
-        let gameNames = {
-            matchg: 'لعبة المطابقة والذاكرة 🎴',
-            listen: 'صائد الأمثلة المسموعة 🎧',
-            missing: 'لعبة الحروف الناقصة 🔠',
-            scramble: 'لعبة ترتيب الحروف 🔀',
-            crossword: 'الكلمات المتقاطعة 🧩'
-        };
-
-        let resultHTML = `
-            <div class="report-block">
-                <h4>إجمالي النقاط في الفترة المحددة: <span class="stat-val good">${totals.total}</span></h4>
-            </div>
-            <div class="report-block">
-                <h4>التفصيل حسب الألعاب:</h4>
-        `;
-        for(let key in gameNames) {
-            resultHTML += `<div class="stat-item"><span>${gameNames[key]}</span> <span class="stat-val">${totals[key]} نقطة</span></div>`;
-        }
+        let gameNames = { matchg: 'المطابقة والذاكرة 🎴', listen: 'صائد الأمثلة المسموعة 🎧', missing: 'الحروف الناقصة 🔠', scramble: 'ترتيب الحروف 🔀', crossword: 'الكلمات المتقاطعة 🧩' };
+        let resultHTML = `<div class="report-block"><h4>إجمالي النقاط في الفترة المحددة: <span class="stat-val good">${totals.total}</span></h4></div><div class="report-block"><h4>التفصيل حسب الألعاب:</h4>`;
+        for(let key in gameNames) { resultHTML += `<div class="stat-item"><span>${gameNames[key]}</span> <span class="stat-val">${totals[key]} نقطة</span></div>`; }
         resultHTML += `</div>`;
         
-        let resultsDiv = document.getElementById('report-results');
-        resultsDiv.innerHTML = resultHTML;
-        resultsDiv.style.display = 'block';
+        let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
     function getGameStats(storageKey) {
         let prog = JSON.parse(localStorage.getItem(storageKey)) || {};
-        let stagesCompleted = 0;
-        let totalStars = 0;
-        let totalTime = 0;
-        
+        let stagesCompleted = 0, totalStars = 0, totalTime = 0;
         for (let lvl in prog) {
             for (let stg in prog[lvl]) {
                 let data = prog[lvl][stg];
-                if (data.stars > 0 || data.time > 0) {
-                    stagesCompleted++;
-                    totalStars += data.stars || 0;
-                    totalTime += data.time || 0;
-                }
+                if (data.stars > 0 || data.time > 0) { stagesCompleted++; totalStars += data.stars || 0; totalTime += data.time || 0; }
             }
         }
         let avgStars = stagesCompleted > 0 ? (totalStars / stagesCompleted).toFixed(1) : 0;
@@ -508,37 +603,17 @@
             'scramble': { name: 'ترتيب الحروف 🔀', data: getGameStats('scrambleGameProgress') },
             'crossword': { name: 'الكلمات المتقاطعة 🧩', data: getGameStats('crosswordGameProgress') }
         };
-
-        let totalCompletedStages = 0;
-        let totalAcquiredStars = 0;
-
+        let totalCompletedStages = 0, totalAcquiredStars = 0;
         let resultHTML = `<div class="report-block"><h4>تفاصيل الإنجاز الشامل (جميع المستويات):</h4>`;
         
         for (let key in gamesData) {
             let stats = gamesData[key].data;
-            totalCompletedStages += stats.stagesCompleted;
-            totalAcquiredStars += stats.totalStars;
-            
-            resultHTML += `
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                    <div style="color: var(--purple); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div>
-                    <div class="stat-item"><span>المراحل المكتومة:</span> <span class="stat-val good">${stats.stagesCompleted}</span></div>
-                    <div class="stat-item"><span>مجموع النجوم المحصلة:</span> <span class="stat-val">${stats.totalStars} ⭐</span></div>
-                </div>
-            `;
+            totalCompletedStages += stats.stagesCompleted; totalAcquiredStars += stats.totalStars;
+            resultHTML += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><div style="color: var(--purple); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div><div class="stat-item"><span>المراحل المكتومة:</span> <span class="stat-val good">${stats.stagesCompleted}</span></div><div class="stat-item"><span>مجموع النجوم المحصلة:</span> <span class="stat-val">${stats.totalStars} ⭐</span></div></div>`;
         }
         
-        resultHTML = `
-            <div class="report-block" style="background: #e8f5e9; border-color: #c8e6c9;">
-                <h4>إجمالي الإنجاز العام:</h4>
-                <div class="stat-item"><span>المراحل المنجزة كلياً:</span> <span class="stat-val good">${totalCompletedStages} مرحلة</span></div>
-                <div class="stat-item"><span>النجوم الكلية المكتسبة:</span> <span class="stat-val">${totalAcquiredStars} ⭐</span></div>
-            </div>
-        ` + resultHTML + `</div>`;
-
-        let resultsDiv = document.getElementById('report-results');
-        resultsDiv.innerHTML = resultHTML;
-        resultsDiv.style.display = 'block';
+        resultHTML = `<div class="report-block" style="background: #e8f5e9; border-color: #c8e6c9;"><h4>إجمالي الإنجاز العام:</h4><div class="stat-item"><span>المراحل المنجزة كلياً:</span> <span class="stat-val good">${totalCompletedStages} مرحلة</span></div><div class="stat-item"><span>النجوم الكلية المكتسبة:</span> <span class="stat-val">${totalAcquiredStars} ⭐</span></div></div>` + resultHTML + `</div>`;
+        let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
     function generatePerformanceReport() {
@@ -549,47 +624,20 @@
             'scramble': { name: 'ترتيب الحروف 🔀', data: getGameStats('scrambleGameProgress') },
             'crossword': { name: 'الكلمات المتقاطعة 🧩', data: getGameStats('crosswordGameProgress') }
         };
-
-        let resultHTML = `
-            <p style="font-size: 13px; color: var(--dark); margin-bottom: 15px; text-align: center; background: #fff3cd; padding: 5px; border-radius: 5px;">
-                💡 <b>ملاحظة لولي الأمر:</b> هذا التقرير يوضح متوسط أداء الطفل في كل مرحلة للتعرف على الألعاب التي يُبدع فيها وتلك التي يحتاج لتدريب أكثر فيها.
-            </p>
-            <div class="report-block"><h4>تحليل السرعة والدقة لكل مرحلة:</h4>
-        `;
+        let resultHTML = `<p style="font-size: 13px; color: var(--dark); margin-bottom: 15px; text-align: center; background: #fff3cd; padding: 5px; border-radius: 5px;">💡 <b>ملاحظة لولي الأمر:</b> هذا التقرير يوضح متوسط أداء الطفل.</p><div class="report-block"><h4>تحليل السرعة والدقة لكل مرحلة:</h4>`;
         
         for (let key in gamesData) {
             let stats = gamesData[key].data;
             if (stats.stagesCompleted === 0) continue; 
-
-            resultHTML += `
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                    <div style="color: var(--primary); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div>
-                    <div class="stat-item"><span>متوسط الدقة (النجوم):</span> <span class="stat-val good">${stats.avgStars} / 5 ⭐</span></div>
-                    <div class="stat-item"><span>متوسط سرعة الإجابة:</span> <span class="stat-val">${stats.avgTime} ثانية</span></div>
-                </div>
-            `;
+            resultHTML += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><div style="color: var(--primary); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div><div class="stat-item"><span>متوسط الدقة (النجوم):</span> <span class="stat-val good">${stats.avgStars} / 5 ⭐</span></div><div class="stat-item"><span>متوسط سرعة الإجابة:</span> <span class="stat-val">${stats.avgTime} ثانية</span></div></div>`;
         }
-        
-        if (resultHTML.includes('المطابقة') === false && resultHTML.includes('صائد') === false) {
-            resultHTML += `<div style="text-align:center; color:var(--danger); font-weight:bold;">لم يقم الطفل بإنهاء أي مراحل بعد لتحليل أدائه.</div>`;
-        }
-
+        if (resultHTML.includes('المطابقة') === false && resultHTML.includes('صائد') === false) { resultHTML += `<div style="text-align:center; color:var(--danger); font-weight:bold;">لم يقم الطفل بإنهاء أي مراحل بعد لتحليل أدائه.</div>`; }
         resultHTML += `</div>`;
-        let resultsDiv = document.getElementById('report-results');
-        resultsDiv.innerHTML = resultHTML;
-        resultsDiv.style.display = 'block';
+        let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
-    function openFullImage(imgSrc) {
-        document.getElementById('full-size-img').src = imgSrc;
-        document.getElementById('image-modal').style.display = 'flex';
-    }
-
-    function closeImageModal(e) {
-        if (e.target.id === 'image-modal' || e.target.tagName === 'BUTTON') {
-            document.getElementById('image-modal').style.display = 'none';
-        }
-    }
+    function openFullImage(imgSrc) { document.getElementById('full-size-img').src = imgSrc; document.getElementById('image-modal').style.display = 'flex'; }
+    function closeImageModal(e) { if (e.target.id === 'image-modal' || e.target.tagName === 'BUTTON') { document.getElementById('image-modal').style.display = 'none'; } }
 
     function checkNewFameAchievements() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
@@ -605,42 +653,24 @@
             let retroReward = 0;
             let currentBadgeCount = appProg.notifiedBadges ? appProg.notifiedBadges.length : 0;
             for(let i=1; i<=currentBadgeCount; i++) retroReward += i;
-            
-            if(retroReward > 0) {
-                appProg.bankBalance = (appProg.bankBalance || 0) + retroReward;
-                alert(`تمت إضافة ${retroReward} جنيه فلسطيني لرصيدك البنكي بأثر رجعي كمكافأة على أوسمتك السابقة! 🎉`);
-            }
-            appProg.retroactiveBadgesAwarded = true;
-            needsSave = true;
+            if(retroReward > 0) { appProg.bankBalance = (appProg.bankBalance || 0) + retroReward; alert(`تمت إضافة ${retroReward} جنيه فلسطيني لرصيدك البنكي بأثر رجعي كمكافأة على أوسمتك السابقة! 🎉`); }
+            appProg.retroactiveBadgesAwarded = true; needsSave = true;
         }
 
         fameStages.forEach(stage => {
             stage.badges.forEach(badge => {
                 let currentBadgeVal = absoluteBadgeIndex;
                 if (score >= badge.req && !appProg.notifiedBadges.includes(badge.id)) {
-                    appProg.notifiedBadges.push(badge.id);
-                    appProg.bankBalance = (appProg.bankBalance || 0) + currentBadgeVal;
-                    needsSave = true;
-                    celebrationQueue.push({
-                        type: 'badge', title: "مبروك! تم فتح وسام", name: badge.name,
-                        desc: `لقد تخطيت ${badge.req.toLocaleString()} نقطة! وحصلت على ${currentBadgeVal} جنيه فلسطيني 💰`, img: badge.img
-                    });
+                    appProg.notifiedBadges.push(badge.id); appProg.bankBalance = (appProg.bankBalance || 0) + currentBadgeVal; needsSave = true;
+                    celebrationQueue.push({ type: 'badge', title: "مبروك! تم فتح وسام", name: badge.name, desc: `لقد تخطيت ${badge.req.toLocaleString()} نقطة! وحصلت على ${currentBadgeVal} جنيه فلسطيني 💰`, img: badge.img });
                 }
                 absoluteBadgeIndex++;
             });
 
             if (score >= stage.end && !appProg.claimedStagesFame.includes(stage.num)) {
-                let baseReward = 15 * stage.num * stage.num;
-                let bonusReward = parseFloat(stageBonuses[stage.num]) || 0;
-                let totalReward = baseReward + bonusReward;
-
-                appProg.bankBalance = (appProg.bankBalance || 0) + totalReward;
-                appProg.claimedStagesFame.push(stage.num);
-                needsSave = true;
-                celebrationQueue.push({
-                    type: 'stage', title: "إنجاز أسطوري! 🏆", name: `ختم مرحلة: ${stage.name}`,
-                    desc: `تخطيت ${stage.end.toLocaleString()} نقطة! تمت إضافة ${totalReward} جنيه فلسطيني لرصيدك البنكي 💰`, img: stage.img
-                });
+                let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; let totalReward = baseReward + bonusReward;
+                appProg.bankBalance = (appProg.bankBalance || 0) + totalReward; appProg.claimedStagesFame.push(stage.num); needsSave = true;
+                celebrationQueue.push({ type: 'stage', title: "إنجاز أسطوري! 🏆", name: `ختم مرحلة: ${stage.name}`, desc: `تخطيت ${stage.end.toLocaleString()} نقطة! تمت إضافة ${totalReward} جنيه فلسطيني لرصيدك البنكي 💰`, img: stage.img });
             }
         });
 
@@ -651,77 +681,36 @@
     function processCelebrationQueue() {
         if(celebrationQueue.length > 0) {
             let item = celebrationQueue.shift();
-            document.getElementById('cel-title').innerText = item.title;
-            document.getElementById('cel-name').innerText = item.name;
-            document.getElementById('cel-desc').innerText = item.desc;
-            let imgEl = document.getElementById('cel-img');
-            imgEl.src = item.img;
-            imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; 
+            document.getElementById('cel-title').innerText = item.title; document.getElementById('cel-name').innerText = item.name; document.getElementById('cel-desc').innerText = item.desc;
+            let imgEl = document.getElementById('cel-img'); imgEl.src = item.img; imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; 
             document.getElementById('celebration-modal').style.display = 'flex';
         }
     }
+    function closeCelebration() { document.getElementById('celebration-modal').style.display = 'none'; setTimeout(processCelebrationQueue, 500); }
 
-    function closeCelebration() {
-        document.getElementById('celebration-modal').style.display = 'none';
-        setTimeout(processCelebrationQueue, 500);
-    }
-
-    function openFameModal() {
-        renderHallOfFame();
-        toggleModal('fame-modal');
-    }
+    function openFameModal() { renderHallOfFame(); toggleModal('fame-modal'); }
 
     function renderHallOfFame() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         let score = Math.floor(appProg.cumulativeScore || 0);
         let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
         document.getElementById('fame-total-points').innerText = score.toLocaleString();
-        const wrapper = document.getElementById('stages-wrapper');
-        wrapper.innerHTML = '';
-
+        const wrapper = document.getElementById('stages-wrapper'); wrapper.innerHTML = '';
         let badgeGlobalIndex = 1;
 
         fameStages.forEach(stage => {
-            let isStageUnlocked = score >= stage.start;
-            let stageClass = isStageUnlocked ? '' : 'locked-stage';
-            let progressPercent = 0;
-            if (score >= stage.end) { progressPercent = 100; } 
-            else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
-            
+            let isStageUnlocked = score >= stage.start; let stageClass = isStageUnlocked ? '' : 'locked-stage'; let progressPercent = 0;
+            if (score >= stage.end) { progressPercent = 100; } else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
             let stageReward = 15 * stage.num * stage.num + (parseFloat(stageBonuses[stage.num]) || 0);
-            
-            let imgClickAction = isStageUnlocked 
-                ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"` 
-                : `onclick="alert('قيمة الجائزة عند ختم هذه المرحلة: ${stageReward} جنيه فلسطيني')" style="cursor: pointer;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"`;
+            let imgClickAction = isStageUnlocked ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"` : `onclick="alert('قيمة الجائزة عند ختم هذه المرحلة: ${stageReward} جنيه فلسطيني')" style="cursor: pointer;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"`;
 
-            let html = `
-                <div class="stage-card ${stageClass}">
-                    <img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction}>
-                    <h3 class="stage-title">
-                        مرحلة ${stage.num}: ${stage.name}
-                        <span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span>
-                    </h3>
-                    <p class="stage-desc">${stage.desc}</p>
-                    <div class="progress-bar-container"><div class="progress-fill" style="width: ${progressPercent}%;"></div></div>
-                    <div class="badges-grid">
-            `;
-
+            let html = `<div class="stage-card ${stageClass}"><img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction}><h3 class="stage-title">مرحلة ${stage.num}: ${stage.name}<span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span></h3><p class="stage-desc">${stage.desc}</p><div class="progress-bar-container"><div class="progress-fill" style="width: ${progressPercent}%;"></div></div><div class="badges-grid">`;
             stage.badges.forEach(badge => {
-                let isBadgeUnlocked = score >= badge.req;
-                let badgeClass = isBadgeUnlocked ? '' : 'locked-badge';
-                let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>';
-                let badgeReward = badgeGlobalIndex;
-                html += `
-                    <div class="badge-item ${badgeClass}" title="جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني" onclick="alert('قيمة جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني')">
-                        <div class="badge-img-wrapper"><img src="${badge.img}" class="badge-img" onerror="this.src='images/mon.jpeg'">${lockOverlay}</div>
-                        <div class="badge-title">${badge.name}</div>
-                        <div class="badge-req">${badge.req.toLocaleString()}</div>
-                    </div>
-                `;
+                let isBadgeUnlocked = score >= badge.req; let badgeClass = isBadgeUnlocked ? '' : 'locked-badge'; let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>'; let badgeReward = badgeGlobalIndex;
+                html += `<div class="badge-item ${badgeClass}" title="جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني" onclick="alert('قيمة جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني')"><div class="badge-img-wrapper"><img src="${badge.img}" class="badge-img" onerror="this.src='images/mon.jpeg'">${lockOverlay}</div><div class="badge-title">${badge.name}</div><div class="badge-req">${badge.req.toLocaleString()}</div></div>`;
                 badgeGlobalIndex++;
             });
-            html += `</div></div>`;
-            wrapper.innerHTML += html;
+            html += `</div></div>`; wrapper.innerHTML += html;
         });
     }
 
@@ -736,6 +725,11 @@
         localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState));
         applyGamesState(gameState);
 
+        let wheelCost = parseInt(document.getElementById('wheel-cost-val').value) || 3000;
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        appProg.wheelCost = wheelCost;
+        localStorage.setItem('appProgress', JSON.stringify(appProg));
+
         if (document.getElementById('chk-reset-all').checked) {
             if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟')) {
                 let pList = ['matchGameProgress', 'listenGameProgress', 'missingGameProgress', 'arrangeGameProgress', 'crosswordProgress'];
@@ -748,7 +742,7 @@
                 alert('تم تصفير جميع الألعاب بنجاح! 🔄');
             }
         }
-        alert('تم حفظ الإعدادات!');
+        alert('تم حفظ الإعدادات بنجاح!');
         toggleModal('admin-modal');
     }
 
@@ -760,15 +754,13 @@
         document.getElementById('chk-arrange').checked = savedState.arrange !== false;
         document.getElementById('chk-crossword').checked = savedState.crossword !== false;
         applyGamesState(savedState);
+
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        document.getElementById('wheel-cost-val').value = appProg.wheelCost || 3000;
     }
 
     function applyGamesState(state) {
-        const btnMatch = document.getElementById('link-matchg');
-        const btnListen = document.getElementById('link-listen');
-        const btnMissing = document.getElementById('link-missing');
-        const btnArrange = document.getElementById('link-arrange');
-        const btnCrossword = document.getElementById('link-crossword');
-
+        const btnMatch = document.getElementById('link-matchg'); const btnListen = document.getElementById('link-listen'); const btnMissing = document.getElementById('link-missing'); const btnArrange = document.getElementById('link-arrange'); const btnCrossword = document.getElementById('link-crossword');
         if (state.matchg !== false) { btnMatch.style.opacity = '1'; btnMatch.style.pointerEvents = 'auto'; btnMatch.setAttribute('href', 'matchg.html'); } else { btnMatch.style.opacity = '0.35'; btnMatch.style.pointerEvents = 'none'; btnMatch.removeAttribute('href'); }
         if (state.listen !== false) { btnListen.style.opacity = '1'; btnListen.style.pointerEvents = 'auto'; btnListen.setAttribute('href', 'listen.html'); } else { btnListen.style.opacity = '0.35'; btnListen.style.pointerEvents = 'none'; btnListen.removeAttribute('href'); }
         if (state.missing !== false) { btnMissing.style.opacity = '1'; btnMissing.style.pointerEvents = 'auto'; btnMissing.setAttribute('href', 'missing_letters.html'); } else { btnMissing.style.opacity = '0.35'; btnMissing.style.pointerEvents = 'none'; btnMissing.removeAttribute('href'); }
@@ -778,49 +770,68 @@
 
     function loadEventSettings() {
         let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        document.querySelectorAll('.event-day-chk').forEach(chk => {
-            chk.checked = eventData.days.includes(parseInt(chk.value));
-        });
+        document.querySelectorAll('.event-day-chk').forEach(chk => { chk.checked = eventData.days.includes(parseInt(chk.value)); });
         document.getElementById('event-multiplier').value = eventData.multiplier || 2;
         
         let btn = document.getElementById('btn-toggle-event');
-        if(eventData.isActive) {
-            btn.innerText = 'إيقاف الحدث';
-            btn.style.backgroundColor = 'var(--warning)';
-            btn.style.color = '#000';
-        } else {
-            btn.innerText = 'بدأ الحدث';
-            btn.style.backgroundColor = 'var(--success)';
-            btn.style.color = '#fff';
-        }
+        if(eventData.isActive) { btn.innerText = 'إيقاف الحدث التلقائي'; btn.style.backgroundColor = 'var(--warning)'; btn.style.color = '#000'; } 
+        else { btn.innerText = 'بدء الحدث التلقائي'; btn.style.backgroundColor = 'var(--success)'; btn.style.color = '#fff'; }
+
+        // تحميل إعدادات الحريف
+        let hareef = JSON.parse(localStorage.getItem('hareefSettings')) || defaultHareefSettings;
+        document.getElementById('hareef-name').value = hareef.name;
+        document.getElementById('hareef-mults').value = hareef.mults.join(',');
+        document.getElementById('hareef-min-h').value = hareef.minH;
+        document.getElementById('hareef-max-h').value = hareef.maxH;
+        document.getElementById('hareef-max-cards').value = hareef.maxCards;
+        document.getElementById('hareef-target-wins').value = hareef.targetWins;
+        document.querySelectorAll('.hareef-game-chk').forEach(chk => {
+            chk.checked = hareef.games.includes(chk.value);
+        });
     }
 
     function toggleEventStatus() {
         let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
         eventData.isActive = !eventData.isActive;
         localStorage.setItem('gameEventData', JSON.stringify(eventData));
-        loadEventSettings();
-        applyGlobalModes();
+        loadEventSettings(); applyGlobalModes();
     }
 
     function saveEventSettings() {
-        let days = [];
-        document.querySelectorAll('.event-day-chk:checked').forEach(chk => days.push(parseInt(chk.value)));
+        let days = []; document.querySelectorAll('.event-day-chk:checked').forEach(chk => days.push(parseInt(chk.value)));
         let mult = parseFloat(document.getElementById('event-multiplier').value) || 2;
         let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        eventData.days = days;
-        eventData.multiplier = mult;
+        eventData.days = days; eventData.multiplier = mult;
         localStorage.setItem('gameEventData', JSON.stringify(eventData));
-        alert('تم حفظ إعدادات الحدث!');
-        applyGlobalModes();
-        toggleModal('event-modal');
+
+        // حفظ الحريف
+        let minH = parseInt(document.getElementById('hareef-min-h').value) || 1;
+        let maxH = parseInt(document.getElementById('hareef-max-h').value) || 5;
+        if(minH > maxH) { alert("تنبيه: الحد الأدنى للزمن يجب أن يكون أقل من أو يساوي الحد الأعلى!"); return; }
+        if(minH < 1 || maxH > 24) { alert("تنبيه: المدى المسموح للزمن هو من 1 إلى 24 ساعة فقط!"); return; }
+
+        let hareefGames = [];
+        document.querySelectorAll('.hareef-game-chk:checked').forEach(chk => hareefGames.push(chk.value));
+
+        let hareef = {
+            name: document.getElementById('hareef-name').value || "الحريف",
+            mults: document.getElementById('hareef-mults').value.split(',').map(n => parseFloat(n.trim())).filter(n => !isNaN(n)),
+            minH: minH, maxH: maxH,
+            maxCards: parseInt(document.getElementById('hareef-max-cards').value) || 4,
+            targetWins: parseInt(document.getElementById('hareef-target-wins').value) || 5,
+            games: hareefGames
+        };
+        if(hareef.mults.length === 0) hareef.mults = [3,4,5,6];
+        localStorage.setItem('hareefSettings', JSON.stringify(hareef));
+
+        alert('تم حفظ إعدادات الأحداث والبطاقات!');
+        applyGlobalModes(); toggleModal('event-modal');
     }
 
     function addStageBonus() {
         let stageSelect = document.getElementById('stage-bonus-select').value;
         let bonusVal = parseFloat(document.getElementById('stage-bonus-val').value);
         if(isNaN(bonusVal)) { alert("الرجاء إدخال مبلغ صحيح!"); return; }
-        
         let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
         stageBonuses[stageSelect] = (parseFloat(stageBonuses[stageSelect]) || 0) + bonusVal;
         localStorage.setItem('stageBonuses', JSON.stringify(stageBonuses));
@@ -830,99 +841,48 @@
     }
 
     function showBonusReport() {
-        let box = document.getElementById('bonus-report-box');
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        let html = '<ul>';
-        for(let i=1; i<=7; i++) {
-            let base = 15 * i * i;
-            let bonus = parseFloat(stageBonuses[i]) || 0;
-            html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه فلسطيني</span></li>`;
-        }
-        html += '</ul>';
-        box.innerHTML = html;
-        box.style.display = 'block';
+        let box = document.getElementById('bonus-report-box'); let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; let html = '<ul>';
+        for(let i=1; i<=7; i++) { let base = 15 * i * i; let bonus = parseFloat(stageBonuses[i]) || 0; html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه فلسطيني</span></li>`; }
+        html += '</ul>'; box.innerHTML = html; box.style.display = 'block';
     }
     
     function addManualPoints() {
         let pts = parseInt(document.getElementById('manual-points-val').value);
         if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للمكافأة!"); return; }
-        
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        appProg.cumulativeScore = (appProg.cumulativeScore || 0) + pts;
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        
-        document.getElementById('manual-points-val').value = '';
-        alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة للطفل! 🎉`);
-        
-        checkNewFameAchievements();
-        updateBankUI();
-        if(document.getElementById('fame-modal').style.display === 'flex') {
-            renderHallOfFame();
-        }
+        appProg.cumulativeScore = (appProg.cumulativeScore || 0) + pts; localStorage.setItem('appProgress', JSON.stringify(appProg));
+        document.getElementById('manual-points-val').value = ''; alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة للطفل! 🎉`);
+        checkNewFameAchievements(); updateBankUI();
+        if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
     }
 
     function subtractManualPoints() {
         let pts = parseInt(document.getElementById('manual-points-val').value);
         if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للخصم!"); return; }
-        
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let currentScore = Math.floor(appProg.cumulativeScore || 0);
-        
-        if(pts > currentScore) pts = currentScore; 
-        appProg.cumulativeScore -= pts;
-        let newScore = appProg.cumulativeScore;
-        
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        
-        let newNotifiedBadges = [];
-        let badgesValueLost = 0;
-        let absoluteBadgeIndex = 1;
-        
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let currentScore = Math.floor(appProg.cumulativeScore || 0);
+        if(pts > currentScore) pts = currentScore; appProg.cumulativeScore -= pts; let newScore = appProg.cumulativeScore;
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; let newNotifiedBadges = []; let badgesValueLost = 0; let absoluteBadgeIndex = 1;
         fameStages.forEach(stage => {
             stage.badges.forEach(badge => {
-                if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) {
-                    if(newScore >= badge.req) {
-                        newNotifiedBadges.push(badge.id);
-                    } else {
-                        badgesValueLost += absoluteBadgeIndex; 
-                    }
-                }
+                if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) { if(newScore >= badge.req) { newNotifiedBadges.push(badge.id); } else { badgesValueLost += absoluteBadgeIndex; } }
                 absoluteBadgeIndex++;
             });
         });
         appProg.notifiedBadges = newNotifiedBadges;
-
-        let newClaimedStages = [];
-        let stagesValueLost = 0;
+        let newClaimedStages = []; let stagesValueLost = 0;
         fameStages.forEach(stage => {
             if(appProg.claimedStagesFame && appProg.claimedStagesFame.includes(stage.num)) {
-                if(newScore >= stage.end) {
-                    newClaimedStages.push(stage.num); 
-                } else {
-                    let baseReward = 15 * stage.num * stage.num;
-                    let bonusReward = parseFloat(stageBonuses[stage.num]) || 0;
-                    stagesValueLost += (baseReward + bonusReward); 
-                }
+                if(newScore >= stage.end) { newClaimedStages.push(stage.num); } else { let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; stagesValueLost += (baseReward + bonusReward); }
             }
         });
         appProg.claimedStagesFame = newClaimedStages;
-
         let totalLostMoney = badgesValueLost + stagesValueLost;
         appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; 
-        
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        document.getElementById('manual-points-val').value = '';
-        
+        localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('manual-points-val').value = '';
         let msg = `تم خصم ${pts} نقطة بنجاح كعقاب.`;
-        if (totalLostMoney > 0) {
-            msg += `\nنظراً لتراجع مستوى النقاط، تم سحب جوائز من البنك بقيمة ${totalLostMoney} جنيه فلسطيني.`;
-        }
-        alert(msg);
-        
-        updateBankUI();
-        if(document.getElementById('fame-modal').style.display === 'flex') {
-            renderHallOfFame();
-        }
+        if (totalLostMoney > 0) { msg += `\nنظراً لتراجع مستوى النقاط، تم سحب جوائز من البنك بقيمة ${totalLostMoney} جنيه فلسطيني.`; }
+        alert(msg); updateBankUI();
+        if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
     }
 
     let wheelAngle = 0, isSpinning = false, reqAnim, chosenPrize = 0;
@@ -938,36 +898,28 @@
         let btn = document.getElementById('btn-spin');
         if(isSpinning) {
             stopWheel();
-            btn.innerText = 'ابدأ الدوران 🎡';
-            btn.classList.remove('stop-mode');
-            btn.disabled = true; 
+            btn.innerText = 'ابدأ الدوران 🎡'; btn.classList.remove('stop-mode'); btn.disabled = true; 
         } else {
             let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
             let total = Math.floor(appProg.cumulativeScore || 0);
             let exch = appProg.exchangedPoints || 0;
-            if (total - exch < 3000) { alert(`رصيد نقاطك لا يكفي! تحتاج الوصول إلى ${exch + 3000} نقطة للمحاولة.`); return; }
-            appProg.exchangedPoints = exch + 3000;
+            let wheelCost = appProg.wheelCost || 3000;
+
+            if (total - exch < wheelCost) { alert(`رصيد نقاطك لا يكفي! تحتاج الوصول إلى ${exch + wheelCost} نقطة للمحاولة.`); return; }
+            appProg.exchangedPoints = exch + wheelCost;
             localStorage.setItem('appProgress', JSON.stringify(appProg));
             updateBankUI();
             
-            let array = new Uint32Array(1);
-            window.crypto.getRandomValues(array);
-            let secureRandom = (array[0] / (0xFFFFFFFF + 1)); 
-            let rand = Math.floor(secureRandom * 100) + 1; 
-
+            let array = new Uint32Array(1); window.crypto.getRandomValues(array);
+            let secureRandom = (array[0] / (0xFFFFFFFF + 1)); let rand = Math.floor(secureRandom * 100) + 1; 
             if (rand <= 30) chosenPrize = 1; else if (rand <= 60) chosenPrize = 2; else if (rand <= 80) chosenPrize = 3; else if (rand <= 90) chosenPrize = 4; else chosenPrize = 5;
 
-            isSpinning = true;
-            document.getElementById('wheel').style.transition = 'none';
-            animateSpin();
-            btn.innerText = 'توقف 🛑';
-            btn.classList.add('stop-mode');
+            isSpinning = true; document.getElementById('wheel').style.transition = 'none'; animateSpin();
+            btn.innerText = 'توقف 🛑'; btn.classList.add('stop-mode');
         }
     }
 
-    function animateSpin() {
-        if(isSpinning) { wheelAngle = (wheelAngle + 15) % 360; document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`; reqAnim = requestAnimationFrame(animateSpin); }
-    }
+    function animateSpin() { if(isSpinning) { wheelAngle = (wheelAngle + 15) % 360; document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`; reqAnim = requestAnimationFrame(animateSpin); } }
 
     function stopWheel() {
         isSpinning = false; cancelAnimationFrame(reqAnim);
@@ -976,14 +928,11 @@
         let finalAngle = wheelAngle + (3 * 360) + (finalTarget - (wheelAngle % 360));
         if (finalTarget < (wheelAngle % 360)) finalAngle += 360;
         let wheelEl = document.getElementById('wheel');
-        wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)';
-        wheelEl.style.transform = `rotate(${finalAngle}deg)`;
+        wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)'; wheelEl.style.transform = `rotate(${finalAngle}deg)`;
         setTimeout(() => {
             wheelEl.style.transition = 'none'; wheelAngle = finalAngle % 360; wheelEl.style.transform = `rotate(${wheelAngle}deg)`;
-            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-            appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize;
-            localStorage.setItem('appProgress', JSON.stringify(appProg));
-            updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه فلسطيني. أضيفت لرصيدك!`);
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize;
+            localStorage.setItem('appProgress', JSON.stringify(appProg)); updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه فلسطيني. أضيفت لرصيدك!`);
             document.getElementById('btn-spin').disabled = false;
         }, 3500);
     }
@@ -993,10 +942,8 @@
         if(isNaN(amount) || amount <= 0) { alert("أدخل مبلغاً صحيحاً!"); return; }
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         if(amount > (appProg.bankBalance || 0)) { alert("الرصيد لا يكفي!"); return; }
-        appProg.bankBalance -= amount;
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        document.getElementById('withdraw-amount').value = '';
-        updateBankUI(); alert(`تم سحب ${amount} جنيه فلسطيني بنجاح.`);
+        appProg.bankBalance -= amount; localStorage.setItem('appProgress', JSON.stringify(appProg));
+        document.getElementById('withdraw-amount').value = ''; updateBankUI(); alert(`تم سحب ${amount} جنيه فلسطيني بنجاح.`);
     }
 </script>
 
