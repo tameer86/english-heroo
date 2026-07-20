@@ -208,12 +208,12 @@
                 <h4 style="color:var(--success); margin-top:0; margin-bottom:10px;">إعدادات عجلة الحظ</h4>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <div>
-                        <label style="font-size: 14px;">تكلفة إضافة محاولة العجلة (تراكمياً):</label>
-                        <input type="number" id="wheel-cost-val" value="3000" min="500" disabled>
+                        <label style="font-size: 14px;">تكلفة محاولة العجلة القادمة:</label>
+                        <input type="number" id="wheel-cost-val" value="3000" min="500">
                     </div>
                     <div style="border-top: 1px solid #ccc; padding-top: 8px;">
                         <label style="font-size: 14px; color: var(--danger);">تعديل يدوي: نقطة التوقف الحالية للصرف:</label>
-                        <input type="number" id="wheel-exchange-val" placeholder="مثال: 12000" disabled>
+                        <input type="number" id="wheel-exchange-val" placeholder="مثال: 12000">
                     </div>
                 </div>
             </div>
@@ -387,7 +387,7 @@
     function logBankTransaction(type, amount, desc) {
         let history = JSON.parse(localStorage.getItem('bankHistory')) || [];
         history.unshift({ date: new Date().getTime(), type, amount, desc });
-        if(history.length > 50) history.pop(); // الاحتفاظ بآخر 50 حركة
+        if(history.length > 50) history.pop(); 
         localStorage.setItem('bankHistory', JSON.stringify(history));
         if(document.getElementById('bank-history-container').style.display === 'block') renderBankHistory();
     }
@@ -407,7 +407,7 @@
         history.forEach(item => {
             let d = new Date(item.date); let dateStr = `${d.getDate()}/${d.getMonth()+1} - ${d.getHours()}:${d.getMinutes()}`;
             let color = item.type === 'in' ? 'var(--success)' : 'var(--danger)'; let sign = item.type === 'in' ? '+' : '-';
-            html += `<div class="history-item"><span style="color:#888; font-size:12px; width:70px;">${dateStr}</span><span style="flex-grow:1; margin:0 10px; font-weight:bold; color:var(--dark);">${item.desc}</span><strong style="color:${color}; font-size:16px;" dir="ltr">${sign}${item.amount}</strong></div>`;
+            html += `<div class="history-item"><span style="color:#555; font-weight:bold; font-size:12px; width:80px;">${dateStr}</span><span style="flex-grow:1; margin:0 10px; font-weight:bold; color:var(--dark);">${item.desc}</span><strong style="color:${color}; font-size:16px;" dir="ltr">${sign}${item.amount}</strong></div>`;
         });
         container.innerHTML = html;
     }
@@ -579,19 +579,28 @@
         const matchgActive = document.getElementById('chk-matchg').checked; const listenActive = document.getElementById('chk-listen').checked; const missingActive = document.getElementById('chk-missing').checked; const arrangeActive = document.getElementById('chk-arrange').checked; const crosswordActive = document.getElementById('chk-crossword').checked;
         const gameState = { matchg: matchgActive, listen: listenActive, missing: missingActive, arrange: arrangeActive, crossword: crosswordActive }; localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState)); applyGamesState(gameState);
 
-        let wheelCost = parseInt(document.getElementById('wheel-cost-val').value) || 3000;
-        let wheelExchange = parseInt(document.getElementById('wheel-exchange-val').value) || 0;
-        
+        // هنا التعديل المهم لحفظ الإعدادات بشكل صحيح في وضع ولي الأمر
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        appProg.wheelCost = wheelCost;
-        if(wheelExchange >= 0) appProg.exchangedPoints = wheelExchange;
+        
+        let wheelCostInput = document.getElementById('wheel-cost-val');
+        if (!wheelCostInput.disabled) {
+            appProg.wheelCost = parseInt(wheelCostInput.value) || 3000;
+        }
+
+        let wheelExchangeInput = document.getElementById('wheel-exchange-val');
+        if (!wheelExchangeInput.disabled && wheelExchangeInput.value !== "") {
+            appProg.exchangedPoints = parseInt(wheelExchangeInput.value);
+            wheelExchangeInput.value = ""; // تصفير الحقل بعد الحفظ
+        }
+        
         localStorage.setItem('appProgress', JSON.stringify(appProg));
 
-        if (document.getElementById('chk-reset-all').checked) {
+        let resetCheckbox = document.getElementById('chk-reset-all');
+        if (!resetCheckbox.disabled && resetCheckbox.checked) {
             if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟')) {
                 let pList = ['matchGameProgress', 'listenGameProgress', 'missingGameProgress', 'scrambleGameProgress', 'crosswordGameProgress'];
                 pList.forEach(key => { let prog = JSON.parse(localStorage.getItem(key)) || {}; for (let lvl in prog) prog[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem(key, JSON.stringify(prog)); });
-                document.getElementById('chk-reset-all').checked = false; alert('تم تصفير جميع الألعاب بنجاح! 🔄');
+                resetCheckbox.checked = false; alert('تم تصفير جميع الألعاب بنجاح! 🔄');
             }
         }
         alert('تم حفظ الإعدادات بنجاح!'); toggleModal('admin-modal');
@@ -602,7 +611,7 @@
         document.getElementById('chk-matchg').checked = savedState.matchg !== false; document.getElementById('chk-listen').checked = savedState.listen !== false; document.getElementById('chk-missing').checked = savedState.missing !== false; document.getElementById('chk-arrange').checked = savedState.arrange !== false; document.getElementById('chk-crossword').checked = savedState.crossword !== false; applyGamesState(savedState);
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         document.getElementById('wheel-cost-val').value = appProg.wheelCost || 3000;
-        document.getElementById('wheel-exchange-val').value = appProg.exchangedPoints || 0;
+        // لا نحمل exchangedPoints إلى حقل الإدخال ليظل فارغاً كأداة تعديل فقط
     }
 
     function applyGamesState(state) {

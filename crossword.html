@@ -61,7 +61,7 @@
         .cw-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 1100px; margin: 0 auto;}
         @media (min-width: 900px) { .cw-layout { flex-direction: row-reverse; align-items: flex-start; justify-content: center; } }
         
-        /* تصميم الشريط الذكي العائم */
+        /* الشريط الذكي العائم */
         .sticky-clue-bar { position: sticky; top: 10px; background: #2c3e50; color: #f1c40f; padding: 12px 20px; border-radius: 10px; box-shadow: 0 6px 15px rgba(0,0,0,0.3); z-index: 100; font-size: clamp(18px, 4vw, 22px); font-weight: bold; text-align: center; border: 2px solid #f1c40f; transition: all 0.3s; width: 90%; max-width: 500px; margin: 0 auto 15px auto; line-height: 1.4; display: none; }
         .sticky-clue-bar span { display: block; font-size: 14px; color: #bdc3c7; margin-bottom: 5px; }
 
@@ -521,7 +521,7 @@
                 if(cellData) {
                     let input = document.createElement('input'); input.className = 'cw-input'; input.maxLength = 1; input.dataset.x = c; input.dataset.y = r; input.dataset.expected = cellData.char;
                     input.onkeydown = (e) => onCellKeydown(e, input); input.oninput = (e) => onCellInput(e, input);
-                    input.onfocus = () => updateActiveClue(input); // إضافة حدث التركيز
+                    input.onfocus = () => updateActiveClue(input); 
                     cellDiv.appendChild(input);
                     if(cellData.displayNum) { let numSpan = document.createElement('span'); numSpan.className = 'cw-number'; numSpan.innerText = cellData.displayNum; cellDiv.appendChild(numSpan); }
                 } else { cellDiv.classList.add('empty'); }
@@ -532,21 +532,25 @@
         placedWordsInfo.forEach(pw => { let li = document.createElement('li'); li.innerHTML = `<span class="num-badge">${pw.displayNum}</span> ${pw.ar}`; li.id = `clue-${pw.id}`; if(pw.isHoriz) ulAcross.appendChild(li); else ulDown.appendChild(li); });
     }
 
-    // الشريط الذكي العائم
+    // الشريط الذكي العائم - تم إصلاحه لكي لا يعطل رسم الشبكة!
     function updateActiveClue(inputEl) {
         if(!inputEl) return;
         let x = parseInt(inputEl.dataset.x); let y = parseInt(inputEl.dataset.y);
         let cellData = cwGridData[`${x},${y}`]; if(!cellData) return;
         
-        let words = placedWordsInfo.filter(pw => cellData.words.includes(pw.id)); if(words.length === 0) return;
+        // استخراج الكلمات التي تمر بهذا المربع
+        let wordsInCell = placedWordsInfo.filter(pw => cellData.words.includes(pw.id)); 
+        if(wordsInCell.length === 0) return;
         
-        let activeWord = words[0];
-        if(words.length > 1 && window.typingDirection) {
+        let activeWord = wordsInCell[0]; // افتراضياً الكلمة الأولى
+        
+        // إذا كان المربع يتقاطع فيه كلمتان، نقرر أيهما نعرض بناءً على اتجاه الكتابة
+        if(wordsInCell.length > 1 && window.typingDirection) {
             let isHorizDir = (window.typingDirection === 'h' || window.typingDirection === '-h');
-            let matchDir = words.find(w => w.isHoriz === isHorizDir);
+            let matchDir = wordsInCell.find(w => w.isHoriz === isHorizDir);
             if(matchDir) activeWord = matchDir;
-        } else if (words.length > 1) {
-           let horiz = words.find(w => w.isHoriz); if(horiz) activeWord = horiz;
+        } else if (wordsInCell.length > 1) {
+           let horiz = wordsInCell.find(w => w.isHoriz); if(horiz) activeWord = horiz;
         }
 
         // تحديث الشريط العلوي العائم
@@ -565,6 +569,7 @@
             if(wp) wp.classList.add('active-word');
         }
         inputEl.classList.add('active-cell');
+        
         let activeLi = document.getElementById(`clue-${activeWord.id}`);
         if(activeLi && !activeLi.classList.contains('completed')) activeLi.classList.add('highlight-clue');
     }
