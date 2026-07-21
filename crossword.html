@@ -61,7 +61,12 @@
         
         .cw-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 1100px; margin: 0 auto;}
         
-        .sticky-hint { position: sticky; top: 10px; z-index: 1000; background: #fff; padding: 12px 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border-right: 6px solid var(--warning); border-left: 6px solid var(--warning); font-size: clamp(16px, 4vw, 22px); font-weight: bold; color: var(--dark); margin: 0 auto 20px auto; max-width: 90%; display: none; transition: all 0.3s ease; text-align: center; }
+        /* التعديلات على شريط التلميح العائم وإضافة لمبة التلميح */
+        .sticky-hint { position: sticky; top: 10px; z-index: 1000; background: #fff; padding: 12px 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border-right: 6px solid var(--warning); border-left: 6px solid var(--warning); font-size: clamp(16px, 4vw, 22px); font-weight: bold; color: var(--dark); margin: 0 auto 20px auto; max-width: 90%; display: none; transition: all 0.3s ease; text-align: center; align-items: center; justify-content: center; gap: 15px;}
+        
+        .hint-btn { background: var(--warning); color: #fff; border: none; border-radius: 50%; width: clamp(35px, 8vw, 45px); height: clamp(35px, 8vw, 45px); font-size: clamp(18px, 4vw, 24px); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: 0.2s; display: flex; justify-content: center; align-items: center; user-select: none; flex-shrink: 0;}
+        .hint-btn:active { transform: scale(0.9); box-shadow: 0 2px 3px rgba(0,0,0,0.2); }
+        .hint-active-cell { color: #fff !important; background-color: var(--danger) !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 
         .cw-board-container { background: #fff; padding: 10px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow-x: auto; width: 100%; display: flex; justify-content: center; box-sizing: border-box; direction: ltr;}
         .cw-grid { display: grid; gap: 2px; background: #2c3e50; padding: 2px; border-radius: 5px; margin: 0 auto; }
@@ -110,9 +115,6 @@
         </div>
         <div class="left-header-group">
             <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
-            
-            
-
             <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
             <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
         </div>
@@ -176,7 +178,10 @@
             </div>
         </div>
         
-        <div id="sticky-hint" class="sticky-hint"><span id="sticky-hint-text">👈 اضغط على أي مربع لتبدأ!</span></div>
+        <div id="sticky-hint" class="sticky-hint">
+            <span id="sticky-hint-text">👈 اضغط على أي مربع لتبدأ!</span>
+            <button id="hint-bulb-btn" class="hint-btn" title="اضغط باستمرار لكشف الكلمة (يخصم نجمة)" onmousedown="showHint(event)" onmouseup="hideHint(event)" onmouseleave="hideHint(event)" ontouchstart="showHint(event)" ontouchend="hideHint(event)" ontouchcancel="hideHint(event)">💡</button>
+        </div>
 
         <div class="cw-layout">
             <div class="cw-board-container">
@@ -294,6 +299,7 @@
     let activeStage = null; let timerInterval; let secondsElapsed = 0;
     let cwGridData = {}; let placedWordsInfo = []; 
     window.currentStageTotalLetters = 0; window.typingDirection = null; 
+    let starPenalty = 0;
 
     let assignedCards = { last5: [], random5: [], friday: [], chests: {} };
 
@@ -315,7 +321,6 @@
         if(modal.style.display === 'flex') { 
             modal.style.display = 'none'; 
         } else if (gameScreen.style.display === 'block') { 
-            // تعديل سد ثغرة التحايل: تصفير السلسلة عند الخروج الداخلي
             localStorage.setItem('consecutive5_crossword', 0);
             showStagesScreen(); 
         } else { 
@@ -477,12 +482,14 @@
 
     function startGame(stageObj) {
         activeStage = stageObj;
+        starPenalty = 0; window.currentActiveWord = null; window.isHintActive = false;
         document.getElementById('stages-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'block';
         let prefix = activeStage.level.startsWith('CLASS') ? activeStage.level.replace('CLASS', '') : activeStage.level;
         let displayStr = currentLevel === "ALL" ? `${prefix}.${activeStage.localStage}` : activeStage.localStage;
         document.getElementById('current-stage-display').innerText = displayStr;
         
-        document.getElementById('sticky-hint').style.display = 'block'; document.getElementById('sticky-hint-text').innerText = '👈 اضغط على أي مربع لتبدأ!';
+        document.getElementById('sticky-hint').style.display = 'flex'; 
+        document.getElementById('sticky-hint-text').innerText = '👈 اضغط على أي مربع لتبدأ!';
 
         let stageWords = [...activeStage.words]; stageWords.sort(() => Math.random() - 0.5);
         generateCrosswordAlgorithm(stageWords); startTimer();
@@ -582,6 +589,7 @@
         }
 
         if(activePw) {
+            window.currentActiveWord = activePw;
             let dx = activePw.isHoriz ? 1 : 0; let dy = activePw.isHoriz ? 0 : 1;
             for(let i=0; i<activePw.len; i++) {
                 let cx = activePw.x + i*dx; let cy = activePw.y + i*dy; let inp = document.querySelector(`.cw-input[data-x="${cx}"][data-y="${cy}"]`);
@@ -591,7 +599,7 @@
             if(curInp && !curInp.classList.contains('correct')) curInp.classList.add('cell-highlight');
 
             let hintBar = document.getElementById('sticky-hint'); let hintText = document.getElementById('sticky-hint-text');
-            hintBar.style.display = 'block'; let icon = activePw.isHoriz ? "➡️" : "⬇️"; hintText.innerHTML = `${icon} <span style="color:var(--danger)">${activePw.ar}</span>`;
+            hintBar.style.display = 'flex'; let icon = activePw.isHoriz ? "➡️" : "⬇️"; hintText.innerHTML = `${icon} <span style="color:var(--danger)">${activePw.ar}</span>`;
         }
     }
 
@@ -600,9 +608,40 @@
         return document.querySelector(`.cw-input[data-x="${nX}"][data-y="${nY}"]:not(.correct)`);
     }
 
+    function getPrevInput(x, y, dir) {
+        let nX = x, nY = y; 
+        if(dir === 'h') nX--; 
+        else if(dir === '-h') nX++; 
+        else if(dir === 'v') nY--; 
+        else if(dir === '-v') nY++;
+        return document.querySelector(`.cw-input[data-x="${nX}"][data-y="${nY}"]:not(.correct)`);
+    }
+
     function onCellKeydown(e, inputEl) {
-        if(e.key === 'ArrowRight') { window.typingDirection = '-h'; } else if(e.key === 'ArrowLeft') { window.typingDirection = 'h'; } else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; } else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; }
-        let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y); setTimeout(() => highlightActiveWord(curX, curY), 10);
+        if(e.key === 'ArrowRight') { window.typingDirection = '-h'; } 
+        else if(e.key === 'ArrowLeft') { window.typingDirection = 'h'; } 
+        else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; } 
+        else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; }
+        
+        let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y); 
+
+        // المسح العكسي
+        if (e.key === 'Backspace') {
+            let activeDir = window.typingDirection;
+            if(!activeDir && window.currentActiveWord) activeDir = window.currentActiveWord.isHoriz ? 'h' : 'v';
+            if(!activeDir) activeDir = 'h';
+            
+            if(inputEl.value === '') {
+                e.preventDefault();
+                let prevInput = getPrevInput(curX, curY, activeDir);
+                if(prevInput) {
+                    prevInput.value = '';
+                    prevInput.focus();
+                }
+            }
+        }
+
+        setTimeout(() => highlightActiveWord(curX, curY), 10);
     }
 
     function onCellInput(e, inputEl) {
@@ -631,12 +670,56 @@
         if(allCorrect) setTimeout(endGame, 500);
     }
 
+    // دوال لمبة التلميح
+    window.isHintActive = false;
+    function showHint(e) {
+        if(e && e.type === 'touchstart') e.preventDefault();
+        if(window.isHintActive || !window.currentActiveWord) return;
+        window.isHintActive = true;
+        
+        starPenalty++;
+        updateLiveStars(secondsElapsed);
+        playSysSound('click');
+        
+        let pw = window.currentActiveWord;
+        let dx = pw.isHoriz ? 1 : 0; let dy = pw.isHoriz ? 0 : 1;
+        for(let i=0; i<pw.len; i++) {
+            let cx = pw.x + i*dx; let cy = pw.y + i*dy;
+            let input = document.querySelector(`.cw-input[data-x="${cx}"][data-y="${cy}"]`);
+            if(input && !input.classList.contains('correct')) {
+                input.dataset.userVal = input.value;
+                input.value = input.dataset.expected;
+                input.classList.add('hint-active-cell');
+            }
+        }
+    }
+
+    function hideHint(e) {
+        if(e && e.type !== 'mouseup' && e.type !== 'mouseleave') e.preventDefault();
+        if(!window.isHintActive || !window.currentActiveWord) return;
+        window.isHintActive = false;
+        
+        let pw = window.currentActiveWord;
+        let dx = pw.isHoriz ? 1 : 0; let dy = pw.isHoriz ? 0 : 1;
+        for(let i=0; i<pw.len; i++) {
+            let cx = pw.x + i*dx; let cy = pw.y + i*dy;
+            let input = document.querySelector(`.cw-input[data-x="${cx}"][data-y="${cy}"]`);
+            if(input && input.classList.contains('hint-active-cell')) {
+                input.value = input.dataset.userVal || '';
+                input.classList.remove('hint-active-cell');
+            }
+        }
+    }
+
     function getStarsForTime(time) {
         let t = getLevelTimes(activeStage.level); let letters = window.currentStageTotalLetters || 10;
         if(time <= (t.t5 * letters)) return 5; if(time <= (t.t4 * letters)) return 4; if(time <= (t.t3 * letters)) return 3; if(time <= (t.t2 * letters)) return 2; if(time <= (t.t1 * letters)) return 1; return 0;
     }
 
-    function updateLiveStars(time) { let currentStars = getStarsForTime(time); document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars); }
+    function updateLiveStars(time) { 
+        let currentStars = Math.max(0, getStarsForTime(time) - starPenalty);
+        document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars); 
+    }
 
     function startTimer() {
         secondsElapsed = 0; document.getElementById('timer-display').innerText = secondsElapsed; document.getElementById('live-stars').innerText = '★★★★★'; 
@@ -692,7 +775,8 @@
 
     function endGame() {
         clearInterval(timerInterval); document.getElementById('sticky-hint').style.display = 'none';
-        let time = secondsElapsed; let stars = getStarsForTime(time);
+        let time = secondsElapsed; 
+        let stars = Math.max(0, getStarsForTime(time) - starPenalty);
         let levelData = gameProgress[activeStage.level] || {}; let previousStars = levelData[activeStage.localStage]?.stars || 0;
         let t = getLevelTimes(activeStage.level); let starPrice = t.starPrice !== undefined ? t.starPrice : 10;
         
