@@ -32,12 +32,6 @@
         .btn-top-action { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         .btn-top-action:hover { transform: scale(1.2); }
 
-        /* شريط التحكم بالصوت */
-        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 2px solid var(--primary); }
-        .vol-icon { font-size: 24px; cursor: pointer; user-select: none; transition: 0.2s; width: 30px; text-align: center;}
-        .vol-icon:hover { transform: scale(1.1); }
-        .vol-slider { width: 90px; cursor: pointer; accent-color: var(--primary); }
-
         /* تعديلات النوافذ المنبثقة */
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: flex-start; justify-content: center; z-index: 1000; overflow-y: auto; padding-top: 5vh; padding-bottom: 5vh; box-sizing: border-box;}
         .modal-content-box { background: #f8f9fc; width: 95%; max-width: 600px; padding: 25px; border-radius: 15px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl; margin: 0 auto; height: auto;}
@@ -133,9 +127,6 @@
 </head>
 <body>
 
-    <!-- موسيقى الخلفية العامة لصفحة الألعاب -->
-    <audio id="bg-music" src="1.mp3" loop autoplay></audio>
-
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
 
     <div class="top-icons">
@@ -147,11 +138,6 @@
         <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
         <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
         <button class="btn-top-action" onclick="openMagicCardsModal()" title="البطاقات السحرية والأحداث">🃏</button>
-        
-        <div class="volume-container" title="التحكم بصوت موسيقى الألعاب">
-            <span id="bg-vol-icon" class="vol-icon">🔊</span>
-            <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.01">
-        </div>
     </div>
 
     <h1> مرحباً بك في قسم الألعاب </h1>
@@ -350,94 +336,6 @@
     </div>
 
 <script>
-    // أصوات النظام والموسيقى الخلفية وتفعيلها بشكل آمن ومستقر
-    let audioCtx = null;
-    function initAudio() { 
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
-        if(audioCtx.state === 'suspended') audioCtx.resume(); 
-    }
-    
-    function playSysSound(type) {
-        try {
-            initAudio();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            if(type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            }
-        } catch(e){}
-    }
-
-    document.addEventListener('click', (e) => {
-        // حماية من الخطأ عند الضغط على نصوص أو عناصر لا تملك خصائص العناصر
-        if(e.target && e.target.closest && (e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn') || e.target.closest('.game-btn'))) {
-            playSysSound('click');
-        }
-        
-        // تشغيل الموسيقى عند أول تفاعل للمستخدم مع الحماية من الأخطاء
-        let bgMusic = document.getElementById('bg-music');
-        if (bgMusic && bgMusic.paused) {
-            let vol = parseFloat(localStorage.getItem('bgMusicVolume'));
-            if(isNaN(vol)) vol = 0.5;
-            let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
-            bgMusic.volume = isMuted ? 0 : vol;
-            let playPromise = bgMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => { console.log("Audio prevented:", error); });
-            }
-        }
-    });
-
-    function initVolumeControl() {
-        let volSlider = document.getElementById('bg-vol-slider');
-        let volIcon = document.getElementById('bg-vol-icon');
-        
-        // قراءة دقيقة لتفادي قيم NaN التي تعطل الكود
-        let savedVol = parseFloat(localStorage.getItem('bgMusicVolume'));
-        if (isNaN(savedVol)) savedVol = 0.5; 
-        
-        if (volSlider) {
-            volSlider.value = savedVol;
-            volSlider.addEventListener('input', function() {
-                localStorage.setItem('bgMusicVolume', this.value);
-                localStorage.setItem('bgMusicMuted', 'false');
-                applyVolumeUI();
-            });
-        }
-        
-        if (volIcon) {
-            volIcon.onclick = function(e) {
-                e.stopPropagation(); // منع النقر من الانتقال للـ document لضمان عدم حدوث تداخلات
-                let muted = localStorage.getItem('bgMusicMuted') === 'true';
-                localStorage.setItem('bgMusicMuted', !muted);
-                applyVolumeUI();
-            };
-        }
-        applyVolumeUI();
-    }
-
-    function applyVolumeUI() {
-        let bgMusic = document.getElementById('bg-music');
-        let volSlider = document.getElementById('bg-vol-slider');
-        let volIcon = document.getElementById('bg-vol-icon');
-        
-        let vol = parseFloat(localStorage.getItem('bgMusicVolume'));
-        if(isNaN(vol)) vol = 0.5;
-        let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
-        
-        if(bgMusic) bgMusic.volume = isMuted ? 0 : vol;
-        
-        if (volSlider) volSlider.value = vol;
-        if (volIcon) {
-            if (isMuted || vol === 0) { volIcon.innerText = '🔇'; } 
-            else if (vol < 0.5) { volIcon.innerText = '🔉'; } 
-            else { volIcon.innerText = '🔊'; }
-        }
-    }
-
     // المحرك الديناميكي للبطاقات والتزامن مع الإعدادات
     const DEFAULT_CARDS_CONFIG = {
         last5: { id: 'last5', name: "بطاقة آخر 5 مراحل", color: "#e74a3b", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 0, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'fixed' }, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "تُطبق أوتوماتيكياً على أحدث 5 مراحل تم حفظها لزيادة التحدي." },
@@ -485,7 +383,6 @@
         applyGlobalModes();
         loadGamesState();
         checkNewFameAchievements(); 
-        initVolumeControl();
     };
 
     function verifyParentModeStrict() {
