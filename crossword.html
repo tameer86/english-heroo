@@ -68,8 +68,10 @@
         .hint-btn:active { transform: scale(0.9); box-shadow: 0 2px 3px rgba(0,0,0,0.2); }
         .hint-active-cell { color: #fff !important; background-color: var(--danger) !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 
-        .cw-board-container { background: #fff; padding: 10px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow-x: auto; width: 100%; display: flex; justify-content: center; box-sizing: border-box; direction: ltr;}
-        .cw-grid { display: grid; gap: 2px; background: #2c3e50; padding: 2px; border-radius: 5px; margin: 0 auto; }
+        /* التعديل الجذري لحل مشكلة قص المربعات من الجانب الأيسر */
+        .cw-board-container { background: #fff; padding: 10px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow-x: auto; width: 100%; box-sizing: border-box; direction: ltr; text-align: center; white-space: nowrap;}
+        .cw-grid { display: inline-grid; gap: 2px; background: #2c3e50; padding: 2px; border-radius: 5px; margin: 0 auto; vertical-align: top; text-align: center;}
+        
         .cw-cell { position: relative; background: transparent; }
         .cw-input { width: 100%; height: 100%; border: none; text-align: center; font-weight: bold; text-transform: lowercase; color: #2c3e50; background: #fff; border-radius: 3px; caret-color: var(--danger); padding: 0; box-sizing: border-box;}
         .cw-input:focus { outline: none; z-index: 10; }
@@ -102,7 +104,6 @@
 </head>
 <body>
 
-    <!-- موسيقى الخلفية للعبة الكلمات المتقاطعة -->
     <audio id="bg-music" src="music\5.mp3" loop autoplay></audio>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
@@ -146,6 +147,16 @@
             <div class="settings-row"><label>الوقت للحرف لـ 1 نجمة:</label> <input type="number" id="time-1" class="parent-only-inputs" value="5" step="0.5"> ث</div>
             <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" class="parent-only-inputs" value="10"></div>
             
+            <div class="settings-row parent-only-btn" style="background:#e8f5e9; padding:15px; border-radius:8px; border: 1px solid #c8e6c9;">
+                <label style="display:block; width:100%; margin-bottom:10px; color:#2e7d32;">💡 إعدادات لمبة المساعدة:</label>
+                <div class="settings-row" style="background:transparent; padding:0; margin-bottom:0; align-items:center;">
+                    <input type="checkbox" id="hint-enabled" class="parent-only-inputs" checked> 
+                    <label for="hint-enabled" style="min-width:auto; margin-left:15px;">تفعيل اللمبة</label>
+                    <label style="min-width:auto; margin-left:5px;">استخدامات/نجمة:</label>
+                    <input type="number" id="hint-cost" class="parent-only-inputs" value="3" min="1" style="width:50px;">
+                </div>
+            </div>
+
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                 <label style="display:block; width:100%; margin-bottom:10px;">نطاق التطبيق:</label>
                 <div class="settings-row" style="background:transparent; padding:0; margin-bottom:0;">   
@@ -180,7 +191,7 @@
         
         <div id="sticky-hint" class="sticky-hint">
             <span id="sticky-hint-text">👈 اضغط على أي مربع لتبدأ!</span>
-            <button id="hint-bulb-btn" class="hint-btn" title="اضغط باستمرار لكشف الكلمة (يخصم نجمة)" onmousedown="showHint(event)" onmouseup="hideHint(event)" onmouseleave="hideHint(event)" ontouchstart="showHint(event)" ontouchend="hideHint(event)" ontouchcancel="hideHint(event)">💡</button>
+            <button id="hint-bulb-btn" class="hint-btn" title="اضغط باستمرار لكشف الكلمة" onmousedown="showHint(event)" onmouseup="hideHint(event)" onmouseleave="hideHint(event)" ontouchstart="showHint(event)" ontouchend="hideHint(event)" ontouchcancel="hideHint(event)">💡</button>
         </div>
 
         <div class="cw-layout">
@@ -234,7 +245,6 @@
         return 'مستوى ' + code;
     }
 
-    // هندسة الأصوات النظامية والموسيقى
     let sysAudioCtx = null; let bounceInterval = null;
     function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
     
@@ -279,12 +289,11 @@
         if (volIcon) { if (isMuted || vol === 0) volIcon.innerText = '🔇'; else if (vol < 0.5) volIcon.innerText = '🔉'; else volIcon.innerText = '🔊'; }
     }
 
-    // المحرك الديناميكي
     const DEFAULT_CARDS_CONFIG = {
         last5: { id: 'last5', name: "آخر 5 مراحل", color: "#e74a3b", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:0}, count: {type:"fixed", val:5}, games: ['crossword'], trigger: {type:'fixed'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "نقاط مضاعفة لأحدث 5 مراحل تم إضافتها لتشجيع الطفل." },
         random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['crossword'], trigger: {type:'random'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "مراحل عشوائية يومية بنقاط مضاعفة." },
         friday: { id: 'friday', name: "الحدث الدوري", color: "#1cc88a", mult: {type:"fixed", val:2}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['crossword'], trigger: {type:'periodic', days: [5]}, canEditTrigger: true, receive: "تلقائي بدون احتفال", timers: 2, desc: "حدث يتفعل في أيام محددة ليضاعف النقاط." },
-        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, games: ['crossword'], trigger: {type:'consecutive', reqWins:5}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "مكافأة تُمنح عند الفوز بعدد معين من المرات المتتالية في نفس اللعبة بـ 5 نجوم. (المراحل المختومة مسبقاً بـ 5 نجوم لا تحسب ضمن السلسلة ولا تكسرها)." },
+        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, games: ['crossword'], trigger: {type:'consecutive', reqWins:5}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "مكافأة تُمنح عند الفوز بعدد معين من المرات المتتالية في نفس اللعبة بـ 5 نجوم." },
         longBreath: { id: 'longBreath', name: "بطاقة النفس الطويل", color: "#3498db", mult: {type:"range", min:2, max:6}, dur: {type:"range", min:1, max:6}, count: {type:"range", min:1, max:5}, games: ['crossword'], trigger: {type:'speedrun', reqGames:30, reqHours:1}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "جائزة إضافية للطفل الذي ينهي ألعاباً كثيرة في وقت قصير." }
     };
 
@@ -299,7 +308,9 @@
     let activeStage = null; let timerInterval; let secondsElapsed = 0;
     let cwGridData = {}; let placedWordsInfo = []; 
     window.currentStageTotalLetters = 0; window.typingDirection = null; 
-    let starPenalty = 0;
+    
+    // متغيرات المساعدة (Hint Bulb)
+    window.hintUses = 0; window.hintPenalty = 0; window.isHintActive = false; window.currentHintCost = 3;
 
     let assignedCards = { last5: [], random5: [], friday: [], chests: {} };
 
@@ -352,7 +363,7 @@
 
     function getLevelTimes(level) {
         let levelKey = level === "ALL" ? "GLOBAL_DEFAULT" : level;
-        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 1, t4: 2, t3: 3, t2: 4, t1: 5, starPrice: 10 };
+        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 1, t4: 2, t3: 3, t2: 4, t1: 5, starPrice: 10, hintEnabled: true, hintCost: 3 };
         return gameTimeSettings[levelKey] || defaultTimes;
     }
 
@@ -361,6 +372,8 @@
         document.getElementById('time-5').value = t.t5; document.getElementById('time-4').value = t.t4;
         document.getElementById('time-3').value = t.t3; document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1; document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 10;
+        document.getElementById('hint-enabled').checked = t.hintEnabled !== false;
+        document.getElementById('hint-cost').value = t.hintCost || 3;
     }
 
     function toggleSettingsModal() {
@@ -372,8 +385,12 @@
 
     function saveTimeSettings() {
         let t5 = parseFloat(document.getElementById('time-5').value) || 1; let t4 = parseFloat(document.getElementById('time-4').value) || 2; let t3 = parseFloat(document.getElementById('time-3').value) || 3; let t2 = parseFloat(document.getElementById('time-2').value) || 4; let t1 = parseFloat(document.getElementById('time-1').value) || 5; let starPrice = parseInt(document.getElementById('star-price').value) || 10;
+        let hintEnabled = document.getElementById('hint-enabled').checked;
+        let hintCost = parseInt(document.getElementById('hint-cost').value) || 3;
+
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
-        let newSettings = { t5, t4, t3, t2, t1, starPrice };
+        let newSettings = { t5, t4, t3, t2, t1, starPrice, hintEnabled, hintCost };
+        
         let applyScope = document.querySelector('input[name="apply-scope"]:checked').value;
         if(applyScope === 'all') { gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; let selectElement = document.getElementById('level-select'); for (let i = 0; i < selectElement.options.length; i++) { if(selectElement.options[i].value && selectElement.options[i].value !== "ALL") gameTimeSettings[selectElement.options[i].value] = newSettings; } } else { if(currentLevel && currentLevel !== "ALL") gameTimeSettings[currentLevel] = newSettings; if(currentLevel === "ALL") gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; }
         localStorage.setItem('crosswordGameSettings', JSON.stringify(gameTimeSettings));
@@ -482,7 +499,12 @@
 
     function startGame(stageObj) {
         activeStage = stageObj;
-        starPenalty = 0; window.currentActiveWord = null; window.isHintActive = false;
+        window.hintUses = 0; window.hintPenalty = 0; window.currentActiveWord = null; window.isHintActive = false;
+        
+        let t = getLevelTimes(activeStage.level);
+        window.currentHintCost = t.hintCost || 3;
+        document.getElementById('hint-bulb-btn').style.display = (t.hintEnabled !== false) ? 'flex' : 'none';
+
         document.getElementById('stages-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'block';
         let prefix = activeStage.level.startsWith('CLASS') ? activeStage.level.replace('CLASS', '') : activeStage.level;
         let displayStr = currentLevel === "ALL" ? `${prefix}.${activeStage.localStage}` : activeStage.localStage;
@@ -625,7 +647,6 @@
         
         let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y); 
 
-        // المسح العكسي
         if (e.key === 'Backspace') {
             let activeDir = window.typingDirection;
             if(!activeDir && window.currentActiveWord) activeDir = window.currentActiveWord.isHoriz ? 'h' : 'v';
@@ -671,13 +692,13 @@
     }
 
     // دوال لمبة التلميح
-    window.isHintActive = false;
     function showHint(e) {
         if(e && e.type === 'touchstart') e.preventDefault();
         if(window.isHintActive || !window.currentActiveWord) return;
         window.isHintActive = true;
         
-        starPenalty++;
+        window.hintUses++;
+        window.hintPenalty = Math.floor(window.hintUses / window.currentHintCost);
         updateLiveStars(secondsElapsed);
         playSysSound('click');
         
@@ -717,7 +738,7 @@
     }
 
     function updateLiveStars(time) { 
-        let currentStars = Math.max(0, getStarsForTime(time) - starPenalty);
+        let currentStars = Math.max(0, getStarsForTime(time) - window.hintPenalty);
         document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars); 
     }
 
@@ -776,7 +797,7 @@
     function endGame() {
         clearInterval(timerInterval); document.getElementById('sticky-hint').style.display = 'none';
         let time = secondsElapsed; 
-        let stars = Math.max(0, getStarsForTime(time) - starPenalty);
+        let stars = Math.max(0, getStarsForTime(time) - window.hintPenalty);
         let levelData = gameProgress[activeStage.level] || {}; let previousStars = levelData[activeStage.localStage]?.stars || 0;
         let t = getLevelTimes(activeStage.level); let starPrice = t.starPrice !== undefined ? t.starPrice : 10;
         

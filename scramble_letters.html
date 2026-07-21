@@ -53,7 +53,7 @@
         .game-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1100px; margin-left: auto; margin-right: auto; flex-wrap: wrap; gap: 10px;}
         .timer { font-size: clamp(16px, 3vw, 24px); color: var(--danger); font-weight: bold; }
         .game-area { width: 100%; max-width: 900px; background: #fff; border-radius: 15px; padding: clamp(15px, 4vw, 30px); margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); box-sizing: border-box;}
-        .arabic-word { font-size: clamp(24px, 5vw, 36px); color: var(--primary); font-weight: bold; margin-bottom: 30px; border-bottom: 3px dashed #eee; padding-bottom: 15px; }
+        .arabic-word { font-size: clamp(24px, 5vw, 36px); color: var(--primary); font-weight: bold; }
         .letters-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2vw, 15px); margin-bottom: 40px; min-height: 80px;}
         .letter-btn { width: clamp(45px, 8vw, 65px); height: clamp(45px, 8vw, 65px); font-size: clamp(20px, 4.5vw, 30px); font-weight: bold; border-radius: 10px; background: #9b59b6; color: white; border: none; cursor: pointer; box-shadow: 0 4px 0 #8e44ad; transition: transform 0.1s, box-shadow 0.1s, background 0.3s; text-transform: lowercase;}
         .letter-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #8e44ad; }
@@ -66,6 +66,11 @@
         .char-box.active-blank { border-bottom: 4px solid var(--warning); background: #fff3cd; transform: scale(1.1); transition: 0.2s;}
         .char-box.filled { color: var(--success); border-bottom: 4px solid var(--success); background: transparent; transform: scale(1);}
         .char-box.space { border-bottom: none; width: clamp(10px, 3vw, 20px); background: transparent; }
+
+        /* ستايل لمبة المساعدة */
+        .hint-btn { background: var(--warning); color: #fff; border: none; border-radius: 50%; width: clamp(35px, 8vw, 45px); height: clamp(35px, 8vw, 45px); font-size: clamp(18px, 4vw, 24px); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: 0.2s; display: flex; justify-content: center; align-items: center; user-select: none; flex-shrink: 0;}
+        .hint-btn:active { transform: scale(0.9); box-shadow: 0 2px 3px rgba(0,0,0,0.2); }
+        .hint-active-cell { color: #fff !important; background-color: var(--danger) !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); border-bottom-color: var(--danger) !important; }
 
         #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2500; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
@@ -135,6 +140,16 @@
             <div class="settings-row"><label>الوقت للحرف لـ 1 نجمة:</label> <input type="number" id="time-1" class="parent-only-inputs" value="5.5" step="0.5"> ث</div>
             <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" class="parent-only-inputs" value="8"></div>
             
+            <div class="settings-row parent-only-btn" style="background:#e8f5e9; padding:15px; border-radius:8px; border: 1px solid #c8e6c9;">
+                <label style="display:block; width:100%; margin-bottom:10px; color:#2e7d32;">💡 إعدادات لمبة المساعدة:</label>
+                <div class="settings-row" style="background:transparent; padding:0; margin-bottom:0; align-items:center;">
+                    <input type="checkbox" id="hint-enabled" class="parent-only-inputs" checked> 
+                    <label for="hint-enabled" style="min-width:auto; margin-left:15px;">تفعيل اللمبة</label>
+                    <label style="min-width:auto; margin-left:5px;">استخدامات/نجمة:</label>
+                    <input type="number" id="hint-cost" class="parent-only-inputs" value="3" min="1" style="width:50px;">
+                </div>
+            </div>
+
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
                 <label style="display:block; width:100%; margin-bottom:10px;">نطاق تطبيق الأوقات الجديدة:</label>
                 <div class="settings-row" style="background:transparent; padding:0; margin-bottom:0;">   
@@ -168,7 +183,11 @@
         </div>
         
         <div class="game-area">
-            <div class="arabic-word" id="arabic-display">معنى الكلمة بالعربي</div>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 3px dashed #eee; padding-bottom: 15px;">
+                <div class="arabic-word" id="arabic-display" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">معنى الكلمة بالعربي</div>
+                <button id="hint-bulb-btn" class="hint-btn" title="اضغط باستمرار لكشف الحرف" onmousedown="showHint(event)" onmouseup="hideHint(event)" onmouseleave="hideHint(event)" ontouchstart="showHint(event)" ontouchend="hideHint(event)" ontouchcancel="hideHint(event)">💡</button>
+            </div>
+
             <div class="english-word-display" id="english-display" style="margin-bottom: 40px;"></div>
             <div class="letters-pool" id="letters-pool"></div>
         </div>
@@ -218,7 +237,6 @@
         return 'مستوى ' + code;
     }
 
-    // هندسة الأصوات النظامية والموسيقى
     let sysAudioCtx = null; let bounceInterval = null;
     function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
     
@@ -268,12 +286,11 @@
         if (volIcon) { if (isMuted || vol === 0) volIcon.innerText = '🔇'; else if (vol < 0.5) volIcon.innerText = '🔉'; else volIcon.innerText = '🔊'; }
     }
 
-    // المحرك الديناميكي
     const DEFAULT_CARDS_CONFIG = {
         last5: { id: 'last5', name: "آخر 5 مراحل", color: "#e74a3b", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:0}, count: {type:"fixed", val:5}, games: ['scramble','arrange'], trigger: {type:'fixed'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "نقاط مضاعفة لأحدث 5 مراحل تم إضافتها لتشجيع الطفل." },
         random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['scramble','arrange'], trigger: {type:'random'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "مراحل عشوائية يومية بنقاط مضاعفة." },
         friday: { id: 'friday', name: "الحدث الدوري", color: "#1cc88a", mult: {type:"fixed", val:2}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['scramble','arrange'], trigger: {type:'periodic', days: [5]}, canEditTrigger: true, receive: "تلقائي بدون احتفال", timers: 2, desc: "حدث يتفعل في أيام محددة ليضاعف النقاط." },
-        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, games: ['scramble','arrange'], trigger: {type:'consecutive', reqWins:5}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "مكافأة تُمنح عند الفوز بعدد معين من المرات المتتالية في نفس اللعبة بـ 5 نجوم. (المراحل المختومة مسبقاً بـ 5 نجوم لا تحسب ضمن السلسلة ولا تكسرها)." },
+        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, games: ['scramble','arrange'], trigger: {type:'consecutive', reqWins:5}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "مكافأة تُمنح عند الفوز بعدد معين من المرات المتتالية في نفس اللعبة بـ 5 نجوم." },
         longBreath: { id: 'longBreath', name: "بطاقة النفس الطويل", color: "#3498db", mult: {type:"range", min:2, max:6}, dur: {type:"range", min:1, max:6}, count: {type:"range", min:1, max:5}, games: ['scramble','arrange'], trigger: {type:'speedrun', reqGames:30, reqHours:1}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "جائزة إضافية للطفل الذي ينهي ألعاباً كثيرة في وقت قصير." }
     };
 
@@ -289,6 +306,9 @@
     let timerInterval; let secondsElapsed = 0;
     let currentBlanks = []; let activeBlankIndex = 0; 
     let consecutiveErrors = 0; let totalErrors = 0; let starPenalty = 0; window.currentStageTotalLetters = 0; 
+
+    // متغيرات المساعدة (Hint Bulb)
+    window.hintUses = 0; window.hintPenalty = 0; window.isHintActive = false; window.hintedBlank = null; window.currentHintCost = 3;
 
     let assignedCards = { last5: [], random5: [], friday: [], chests: {} }; let magicCardEventInterval = null;
 
@@ -311,7 +331,6 @@
         if(modal.style.display === 'flex') { 
             modal.style.display = 'none'; 
         } else if (gameScreen.style.display === 'block') { 
-            // تعديل سد ثغرة التحايل: تصفير السلسلة عند الخروج الداخلي
             localStorage.setItem('consecutive5_scramble', 0);
             showStagesScreen(); 
         } else { 
@@ -325,8 +344,6 @@
         else { modal.style.display = 'flex'; }
     }
 
-    // --- المحرك الديناميكي للبطاقات ---
-    function toggleEventsAdminModal() { renderDynamicCardsEditor(); toggleModal('events-admin-modal'); }
     function renderDynamicCardsEditor() {
         let container = document.getElementById('dynamic-cards-editor'); container.innerHTML = '';
         for(let key in cardsConfig) {
@@ -389,7 +406,6 @@
         localStorage.setItem('gameCardsConfig', JSON.stringify(cardsConfig)); alert('تم حفظ الخصائص بنجاح! 💾'); toggleModal('events-admin-modal');
     }
 
-    // عرض البطاقات للمستخدم مع شرح ديناميكي
     function openMagicCardsModal() { renderMagicCards(); toggleModal('magic-cards-modal'); clearInterval(magicCardEventInterval); magicCardEventInterval = setInterval(updateMagicCardsTimers, 1000); }
     function getDescHelp(key) {
         let c = cardsConfig[key]; let title = document.getElementById('info-title'); let body = document.getElementById('info-body');
@@ -496,7 +512,7 @@
         });
         if (!hasCompletedLevels) {
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
-            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>'; selectElement.disabled = true; return;
+            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل لتتمكن من اللعب.</p>'; selectElement.disabled = true; return;
         }
         selectElement.value = "ALL"; currentLevel = "ALL"; loadGameData(); loadSettingsUI();
     }
@@ -505,7 +521,7 @@
 
     function getLevelTimes(level) {
         let levelKey = level === "ALL" ? "GLOBAL_DEFAULT" : level;
-        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 1.5, t4: 2.5, t3: 3.5, t2: 4.5, t1: 5.5, starPrice: 8 };
+        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 1.5, t4: 2.5, t3: 3.5, t2: 4.5, t1: 5.5, starPrice: 8, hintEnabled: true, hintCost: 3 };
         return gameTimeSettings[levelKey] || defaultTimes;
     }
 
@@ -514,6 +530,8 @@
         document.getElementById('time-5').value = t.t5; document.getElementById('time-4').value = t.t4;
         document.getElementById('time-3').value = t.t3; document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1; document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 8;
+        document.getElementById('hint-enabled').checked = t.hintEnabled !== false;
+        document.getElementById('hint-cost').value = t.hintCost || 3;
     }
 
     function toggleSettingsModal() {
@@ -525,8 +543,12 @@
 
     function saveTimeSettings() {
         let t5 = parseFloat(document.getElementById('time-5').value) || 1.5; let t4 = parseFloat(document.getElementById('time-4').value) || 2.5; let t3 = parseFloat(document.getElementById('time-3').value) || 3.5; let t2 = parseFloat(document.getElementById('time-2').value) || 4.5; let t1 = parseFloat(document.getElementById('time-1').value) || 5.5; let starPrice = parseInt(document.getElementById('star-price').value) || 8;
+        let hintEnabled = document.getElementById('hint-enabled').checked;
+        let hintCost = parseInt(document.getElementById('hint-cost').value) || 3;
+        
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
-        let newSettings = { t5, t4, t3, t2, t1, starPrice };
+        let newSettings = { t5, t4, t3, t2, t1, starPrice, hintEnabled, hintCost };
+        
         let applyScope = document.querySelector('input[name="apply-scope"]:checked').value;
         if(applyScope === 'all') { gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; let selectElement = document.getElementById('level-select'); for (let i = 0; i < selectElement.options.length; i++) { if(selectElement.options[i].value && selectElement.options[i].value !== "ALL") gameTimeSettings[selectElement.options[i].value] = newSettings; } } else { if(currentLevel && currentLevel !== "ALL") gameTimeSettings[currentLevel] = newSettings; if(currentLevel === "ALL") gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; }
         localStorage.setItem('scrambleGameSettings', JSON.stringify(gameTimeSettings));
@@ -641,6 +663,12 @@
         document.getElementById('current-stage-display').innerText = displayStr;
         
         consecutiveErrors = 0; totalErrors = 0; starPenalty = 0; window.currentStageTotalLetters = 0;
+        window.hintUses = 0; window.hintPenalty = 0; window.isHintActive = false; window.hintedBlank = null;
+
+        let t = getLevelTimes(activeStage.level);
+        window.currentHintCost = t.hintCost || 3;
+        document.getElementById('hint-bulb-btn').style.display = (t.hintEnabled !== false) ? 'flex' : 'none';
+
         stageWords = [...activeStage.words];
         
         stageWords.forEach(w => {
@@ -680,6 +708,35 @@
         });
     }
 
+    function showHint(e) {
+        if(e && e.type === 'touchstart') e.preventDefault();
+        if(window.isHintActive || activeBlankIndex >= currentBlanks.length) return;
+        window.isHintActive = true;
+        
+        window.hintUses++;
+        window.hintPenalty = Math.floor(window.hintUses / window.currentHintCost);
+        updateLiveStars(secondsElapsed);
+        playSysSound('click');
+        
+        window.hintedBlank = currentBlanks[activeBlankIndex];
+        window.hintedBlank.innerText = window.hintedBlank.dataset.char;
+        window.hintedBlank.classList.remove('hidden-char');
+        window.hintedBlank.classList.add('hint-active-cell');
+    }
+
+    function hideHint(e) {
+        if(e && e.type !== 'mouseup' && e.type !== 'mouseleave') e.preventDefault();
+        if(!window.isHintActive || !window.hintedBlank) return;
+        window.isHintActive = false;
+        
+        if (!window.hintedBlank.classList.contains('filled')) {
+            window.hintedBlank.innerText = '';
+            window.hintedBlank.classList.add('hidden-char');
+        }
+        window.hintedBlank.classList.remove('hint-active-cell');
+        window.hintedBlank = null;
+    }
+
     function handleMistake() {
         playSysSound('error'); consecutiveErrors++; totalErrors++;
         if (consecutiveErrors === 2) { starPenalty++; consecutiveErrors = 0; totalErrors = 0; } 
@@ -693,7 +750,8 @@
         if (activeBlankIndex >= currentBlanks.length || btnElement.classList.contains('used')) return;
         let activeBlank = currentBlanks[activeBlankIndex]; let expectedChar = activeBlank.dataset.char;
         if (char === expectedChar) {
-            btnElement.classList.add('used'); activeBlank.classList.remove('hidden-char', 'active-blank'); activeBlank.classList.add('filled'); activeBlank.innerText = char;
+            btnElement.classList.add('used'); activeBlank.classList.remove('hidden-char', 'active-blank', 'hint-active-cell'); activeBlank.classList.add('filled'); activeBlank.innerText = char;
+            if(window.hintedBlank === activeBlank) { window.hintedBlank = null; window.isHintActive = false; }
             activeBlankIndex++; handleCorrect();
             if (activeBlankIndex < currentBlanks.length) { currentBlanks[activeBlankIndex].classList.add('active-blank'); } 
             else { setTimeout(() => { currentWordIndex++; loadWord(); }, 600); }
@@ -708,7 +766,10 @@
         if(time <= (t.t5 * letters)) return 5; if(time <= (t.t4 * letters)) return 4; if(time <= (t.t3 * letters)) return 3; if(time <= (t.t2 * letters)) return 2; if(time <= (t.t1 * letters)) return 1; return 0;
     }
 
-    function updateLiveStars(time) { let currentStars = Math.max(0, getStarsForTime(time) - starPenalty); document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars); }
+    function updateLiveStars(time) { 
+        let currentStars = Math.max(0, getStarsForTime(time) - starPenalty - window.hintPenalty); 
+        document.getElementById('live-stars').innerText = '★'.repeat(currentStars) + '☆'.repeat(5 - currentStars); 
+    }
 
     function startTimer() {
         secondsElapsed = 0; document.getElementById('timer-display').innerText = secondsElapsed; document.getElementById('live-stars').innerText = '★★★★★'; 
@@ -764,7 +825,7 @@
 
     function endGame() {
         clearInterval(timerInterval);
-        let time = secondsElapsed; let stars = Math.max(0, getStarsForTime(time) - starPenalty);
+        let time = secondsElapsed; let stars = Math.max(0, getStarsForTime(time) - starPenalty - window.hintPenalty);
         let levelData = gameProgress[activeStage.level] || {}; let previousStars = levelData[activeStage.localStage]?.stars || 0;
         let t = getLevelTimes(activeStage.level); let starPrice = t.starPrice !== undefined ? t.starPrice : 8;
         
