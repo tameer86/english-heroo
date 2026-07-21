@@ -123,10 +123,21 @@
         .range-inputs { display: flex; gap: 10px; }
         .range-inputs input { width: 50%; }
         .games-checkboxes label { display: inline-block; margin-left: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 20px; font-size: 13px; color: #333;}
+        
+        /* التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; position: absolute; top: 15px; left: 15px; z-index: 1000; }
+        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
     </style>
 </head>
 <body>
     <audio id="bg-music" src="music\game.mp3" loop autoplay></audio>
+
+    <div class="volume-container">
+        <div id="bg-vol-icon" class="vol-icon">🔊</div>
+        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5">
+    </div>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
 
@@ -337,6 +348,46 @@
     </div>
 
 <script>
+    // الأصوات التفاعلية للمحرك
+    let sysAudioCtx = null;
+    function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
+    
+    function playSysSound(type) {
+        try {
+            initSysAudio();
+            const osc = sysAudioCtx.createOscillator(); const gain = sysAudioCtx.createGain();
+            osc.connect(gain); gain.connect(sysAudioCtx.destination);
+            if(type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
+            }
+        } catch(e){}
+    }
+
+    document.addEventListener('click', (e) => { 
+        if(e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.icon-btn') || e.target.closest('.game-btn') || e.target.closest('.btn-top-action') || e.target.closest('.btn-spin') || e.target.closest('.btn-close-modal') || e.target.closest('.btn-admin-action') || e.target.closest('.btn-withdraw') || e.target.closest('.badge-item') || e.target.closest('.stage-card') || e.target.closest('.btn-help-icon') || e.target.closest('.wheel-box')) {
+            playSysSound('click'); 
+        }
+    });
+
+    function initVolumeControl() {
+        let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
+        let savedVol = localStorage.getItem('bgMusicVolume'); if (savedVol === null) savedVol = 0.5; 
+        if (volSlider) { volSlider.value = savedVol; volSlider.oninput = function() { localStorage.setItem('bgMusicVolume', this.value); localStorage.setItem('bgMusicMuted', 'false'); applyVolumeUI(); }; }
+        if (volIcon) { volIcon.onclick = function() { let muted = localStorage.getItem('bgMusicMuted') === 'true'; localStorage.setItem('bgMusicMuted', !muted); applyVolumeUI(); }; }
+        applyVolumeUI();
+    }
+
+    function applyVolumeUI() {
+        let bgMusic = document.getElementById('bg-music'); let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
+        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5); let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+        if(bgMusic) bgMusic.volume = isMuted ? 0 : vol;
+        if (volSlider) volSlider.value = vol;
+        if (volIcon) { if (isMuted || vol === 0) volIcon.innerText = '🔇'; else if (vol < 0.5) volIcon.innerText = '🔉'; else volIcon.innerText = '🔊'; }
+    }
+
     // المحرك الديناميكي للبطاقات والتزامن مع الإعدادات
     const DEFAULT_CARDS_CONFIG = {
         last5: { id: 'last5', name: "بطاقة آخر 5 مراحل", color: "#e74a3b", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 0, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'fixed' }, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "تُطبق أوتوماتيكياً على أحدث 5 مراحل تم حفظها لزيادة التحدي." },
@@ -384,6 +435,7 @@
         applyGlobalModes();
         loadGamesState();
         checkNewFameAchievements(); 
+        initVolumeControl();
     };
 
     function verifyParentModeStrict() {
