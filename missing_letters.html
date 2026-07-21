@@ -39,12 +39,7 @@
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
-        /* تنسيقات البطاقات المعدلة */
-        .hot-stage-last { background: linear-gradient(45deg, #e74a3b, #c0392b) !important; color: white !important; border: 2px solid #fff; box-shadow: 0 0 10px #e74a3b;}
-        .hot-stage-random { background: linear-gradient(45deg, #f6c23e, #f39c12) !important; color: white !important; border: 2px dashed #fff; animation: pulseHot 1.5s infinite;}
-        .hareef-stage { background: linear-gradient(45deg, #9b59b6, #8e44ad) !important; color: white !important; border: 2px solid #fff; box-shadow: 0 0 10px #9b59b6;}
-        @keyframes pulseHot { 0% {box-shadow: 0 0 0 0 rgba(246, 194, 62, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(246, 194, 62, 0);} 100% {box-shadow: 0 0 0 0 rgba(246, 194, 62, 0);} }
-        .hot-badge { font-size:11px; color:#fff; background:rgba(0,0,0,0.4); padding:2px 5px; border-radius:4px; margin-right: 5px; }
+        .hot-badge { font-size:11px; color:#fff; background:rgba(0,0,0,0.4); padding:2px 5px; border-radius:4px; margin-right: 5px; display: inline-block;}
         
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
         .modal-content-box { background: #fff; width: 95%; max-width: 500px; padding: 25px; border-radius: 15px; text-align: right; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
@@ -88,7 +83,6 @@
         .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
         .modal-btn:hover { opacity: 0.9; }
 
-        /* صندوق الحريف المطور */
         #chest-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; z-index:3000; flex-direction:column; }
         .chest-box { font-size: 100px; cursor: pointer; animation: bounceChest 0.4s infinite alternate ease-in; filter: drop-shadow(0 0 25px rgba(241,196,15,1)); transition: transform 0.3s;}
         @keyframes bounceChest { from { transform: translateY(0) scale(1); } to { transform: translateY(-50px) scale(1.2); } }
@@ -100,6 +94,9 @@
     </style>
 </head>
 <body>
+
+    <!-- ملف الصوت في الخلفية للعبة الحروف الناقصة -->
+    <audio id="bg-music" src="music/3.mp3" loop autoplay></audio>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
     <div id="flash-effect" class="hareef-flash"></div>
@@ -200,10 +197,10 @@
     </div>
 
     <div id="chest-modal">
-        <h2 style="color:#fff; text-shadow:0 2px 4px #000; font-size:30px; margin-bottom:30px; text-align:center;">إنجاز أسطوري! 5 انتصارات متتالية!</h2>
-        <div id="chest-icon" class="chest-box" onclick="openHareefChest()">🧰</div>
+        <h2 id="chest-modal-title" style="color:#fff; text-shadow:0 2px 4px #000; font-size:30px; margin-bottom:30px; text-align:center;">إنجاز أسطوري!</h2>
+        <div id="chest-icon" class="chest-box" onclick="openDynamicChest()">🧰</div>
         <div id="chest-details" style="display:none; text-align:center; color:#fff; margin-top:20px; font-size:20px; font-weight:bold; line-height:1.6;"></div>
-        <button id="chest-btn" style="display:none; background:var(--success); color:#fff; border:none; padding:10px 30px; font-size:20px; border-radius:10px; margin-top:20px; cursor:pointer;" onclick="closeChestModal()">استلام المجد 🏆</button>
+        <button id="chest-btn" style="display:none; background:var(--success); color:#fff; border:none; padding:10px 30px; font-size:20px; border-radius:10px; margin-top:20px; cursor:pointer;" onclick="closeChestModal()">استلام الجائزة 🏆</button>
     </div>
 
 <script>
@@ -226,91 +223,86 @@
         return 'مستوى ' + code;
     }
 
+    // هندسة الأصوات النظامية
+    let audioCtx = null; let bounceInterval = null;
+    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
+    
+    function playSysSound(type) {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if(type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if(type === 'error') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if(type === 'bounce') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'open') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            }
+        } catch(e){}
+    }
+    document.addEventListener('click', (e) => { if(e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn')) playSysSound('click'); });
+
+    // خصائص البطاقات الديناميكية
+    let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
+    if(!cardsConfig) {
+        cardsConfig = {
+            last5: { id: 'last5', name: "آخر 5 مراحل", color: "#e74a3b", mult: {type:"fixed", val:1.5}, count: {type:"fixed", val:5}, games: ['missing'] },
+            random5: { id: 'random5', name: "بطاقة ملتهبة عشوائية", color: "#f6c23e", mult: {type:"fixed", val:1.5}, count: {type:"fixed", val:5}, games: ['missing'] },
+            friday: { id: 'friday', name: "حدث يوم الجمعة", color: "#1cc88a", mult: {type:"fixed", val:2}, count: {type:"fixed", val:5}, trigger: {days: [5]}, games: ['missing'] },
+            hareef: { id: 'hareef', name: "الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, trigger: {reqWins:5}, games: ['missing'] },
+            longBreath: { id: 'longBreath', name: "النفس الطويل", color: "#3498db", mult: {type:"range", min:2, max:6}, dur: {type:"range", min:1, max:6}, count: {type:"range", min:1, max:5}, trigger: {reqGames:30, reqHours:1}, games: ['missing'] }
+        };
+    }
+
     let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
     let gameProgress = JSON.parse(localStorage.getItem('missingGameProgress')) || {};
     let gameTimeSettings = JSON.parse(localStorage.getItem('missingGameSettings')) || {};
     
-    let currentLevel = "";
-    let globalStagesList = [];
-    const WORDS_PER_STAGE = 10;
-    
-    let activeStage = null;
-    let currentWordIndex = 0;
-    let stageWords = [];
-    let timerInterval;
-    let secondsElapsed = 0;
-    let currentBlanks = []; 
-    let activeBlankIndex = 0; 
-    let consecutiveErrors = 0;
-    let totalErrors = 0;
-    let starPenalty = 0;
-    window.currentStageTotalLetters = 0; 
+    let currentLevel = ""; let globalStagesList = []; const WORDS_PER_STAGE = 10;
+    let activeStage = null; let currentWordIndex = 0; let stageWords = [];
+    let timerInterval; let secondsElapsed = 0;
+    let currentBlanks = []; let activeBlankIndex = 0; 
+    let consecutiveErrors = 0; let totalErrors = 0; let starPenalty = 0; window.currentStageTotalLetters = 0; 
 
-    // إعدادات الصوت
-    let audioCtx = null;
-    let bounceInterval = null;
-    function initAudio() {
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if(audioCtx.state === 'suspended') audioCtx.resume();
-    }
-    function playSound(type) {
-        try {
-            initAudio();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            if(type === 'bounce') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            } else if (type === 'open') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.2);
-                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.5);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
-            }
-        } catch(e) {}
-    }
+    let assignedCards = { last5: [], random5: [], friday: [], chests: {} };
 
     window.onload = function() {
-        verifyParentModeStrict();
-        applyGlobalModes();
+        verifyParentModeStrict(); applyGlobalModes();
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
         initializeDropdown();
     };
 
-    function verifyParentModeStrict() {
-        let isParent = localStorage.getItem('isParentMode');
-        if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false');
-    }
+    function verifyParentModeStrict() { let isParent = localStorage.getItem('isParentMode'); if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false'); }
 
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
+        let banner = document.getElementById('parent-mode-banner'); if(banner) banner.style.display = isParent ? 'block' : 'none';
         document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
         document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
-
-        let defaultEvent = { isActive: true, days: [5], multiplier: 2 };
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEvent;
-        let today = new Date().getDay();
-        if(eventData.isActive && eventData.days.includes(today)) window.currentEventMultiplier = eventData.multiplier;
-        else window.currentEventMultiplier = 1;
     }
 
     function handleGlobalBack() {
-        const modal = document.getElementById('settings-modal');
-        const gameScreen = document.getElementById('game-screen');
-        if(modal.style.display === 'flex') { modal.style.display = 'none'; } 
-        else if (gameScreen.style.display === 'block') { showStagesScreen(); } 
-        else { window.location.href = 'game.html'; }
+        const modal = document.getElementById('settings-modal'); const gameScreen = document.getElementById('game-screen');
+        if(modal.style.display === 'flex') { modal.style.display = 'none'; } else if (gameScreen.style.display === 'block') { showStagesScreen(); } else { window.location.href = 'game.html'; }
     }
 
     function initializeDropdown() {
-        const selectElement = document.getElementById('level-select'); selectElement.innerHTML = ''; 
-        let hasCompletedLevels = false;
+        const selectElement = document.getElementById('level-select'); selectElement.innerHTML = ''; let hasCompletedLevels = false;
         let optionAll = document.createElement('option'); optionAll.value = "ALL"; optionAll.textContent = "جميع المستويات"; selectElement.appendChild(optionAll);
         let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
 
@@ -322,8 +314,7 @@
         
         if (!hasCompletedLevels) {
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
-            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
-            selectElement.disabled = true; return;
+            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>'; selectElement.disabled = true; return;
         }
         selectElement.value = "ALL"; currentLevel = "ALL"; loadGameData(); loadSettingsUI();
     }
@@ -348,129 +339,113 @@
         if(modal.style.display === 'flex') { modal.style.display = 'none'; } else { loadSettingsUI(); modal.style.display = 'flex'; applyGlobalModes(); }
     }
 
-    function adjustBulkTime(sign) {
-        let val = parseFloat(document.getElementById('bulk-time').value) || 0; if(val === 0) return;
-        for(let i=1; i<=5; i++) { let el = document.getElementById('time-' + i); if(el) el.value = Math.max(0, (parseFloat(el.value) + (val * sign))).toFixed(1); }
-    }
+    function adjustBulkTime(sign) { let val = parseFloat(document.getElementById('bulk-time').value) || 0; if(val === 0) return; for(let i=1; i<=5; i++) { let el = document.getElementById('time-' + i); if(el) el.value = Math.max(0, (parseFloat(el.value) + (val * sign))).toFixed(1); } }
 
     function saveTimeSettings() {
-        let t5 = parseFloat(document.getElementById('time-5').value) || 1.5; let t4 = parseFloat(document.getElementById('time-4').value) || 2.5;
-        let t3 = parseFloat(document.getElementById('time-3').value) || 3.5; let t2 = parseFloat(document.getElementById('time-2').value) || 4.5;
-        let t1 = parseFloat(document.getElementById('time-1').value) || 5.5; let starPrice = parseInt(document.getElementById('star-price').value) || 7;
+        let t5 = parseFloat(document.getElementById('time-5').value) || 1.5; let t4 = parseFloat(document.getElementById('time-4').value) || 2.5; let t3 = parseFloat(document.getElementById('time-3').value) || 3.5; let t2 = parseFloat(document.getElementById('time-2').value) || 4.5; let t1 = parseFloat(document.getElementById('time-1').value) || 5.5; let starPrice = parseInt(document.getElementById('star-price').value) || 7;
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
-        
-        let newSettings = { t5, t4, t3, t2, t1, starPrice };
-        let applyScope = document.querySelector('input[name="apply-scope"]:checked').value;
-        if(applyScope === 'all') {
-            gameTimeSettings['GLOBAL_DEFAULT'] = newSettings;
-            let selectElement = document.getElementById('level-select');
-            for (let i = 0; i < selectElement.options.length; i++) { if(selectElement.options[i].value && selectElement.options[i].value !== "ALL") gameTimeSettings[selectElement.options[i].value] = newSettings; }
-        } else {
-            if(currentLevel && currentLevel !== "ALL") gameTimeSettings[currentLevel] = newSettings;
-            if(currentLevel === "ALL") gameTimeSettings['GLOBAL_DEFAULT'] = newSettings;
-        }
+        let newSettings = { t5, t4, t3, t2, t1, starPrice }; let applyScope = document.querySelector('input[name="apply-scope"]:checked').value;
+        if(applyScope === 'all') { gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; let selectElement = document.getElementById('level-select'); for (let i = 0; i < selectElement.options.length; i++) { if(selectElement.options[i].value && selectElement.options[i].value !== "ALL") gameTimeSettings[selectElement.options[i].value] = newSettings; } } else { if(currentLevel && currentLevel !== "ALL") gameTimeSettings[currentLevel] = newSettings; if(currentLevel === "ALL") gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; }
         localStorage.setItem('missingGameSettings', JSON.stringify(gameTimeSettings));
-
         let resetOpt = document.querySelector('input[name="reset-opt"]:checked').value;
-        if(resetOpt === 'current' && currentLevel && currentLevel !== "ALL") {
-            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('missingGameProgress', JSON.stringify(gameProgress)); renderStages();
-        } else if (resetOpt === 'all' || (resetOpt === 'current' && currentLevel === "ALL")) {
-            for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('missingGameProgress', JSON.stringify(gameProgress)); renderStages();
-        }
-        
+        if(resetOpt === 'current' && currentLevel && currentLevel !== "ALL") { gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('missingGameProgress', JSON.stringify(gameProgress)); renderStages(); } else if (resetOpt === 'all' || (resetOpt === 'current' && currentLevel === "ALL")) { for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('missingGameProgress', JSON.stringify(gameProgress)); renderStages(); }
         alert("تم حفظ الإعدادات بنجاح."); toggleSettingsModal();
     }
 
     function loadGameData() {
         globalStagesList = [];
-        let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
-        let absoluteId = 1;
+        let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); }); let absoluteId = 1;
         availableLevelsList.forEach(lvl => {
-            let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0;
-            let levelWords = (allLevelsData[lvl] || []).slice(0, savedCount);
-            if(levelWords.length === 0) return;
+            let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0; let levelWords = (allLevelsData[lvl] || []).slice(0, savedCount); if(levelWords.length === 0) return;
             let tStages = Math.ceil(levelWords.length / WORDS_PER_STAGE);
             for(let s = 1; s <= tStages; s++) {
-                let startIndex = (s - 1) * WORDS_PER_STAGE; let endIndex = startIndex + WORDS_PER_STAGE;
-                let stageWords = levelWords.slice(startIndex, endIndex);
-                if (stageWords.length < WORDS_PER_STAGE && levelWords.length >= WORDS_PER_STAGE) {
-                    let needed = WORDS_PER_STAGE - stageWords.length; let previousWords = levelWords.slice(0, startIndex); previousWords.sort(() => Math.random() - 0.5); stageWords = stageWords.concat(previousWords.slice(0, needed));
-                }
+                let startIndex = (s - 1) * WORDS_PER_STAGE; let endIndex = startIndex + WORDS_PER_STAGE; let stageWords = levelWords.slice(startIndex, endIndex);
+                if (stageWords.length < WORDS_PER_STAGE && levelWords.length >= WORDS_PER_STAGE) { let needed = WORDS_PER_STAGE - stageWords.length; let previousWords = levelWords.slice(0, startIndex); previousWords.sort(() => Math.random() - 0.5); stageWords = stageWords.concat(previousWords.slice(0, needed)); }
                 globalStagesList.push({ id: absoluteId++, level: lvl, localStage: s, words: stageWords });
             }
         });
-        updateGlobalHotStages('missing'); renderStages();
+        assignDynamicCards(); renderStages();
     }
 
-    function updateGlobalHotStages(gameKey) {
-        let now = new Date().getTime();
-        let savedData = JSON.parse(localStorage.getItem('hotStagesData_' + gameKey)) || {};
-        if (!savedData.expiry || now > savedData.expiry || savedData.totalStages !== globalStagesList.length) {
-            let last10 = []; let random10 = [];
-            if (globalStagesList.length > 0) {
-                last10 = globalStagesList.slice(-5).map(s => s.id); // 5 ملتهبة
-                let pool = globalStagesList.filter(s => !last10.includes(s.id));
-                let poolWithStars = pool.map(s => { let prog = (gameProgress[s.level] && gameProgress[s.level][s.localStage]) ? gameProgress[s.level][s.localStage].stars : 0; return { id: s.id, stars: prog }; });
-                poolWithStars.sort((a, b) => a.stars - b.stars);
-                let eligible = poolWithStars.filter(s => s.stars === 0);
-                if(eligible.length < 5) eligible = poolWithStars.filter(s => s.stars < 5);
-                let selectedRandom = []; let currentStarLevel = 0;
-                while(selectedRandom.length < 5 && currentStarLevel <= 5 && eligible.length > 0) { // 5 عشوائية
-                    let tierStages = eligible.filter(s => s.stars === currentStarLevel); tierStages.sort(() => Math.random() - 0.5);
-                    while(tierStages.length > 0 && selectedRandom.length < 5) { selectedRandom.push(tierStages.pop().id); }
-                    currentStarLevel++;
-                }
-                random10 = selectedRandom;
+    function pickStages(count, excludeList) {
+        let pool = globalStagesList.filter(s => !excludeList.includes(s.id));
+        let poolWithStars = pool.map(s => { return {id: s.id, stars: gameProgress[s.level]?.[s.localStage]?.stars || 0 }; });
+        poolWithStars = poolWithStars.filter(s => s.stars < 5);
+        poolWithStars.sort((a,b) => { if(a.stars !== b.stars) return a.stars - b.stars; return Math.random() - 0.5; });
+        return poolWithStars.slice(0, count).map(s => s.id);
+    }
+
+    function assignDynamicCards() {
+        assignedCards = { last5: [], random5: [], friday: [], chests: {} };
+        if(globalStagesList.length === 0) return;
+        let cL5 = cardsConfig.last5;
+        if(cL5 && cL5.games.includes('missing')) { let count = (cL5.count.type === 'fixed') ? cL5.count.val : 5; assignedCards.last5 = globalStagesList.slice(-count).map(s => s.id); }
+
+        ['hareef', 'longBreath'].forEach(type => {
+            let cData = JSON.parse(localStorage.getItem(`activeChest_${type}_missing`));
+            if(cData && cData.expiry > Date.now()) { assignedCards.chests[type] = cData; } else { localStorage.removeItem(`activeChest_${type}_missing`); }
+        });
+
+        let cR5 = cardsConfig.random5;
+        if(cR5 && cR5.games.includes('missing')) {
+            let now = Date.now(); let savedR5 = JSON.parse(localStorage.getItem('dynRandom5_missing')) || {};
+            if(!savedR5.expiry || now > savedR5.expiry || savedR5.total !== globalStagesList.length) {
+                let exclude = [...assignedCards.last5]; for(let key in assignedCards.chests) exclude.push(...assignedCards.chests[key].stages);
+                let count = (cR5.count.type === 'fixed') ? cR5.count.val : 5; let newR5 = pickStages(count, exclude);
+                savedR5 = { stages: newR5, expiry: now + (24*3600000), total: globalStagesList.length }; localStorage.setItem('dynRandom5_missing', JSON.stringify(savedR5));
             }
-            savedData = { last10, random10, expiry: now + (24 * 60 * 60 * 1000), totalStages: globalStagesList.length };
-            localStorage.setItem('hotStagesData_' + gameKey, JSON.stringify(savedData));
+            assignedCards.random5 = savedR5.stages || [];
         }
-        window.currentHotLast10 = savedData.last10 || []; window.currentHotRandom10 = savedData.random10 || [];
+
+        let cFri = cardsConfig.friday;
+        if(cFri && cFri.games.includes('missing') && cFri.trigger.days.includes(new Date().getDay())) {
+            let savedFri = JSON.parse(localStorage.getItem('dynFriday_missing')) || {}; let todayStr = new Date().toDateString();
+            if(savedFri.date !== todayStr || savedFri.total !== globalStagesList.length) {
+                let exclude = [...assignedCards.last5, ...assignedCards.random5]; for(let key in assignedCards.chests) exclude.push(...assignedCards.chests[key].stages);
+                let count = (cFri.count.type === 'fixed') ? cFri.count.val : 5; let newFri = pickStages(count, exclude);
+                savedFri = { stages: newFri, date: todayStr, total: globalStagesList.length }; localStorage.setItem('dynFriday_missing', JSON.stringify(savedFri));
+            }
+            assignedCards.friday = savedFri.stages || [];
+        }
+    }
+
+    function getStageActiveCard(stageId) {
+        if(assignedCards.last5.includes(stageId)) return { id: 'last5', config: cardsConfig.last5 };
+        for(let key in assignedCards.chests) { if(assignedCards.chests[key].stages.includes(stageId)) return { id: key, config: cardsConfig[key], dynamicData: assignedCards.chests[key] }; }
+        if(assignedCards.friday.includes(stageId)) return { id: 'friday', config: cardsConfig.friday };
+        if(assignedCards.random5.includes(stageId)) return { id: 'random5', config: cardsConfig.random5 };
+        return null;
     }
 
     function renderStages() {
         const container = document.getElementById('stages-container'); container.innerHTML = '';
         if(globalStagesList.length === 0) return;
 
-        let hareefActive = JSON.parse(localStorage.getItem('hareefActive_missing'));
-        if(hareefActive && hareefActive.expiry < Date.now()) { localStorage.removeItem('hareefActive_missing'); hareefActive = null; }
-
         let renderedStages = currentLevel === "ALL" ? globalStagesList : globalStagesList.filter(s => s.level === currentLevel);
 
         renderedStages.forEach(stage => {
             let btn = document.createElement('button'); btn.className = 'stage-btn';
             
-            let isLastHot = window.currentHotLast10.includes(stage.id);
-            let isRandomHot = window.currentHotRandom10.includes(stage.id);
-            let isHareef = hareefActive && hareefActive.stages.includes(stage.id);
-
-            let levelData = gameProgress[stage.level] || {};
-            let starsCount = levelData[stage.localStage]?.stars || 0; 
+            let activeCard = getStageActiveCard(stage.id);
+            let levelData = gameProgress[stage.level] || {}; let starsCount = levelData[stage.localStage]?.stars || 0; 
             let timeSpent = levelData[stage.localStage]?.time ? ` | ${levelData[stage.localStage].time}ث` : '';
             let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
             
             let prefix = stage.level.startsWith('CLASS') ? stage.level.replace('CLASS', '') : stage.level;
             let displayName = currentLevel === "ALL" ? `${prefix}.${stage.localStage}` : `مرحلة ${stage.localStage}`;
 
-            if(isHareef) {
-                btn.classList.add('hareef-stage');
-                btn.innerHTML = `${displayName} <span class="hot-badge">🏅 ${hareefActive.mult}x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
-            } else if(isLastHot) {
-                btn.classList.add('hot-stage-last');
-                btn.innerHTML = `${displayName} <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
-            } else if(isRandomHot) {
-                btn.classList.add('hot-stage-random');
-                btn.innerHTML = `${displayName} <span class="hot-badge">🌟 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+            if(activeCard) {
+                let c = activeCard.config;
+                let multVal = (activeCard.dynamicData) ? activeCard.dynamicData.mult : (c.mult.type === 'fixed' ? c.mult.val : c.mult.max);
+                btn.style.background = `linear-gradient(45deg, ${c.color}, #555)`;
+                btn.style.boxShadow = `0 0 10px ${c.color}`;
+                btn.style.border = `2px solid #fff`;
+                btn.innerHTML = `${displayName} <span class="hot-badge">✨ ${multVal}x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
             } else {
                 btn.innerHTML = `${displayName} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
             }
             
-            btn.onclick = () => {
-                window.currentStageIsLastHot = isLastHot;
-                window.currentStageIsRandomHot = isRandomHot;
-                window.currentStageHareefMult = isHareef ? hareefActive.mult : 1;
-                startGame(stage);
-            };
+            btn.onclick = () => { window.currentActiveCard = activeCard; startGame(stage); };
             container.appendChild(btn);
         });
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
@@ -486,7 +461,6 @@
         consecutiveErrors = 0; totalErrors = 0; starPenalty = 0; window.currentStageTotalLetters = 0;
         stageWords = [...activeStage.words];
         
-        // حساب إجمالي الحروف الناقصة للمرحلة لضبط الوقت الذكي
         stageWords.forEach(w => {
             let enWord = w.en.trim(); let count = 0;
             for(let i=0; i<enWord.length; i++) { if(enWord[i].match(/[a-z]/i)) count++; }
@@ -535,7 +509,7 @@
     }
 
     function handleMistake() {
-        consecutiveErrors++; totalErrors++;
+        playSysSound('error'); consecutiveErrors++; totalErrors++;
         if (consecutiveErrors === 2) { starPenalty++; consecutiveErrors = 0; totalErrors = 0; } 
         else if (totalErrors === 3) { starPenalty++; consecutiveErrors = 0; totalErrors = 0; }
         updateLiveStars(secondsElapsed);
@@ -569,6 +543,52 @@
         clearInterval(timerInterval); timerInterval = setInterval(() => { secondsElapsed++; document.getElementById('timer-display').innerText = secondsElapsed; updateLiveStars(secondsElapsed); }, 1000);
     }
 
+    function getRandomStep(min, max, step) { let steps = Math.floor((max - min) / step); let randStep = Math.floor(Math.random() * (steps + 1)); return min + (randStep * step); }
+
+    function handleLongBreathHistory() {
+        let lbConfig = cardsConfig.longBreath;
+        if(lbConfig && lbConfig.games.includes('missing')) {
+            let history = JSON.parse(localStorage.getItem('longBreathHistory_missing')) || []; history.push(Date.now());
+            let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); history = history.filter(t => t >= cutoff);
+            localStorage.setItem('longBreathHistory_missing', JSON.stringify(history));
+            if(history.length >= lbConfig.trigger.reqGames) { localStorage.setItem('longBreathHistory_missing', '[]'); triggerDynamicChest('longBreath', lbConfig); return true; }
+        }
+        return false;
+    }
+
+    function triggerDynamicChest(type, config) {
+        let mult = (config.mult.type === 'range') ? getRandomStep(config.mult.min, config.mult.max, 0.5) : config.mult.val;
+        let dur = (config.dur.type === 'range') ? getRandomStep(config.dur.min, config.dur.max, 0.5) : config.dur.val;
+        let count = (config.count.type === 'range') ? Math.floor(getRandomStep(config.count.min, config.count.max, 1)) : config.count.val;
+
+        let exclude = [...assignedCards.last5, ...assignedCards.random5, ...assignedCards.friday];
+        let selected = pickStages(count, exclude);
+        if(selected.length === 0) selected = globalStagesList.slice(0, count).map(s=>s.id); 
+
+        let activeData = { mult: mult, stages: selected, expiry: Date.now() + (dur * 3600000) };
+        localStorage.setItem(`activeChest_${type}_missing`, JSON.stringify(activeData));
+        window.tempChestReward = { name: config.name, mult: mult, count: selected.length, hours: dur };
+
+        document.getElementById('flash-effect').style.animation = 'flashAnim 1s ease-out forwards';
+        document.getElementById('chest-modal').style.display = 'flex';
+        document.getElementById('chest-modal-title').innerText = (type==='hareef') ? "إنجاز أسطوري! 5 انتصارات متتالية!" : "إنجاز خارق! أنهيت التحدي السريع!";
+        document.getElementById('chest-icon').className = 'chest-box'; document.getElementById('chest-icon').innerText = '🧰';
+        document.getElementById('chest-details').style.display = 'none'; document.getElementById('chest-btn').style.display = 'none';
+        
+        playSound('bounce'); bounceInterval = setInterval(()=> playSound('bounce'), 450);
+        setTimeout(() => { document.getElementById('flash-effect').style.animation = ''; }, 1000);
+    }
+
+    function openDynamicChest() {
+        let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
+        clearInterval(bounceInterval); playSound('open');
+        icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempChestReward;
+        document.getElementById('chest-details').innerHTML = `حصلت على <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعة!</span>`;
+        document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
+    }
+
+    function closeChestModal() { clearInterval(bounceInterval); document.getElementById('chest-modal').style.display = 'none'; assignDynamicCards(); showStagesScreen(); }
+
     function endGame() {
         clearInterval(timerInterval);
         let time = secondsElapsed; let stars = Math.max(0, getStarsForTime(time) - starPenalty);
@@ -579,8 +599,13 @@
 
         if(stars > previousStars) {
             basePoints = (stars - previousStars) * starPrice;
-            let hotMult = (window.currentStageIsLastHot || window.currentStageIsRandomHot) ? 1.5 : 1;
-            let finalMultiplier = (window.currentEventMultiplier || 1) * hotMult * (window.currentStageHareefMult || 1);
+            
+            // حساب المضاعف الديناميكي
+            let finalMultiplier = 1;
+            if(window.currentActiveCard) {
+                let c = window.currentActiveCard.config;
+                finalMultiplier = window.currentActiveCard.dynamicData ? window.currentActiveCard.dynamicData.mult : (c.mult.type === 'fixed' ? c.mult.val : c.mult.max);
+            }
             
             totalPoints = Math.round(basePoints * finalMultiplier);
             bonusPoints = totalPoints - basePoints;
@@ -600,68 +625,46 @@
         gameProgress[activeStage.level] = levelData;
         localStorage.setItem('missingGameProgress', JSON.stringify(gameProgress));
 
-        // نظام الحريف
-        let hareefSettings = JSON.parse(localStorage.getItem('hareefSettings')) || { name: "الحريف", mults: [3,4,5,6], maxStages: 4, minHours: 1, maxHours: 5, reqWins: 5, games: {missing:true} };
-        if(hareefSettings.games['missing']) {
-            if(stars === 5) {
-                let cons = parseInt(localStorage.getItem('consecutive5_missing')) || 0; cons++; localStorage.setItem('consecutive5_missing', cons);
-                if(cons >= hareefSettings.reqWins) { localStorage.setItem('consecutive5_missing', 0); triggerHareefChest(hareefSettings); } 
-                else { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
-            } else { localStorage.setItem('consecutive5_missing', 0); showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
-        } else { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
-
-        if(window.currentStageHareefMult > 1) {
-            let hData = JSON.parse(localStorage.getItem('hareefActive_missing'));
-            if(hData) { hData.stages = hData.stages.filter(id => id !== activeStage.id); if(hData.stages.length === 0) localStorage.removeItem('hareefActive_missing'); else localStorage.setItem('hareefActive_missing', JSON.stringify(hData)); }
+        // خصم المرحلة الملعوبة من الصناديق النشطة لتختفي البطاقة
+        if(window.currentActiveCard && ['hareef', 'longBreath'].includes(window.currentActiveCard.id)) {
+            let activeData = window.currentActiveCard.dynamicData;
+            activeData.stages = activeData.stages.filter(id => id !== activeStage.id);
+            if(activeData.stages.length === 0) localStorage.removeItem(`activeChest_${window.currentActiveCard.id}_missing`);
+            else localStorage.setItem(`activeChest_${window.currentActiveCard.id}_missing`, JSON.stringify(activeData));
         }
+
+        // معالجة سلسلة الحريف
+        let hareefTriggered = false;
+        let cHareef = cardsConfig.hareef;
+        if(cHareef && cHareef.games.includes('missing')) {
+            if(previousStars === 5) {
+                // التجاهل الكامل (لا تكسر السلسلة ولا تزيدها)
+            } else {
+                if(stars === 5) {
+                    let cons = parseInt(localStorage.getItem('consecutive5_missing')) || 0; cons++; localStorage.setItem('consecutive5_missing', cons);
+                    if(cons >= cHareef.trigger.reqWins) { localStorage.setItem('consecutive5_missing', 0); triggerDynamicChest('hareef', cHareef); hareefTriggered = true; }
+                } else { localStorage.setItem('consecutive5_missing', 0); }
+            }
+        }
+
+        let lbTriggered = false;
+        if(!hareefTriggered) { lbTriggered = handleLongBreathHistory(); }
+
+        if(!hareefTriggered && !lbTriggered) { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
     }
-
-    function triggerHareefChest(hSet) {
-        document.getElementById('flash-effect').style.animation = 'flashAnim 1s ease-out forwards';
-        document.getElementById('chest-modal').style.display = 'flex';
-        document.getElementById('chest-icon').className = 'chest-box'; document.getElementById('chest-icon').innerText = '🧰';
-        document.getElementById('chest-details').style.display = 'none'; document.getElementById('chest-btn').style.display = 'none';
-        
-        playSound('bounce');
-        bounceInterval = setInterval(()=> playSound('bounce'), 450);
-
-        setTimeout(() => { document.getElementById('flash-effect').style.animation = ''; }, 1000);
-
-        let validStages = globalStagesList.filter(s => { let p = gameProgress[s.level]?.[s.localStage]?.stars || 0; return p === 0 && !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id); });
-        if(validStages.length < hSet.maxStages) { let backup = globalStagesList.filter(s => !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id)); backup.sort((a,b) => (gameProgress[a.level]?.[a.localStage]?.stars || 0) - (gameProgress[b.level]?.[b.localStage]?.stars || 0)); validStages = backup; }
-        
-        validStages.sort(() => Math.random() - 0.5); let numStages = Math.floor(Math.random() * hSet.maxStages) + 1;
-        let selected = validStages.slice(0, numStages).map(s => s.id); let mult = hSet.mults[Math.floor(Math.random() * hSet.mults.length)];
-        let hours = Math.floor(Math.random() * (hSet.maxHours - hSet.minHours + 1)) + hSet.minHours;
-
-        let activeData = { mult: mult, stages: selected, expiry: Date.now() + (hours * 3600000) };
-        localStorage.setItem('hareefActive_missing', JSON.stringify(activeData));
-        window.tempHareefReward = { name: hSet.name, mult: mult, count: selected.length, hours: hours };
-    }
-
-    function openHareefChest() {
-        let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
-        clearInterval(bounceInterval); playSound('open');
-        icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempHareefReward;
-        document.getElementById('chest-details').innerHTML = `حصلت على بطاقة <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعات!</span>`;
-        document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
-    }
-
-    function closeChestModal() { clearInterval(bounceInterval); document.getElementById('chest-modal').style.display = 'none'; showStagesScreen(); }
 
     function showResultModal(stars, time, bBase, bBonus, bTotal) {
         document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
         document.getElementById('modal-time').innerText = time;
         document.getElementById('modal-points-base').innerText = bBase; document.getElementById('modal-points-bonus').innerText = bBonus; document.getElementById('modal-points-total').innerText = bTotal;
         let msgElement = document.getElementById('modal-points-msg');
-        if(bTotal > 0) { msgElement.innerText = `رائع! كسبت ${bTotal} نقطة إضافية للعلامة التراكمية! 🏆`; } 
-        else { msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع وبأخطاء أقل لرفع نجومك! 💪`; }
+        if(bTotal > 0) { msgElement.innerText = `رائع! كسبت ${bTotal} نقطة إضافية للعلامة التراكمية! 🏆`; } else { msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع وبأخطاء أقل لرفع نجومك! 💪`; }
         document.getElementById('result-modal').style.display = 'flex';
     }
 
     function showStagesScreen() {
         clearInterval(timerInterval);
-        document.getElementById('result-modal').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('stages-screen').style.display = 'block'; renderStages();
+        document.getElementById('result-modal').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('stages-screen').style.display = 'block'; assignDynamicCards(); renderStages();
     }
 </script>
 

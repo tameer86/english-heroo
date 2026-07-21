@@ -11,7 +11,7 @@
             window.location.replace("index.html"); 
         }
     })();
-</script>
+    </script>
     <style>
         :root {
             --primary: #3498db; --purple: #8e44ad; --danger: #e74a3b; 
@@ -33,7 +33,7 @@
         .btn-top-action:hover { transform: scale(1.2); }
 
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content-box { background: #f8f9fc; width: 95%; max-width: 450px; padding: 25px; border-radius: 15px; text-align: center; position: relative; max-height: 95vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
+        .modal-content-box { background: #f8f9fc; width: 95%; max-width: 600px; padding: 25px; border-radius: 15px; text-align: center; position: relative; max-height: 95vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
         .btn-close-modal { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 10;}
         .btn-close-modal:hover { opacity: 0.8; }
 
@@ -99,27 +99,37 @@
         .stat-val { color: var(--danger); font-size: 16px;}
         .stat-val.good { color: var(--success); }
 
-        /* تعديلات البطاقات السحرية */
-        .magic-card-item { display:flex; flex-direction:column; border-radius:10px; padding:15px; margin-bottom:15px; text-align:right; box-shadow:0 4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);}
-        .magic-card-item.hot-last { background: linear-gradient(135deg, #e74a3b, #c0392b); color: #fff !important; }
-        .magic-card-item.hot-random { background: linear-gradient(135deg, #f6c23e, #f39c12); color: #fff !important; }
-        .magic-card-item.hareef { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff !important; }
-        .magic-card-item.event-card { background: linear-gradient(135deg, #1cc88a, #16a085); color: #fff !important; }
-        .magic-card-item.inactive { background: linear-gradient(135deg, #95a5a6, #7f8c8d); filter: grayscale(50%); opacity: 0.9; color: #fff !important; }
+        /* البطاقات السحرية */
+        .magic-card-item { display:flex; flex-direction:column; border-radius:10px; padding:15px; margin-bottom:15px; text-align:right; box-shadow:0 4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3); position: relative; }
         .magic-card-item * { color: #fff !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
-        .mc-title { font-size: 18px; font-weight: bold; margin:0 0 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.4); padding-bottom: 5px;}
+        .mc-title { font-size: 18px; font-weight: bold; margin:0 0 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.4); padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center;}
         .mc-desc { font-size: 14px; margin:0 0 10px 0; line-height: 1.4;}
         .mc-timer { font-size: 15px; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 5px; display: inline-block; }
+        .btn-help-icon { background: rgba(255,255,255,0.2); border: 1px solid #fff; border-radius: 50%; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;}
+        .btn-help-icon:hover { background: #fff; color: #333 !important; text-shadow: none; }
+
+        /* Dynamic Events Editor */
+        .event-editor-row { display: flex; flex-direction: column; text-align: right; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .event-editor-row h4 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 5px; cursor: pointer; display: flex; justify-content: space-between;}
+        .event-details { display: none; margin-top: 15px; }
+        .prop-group { margin-bottom: 12px; }
+        .prop-group label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 14px; color: var(--dark);}
+        .prop-group input[type="text"], .prop-group input[type="number"], .prop-group input[type="color"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .radio-inline { display: flex; gap: 15px; margin-bottom: 5px; }
+        .range-inputs { display: flex; gap: 10px; }
+        .range-inputs input { width: 50%; }
+        .games-checkboxes label { display: inline-block; margin-left: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 20px; font-size: 13px; color: #333;}
     </style>
 </head>
 <body>
+     <audio id="bg-music" src="music/game.mp3" loop autoplay></audio>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
 
     <div class="top-icons">
         <button class="btn-top-action" onclick="window.location.href='index.html?screen=dashboard'" title="العودة للوحة التحكم">🔙</button>
         <button class="btn-top-action" onclick="toggleModal('admin-modal')" title="إعدادات الألعاب لولي الأمر">⚙️</button>
-        <button class="btn-top-action" onclick="toggleModal('event-modal')" title="إعدادات الأحداث والبطاقات">📅</button>
+        <button class="btn-top-action" onclick="toggleEventsAdminModal()" title="إعدادات الأحداث والبطاقات">📅</button>
         <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
         <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
         <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
@@ -138,17 +148,31 @@
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
     </div>
 
-    <!-- البطاقات السحرية -->
+    <!-- البطاقات السحرية للمستخدم -->
     <div id="magic-cards-modal" class="custom-modal">
         <div class="modal-content-box" style="background:#f0f2f5;">
             <button class="btn-close-modal" onclick="toggleModal('magic-cards-modal')">✖</button>
-            <h3 style="color: var(--purple); margin-top:0; border-bottom: 2px solid #ddd; padding-bottom: 10px;">🃏 البطاقات السحرية والأحداث</h3>
+            <h3 style="color: var(--purple); margin-top:0; border-bottom: 2px solid #ddd; padding-bottom: 10px;">🃏 البطاقات السحرية النشطة</h3>
             <div id="magic-cards-container" style="max-height: 65vh; overflow-y: auto; padding: 5px;">
                 <!-- تُعبأ برمجياً -->
             </div>
         </div>
     </div>
 
+    <!-- محرر البطاقات الديناميكي لولي الأمر -->
+    <div id="events-admin-modal" class="custom-modal">
+        <div class="modal-content-box" style="background:#f8f9fc; text-align: right;">
+            <button class="btn-close-modal" onclick="toggleModal('events-admin-modal')">✖</button>
+            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📅 محرك الأحداث والبطاقات الديناميكي</h3>
+            <p style="font-size: 13px; color: #555;">من هنا يمكنك التحكم بخصائص جميع البطاقات التي ستظهر في الألعاب بشكل ديناميكي.</p>
+            <div id="dynamic-cards-editor" class="parent-only-inputs" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;">
+                <!-- يعبأ برمجيا -->
+            </div>
+            <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top: 15px;" onclick="saveDynamicCardsConfig()">💾 حفظ جميع الخصائص</button>
+        </div>
+    </div>
+
+    <!-- باقي النوافذ -->
     <div id="news-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
@@ -206,16 +230,11 @@
             </div>
 
             <div class="admin-row parent-only-inputs" style="margin-top:15px; background:#f8f9fc; padding:10px; border-radius:5px; border:1px dashed #ccc; text-align:right;">
-                <label style="font-size:13px; color:var(--primary);">تعديل النقاط المستبدلة للبنك:</label>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="edit-exch-points" placeholder="النقاط المستبدلة">
-                    <button class="parent-only-btn" style="background:var(--primary); color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;" onclick="updateExchangedPoints()">تحديث</button>
-                </div>
+                <label style="font-size:13px; color:var(--primary);">النقاط المستبدلة للبنك:</label>
+                <input type="number" id="edit-exch-points" placeholder="النقاط المستبدلة">
+                
                 <label style="font-size:13px; color:var(--primary); margin-top:10px;">تكلفة لفة العجل بالنقاط (الافتراضي 3000):</label>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="edit-spin-cost" placeholder="التكلفة">
-                    <button class="parent-only-btn" style="background:var(--primary); color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;" onclick="updateSpinCost()">تحديث</button>
-                </div>
+                <input type="number" id="edit-spin-cost" placeholder="التكلفة">
             </div>
 
             <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
@@ -249,71 +268,7 @@
         </div>
     </div>
 
-    <!-- إعدادات الأحداث والبطاقات المحدثة -->
-    <div id="event-modal" class="custom-modal">
-        <div class="modal-content-box">
-            <button class="btn-close-modal" onclick="toggleModal('event-modal')">✖</button>
-            <h3 style="color: var(--primary); margin-top:0;">📅 إعدادات الأحداث والبطاقات</h3>
-            
-            <h4 style="text-align:right; color:var(--success); border-bottom:1px dashed #ccc;">حدث الجمعة التلقائي</h4>
-            <div class="admin-checkbox-group parent-only-inputs">
-                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">أيام تفعيل الحدث:</strong>
-                <label><input type="checkbox" class="event-day-chk" value="0"> الأحد</label>
-                <label><input type="checkbox" class="event-day-chk" value="1"> الإثنين</label>
-                <label><input type="checkbox" class="event-day-chk" value="2"> الثلاثاء</label>
-                <label><input type="checkbox" class="event-day-chk" value="3"> الأربعاء</label>
-                <label><input type="checkbox" class="event-day-chk" value="4"> الخميس</label>
-                <label><input type="checkbox" class="event-day-chk" value="5"> الجمعة</label>
-                <label><input type="checkbox" class="event-day-chk" value="6"> السبت</label>
-            </div>
-            <div class="admin-row parent-only-inputs" style="margin-top: 10px;">
-                <label>نسبة المضاعفة للحدث (مثال 2):</label>
-                <input type="number" id="event-multiplier" step="0.1" min="1" value="2">
-            </div>
-            <button class="btn-admin-action parent-only-btn" id="btn-toggle-event" onclick="toggleEventStatus()" style="margin-top: 10px;"></button>
-
-            <h4 style="text-align:right; color:var(--purple); border-bottom:1px dashed #ccc; margin-top:20px;">بطاقة الحريف (مكافأة 5 نجوم متتالية)</h4>
-            <div class="admin-row parent-only-inputs">
-                <label>اسم البطاقة:</label>
-                <input type="text" id="hareef-name" value="الحريف">
-            </div>
-            <div class="admin-row parent-only-inputs">
-                <label>خيارات المضاعفة العشوائية (4 قيم):</label>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="hareef-m1" value="3" style="width:25%;"><input type="number" id="hareef-m2" value="4" style="width:25%;">
-                    <input type="number" id="hareef-m3" value="5" style="width:25%;"><input type="number" id="hareef-m4" value="6" style="width:25%;">
-                </div>
-            </div>
-            <div class="admin-row parent-only-inputs">
-                <label>الحد الأقصى لعدد المراحل العشوائية الممنوحة:</label>
-                <input type="number" id="hareef-max-stages" value="4" min="1">
-            </div>
-            <div class="admin-row parent-only-inputs">
-                <label>زمن الحدث بالساعات (أدنى - أعلى):</label>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="hareef-min-h" value="1" min="1" max="24" style="width:50%;">
-                    <input type="number" id="hareef-max-h" value="5" min="1" max="24" style="width:50%;">
-                </div>
-            </div>
-            <div class="admin-row parent-only-inputs">
-                <label>عدد مرات الفوز المتتالية بخمس نجوم المطلوبة:</label>
-                <input type="number" id="hareef-req-wins" value="5" min="1">
-            </div>
-            <div class="admin-checkbox-group parent-only-inputs">
-                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">الألعاب التي تعمل بها بطاقة الحريف:</strong>
-                <label><input type="checkbox" id="hareef-chk-all" onchange="toggleHareefAll(this)"> تحديد الكل</label>
-                <label><input type="checkbox" class="hareef-game-chk" value="matchg"> المطابقة والذاكرة</label>
-                <label><input type="checkbox" class="hareef-game-chk" value="listen"> صائد الأمثلة</label>
-                <label><input type="checkbox" class="hareef-game-chk" value="missing"> الحروف الناقصة</label>
-                <label><input type="checkbox" class="hareef-game-chk" value="scramble"> ترتيب الحروف</label>
-                <label><input type="checkbox" class="hareef-game-chk" value="crossword"> الكلمات المتقاطعة</label>
-            </div>
-
-            <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top:20px;" onclick="saveEventAndHareefSettings()">💾 حفظ إعدادات الأحداث والبطاقات</button>
-        </div>
-    </div>
-
-    <!-- بنك الأبطال المحدث -->
+    <!-- بنك الأبطال -->
     <div id="bank-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
@@ -346,12 +301,11 @@
             </div>
 
             <h4 style="text-align:right; margin:15px 0 5px 0; color:var(--dark);">🧾 كشف حساب البنك</h4>
-            <div class="bank-statement-box" id="bank-statement-list">
-                <!-- الحركات المالية -->
-            </div>
+            <div class="bank-statement-box" id="bank-statement-list"></div>
         </div>
     </div>
 
+    <!-- الشرف و الأوسمة -->
     <div id="fame-modal" class="custom-modal">
         <div class="modal-content-box" id="fame-content">
             <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
@@ -377,23 +331,52 @@
         <img id="full-size-img" src="" class="full-size-image" alt="صورة المرحلة المكبرة">
     </div>
 
-    <div><img src="images/mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image"></div>
+    <div><img src="images/mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image" style="margin-top: 35px; width: clamp(240px, 42vw, 480px); height: auto; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);"></div>
 
 <script>
+    // أصوات النظام الأساسية باستخدام AudioContext
+    let audioCtx = null;
+    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
+    function playSysSound(type) {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if(type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            }
+        } catch(e){}
+    }
+    document.addEventListener('click', (e) => {
+        if(e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn') || e.target.closest('.game-btn')) playSysSound('click');
+    });
+
+    // المحرك الديناميكي للبطاقات
+    const DEFAULT_CARDS_CONFIG = {
+        last5: { id: 'last5', name: "بطاقة آخر 5 مراحل", color: "#e74a3b", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 0, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'fixed' }, receive: "تلقائي بدون احتفال", timers: 1, desc: "نقاط مضاعفة لأحدث 5 مراحل تم إضافتها في اللعبة." },
+        random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 24, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 10 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'random' }, receive: "تلقائي بدون احتفال", timers: 1, desc: "5 مراحل عشوائية غير مختومة (أولوية 0 نجوم) يتم توزيعها يومياً بمضاعف خاص." },
+        friday: { id: 'friday', name: "حدث الجمعة الدوري", color: "#1cc88a", mult: { type: "fixed", val: 2, min: 1, max: 4 }, dur: { type: "fixed", val: 24, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 10 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'periodic', days: [5] }, receive: "تلقائي بدون احتفال", timers: 2, desc: "حدث دوري يعطي مضاعفات لعدد محدد من المراحل العشوائية في أيام معينة." },
+        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: { type: "range", val: 3, min: 3, max: 6 }, dur: { type: "range", val: 3, min: 1, max: 5 }, count: { type: "range", val: 3, min: 1, max: 4 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'consecutive', reqWins: 5 }, receive: "صندوق احتفالي", timers: 1, desc: "بطاقة تُربح عند إتمام سلسلة انتصارات متتالية بخمس نجوم في نفس اللعبة." },
+        longBreath: { id: 'longBreath', name: "بطاقة النفس الطويل", color: "#3498db", mult: { type: "range", val: 4, min: 2, max: 6 }, dur: { type: "range", val: 3, min: 1, max: 6 }, count: { type: "range", val: 3, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'speedrun', reqGames: 30, reqHours: 1 }, receive: "صندوق احتفالي", timers: 1, desc: "بطاقة تُمنح لمن ينجز عدداً كبيراً من الألعاب خلال مدة زمنية قصيرة." }
+    };
+
+    let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
+    if(!cardsConfig) { cardsConfig = DEFAULT_CARDS_CONFIG; localStorage.setItem('gameCardsConfig', JSON.stringify(cardsConfig)); }
+
     const fameStages = [
         { num: 1, name: "الحفاضة الفولاذية", start: 1000, end: 10000, img: "images/1.png", desc: "بداية متواضعة لكنها مرعبة، البطل ما زال يحبو في عالم الكلمات ويأكل الحروف الطائرة، لكن لكمته اللغوية قوية ومدمرة!", badges: [ { id: "1.1", name: "مُفجر الحروف", req: 2000, img: "images/1.1.png" }, { id: "1.2", name: "المطاط الصغير", req: 4000, img: "images/1.2.png" }, { id: "1.3", name: "العطسة المدمرة", req: 6000, img: "images/1.3.png" }, { id: "1.4", name: "البربور الحارق", req: 8000, img: "images/1.4.png" }, { id: "1.5", name: "الشرارة اللغوية", req: 10000, img: "images/1.5.png" } ] },
         { num: 2, name: "الديناصور الثرثار", start: 10000, end: 30000, img: "images/2.png", desc: "يركب تي-ريكس يعتقد أن الحروف الإنجليزية هي وجبته الخفيفة المفضلة. الطفل يتحدث كثيراً لدرجة أن الديناصور يضطر للاستماع، ومعاً يصنعان انفجاراً صوتياً من المفردات يرعب القواميس.", badges: [ { id: "2.1", name: "تنين الأعور", req: 14000, img: "images/2.1.png" }, { id: "2.2", name: "الخارق الحارق", req: 18000, img: "images/2.2.png" }, { id: "2.3", name: "القدم الثقيلة", req: 22000, img: "images/2.3.png" }, { id: "2.4", name: "هزيم الرعد", req: 26000, img: "images/2.4.png" }, { id: "2.5", name: "الدارع الفارع", req: 30000, img: "images/2.5.png" } ] },
         { num: 3, name: "نينجا المفردات", start: 30000, end: 70000, img: "images/3.png", desc: "يتحرك غير مرئي بين الجمل المعقدة. يمكنه التوازن تماماً على حرف جر واحد. يضرب بقنابل سياقية دقيقة وأشباح سياقية لإخفاء الارتباك. خَفْه، فإنه سينظم مكتبتك... بصمت.", badges: [ { id: "3.1", name: "السيف الفالق", req: 38000, img: "images/3.1.png" }, { id: "3.2", name: "الشبح السارق", req: 46000, img: "images/3.2.png" }, { id: "3.3", name: "العين الثالثة الذكية", req: 54000, img: "images/3.3.png" }, { id: "3.4", name: "مغناطيس الرعب", req: 62000, img: "images/3.4.png" }, { id: "3.5", name: "القنبلة السنفورية", req: 70000, img: "images/3.5.png" } ] },
-        { num: 4, name: "زومبي المفردات", start: 70000, end: 150000, img: "images/4.png", desc: "لديه الكثير من الكلمات في رأسه لدرجة أن عقله خرج للحصول على بعض الهواء النقي. إنه لا يريد عقولاً؛ إنه يريد مرادفات. خبير في 'استهلاك' قوائم المفردات بلا تفكير. احذر من عضته الفكرية!", badges: [ { id: "4.1", name: "العقل المشع", req: 86000, img: "images/4.1.png" }, { id: "4.2", name: "الأسطورة النمورة", req: 102000, img: "images/4.2.png" }, { id: "4.3", name: "بروسلي الكلمات", req: 118000, img: "images/4.3.png" }, { id: "4.4", name: "أبو الحروف", req: 134000, img: "images/4.4.png" }, { id: "4.5", name: "المعالج الخارق", req: 150000, img: "images/4.5.png" } ] },
-        { num: 5, name: "ساحر الأبجدية", start: 150000, end: 310000, img: "images/5.png", desc: "قرأ كل قاموس من النهاية إلى البداية. تعاويذه مصنوعة من قواعد نحوية معقدة. يمكنه تحويل فقرة مملة إلى عمل فني بصفة واحدة. تحذير: قد يحول قلمك من حين لآخر إلى ببغاء صغير وثرثار.", badges: [ { id: "5.1", name: "الساحرة الشمطاء", req: 182000, img: "images/5.1.png" }, { id: "5.2", name: "البلورة الكركوزية", req: 214000, img: "images/5.2.png" }, { id: "5.3", name: "مستدعي الصقور", req: 246000, img: "images/5.3.png" }, { id: "5.4", name: "بوابة البعد المنفلوطي", req: 278000, img: "images/5.4.png" }, { id: "5.5", name: "اللعنة السنفورية", req: 310000, img: "images/5.5.png" } ] },
-        { num: 6, name: "سايبورغ المفردات", start: 310000, end: 630000, img: "images/6.png", desc: "جزء فتى، جزء كمبيوتر فائق. دماغه لديه سرعة معالجة أسرع من جوجل. ذراعه 'كاسح الجمل' تكسر فعلياً القواعد المعقدة. إنه لا يقرأ الكلمات فقط؛ إنه يحملها، ومفرداته يتم تحديثها أسرع من متجر التطبيقات.", badges: [ { id: "6.1", name: "رادار الليزر الفاقع", req: 374000, img: "images/6.1.png" }, { id: "6.2", name: "القبضة الحديدية المصدية", req: 438000, img: "images/6.2.png" }, { id: "6.3", name: "شريحة الحفظ المنشطح", req: 502000, img: "images/6.3.png" }, { id: "6.4", name: "صدمة الليزر الشلوطية", req: 566000, img: "images/6.4.png" }, { id: "6.5", name: "النفاث الصاروخي المشوي", req: 630000, img: "images/6.5.png" } ] },
-        { num: 7, name: "إنجلش جالاكتوس", start: 630000, end: 1000000, img: "images/7.png", desc: "كيان كوني بأبعاد لغوية. يرتدي زي السنفور الفضائي العملاق لأنه يستطيع. إنه لا يتعلم الكلمات؛ إنه يستهلك لغات كاملة ويبصق روايات ملحمية مثالية ومصقولة. الكون هو مكتبته.", badges: [ { id: "7.1", name: "مستدعي النيازك السنفورية", req: 704000, img: "images/7.1.png" }, { id: "7.2", name: "صاعق شرشبيل الزمني", req: 778000, img: "images/7.2.png" }, { id: "7.3", name: "تاج بابا سنفور المنقور", req: 852000, img: "images/7.3.png" }, { id: "7.4", name: "جاذبية الكواكب", req: 926000, img: "images/7.4.png" }, { id: "7.5", name: "سيد اللانهاية السنفورية", req: 1000000, img: "images/7.5.png" } ] }
+        { num: 4, name: "زومبي المفردات", start: 70000, end: 150000, img: "images/4.png", desc: "لديه الكثير من الكلمات في رأسه لدرجة أن عقله خرج للحصول على بعض الهواء النقي. إنه لا يريد عقولاً؛ إنه يريد مرادفات.", badges: [ { id: "4.1", name: "العقل المشع", req: 86000, img: "images/4.1.png" }, { id: "4.2", name: "الأسطورة النمورة", req: 102000, img: "images/4.2.png" }, { id: "4.3", name: "بروسلي الكلمات", req: 118000, img: "images/4.3.png" }, { id: "4.4", name: "أبو الحروف", req: 134000, img: "images/4.4.png" }, { id: "4.5", name: "المعالج الخارق", req: 150000, img: "images/4.5.png" } ] },
+        { num: 5, name: "ساحر الأبجدية", start: 150000, end: 310000, img: "images/5.png", desc: "قرأ كل قاموس من النهاية إلى البداية. تعاويذه مصنوعة من قواعد نحوية معقدة. يمكنه تحويل فقرة مملة إلى عمل فني بصفة واحدة.", badges: [ { id: "5.1", name: "الساحرة الشمطاء", req: 182000, img: "images/5.1.png" }, { id: "5.2", name: "البلورة الكركوزية", req: 214000, img: "images/5.2.png" }, { id: "5.3", name: "مستدعي الصقور", req: 246000, img: "images/5.3.png" }, { id: "5.4", name: "بوابة البعد المنفلوطي", req: 278000, img: "images/5.4.png" }, { id: "5.5", name: "اللعنة السنفورية", req: 310000, img: "images/5.5.png" } ] },
+        { num: 6, name: "سايبورغ المفردات", start: 310000, end: 630000, img: "images/6.png", desc: "جزء فتى، جزء كمبيوتر فائق. دماغه لديه سرعة معالجة أسرع من جوجل.", badges: [ { id: "6.1", name: "رادار الليزر الفاقع", req: 374000, img: "images/6.1.png" }, { id: "6.2", name: "القبضة الحديدية المصدية", req: 438000, img: "images/6.2.png" }, { id: "6.3", name: "شريحة الحفظ المنشطح", req: 502000, img: "images/6.3.png" }, { id: "6.4", name: "صدمة الليزر الشلوطية", req: 566000, img: "images/6.4.png" }, { id: "6.5", name: "النفاث الصاروخي المشوي", req: 630000, img: "images/6.5.png" } ] },
+        { num: 7, name: "إنجلش جالاكتوس", start: 630000, end: 1000000, img: "images/7.png", desc: "كيان كوني بأبعاد لغوية. يرتدي زي السنفور الفضائي العملاق لأنه يستطيع. الكون هو مكتبته.", badges: [ { id: "7.1", name: "مستدعي النيازك السنفورية", req: 704000, img: "images/7.1.png" }, { id: "7.2", name: "صاعق شرشبيل الزمني", req: 778000, img: "images/7.2.png" }, { id: "7.3", name: "تاج بابا سنفور المنقور", req: 852000, img: "images/7.3.png" }, { id: "7.4", name: "جاذبية الكواكب", req: 926000, img: "images/7.4.png" }, { id: "7.5", name: "سيد اللانهاية السنفورية", req: 1000000, img: "images/7.5.png" } ] }
     ];
 
     let celebrationQueue = [];
-    let defaultEventData = { isActive: true, days: [5], multiplier: 2 }; 
-    let defaultHareefData = { name: "الحريف", mults: [3,4,5,6], maxStages: 4, minHours: 1, maxHours: 5, reqWins: 5, games: {matchg:true, listen:true, missing:true, arrange:true, crossword:true} };
-
     let magicCardEventInterval = null;
 
     window.onload = function() {
@@ -405,9 +388,20 @@
 
     function verifyParentModeStrict() {
         let isParent = localStorage.getItem('isParentMode');
-        if(isParent !== 'true' && isParent !== 'false') {
-            localStorage.setItem('isParentMode', 'false');
-        }
+        if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false');
+    }
+
+    function applyGlobalModes() {
+        let isParent = localStorage.getItem('isParentMode') === 'true';
+        document.querySelectorAll('.parent-only-inputs').forEach(el => {
+            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') { if(el.type === 'checkbox') el.disabled = !isParent; else el.disabled = !isParent; }
+            else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box') || el.classList.contains('admin-row')) {
+                let inputs = el.querySelectorAll('input, select'); inputs.forEach(inp => inp.disabled = !isParent);
+            }
+        });
+        document.querySelectorAll('.parent-only-btn').forEach(btn => {
+            if (btn.tagName === 'BUTTON') { btn.style.display = isParent ? 'inline-block' : 'none'; if(isParent && !btn.style.width && !btn.parentElement.style.display) btn.style.width = '100%'; }
+        });
     }
 
     function logBankStatement(desc, amount, isIncoming) {
@@ -427,49 +421,10 @@
         list.forEach(item => {
             let cls = item.isIncoming ? 'statement-in' : 'statement-out';
             let sign = item.isIncoming ? '+' : '-';
-            html += `<div class="statement-item">
-                <div><span class="${cls}"><b>${sign}${item.amount}</b> جنيه</span> <span style="color:#aaa; font-size:11px;">(${item.date})</span></div>
-                <div>${item.desc}</div>
-            </div>`;
+            html += `<div class="statement-item"><div><span class="${cls}"><b>${sign}${item.amount}</b> جنيه</span> <span style="color:#aaa; font-size:11px;">(${item.date})</span></div><div>${item.desc}</div></div>`;
         });
         if(html === '') html = '<div style="text-align:center; color:#999;">لا توجد حركات مالية بعد.</div>';
-        let box = document.getElementById('bank-statement-list');
-        if(box) box.innerHTML = html;
-    }
-
-    function openNewsModal() {
-        fetch('news.txt')
-            .then(response => {
-                if(!response.ok) throw new Error('لا يوجد أخبار حالياً');
-                return response.text();
-            })
-            .then(text => {
-                document.getElementById('news-content').innerText = text;
-                toggleModal('news-modal');
-            })
-            .catch(err => {
-                document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.';
-                toggleModal('news-modal');
-            });
-    }
-
-    function applyGlobalModes() {
-        let isParent = localStorage.getItem('isParentMode') === 'true';
-        document.querySelectorAll('.parent-only-inputs').forEach(el => {
-            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') {
-                if(el.type === 'checkbox') el.disabled = !isParent;
-                else el.disabled = !isParent;
-            } else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box') || el.classList.contains('admin-row')) {
-                let inputs = el.querySelectorAll('input, select');
-                inputs.forEach(inp => inp.disabled = !isParent);
-            }
-        });
-        document.querySelectorAll('.parent-only-btn').forEach(btn => {
-            if (btn.tagName === 'BUTTON') {
-                btn.style.display = isParent ? 'inline-block' : 'none';
-                if(isParent && !btn.style.width && !btn.parentElement.style.display) btn.style.width = '100%';
-            }
-        });
+        let box = document.getElementById('bank-statement-list'); if(box) box.innerHTML = html;
     }
 
     function toggleModal(id) {
@@ -480,128 +435,255 @@
             modal.style.display = 'none';
         } else {
             if(id === 'bank-modal') { updateBankUI(); renderBankStatement(); }
-            if(id === 'event-modal') loadEventSettings();
             modal.style.display = 'flex';
         }
     }
 
-    function openMagicCardsModal() {
-        renderMagicCards();
-        toggleModal('magic-cards-modal');
-        clearInterval(magicCardEventInterval);
-        magicCardEventInterval = setInterval(updateMagicCardsEventTimer, 1000);
+    // --- المحرك الديناميكي للبطاقات ---
+    function toggleEventsAdminModal() {
+        renderDynamicCardsEditor();
+        toggleModal('events-admin-modal');
     }
 
-    function updateMagicCardsEventTimer() {
-        let el = document.getElementById('mc-event-timer');
-        if(!el) return;
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        if(eventData.days.length === 0) { el.innerText = "الحدث معطل حالياً."; return; }
-        
-        let now = new Date();
-        let today = now.getDay();
-        if(eventData.isActive && eventData.days.includes(today)) {
-            let end = new Date(); end.setHours(23, 59, 59, 999);
-            let diff = end - now;
-            let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
-            el.innerText = `يغلق بعد: ${h}س ${m}د ${s}ث`;
-        } else {
-            let daysToNext = 1;
-            while(!eventData.days.includes((today + daysToNext) % 7)) daysToNext++;
-            let nextDate = new Date();
-            nextDate.setDate(now.getDate() + daysToNext); nextDate.setHours(0, 0, 0, 0);
-            let diff = nextDate - now;
-            let d = Math.floor(diff/(24*3600000)); let h = Math.floor((diff%(24*3600000))/3600000);
-            let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
-            let dStr = d > 0 ? `${d} يوم و ` : '';
-            el.innerText = `يفتح بعد: ${dStr}${h}س ${m}د ${s}ث`;
+    function renderDynamicCardsEditor() {
+        let container = document.getElementById('dynamic-cards-editor'); container.innerHTML = '';
+        for(let key in cardsConfig) {
+            let c = cardsConfig[key];
+            let html = `<div class="event-editor-row">
+                <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'">📝 ${c.name} (انقر للتعديل)</h4>
+                <div class="event-details">
+                    <div class="prop-group"><label>اسم البطاقة:</label><input type="text" id="cfg_${key}_name" value="${c.name}"></div>
+                    <div class="prop-group"><label>لون البطاقة:</label><input type="color" id="cfg_${key}_color" value="${c.color}"></div>
+                    
+                    <div class="prop-group"><label>المضاعف (رقم يضرب به):</label>
+                        <div class="radio-inline">
+                            <label><input type="radio" name="r_mult_${key}" value="fixed" ${c.mult.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'mult', '${key}')"> ثابت</label>
+                            <label><input type="radio" name="r_mult_${key}" value="range" ${c.mult.type==='range'?'checked':''} onchange="toggleInputs(this, 'mult', '${key}')"> عشوائي من فترة</label>
+                        </div>
+                        <input type="number" step="0.5" id="cfg_${key}_mult_val" value="${c.mult.val}" style="display:${c.mult.type==='fixed'?'block':'none'};">
+                        <div class="range-inputs" id="cfg_${key}_mult_range" style="display:${c.mult.type==='range'?'flex':'none'};">
+                            <input type="number" step="0.5" id="cfg_${key}_mult_min" value="${c.mult.min}" placeholder="الحد الأدنى">
+                            <input type="number" step="0.5" id="cfg_${key}_mult_max" value="${c.mult.max}" placeholder="الحد الأعلى">
+                        </div>
+                    </div>
+
+                    <div class="prop-group"><label>مدة الحدث (بالساعات):</label>
+                        <div class="radio-inline">
+                            <label><input type="radio" name="r_dur_${key}" value="fixed" ${c.dur.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> ثابت</label>
+                            <label><input type="radio" name="r_dur_${key}" value="range" ${c.dur.type==='range'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> عشوائي من فترة</label>
+                        </div>
+                        <input type="number" step="0.5" id="cfg_${key}_dur_val" value="${c.dur.val}" style="display:${c.dur.type==='fixed'?'block':'none'};">
+                        <div class="range-inputs" id="cfg_${key}_dur_range" style="display:${c.dur.type==='range'?'flex':'none'};">
+                            <input type="number" step="0.5" id="cfg_${key}_dur_min" value="${c.dur.min}" placeholder="الحد الأدنى">
+                            <input type="number" step="0.5" id="cfg_${key}_dur_max" value="${c.dur.max}" placeholder="الحد الأعلى">
+                        </div>
+                    </div>
+
+                    <div class="prop-group"><label>عدد البطاقات (المراحل):</label>
+                        <div class="radio-inline">
+                            <label><input type="radio" name="r_cnt_${key}" value="fixed" ${c.count.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'count', '${key}')"> ثابت</label>
+                            <label><input type="radio" name="r_cnt_${key}" value="range" ${c.count.type==='range'?'checked':''} onchange="toggleInputs(this, 'count', '${key}')"> عشوائي من فترة</label>
+                        </div>
+                        <input type="number" step="1" id="cfg_${key}_cnt_val" value="${c.count.val}" style="display:${c.count.type==='fixed'?'block':'none'};">
+                        <div class="range-inputs" id="cfg_${key}_cnt_range" style="display:${c.count.type==='range'?'flex':'none'};">
+                            <input type="number" step="1" id="cfg_${key}_cnt_min" value="${c.count.min}" placeholder="أدنى (مثال: 1)">
+                            <input type="number" step="1" id="cfg_${key}_cnt_max" value="${c.count.max}" placeholder="أعلى (مثال: 5)">
+                        </div>
+                    </div>
+
+                    <div class="prop-group"><label>الألعاب المشمولة بالبطاقة:</label>
+                        <div class="games-checkboxes">
+                            <label><input type="checkbox" onchange="toggleGamesCheckboxes(this, '${key}')"> تحديد الكل</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="matchg" ${c.games.includes('matchg')?'checked':''}> المطابقة</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="listen" ${c.games.includes('listen')?'checked':''}> الأمثلة</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="missing" ${c.games.includes('missing')?'checked':''}> الناقصة</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="arrange" ${c.games.includes('arrange')?'checked':''}> الترتيب</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="crossword" ${c.games.includes('crossword')?'checked':''}> المتقاطعة</label>
+                        </div>
+                    </div>`;
+
+            if(c.canEditTrigger) {
+                if(c.trigger.type === 'periodic') {
+                    html += `<div class="prop-group"><label>أيام الحدث (الجمعة=5، السبت=6...):</label>
+                        <input type="text" id="cfg_${key}_trig_days" value="${c.trigger.days.join(',')}" placeholder="مثال: 5,6"></div>`;
+                } else if(c.trigger.type === 'consecutive') {
+                    html += `<div class="prop-group"><label>عدد الانتصارات المتتالية لربحها:</label>
+                        <input type="number" id="cfg_${key}_trig_wins" value="${c.trigger.reqWins}"></div>`;
+                } else if(c.trigger.type === 'speedrun') {
+                    html += `<div class="prop-group"><label>إنجاز (عدد ألعاب) في (عدد ساعات):</label>
+                        <div style="display:flex; gap:10px;"><input type="number" id="cfg_${key}_trig_games" value="${c.trigger.reqGames}" placeholder="ألعاب"><input type="number" id="cfg_${key}_trig_hrs" value="${c.trigger.reqHours}" placeholder="ساعات"></div></div>`;
+                }
+            }
+            
+            html += `<div class="prop-group" style="background:#f1f1f1; padding:8px; border-radius:5px;"><span style="color:#777; font-size:13px;">طريقة الاستلام: <b>${c.receive}</b> | نوع العداد: <b>${c.timers} عداد</b></span></div>
+                </div></div>`;
+            container.innerHTML += html;
         }
     }
 
+    function toggleInputs(radioEl, prop, key) {
+        if(prop === 'mult') { document.getElementById(`cfg_${key}_mult_val`).style.display = radioEl.value==='fixed'?'block':'none'; document.getElementById(`cfg_${key}_mult_range`).style.display = radioEl.value==='range'?'flex':'none'; }
+        if(prop === 'dur') { document.getElementById(`cfg_${key}_dur_val`).style.display = radioEl.value==='fixed'?'block':'none'; document.getElementById(`cfg_${key}_dur_range`).style.display = radioEl.value==='range'?'flex':'none'; }
+        if(prop === 'count') { document.getElementById(`cfg_${key}_cnt_val`).style.display = radioEl.value==='fixed'?'block':'none'; document.getElementById(`cfg_${key}_cnt_range`).style.display = radioEl.value==='range'?'flex':'none'; }
+    }
+
+    function toggleGamesCheckboxes(masterChk, key) {
+        document.querySelectorAll(`.chk_games_${key}`).forEach(el => el.checked = masterChk.checked);
+    }
+
+    function saveDynamicCardsConfig() {
+        for(let key in cardsConfig) {
+            let c = cardsConfig[key];
+            c.name = document.getElementById(`cfg_${key}_name`).value;
+            c.color = document.getElementById(`cfg_${key}_color`).value;
+            
+            c.mult.type = document.querySelector(`input[name="r_mult_${key}"]:checked`).value;
+            c.mult.val = parseFloat(document.getElementById(`cfg_${key}_mult_val`).value) || 1;
+            c.mult.min = parseFloat(document.getElementById(`cfg_${key}_mult_min`).value) || 1;
+            c.mult.max = parseFloat(document.getElementById(`cfg_${key}_mult_max`).value) || 2;
+            
+            c.dur.type = document.querySelector(`input[name="r_dur_${key}"]:checked`).value;
+            c.dur.val = parseFloat(document.getElementById(`cfg_${key}_dur_val`).value) || 0;
+            c.dur.min = parseFloat(document.getElementById(`cfg_${key}_dur_min`).value) || 1;
+            c.dur.max = parseFloat(document.getElementById(`cfg_${key}_dur_max`).value) || 24;
+
+            c.count.type = document.querySelector(`input[name="r_cnt_${key}"]:checked`).value;
+            c.count.val = parseInt(document.getElementById(`cfg_${key}_cnt_val`).value) || 5;
+            c.count.min = parseInt(document.getElementById(`cfg_${key}_cnt_min`).value) || 1;
+            c.count.max = parseInt(document.getElementById(`cfg_${key}_cnt_max`).value) || 5;
+
+            let games = []; document.querySelectorAll(`.chk_games_${key}:checked`).forEach(el => games.push(el.value));
+            c.games = games;
+
+            if(c.canEditTrigger) {
+                if(c.trigger.type === 'periodic') { c.trigger.days = document.getElementById(`cfg_${key}_trig_days`).value.split(',').map(Number); }
+                else if(c.trigger.type === 'consecutive') { c.trigger.reqWins = parseInt(document.getElementById(`cfg_${key}_trig_wins`).value) || 5; }
+                else if(c.trigger.type === 'speedrun') { c.trigger.reqGames = parseInt(document.getElementById(`cfg_${key}_trig_games`).value)||30; c.trigger.reqHours = parseInt(document.getElementById(`cfg_${key}_trig_hrs`).value)||1; }
+            }
+        }
+        localStorage.setItem('gameCardsConfig', JSON.stringify(cardsConfig));
+        alert('تم حفظ خصائص البطاقات الديناميكية بنجاح! 💾');
+        toggleModal('events-admin-modal');
+    }
+
+    // عرض البطاقات للمستخدم في أيقونة البطاقات
+    function openMagicCardsModal() { renderMagicCards(); toggleModal('magic-cards-modal'); clearInterval(magicCardEventInterval); magicCardEventInterval = setInterval(updateMagicCardsTimers, 1000); }
+
+    function getDescHelp(key) { alert(cardsConfig[key].desc); }
+
     function renderMagicCards() {
-        const container = document.getElementById('magic-cards-container');
-        container.innerHTML = '';
+        const container = document.getElementById('magic-cards-container'); container.innerHTML = '';
         let html = '';
+        
+        // 1. بطاقة آخر 5
+        let c1 = cardsConfig.last5;
+        let c1MultText = c1.mult.type==='fixed' ? c1.mult.val : `من ${c1.mult.min} إلى ${c1.mult.max}`;
+        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c1.color}, #555);">
+            <div class="mc-title"><span>🔥 ${c1.name}</span> <div class="btn-help-icon" onclick="getDescHelp('last5')">i</div></div>
+            <div class="mc-desc">مضاعفة النقاط بمقدار (${c1MultText}x) مطبقة دائماً على أحدث المراحل.</div></div>`;
 
-        html += `<div class="magic-card-item hot-last">
-            <div class="mc-title">🔥 البطاقات الملتهبة (أحدث 5 مراحل)</div>
-            <div class="mc-desc">نقاط مضاعفة (1.5x) لأحدث 5 مراحل تم إضافتها في جميع الألعاب. لا تنتهي صلاحيتها حتى يتم إضافة مراحل جديدة.</div>
-        </div>`;
+        // 2. العشوائية
+        let c2 = cardsConfig.random5;
+        let c2MultText = c2.mult.type==='fixed' ? c2.mult.val : `من ${c2.mult.min} إلى ${c2.mult.max}`;
+        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c2.color}, #555);">
+            <div class="mc-title"><span>🌟 ${c2.name}</span> <div class="btn-help-icon" onclick="getDescHelp('random5')">i</div></div>
+            <div class="mc-desc">مراحل عشوائية بمضاعفة (${c2MultText}x).</div>
+            <div class="mc-timer" id="mc-timer-random5">يتم التحديث كل 24 ساعة.</div></div>`;
 
-        html += `<div class="magic-card-item hot-random">
-            <div class="mc-title">🌟 البطاقات العشوائية اليومية</div>
-            <div class="mc-desc">5 مراحل عشوائية غير مختومة (أولوية 0 نجوم) من جميع المراحل المتاحة لك بضعف ونصف النقاط.</div>
-            <div class="mc-timer">يتم التحديث كل 24 ساعة تلقائياً.</div>
-        </div>`;
+        // 3. الجمعة (دوري)
+        let c3 = cardsConfig.friday;
+        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c3.color}, #555);" id="card-friday-container">
+            <div class="mc-title"><span>📅 ${c3.name}</span> <div class="btn-help-icon" onclick="getDescHelp('friday')">i</div></div>
+            <div class="mc-desc" id="mc-desc-friday"></div><div class="mc-timer" id="mc-timer-friday">جاري الحساب...</div></div>`;
 
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        let today = new Date().getDay();
-        let evActive = (eventData.isActive && eventData.days.includes(today));
-        let evClass = evActive ? 'event-card' : 'inactive';
-        let evText = evActive ? `شغال الآن! (يضاعف النقاط ${eventData.multiplier}x)` : `متوقف. يشتغل في الأيام المحددة.`;
-        html += `<div class="magic-card-item ${evClass}">
-            <div class="mc-title">📅 حدث المضاعفة العام</div>
-            <div class="mc-desc">${evText}</div>
-            <div class="mc-timer" id="mc-event-timer">جاري حساب الوقت...</div>
-        </div>`;
-
-        let hareefGames = ['matchg', 'listen', 'missing', 'scramble', 'crossword'];
-        let hareefNames = {'matchg':'المطابقة', 'listen':'الصائد', 'missing':'الحروف الناقصة', 'scramble':'ترتيب الحروف', 'crossword':'المتقاطعة'};
-        let hareefSettings = JSON.parse(localStorage.getItem('hareefSettings')) || defaultHareefData;
-        let foundHareef = false;
-
-        hareefGames.forEach(g => {
-            let hData = JSON.parse(localStorage.getItem('hareefActive_' + g));
-            if(hData && hData.expiry > Date.now()) {
-                foundHareef = true;
-                let hrsLeft = Math.max(0, Math.floor((hData.expiry - Date.now()) / 3600000));
-                let minLeft = Math.max(0, Math.floor(((hData.expiry - Date.now()) % 3600000) / 60000));
-                html += `<div class="magic-card-item hareef">
-                    <div class="mc-title">🏅 بطاقة ${hareefSettings.name} - لعبة ${hareefNames[g]}</div>
-                    <div class="mc-desc">ربحت هذه البطاقة لفوزك المتتالي! لديك ${hData.stages.length} مرحلة عشوائية في اللعبة بنقاط مضروبة بـ (${hData.mult}x).</div>
-                    <div class="mc-timer">⏳ متبقي: ${hrsLeft}س ${minLeft}د</div>
-                </div>`;
+        // 4 & 5. الحريف و النفس الطويل (مبنية على المكتسبات)
+        ['hareef', 'longBreath'].forEach(type => {
+            let c = cardsConfig[type];
+            let found = false;
+            let hareefGames = ['matchg', 'listen', 'missing', 'arrange', 'crossword'];
+            let hareefNames = {'matchg':'المطابقة', 'listen':'الصائد', 'missing':'الناقصة', 'arrange':'الترتيب', 'crossword':'المتقاطعة'};
+            
+            hareefGames.forEach(g => {
+                let activeData = JSON.parse(localStorage.getItem(`activeChest_${type}_${g}`));
+                if(activeData && activeData.expiry > Date.now()) {
+                    found = true;
+                    html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c.color}, #555);">
+                        <div class="mc-title"><span>🏅 ${c.name} - لعبة ${hareefNames[g]}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
+                        <div class="mc-desc">لديك ${activeData.stages.length} مرحلة عشوائية بنقاط مضروبة بـ (${activeData.mult}x).</div>
+                        <div class="mc-timer" id="mc-timer-${type}-${g}" data-expiry="${activeData.expiry}">⏳ متبقي: ...</div></div>`;
+                }
+            });
+            if(!found) {
+                html += `<div class="magic-card-item" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); filter: grayscale(50%);">
+                    <div class="mc-title"><span>🏅 ${c.name}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
+                    <div class="mc-desc">لا تملك هذه البطاقة. حقق شرطها المخصص لتربحها!</div></div>`;
             }
         });
 
-        if(!foundHareef) {
-            html += `<div class="magic-card-item inactive">
-                <div class="mc-title">🏅 بطاقات ${hareefSettings.name}</div>
-                <div class="mc-desc">لا تملك أي بطاقة حالياً. العب واربح ${hareefSettings.reqWins} مرات متتالية بـ 5 نجوم في أي لعبة للحصول عليها!</div>
-            </div>`;
-        }
+        container.innerHTML = html; updateMagicCardsTimers();
+    }
 
-        container.innerHTML = html;
-        updateMagicCardsEventTimer();
+    function updateMagicCardsTimers() {
+        // Friday
+        let c3 = cardsConfig.friday;
+        let today = new Date().getDay();
+        let elFriday = document.getElementById('mc-timer-friday');
+        let descFriday = document.getElementById('mc-desc-friday');
+        if(elFriday) {
+            let now = new Date();
+            if(c3.trigger.days.includes(today)) {
+                descFriday.innerText = `الحدث فعال! نقاط مضاعفة (${c3.mult.type==='fixed'?c3.mult.val:'متغيرة'}x).`;
+                let end = new Date(); end.setHours(23, 59, 59, 999); let diff = end - now;
+                let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
+                elFriday.innerText = `ينتهي الحدث بعد: ${h}س ${m}د ${s}ث`;
+                document.getElementById('card-friday-container').style.filter = "none";
+            } else {
+                descFriday.innerText = `الحدث متوقف حالياً.`; document.getElementById('card-friday-container').style.filter = "grayscale(50%)";
+                let daysToNext = 1; while(!c3.trigger.days.includes((today + daysToNext) % 7)) daysToNext++;
+                let nextDate = new Date(); nextDate.setDate(now.getDate() + daysToNext); nextDate.setHours(0, 0, 0, 0);
+                let diff = nextDate - now; let d = Math.floor(diff/(24*3600000)); let h = Math.floor((diff%(24*3600000))/3600000); let m = Math.floor((diff%3600000)/60000);
+                elFriday.innerText = `يفتح بعد: ${d>0?d+' يوم و ':''}${h}س ${m}د`;
+            }
+        }
+        // Active Chests
+        document.querySelectorAll('[id^="mc-timer-hareef-"], [id^="mc-timer-longBreath-"]').forEach(el => {
+            let expiry = parseInt(el.getAttribute('data-expiry'));
+            if(expiry > Date.now()) {
+                let diff = expiry - Date.now();
+                let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
+                el.innerText = `⏳ متبقي: ${h}س ${m}د ${s}ث`;
+            } else { el.innerText = "انتهت الصلاحية!"; }
+        });
+    }
+
+    function openNewsModal() {
+        fetch('news.txt')
+            .then(response => { if(!response.ok) throw new Error('لا يوجد أخبار حالياً'); return response.text(); })
+            .then(text => { document.getElementById('news-content').innerText = text; toggleModal('news-modal'); })
+            .catch(err => { document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.'; toggleModal('news-modal'); });
     }
 
     function openReportsModal() {
         document.getElementById('main-report-type').value = 'points';
-        toggleReportInputs();
-        document.getElementById('report-results').style.display = 'none';
-        toggleModal('reports-modal');
+        toggleReportInputs(); document.getElementById('report-results').style.display = 'none'; toggleModal('reports-modal');
     }
 
     function toggleReportInputs() {
         let type = document.getElementById('main-report-type').value;
         let timeSelectors = document.getElementById('time-selectors');
-        if (type === 'points') { timeSelectors.style.display = 'flex'; updateReportRangeOptions(); } 
-        else { timeSelectors.style.display = 'none'; }
+        if (type === 'points') { timeSelectors.style.display = 'flex'; updateReportRangeOptions(); } else { timeSelectors.style.display = 'none'; }
         document.getElementById('report-results').style.display = 'none';
     }
 
     function updateReportRangeOptions() {
-        let type = document.getElementById('report-type').value;
-        let selectNum = document.getElementById('report-num'); selectNum.innerHTML = '';
+        let type = document.getElementById('report-type').value; let selectNum = document.getElementById('report-num'); selectNum.innerHTML = '';
         let max = 0; if(type === 'hours') max = 24; if(type === 'days') max = 7; if(type === 'weeks') max = 4; if(type === 'months') max = 12;
         for(let i = 1; i <= max; i++) { let opt = document.createElement('option'); opt.value = i; opt.text = i; selectNum.appendChild(opt); }
     }
 
     function generateSelectedReport() {
         let type = document.getElementById('main-report-type').value;
-        if (type === 'points') generatePointsReport();
-        else if (type === 'progress') generateProgressReport();
-        else if (type === 'performance') generatePerformanceReport();
+        if (type === 'points') generatePointsReport(); else if (type === 'progress') generateProgressReport(); else if (type === 'performance') generatePerformanceReport();
     }
 
     function generatePointsReport() {
@@ -614,8 +696,7 @@
         let gameNames = { matchg: 'لعبة المطابقة 🎴', listen: 'صائد الأمثلة 🎧', missing: 'الحروف الناقصة 🔠', scramble: 'ترتيب الحروف 🔀', crossword: 'الكلمات المتقاطعة 🧩' };
         let resultHTML = `<div class="report-block"><h4>إجمالي النقاط في الفترة: <span class="stat-val good">${totals.total}</span></h4></div><div class="report-block"><h4>التفصيل حسب الألعاب:</h4>`;
         for(let key in gameNames) { resultHTML += `<div class="stat-item"><span>${gameNames[key]}</span> <span class="stat-val">${totals[key]} نقطة</span></div>`; }
-        resultHTML += `</div>`;
-        let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
+        resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
     function getGameStats(storageKey) {
@@ -640,34 +721,21 @@
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
-    function openFullImage(imgSrc) {
-        document.getElementById('full-size-img').src = imgSrc;
-        document.getElementById('image-modal').style.display = 'flex';
-    }
-
-    function closeImageModal(e) {
-        if (e.target.id === 'image-modal' || e.target.tagName === 'BUTTON') {
-            document.getElementById('image-modal').style.display = 'none';
-        }
-    }
+    function openFullImage(imgSrc) { document.getElementById('full-size-img').src = imgSrc; document.getElementById('image-modal').style.display = 'flex'; }
+    function closeImageModal(e) { if (e.target.id === 'image-modal' || e.target.tagName === 'BUTTON') { document.getElementById('image-modal').style.display = 'none'; } }
 
     function checkNewFameAchievements() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         let score = Math.floor(appProg.cumulativeScore || 0);
         let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        
-        appProg.notifiedBadges = appProg.notifiedBadges || [];
-        appProg.claimedStagesFame = appProg.claimedStagesFame || [];
-        let needsSave = false;
-        let absoluteBadgeIndex = 1;
+        appProg.notifiedBadges = appProg.notifiedBadges || []; appProg.claimedStagesFame = appProg.claimedStagesFame || [];
+        let needsSave = false; let absoluteBadgeIndex = 1;
 
         fameStages.forEach(stage => {
             stage.badges.forEach(badge => {
                 let currentBadgeVal = absoluteBadgeIndex;
                 if (score >= badge.req && !appProg.notifiedBadges.includes(badge.id)) {
-                    appProg.notifiedBadges.push(badge.id);
-                    appProg.bankBalance = (appProg.bankBalance || 0) + currentBadgeVal;
-                    needsSave = true;
+                    appProg.notifiedBadges.push(badge.id); appProg.bankBalance = (appProg.bankBalance || 0) + currentBadgeVal; needsSave = true;
                     logBankStatement(`مكافأة وسام: ${badge.name}`, currentBadgeVal, true);
                     celebrationQueue.push({ type: 'badge', title: "مبروك! تم فتح وسام", name: badge.name, desc: `تخطيت ${badge.req.toLocaleString()} نقطة! وحصلت على ${currentBadgeVal} جنيه 💰`, img: badge.img });
                 }
@@ -675,18 +743,12 @@
             });
 
             if (score >= stage.end && !appProg.claimedStagesFame.includes(stage.num)) {
-                let baseReward = 15 * stage.num * stage.num;
-                let bonusReward = parseFloat(stageBonuses[stage.num]) || 0;
-                let totalReward = baseReward + bonusReward;
-
-                appProg.bankBalance = (appProg.bankBalance || 0) + totalReward;
-                appProg.claimedStagesFame.push(stage.num);
-                needsSave = true;
+                let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; let totalReward = baseReward + bonusReward;
+                appProg.bankBalance = (appProg.bankBalance || 0) + totalReward; appProg.claimedStagesFame.push(stage.num); needsSave = true;
                 logBankStatement(`مكافأة ختم مرحلة: ${stage.name}`, totalReward, true);
                 celebrationQueue.push({ type: 'stage', title: "إنجاز أسطوري! 🏆", name: `ختم مرحلة: ${stage.name}`, desc: `تخطيت ${stage.end.toLocaleString()} نقطة! وحصلت على ${totalReward} جنيه 💰`, img: stage.img });
             }
         });
-
         if(needsSave) localStorage.setItem('appProgress', JSON.stringify(appProg));
         processCelebrationQueue();
     }
@@ -694,98 +756,68 @@
     function processCelebrationQueue() {
         if(celebrationQueue.length > 0) {
             let item = celebrationQueue.shift();
-            document.getElementById('cel-title').innerText = item.title;
-            document.getElementById('cel-name').innerText = item.name;
+            document.getElementById('cel-title').innerText = item.title; document.getElementById('cel-name').innerText = item.name;
             document.getElementById('cel-desc').innerText = item.desc;
-            let imgEl = document.getElementById('cel-img');
-            imgEl.src = item.img;
-            imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; 
+            let imgEl = document.getElementById('cel-img'); imgEl.src = item.img; imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; 
             document.getElementById('celebration-modal').style.display = 'flex';
         }
     }
 
-    function closeCelebration() {
-        document.getElementById('celebration-modal').style.display = 'none';
-        setTimeout(processCelebrationQueue, 500);
-    }
+    function closeCelebration() { document.getElementById('celebration-modal').style.display = 'none'; setTimeout(processCelebrationQueue, 500); }
 
-    function openFameModal() {
-        renderHallOfFame();
-        toggleModal('fame-modal');
-    }
+    function openFameModal() { renderHallOfFame(); toggleModal('fame-modal'); }
 
     function renderHallOfFame() {
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let score = Math.floor(appProg.cumulativeScore || 0);
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        document.getElementById('fame-total-points').innerText = score.toLocaleString();
-        const wrapper = document.getElementById('stages-wrapper');
-        wrapper.innerHTML = '';
-
-        let badgeGlobalIndex = 1;
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let score = Math.floor(appProg.cumulativeScore || 0);
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; document.getElementById('fame-total-points').innerText = score.toLocaleString();
+        const wrapper = document.getElementById('stages-wrapper'); wrapper.innerHTML = ''; let badgeGlobalIndex = 1;
 
         fameStages.forEach(stage => {
-            let isStageUnlocked = score >= stage.start;
-            let stageClass = isStageUnlocked ? '' : 'locked-stage';
-            let progressPercent = 0;
-            if (score >= stage.end) { progressPercent = 100; } 
-            else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
-            
+            let isStageUnlocked = score >= stage.start; let stageClass = isStageUnlocked ? '' : 'locked-stage'; let progressPercent = 0;
+            if (score >= stage.end) { progressPercent = 100; } else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
             let stageReward = 15 * stage.num * stage.num + (parseFloat(stageBonuses[stage.num]) || 0);
-            
-            let imgClickAction = isStageUnlocked 
-                ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"` 
-                : `onclick="alert('قيمة الجائزة عند ختم هذه المرحلة: ${stageReward} جنيه فلسطيني')" style="cursor: pointer;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"`;
+            let imgClickAction = isStageUnlocked ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"` : `onclick="alert('قيمة الجائزة عند ختم هذه المرحلة: ${stageReward} جنيه فلسطيني')" style="cursor: pointer;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"`;
 
             let html = `<div class="stage-card ${stageClass}"><img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction}><h3 class="stage-title">مرحلة ${stage.num}: ${stage.name}<span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span></h3><p class="stage-desc">${stage.desc}</p><div class="progress-bar-container"><div class="progress-fill" style="width: ${progressPercent}%;"></div></div><div class="badges-grid">`;
-
             stage.badges.forEach(badge => {
-                let isBadgeUnlocked = score >= badge.req;
-                let badgeClass = isBadgeUnlocked ? '' : 'locked-badge';
-                let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>';
-                let badgeReward = badgeGlobalIndex;
+                let isBadgeUnlocked = score >= badge.req; let badgeClass = isBadgeUnlocked ? '' : 'locked-badge'; let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>'; let badgeReward = badgeGlobalIndex;
                 html += `<div class="badge-item ${badgeClass}" title="جائزة هذا الوسام: ${badgeReward} جنيه" onclick="alert('قيمة جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني')"><div class="badge-img-wrapper"><img src="${badge.img}" class="badge-img" onerror="this.src='images/mon.jpeg'">${lockOverlay}</div><div class="badge-title">${badge.name}</div><div class="badge-req">${badge.req.toLocaleString()}</div></div>`;
                 badgeGlobalIndex++;
             });
-            html += `</div></div>`;
-            wrapper.innerHTML += html;
+            html += `</div></div>`; wrapper.innerHTML += html;
         });
     }
 
     function saveMainSettings() {
-        const matchgActive = document.getElementById('chk-matchg').checked;
-        const listenActive = document.getElementById('chk-listen').checked;
-        const missingActive = document.getElementById('chk-missing').checked;
-        const arrangeActive = document.getElementById('chk-arrange').checked;
-        const crosswordActive = document.getElementById('chk-crossword').checked;
-
-        const gameState = { matchg: matchgActive, listen: listenActive, missing: missingActive, arrange: arrangeActive, crossword: crosswordActive };
-        localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState));
-        applyGamesState(gameState);
+        const gameState = {
+            matchg: document.getElementById('chk-matchg').checked, listen: document.getElementById('chk-listen').checked,
+            missing: document.getElementById('chk-missing').checked, arrange: document.getElementById('chk-arrange').checked, crossword: document.getElementById('chk-crossword').checked
+        };
+        localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState)); applyGamesState(gameState);
 
         if (document.getElementById('chk-reset-all').checked) {
             if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟')) {
                 let pList = ['matchGameProgress', 'listenGameProgress', 'missingGameProgress', 'scrambleGameProgress', 'crosswordGameProgress'];
-                pList.forEach(key => {
-                    let prog = JSON.parse(localStorage.getItem(key)) || {};
-                    for (let lvl in prog) prog[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
-                    localStorage.setItem(key, JSON.stringify(prog));
-                });
-                document.getElementById('chk-reset-all').checked = false;
-                alert('تم تصفير جميع الألعاب بنجاح! 🔄');
+                pList.forEach(key => { let prog = JSON.parse(localStorage.getItem(key)) || {}; for (let lvl in prog) prog[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem(key, JSON.stringify(prog)); });
+                document.getElementById('chk-reset-all').checked = false; alert('تم تصفير جميع الألعاب بنجاح! 🔄');
             }
         }
-        alert('تم حفظ الإعدادات!');
-        toggleModal('admin-modal');
+        
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let exchVal = parseInt(document.getElementById('edit-exch-points').value);
+        let spinVal = parseInt(document.getElementById('edit-spin-cost').value);
+        if(!isNaN(exchVal) && exchVal >= 0) appProg.exchangedPoints = exchVal;
+        if(!isNaN(spinVal) && spinVal > 0) { let wheelSet = JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 }; wheelSet.spinCost = spinVal; localStorage.setItem('wheelSettings', JSON.stringify(wheelSet)); }
+        localStorage.setItem('appProgress', JSON.stringify(appProg));
+        updateBankUI();
+
+        alert('تم حفظ الإعدادات بنجاح!'); toggleModal('admin-modal');
     }
 
     function loadGamesState() {
         const savedState = JSON.parse(localStorage.getItem('disabledGamesConfig')) || { matchg: true, listen: true, missing: true, arrange: true, crossword: true };
-        document.getElementById('chk-matchg').checked = savedState.matchg !== false;
-        document.getElementById('chk-listen').checked = savedState.listen !== false;
-        document.getElementById('chk-missing').checked = savedState.missing !== false;
-        document.getElementById('chk-arrange').checked = savedState.arrange !== false;
-        document.getElementById('chk-crossword').checked = savedState.crossword !== false;
+        document.getElementById('chk-matchg').checked = savedState.matchg !== false; document.getElementById('chk-listen').checked = savedState.listen !== false;
+        document.getElementById('chk-missing').checked = savedState.missing !== false; document.getElementById('chk-arrange').checked = savedState.arrange !== false; document.getElementById('chk-crossword').checked = savedState.crossword !== false;
         applyGamesState(savedState);
     }
 
@@ -798,166 +830,46 @@
         if (state.crossword !== false) { btnCrossword.style.opacity = '1'; btnCrossword.style.pointerEvents = 'auto'; btnCrossword.setAttribute('href', 'crossword.html'); } else { btnCrossword.style.opacity = '0.35'; btnCrossword.style.pointerEvents = 'none'; btnCrossword.removeAttribute('href'); }
     }
 
-    // إعدادات الأحداث وبطاقة الحريف
-    function loadEventSettings() {
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        document.querySelectorAll('.event-day-chk').forEach(chk => { chk.checked = eventData.days.includes(parseInt(chk.value)); });
-        document.getElementById('event-multiplier').value = eventData.multiplier || 2;
-        let btn = document.getElementById('btn-toggle-event');
-        if(eventData.isActive) { btn.innerText = 'إيقاف الحدث العام'; btn.style.backgroundColor = 'var(--warning)'; btn.style.color = '#000'; } 
-        else { btn.innerText = 'بدأ الحدث العام'; btn.style.backgroundColor = 'var(--success)'; btn.style.color = '#fff'; }
-
-        let hareefData = JSON.parse(localStorage.getItem('hareefSettings')) || defaultHareefData;
-        document.getElementById('hareef-name').value = hareefData.name;
-        document.getElementById('hareef-m1').value = hareefData.mults[0];
-        document.getElementById('hareef-m2').value = hareefData.mults[1];
-        document.getElementById('hareef-m3').value = hareefData.mults[2];
-        document.getElementById('hareef-m4').value = hareefData.mults[3];
-        document.getElementById('hareef-max-stages').value = hareefData.maxStages;
-        document.getElementById('hareef-min-h').value = hareefData.minHours;
-        document.getElementById('hareef-max-h').value = hareefData.maxHours;
-        document.getElementById('hareef-req-wins').value = hareefData.reqWins;
-        document.querySelectorAll('.hareef-game-chk').forEach(chk => { chk.checked = hareefData.games[chk.value] === true; });
-    }
-
-    function toggleHareefAll(source) {
-        document.querySelectorAll('.hareef-game-chk').forEach(chk => { chk.checked = source.checked; });
-    }
-
-    function toggleEventStatus() {
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        eventData.isActive = !eventData.isActive;
-        localStorage.setItem('gameEventData', JSON.stringify(eventData));
-        loadEventSettings(); applyGlobalModes();
-    }
-
-    function saveEventAndHareefSettings() {
-        let days = []; document.querySelectorAll('.event-day-chk:checked').forEach(chk => days.push(parseInt(chk.value)));
-        let mult = parseFloat(document.getElementById('event-multiplier').value) || 2;
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEventData;
-        eventData.days = days; eventData.multiplier = mult;
-        localStorage.setItem('gameEventData', JSON.stringify(eventData));
-
-        let hMin = parseInt(document.getElementById('hareef-min-h').value);
-        let hMax = parseInt(document.getElementById('hareef-max-h').value);
-        if(hMin > hMax || hMin < 1 || hMax > 24) { alert("نطاق الساعات للحريف غير صحيح. المسموح من 1 إلى 24 ساعة، والأدنى أقل من الأعلى."); return; }
-
-        let hareefData = {
-            name: document.getElementById('hareef-name').value || "الحريف",
-            mults: [
-                parseFloat(document.getElementById('hareef-m1').value) || 3, parseFloat(document.getElementById('hareef-m2').value) || 4,
-                parseFloat(document.getElementById('hareef-m3').value) || 5, parseFloat(document.getElementById('hareef-m4').value) || 6
-            ],
-            maxStages: parseInt(document.getElementById('hareef-max-stages').value) || 4,
-            minHours: hMin, maxHours: hMax,
-            reqWins: parseInt(document.getElementById('hareef-req-wins').value) || 5,
-            games: {}
-        };
-        document.querySelectorAll('.hareef-game-chk').forEach(chk => { hareefData.games[chk.value] = chk.checked; });
-        localStorage.setItem('hareefSettings', JSON.stringify(hareefData));
-
-        alert('تم حفظ إعدادات الأحداث والبطاقات!');
-        applyGlobalModes();
-        toggleModal('event-modal');
-    }
-
     function addStageBonus() {
-        let stageSelect = document.getElementById('stage-bonus-select').value;
-        let bonusVal = parseFloat(document.getElementById('stage-bonus-val').value);
+        let stageSelect = document.getElementById('stage-bonus-select').value; let bonusVal = parseFloat(document.getElementById('stage-bonus-val').value);
         if(isNaN(bonusVal)) { alert("الرجاء إدخال مبلغ صحيح!"); return; }
-        
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        stageBonuses[stageSelect] = (parseFloat(stageBonuses[stageSelect]) || 0) + bonusVal;
-        localStorage.setItem('stageBonuses', JSON.stringify(stageBonuses));
-        document.getElementById('stage-bonus-val').value = '';
-        alert(`تم إضافة ${bonusVal} جنيه فلسطيني إلى المرحلة ${stageSelect} بنجاح!`);
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; stageBonuses[stageSelect] = (parseFloat(stageBonuses[stageSelect]) || 0) + bonusVal; localStorage.setItem('stageBonuses', JSON.stringify(stageBonuses));
+        document.getElementById('stage-bonus-val').value = ''; alert(`تم إضافة ${bonusVal} جنيه فلسطيني إلى المرحلة ${stageSelect} بنجاح!`);
         if(document.getElementById('bonus-report-box').style.display === 'block') showBonusReport();
     }
 
     function showBonusReport() {
-        let box = document.getElementById('bonus-report-box');
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        let html = '<ul>';
-        for(let i=1; i<=7; i++) {
-            let base = 15 * i * i;
-            let bonus = parseFloat(stageBonuses[i]) || 0;
-            html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه فلسطيني</span></li>`;
-        }
-        html += '</ul>';
-        box.innerHTML = html; box.style.display = 'block';
+        let box = document.getElementById('bonus-report-box'); let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; let html = '<ul>';
+        for(let i=1; i<=7; i++) { let base = 15 * i * i; let bonus = parseFloat(stageBonuses[i]) || 0; html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه فلسطيني</span></li>`; }
+        html += '</ul>'; box.innerHTML = html; box.style.display = 'block';
     }
     
     function addManualPoints() {
         let pts = parseInt(document.getElementById('manual-points-val').value);
         if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للمكافأة!"); return; }
-        
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        appProg.cumulativeScore = (appProg.cumulativeScore || 0) + pts;
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        
-        document.getElementById('manual-points-val').value = '';
-        alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة! 🎉`);
-        
-        checkNewFameAchievements(); updateBankUI();
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; appProg.cumulativeScore = (appProg.cumulativeScore || 0) + pts; localStorage.setItem('appProgress', JSON.stringify(appProg));
+        document.getElementById('manual-points-val').value = ''; alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة! 🎉`); checkNewFameAchievements(); updateBankUI();
         if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
     }
 
     function subtractManualPoints() {
         let pts = parseInt(document.getElementById('manual-points-val').value);
         if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للخصم!"); return; }
-        
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let currentScore = Math.floor(appProg.cumulativeScore || 0);
-        
-        if(pts > currentScore) pts = currentScore; 
-        appProg.cumulativeScore -= pts;
-        let newScore = appProg.cumulativeScore;
-        
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        let newNotifiedBadges = []; let badgesValueLost = 0; let absoluteBadgeIndex = 1;
-        
-        fameStages.forEach(stage => {
-            stage.badges.forEach(badge => {
-                if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) {
-                    if(newScore >= badge.req) { newNotifiedBadges.push(badge.id); } 
-                    else { badgesValueLost += absoluteBadgeIndex; }
-                }
-                absoluteBadgeIndex++;
-            });
-        });
-        appProg.notifiedBadges = newNotifiedBadges;
-
-        let newClaimedStages = []; let stagesValueLost = 0;
-        fameStages.forEach(stage => {
-            if(appProg.claimedStagesFame && appProg.claimedStagesFame.includes(stage.num)) {
-                if(newScore >= stage.end) { newClaimedStages.push(stage.num); } 
-                else { let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; stagesValueLost += (baseReward + bonusReward); }
-            }
-        });
-        appProg.claimedStagesFame = newClaimedStages;
-
-        let totalLostMoney = badgesValueLost + stagesValueLost;
-        appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; 
-        
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        document.getElementById('manual-points-val').value = '';
-        
-        let msg = `تم خصم ${pts} نقطة بنجاح كعقاب.`;
-        if (totalLostMoney > 0) {
-            msg += `\nنظراً لتراجع مستوى النقاط، تم سحب جوائز من البنك بقيمة ${totalLostMoney} جنيه.`;
-            logBankStatement("سحب عقابي بسبب تراجع المراحل", totalLostMoney, false);
-        }
-        alert(msg);
-        updateBankUI();
-        if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let currentScore = Math.floor(appProg.cumulativeScore || 0);
+        if(pts > currentScore) pts = currentScore; appProg.cumulativeScore -= pts; let newScore = appProg.cumulativeScore;
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; let newNotifiedBadges = []; let badgesValueLost = 0; let absoluteBadgeIndex = 1;
+        fameStages.forEach(stage => { stage.badges.forEach(badge => { if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) { if(newScore >= badge.req) { newNotifiedBadges.push(badge.id); } else { badgesValueLost += absoluteBadgeIndex; } } absoluteBadgeIndex++; }); });
+        appProg.notifiedBadges = newNotifiedBadges; let newClaimedStages = []; let stagesValueLost = 0;
+        fameStages.forEach(stage => { if(appProg.claimedStagesFame && appProg.claimedStagesFame.includes(stage.num)) { if(newScore >= stage.end) { newClaimedStages.push(stage.num); } else { let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; stagesValueLost += (baseReward + bonusReward); } } });
+        appProg.claimedStagesFame = newClaimedStages; let totalLostMoney = badgesValueLost + stagesValueLost; appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; 
+        localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('manual-points-val').value = '';
+        let msg = `تم خصم ${pts} نقطة بنجاح كعقاب.`; if (totalLostMoney > 0) { msg += `\nتم سحب جوائز من البنك بقيمة ${totalLostMoney} جنيه.`; logBankStatement("سحب عقابي لتراجع المراحل", totalLostMoney, false); }
+        alert(msg); updateBankUI(); if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
     }
 
     let wheelAngle = 0, isSpinning = false, reqAnim, chosenPrize = 0;
 
-    function getWheelSettings() {
-        let set = JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 };
-        return set;
-    }
+    function getWheelSettings() { return JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 }; }
 
     function updateBankUI() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
@@ -968,91 +880,37 @@
         document.getElementById('edit-spin-cost').value = getWheelSettings().spinCost;
     }
 
-    function updateExchangedPoints() {
-        let val = parseInt(document.getElementById('edit-exch-points').value);
-        if(isNaN(val) || val < 0) { alert("أدخل رقم صحيح"); return; }
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        appProg.exchangedPoints = val;
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        updateBankUI(); alert("تم تثبيت النقاط المستبدلة!");
-    }
-
-    function updateSpinCost() {
-        let val = parseInt(document.getElementById('edit-spin-cost').value);
-        if(isNaN(val) || val <= 0) { alert("أدخل رقم صحيح"); return; }
-        let set = getWheelSettings(); set.spinCost = val;
-        localStorage.setItem('wheelSettings', JSON.stringify(set));
-        updateBankUI(); alert("تم تحديث تكلفة لفة العجل!");
-    }
-
     function handleSpinClick() {
         let btn = document.getElementById('btn-spin');
-        if(isSpinning) {
-            stopWheel();
-            btn.innerText = 'ابدأ الدوران 🎡'; btn.classList.remove('stop-mode'); btn.disabled = true; 
-        } else {
-            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-            let total = Math.floor(appProg.cumulativeScore || 0);
-            let exch = appProg.exchangedPoints || 0;
-            let cost = getWheelSettings().spinCost;
-            if (total - exch < cost) { alert(`رصيد نقاطك لا يكفي! تحتاج للوصول إلى ${exch + cost} نقطة للمحاولة.`); return; }
-            appProg.exchangedPoints = exch + cost;
-            localStorage.setItem('appProgress', JSON.stringify(appProg));
-            updateBankUI();
-            
-            let array = new Uint32Array(1); window.crypto.getRandomValues(array);
-            let secureRandom = (array[0] / (0xFFFFFFFF + 1)); let rand = Math.floor(secureRandom * 100) + 1; 
+        if(isSpinning) { stopWheel(); btn.innerText = 'ابدأ الدوران 🎡'; btn.classList.remove('stop-mode'); btn.disabled = true; } else {
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let total = Math.floor(appProg.cumulativeScore || 0); let exch = appProg.exchangedPoints || 0; let cost = getWheelSettings().spinCost;
+            if (total - exch < cost) { alert(`رصيد نقاطك لا يكفي! تحتاج للوصول إلى ${exch + cost} نقطة.`); return; }
+            appProg.exchangedPoints = exch + cost; localStorage.setItem('appProgress', JSON.stringify(appProg)); updateBankUI();
+            let array = new Uint32Array(1); window.crypto.getRandomValues(array); let rand = Math.floor((array[0] / (0xFFFFFFFF + 1)) * 100) + 1; 
             if (rand <= 30) chosenPrize = 1; else if (rand <= 60) chosenPrize = 2; else if (rand <= 80) chosenPrize = 3; else if (rand <= 90) chosenPrize = 4; else chosenPrize = 5;
-
-            isSpinning = true; document.getElementById('wheel').style.transition = 'none';
-            animateSpin(); btn.innerText = 'توقف 🛑'; btn.classList.add('stop-mode');
+            isSpinning = true; document.getElementById('wheel').style.transition = 'none'; animateSpin(); btn.innerText = 'توقف 🛑'; btn.classList.add('stop-mode');
         }
     }
 
-    function animateSpin() {
-        if(isSpinning) { wheelAngle = (wheelAngle + 15) % 360; document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`; reqAnim = requestAnimationFrame(animateSpin); }
-    }
+    function animateSpin() { if(isSpinning) { wheelAngle = (wheelAngle + 15) % 360; document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`; reqAnim = requestAnimationFrame(animateSpin); } }
 
     function stopWheel() {
-        isSpinning = false; cancelAnimationFrame(reqAnim);
-        let prizeAngleMap = { 1: 324, 2: 252, 3: 180, 4: 108, 5: 36 };
-        let finalTarget = prizeAngleMap[chosenPrize] + (Math.floor(Math.random() * 60) - 30);
-        let finalAngle = wheelAngle + (3 * 360) + (finalTarget - (wheelAngle % 360));
-        if (finalTarget < (wheelAngle % 360)) finalAngle += 360;
-        let wheelEl = document.getElementById('wheel');
-        wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)'; wheelEl.style.transform = `rotate(${finalAngle}deg)`;
+        isSpinning = false; cancelAnimationFrame(reqAnim); let prizeAngleMap = { 1: 324, 2: 252, 3: 180, 4: 108, 5: 36 }; let finalTarget = prizeAngleMap[chosenPrize] + (Math.floor(Math.random() * 60) - 30);
+        let finalAngle = wheelAngle + (3 * 360) + (finalTarget - (wheelAngle % 360)); if (finalTarget < (wheelAngle % 360)) finalAngle += 360;
+        let wheelEl = document.getElementById('wheel'); wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)'; wheelEl.style.transform = `rotate(${finalAngle}deg)`;
         setTimeout(() => {
             wheelEl.style.transition = 'none'; wheelAngle = finalAngle % 360; wheelEl.style.transform = `rotate(${wheelAngle}deg)`;
-            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-            appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize;
-            localStorage.setItem('appProgress', JSON.stringify(appProg));
-            logBankStatement("جائزة عجلة الحظ", chosenPrize, true);
-            updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه. أضيفت لرصيدك!`);
-            document.getElementById('btn-spin').disabled = false;
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize; localStorage.setItem('appProgress', JSON.stringify(appProg));
+            logBankStatement("جائزة عجلة الحظ", chosenPrize, true); updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه.`); document.getElementById('btn-spin').disabled = false;
         }, 3500);
     }
 
     function withdrawBank() {
-        let amount = parseFloat(document.getElementById('withdraw-amount').value);
-        if(isNaN(amount) || amount === 0) { alert("أدخل مبلغاً صحيحاً!"); return; }
+        let amount = parseFloat(document.getElementById('withdraw-amount').value); if(isNaN(amount) || amount === 0) { alert("أدخل مبلغاً صحيحاً!"); return; }
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        
-        if(amount > 0) {
-            if(amount > (appProg.bankBalance || 0)) { alert("الرصيد لا يكفي للسحب!"); return; }
-            appProg.bankBalance -= amount;
-            logBankStatement("سحب مصروف من البنك", amount, false);
-            alert(`تم سحب ${amount} جنيه بنجاح.`);
-        } else {
-            // إيداع (الرقم سالب)
-            let deposit = Math.abs(amount);
-            appProg.bankBalance = (appProg.bankBalance || 0) + deposit;
-            logBankStatement("إيداع نقدي في البنك", deposit, true);
-            alert(`تم إيداع ${deposit} جنيه في رصيدك بنجاح.`);
-        }
-
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        document.getElementById('withdraw-amount').value = '';
-        updateBankUI(); 
+        if(amount > 0) { if(amount > (appProg.bankBalance || 0)) { alert("الرصيد لا يكفي للسحب!"); return; } appProg.bankBalance -= amount; logBankStatement("سحب مصروف", amount, false); alert(`تم سحب ${amount} جنيه بنجاح.`); } 
+        else { let deposit = Math.abs(amount); appProg.bankBalance = (appProg.bankBalance || 0) + deposit; logBankStatement("إيداع نقدي", deposit, true); alert(`تم إيداع ${deposit} جنيه بنجاح.`); }
+        localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('withdraw-amount').value = ''; updateBankUI(); 
     }
 </script>
 
