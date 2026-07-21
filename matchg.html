@@ -32,7 +32,7 @@
         #stages-screen { display: block; }
         .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
         
-        .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
+        .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: #3498db; color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
@@ -72,11 +72,11 @@
         .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
         .modal-btn:hover { opacity: 0.9; }
 
-        /* صندوق الحريف */
+        /* صندوق الحريف المطور */
         #chest-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; z-index:3000; flex-direction:column; }
-        .chest-box { font-size: 100px; cursor: pointer; animation: bounceChest 0.8s infinite alternate; filter: drop-shadow(0 0 20px rgba(241,196,15,0.8)); transition: transform 0.3s;}
-        @keyframes bounceChest { from { transform: translateY(0) scale(1); } to { transform: translateY(-30px) scale(1.1); } }
-        .chest-open { animation: none; transform: scale(1.5) !important; cursor: default;}
+        .chest-box { font-size: 100px; cursor: pointer; animation: bounceChest 0.4s infinite alternate ease-in; filter: drop-shadow(0 0 25px rgba(241,196,15,1)); transition: transform 0.3s;}
+        @keyframes bounceChest { from { transform: translateY(0) scale(1); } to { transform: translateY(-50px) scale(1.2); } }
+        .chest-open { animation: none; transform: scale(1.6) !important; cursor: default; filter: drop-shadow(0 0 40px rgba(28,200,138,1));}
         .hareef-flash { position:absolute; top:0; left:0; width:100%; height:100%; background:#fff; z-index:3001; opacity:0; pointer-events:none; }
         @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -221,6 +221,36 @@
     let totalErrors = 0;
     let starPenalty = 0;
 
+    // إعدادات الصوت
+    let audioCtx = null;
+    let bounceInterval = null;
+    function initAudio() {
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    function playSound(type) {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if(type === 'bounce') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'open') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.2);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            }
+        } catch(e) {}
+    }
+
     window.onload = function() {
         verifyParentModeStrict();
         applyGlobalModes();
@@ -358,18 +388,18 @@
         if (!savedData.expiry || now > savedData.expiry || savedData.totalStages !== globalStagesList.length) {
             let last10 = []; let random10 = [];
             if (globalStagesList.length > 0) {
-                last10 = globalStagesList.slice(-10).map(s => s.id);
+                last10 = globalStagesList.slice(-5).map(s => s.id); // 5 ملتهبة
                 let pool = globalStagesList.filter(s => !last10.includes(s.id));
                 let poolWithStars = pool.map(s => { let prog = (gameProgress[s.level] && gameProgress[s.level][s.localStage]) ? gameProgress[s.level][s.localStage].stars : 0; return { id: s.id, stars: prog }; });
                 poolWithStars.sort((a, b) => a.stars - b.stars);
                 let eligible = poolWithStars.filter(s => s.stars === 0);
-                if(eligible.length < 10) eligible = poolWithStars.filter(s => s.stars < 5);
+                if(eligible.length < 5) eligible = poolWithStars.filter(s => s.stars < 5);
                 
                 let selectedRandom = []; let currentStarLevel = 0;
-                while(selectedRandom.length < 10 && currentStarLevel <= 5 && eligible.length > 0) {
+                while(selectedRandom.length < 5 && currentStarLevel <= 5 && eligible.length > 0) { // 5 عشوائية
                     let tierStages = eligible.filter(s => s.stars === currentStarLevel);
                     tierStages.sort(() => Math.random() - 0.5);
-                    while(tierStages.length > 0 && selectedRandom.length < 10) { selectedRandom.push(tierStages.pop().id); }
+                    while(tierStages.length > 0 && selectedRandom.length < 5) { selectedRandom.push(tierStages.pop().id); }
                     currentStarLevel++;
                 }
                 random10 = selectedRandom;
@@ -438,9 +468,12 @@
         document.getElementById('current-stage-display').innerText = displayStr;
         
         consecutiveErrors = 0; totalErrors = 0; starPenalty = 0;
+
         let stageWords = [...activeStage.words];
+
         let cardsArray = [];
         stageWords.forEach(w => { cardsArray.push({text: w.en, id: w.id, type: 'en'}); cardsArray.push({text: w.ar, id: w.id, type: 'ar'}); });
+        
         cardsArray.sort(() => Math.random() - 0.5);
         renderBoard(cardsArray); startTimer();
     }
@@ -528,105 +561,68 @@
         gameProgress[activeStage.level] = levelData;
         localStorage.setItem('matchGameProgress', JSON.stringify(gameProgress));
 
-        // نظام الحريف (معالجة الفوز المتتالي بـ 5 نجوم)
+        // نظام الحريف
         let hareefSettings = JSON.parse(localStorage.getItem('hareefSettings')) || { name: "الحريف", mults: [3,4,5,6], maxStages: 4, minHours: 1, maxHours: 5, reqWins: 5, games: {matchg:true} };
         if(hareefSettings.games['matchg']) {
             if(stars === 5) {
-                let cons = parseInt(localStorage.getItem('consecutive5_matchg')) || 0;
-                cons++; localStorage.setItem('consecutive5_matchg', cons);
-                if(cons >= hareefSettings.reqWins) {
-                    localStorage.setItem('consecutive5_matchg', 0);
-                    triggerHareefChest(hareefSettings);
-                } else {
-                    showResultModal(stars, time, basePoints, bonusPoints, totalPoints);
-                }
-            } else {
-                localStorage.setItem('consecutive5_matchg', 0);
-                showResultModal(stars, time, basePoints, bonusPoints, totalPoints);
-            }
-        } else {
-            showResultModal(stars, time, basePoints, bonusPoints, totalPoints);
-        }
+                let cons = parseInt(localStorage.getItem('consecutive5_matchg')) || 0; cons++; localStorage.setItem('consecutive5_matchg', cons);
+                if(cons >= hareefSettings.reqWins) { localStorage.setItem('consecutive5_matchg', 0); triggerHareefChest(hareefSettings); } 
+                else { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
+            } else { localStorage.setItem('consecutive5_matchg', 0); showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
+        } else { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
 
-        // إزالة المرحلة من بطاقات الحريف إذا تم لعبها
         if(window.currentStageHareefMult > 1) {
             let hData = JSON.parse(localStorage.getItem('hareefActive_matchg'));
-            if(hData) {
-                hData.stages = hData.stages.filter(id => id !== activeStage.id);
-                if(hData.stages.length === 0) localStorage.removeItem('hareefActive_matchg');
-                else localStorage.setItem('hareefActive_matchg', JSON.stringify(hData));
-            }
+            if(hData) { hData.stages = hData.stages.filter(id => id !== activeStage.id); if(hData.stages.length === 0) localStorage.removeItem('hareefActive_matchg'); else localStorage.setItem('hareefActive_matchg', JSON.stringify(hData)); }
         }
     }
 
     function triggerHareefChest(hSet) {
         document.getElementById('flash-effect').style.animation = 'flashAnim 1s ease-out forwards';
         document.getElementById('chest-modal').style.display = 'flex';
-        document.getElementById('chest-icon').className = 'chest-box';
-        document.getElementById('chest-icon').innerText = '🧰';
-        document.getElementById('chest-details').style.display = 'none';
-        document.getElementById('chest-btn').style.display = 'none';
+        document.getElementById('chest-icon').className = 'chest-box'; document.getElementById('chest-icon').innerText = '🧰';
+        document.getElementById('chest-details').style.display = 'none'; document.getElementById('chest-btn').style.display = 'none';
         
+        playSound('bounce');
+        bounceInterval = setInterval(()=> playSound('bounce'), 450);
+
         setTimeout(() => { document.getElementById('flash-effect').style.animation = ''; }, 1000);
 
-        let validStages = globalStagesList.filter(s => {
-            let p = gameProgress[s.level]?.[s.localStage]?.stars || 0;
-            return p === 0 && !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id);
-        });
-        if(validStages.length < hSet.maxStages) {
-            let backup = globalStagesList.filter(s => !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id));
-            backup.sort((a,b) => (gameProgress[a.level]?.[a.localStage]?.stars || 0) - (gameProgress[b.level]?.[b.localStage]?.stars || 0));
-            validStages = backup;
-        }
-
-        validStages.sort(() => Math.random() - 0.5);
-        let numStages = Math.floor(Math.random() * hSet.maxStages) + 1;
-        let selected = validStages.slice(0, numStages).map(s => s.id);
-        let mult = hSet.mults[Math.floor(Math.random() * hSet.mults.length)];
+        let validStages = globalStagesList.filter(s => { let p = gameProgress[s.level]?.[s.localStage]?.stars || 0; return p === 0 && !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id); });
+        if(validStages.length < hSet.maxStages) { let backup = globalStagesList.filter(s => !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id)); backup.sort((a,b) => (gameProgress[a.level]?.[a.localStage]?.stars || 0) - (gameProgress[b.level]?.[b.localStage]?.stars || 0)); validStages = backup; }
+        
+        validStages.sort(() => Math.random() - 0.5); let numStages = Math.floor(Math.random() * hSet.maxStages) + 1;
+        let selected = validStages.slice(0, numStages).map(s => s.id); let mult = hSet.mults[Math.floor(Math.random() * hSet.mults.length)];
         let hours = Math.floor(Math.random() * (hSet.maxHours - hSet.minHours + 1)) + hSet.minHours;
 
         let activeData = { mult: mult, stages: selected, expiry: Date.now() + (hours * 3600000) };
         localStorage.setItem('hareefActive_matchg', JSON.stringify(activeData));
-
         window.tempHareefReward = { name: hSet.name, mult: mult, count: selected.length, hours: hours };
     }
 
     function openHareefChest() {
-        let icon = document.getElementById('chest-icon');
-        if(icon.classList.contains('chest-open')) return;
-        icon.className = 'chest-box chest-open'; icon.innerText = '💎';
-        let r = window.tempHareefReward;
+        let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
+        clearInterval(bounceInterval); playSound('open');
+        icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempHareefReward;
         document.getElementById('chest-details').innerHTML = `حصلت على بطاقة <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعات!</span>`;
-        document.getElementById('chest-details').style.display = 'block';
-        document.getElementById('chest-btn').style.display = 'inline-block';
+        document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
     }
 
-    function closeChestModal() {
-        document.getElementById('chest-modal').style.display = 'none';
-        showStagesScreen();
-    }
+    function closeChestModal() { clearInterval(bounceInterval); document.getElementById('chest-modal').style.display = 'none'; showStagesScreen(); }
 
     function showResultModal(stars, time, bBase, bBonus, bTotal) {
         document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
         document.getElementById('modal-time').innerText = time;
-        
-        document.getElementById('modal-points-base').innerText = bBase;
-        document.getElementById('modal-points-bonus').innerText = bBonus;
-        document.getElementById('modal-points-total').innerText = bTotal;
-
+        document.getElementById('modal-points-base').innerText = bBase; document.getElementById('modal-points-bonus').innerText = bBonus; document.getElementById('modal-points-total').innerText = bTotal;
         let msgElement = document.getElementById('modal-points-msg');
         if(bTotal > 0) { msgElement.innerText = `رائع! كسبت ${bTotal} نقطة إضافية للعلامة التراكمية! 🏆`; } 
         else { msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع وبأخطاء أقل لرفع نجومك! 💪`; }
-        
         document.getElementById('result-modal').style.display = 'flex';
     }
 
     function showStagesScreen() {
         clearInterval(timerInterval);
-        document.getElementById('result-modal').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'none';
-        document.getElementById('stages-screen').style.display = 'block';
-        renderStages();
+        document.getElementById('result-modal').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('stages-screen').style.display = 'block'; renderStages();
     }
 </script>
 

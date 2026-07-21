@@ -32,7 +32,7 @@
         #stages-screen { display: block; }
         .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
         
-        .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
+        .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: #3498db; color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
@@ -72,11 +72,11 @@
         .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
         .modal-btn:hover { opacity: 0.9; }
 
-        /* صندوق الحريف */
+        /* صندوق الحريف المطور */
         #chest-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; z-index:3000; flex-direction:column; }
-        .chest-box { font-size: 100px; cursor: pointer; animation: bounceChest 0.8s infinite alternate; filter: drop-shadow(0 0 20px rgba(241,196,15,0.8)); transition: transform 0.3s;}
-        @keyframes bounceChest { from { transform: translateY(0) scale(1); } to { transform: translateY(-30px) scale(1.1); } }
-        .chest-open { animation: none; transform: scale(1.5) !important; cursor: default;}
+        .chest-box { font-size: 100px; cursor: pointer; animation: bounceChest 0.4s infinite alternate ease-in; filter: drop-shadow(0 0 25px rgba(241,196,15,1)); transition: transform 0.3s;}
+        @keyframes bounceChest { from { transform: translateY(0) scale(1); } to { transform: translateY(-50px) scale(1.2); } }
+        .chest-open { animation: none; transform: scale(1.6) !important; cursor: default; filter: drop-shadow(0 0 40px rgba(28,200,138,1));}
         .hareef-flash { position:absolute; top:0; left:0; width:100%; height:100%; background:#fff; z-index:3001; opacity:0; pointer-events:none; }
         @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -235,6 +235,36 @@
     let currentBubbles = [];
     let isProcessingAnswer = false; 
 
+    // إعدادات الصوت
+    let audioCtx = null;
+    let bounceInterval = null;
+    function initAudio() {
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    function playSound(type) {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if(type === 'bounce') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'open') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.2);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            }
+        } catch(e) {}
+    }
+
     window.onload = function() {
         verifyParentModeStrict();
         applyGlobalModes();
@@ -250,17 +280,14 @@
 
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
-        let banner = document.getElementById('parent-mode-banner');
-        if(banner) banner.style.display = isParent ? 'block' : 'none';
+        document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
+        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
 
         let defaultEvent = { isActive: true, days: [5], multiplier: 2 };
         let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEvent;
         let today = new Date().getDay();
         if(eventData.isActive && eventData.days.includes(today)) window.currentEventMultiplier = eventData.multiplier;
         else window.currentEventMultiplier = 1;
-
-        document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
-        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
     }
 
     function handleGlobalBack() {
@@ -405,16 +432,16 @@
         if (!savedData.expiry || now > savedData.expiry || savedData.totalStages !== globalStagesList.length) {
             let last10 = []; let random10 = [];
             if (globalStagesList.length > 0) {
-                last10 = globalStagesList.slice(-10).map(s => s.id);
+                last10 = globalStagesList.slice(-5).map(s => s.id); // 5 ملتهبة
                 let pool = globalStagesList.filter(s => !last10.includes(s.id));
                 let poolWithStars = pool.map(s => { let prog = (gameProgress[s.level] && gameProgress[s.level][s.localStage]) ? gameProgress[s.level][s.localStage].stars : 0; return { id: s.id, stars: prog }; });
                 poolWithStars.sort((a, b) => a.stars - b.stars);
                 let eligible = poolWithStars.filter(s => s.stars === 0);
-                if(eligible.length < 10) eligible = poolWithStars.filter(s => s.stars < 5);
+                if(eligible.length < 5) eligible = poolWithStars.filter(s => s.stars < 5);
                 let selectedRandom = []; let currentStarLevel = 0;
-                while(selectedRandom.length < 10 && currentStarLevel <= 5 && eligible.length > 0) {
+                while(selectedRandom.length < 5 && currentStarLevel <= 5 && eligible.length > 0) { // 5 عشوائية
                     let tierStages = eligible.filter(s => s.stars === currentStarLevel); tierStages.sort(() => Math.random() - 0.5);
-                    while(tierStages.length > 0 && selectedRandom.length < 10) { selectedRandom.push(tierStages.pop().id); }
+                    while(tierStages.length > 0 && selectedRandom.length < 5) { selectedRandom.push(tierStages.pop().id); }
                     currentStarLevel++;
                 }
                 random10 = selectedRandom;
@@ -589,6 +616,10 @@
         document.getElementById('chest-modal').style.display = 'flex';
         document.getElementById('chest-icon').className = 'chest-box'; document.getElementById('chest-icon').innerText = '🧰';
         document.getElementById('chest-details').style.display = 'none'; document.getElementById('chest-btn').style.display = 'none';
+        
+        playSound('bounce');
+        bounceInterval = setInterval(()=> playSound('bounce'), 450);
+
         setTimeout(() => { document.getElementById('flash-effect').style.animation = ''; }, 1000);
 
         let validStages = globalStagesList.filter(s => { let p = gameProgress[s.level]?.[s.localStage]?.stars || 0; return p === 0 && !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id); });
@@ -605,12 +636,13 @@
 
     function openHareefChest() {
         let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
+        clearInterval(bounceInterval); playSound('open');
         icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempHareefReward;
         document.getElementById('chest-details').innerHTML = `حصلت على بطاقة <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعات!</span>`;
         document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
     }
 
-    function closeChestModal() { document.getElementById('chest-modal').style.display = 'none'; showStagesScreen(); }
+    function closeChestModal() { clearInterval(bounceInterval); document.getElementById('chest-modal').style.display = 'none'; showStagesScreen(); }
 
     function showResultModal(stars, time, bBase, bBonus, bTotal) {
         document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
