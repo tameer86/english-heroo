@@ -36,7 +36,12 @@
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
-        /* تخصيص مظهر البطاقات النشطة */
+        /* التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; }
+        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
+
         .hot-badge { font-size:11px; color:#fff; background:rgba(0,0,0,0.4); padding:2px 5px; border-radius:4px; margin-right: 5px; display: inline-block;}
 
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
@@ -80,8 +85,8 @@
 </head>
 <body>
 
-    <!-- ملف الصوت في الخلفية للعبة الذاكرة -->
-    <audio id="bg-music" src="music/1.mp3" loop autoplay></audio>
+    <!-- موسيقى الخلفية للعبة الذاكرة -->
+    <audio id="bg-music" src="1.mp3" loop autoplay></audio>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
     <div id="flash-effect" class="hareef-flash"></div>
@@ -93,6 +98,12 @@
         </div>
         <div class="left-header-group">
             <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
+            
+            <div class="volume-container" title="التحكم بموسيقى الخلفية">
+                <span id="bg-vol-icon" class="vol-icon">🔊</span>
+                <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.01">
+            </div>
+
             <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
             <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
         </div>
@@ -174,7 +185,7 @@
         </div>
     </div>
 
-    <!-- صندوق موحد للبطاقات (الحريف، النفس الطويل... الخ) -->
+    <!-- صندوق موحد للبطاقات الاحتفالية -->
     <div id="chest-modal">
         <h2 id="chest-modal-title" style="color:#fff; text-shadow:0 2px 4px #000; font-size:30px; margin-bottom:30px; text-align:center;">إنجاز أسطوري!</h2>
         <div id="chest-icon" class="chest-box" onclick="openDynamicChest()">🧰</div>
@@ -202,40 +213,81 @@
         return 'مستوى ' + code;
     }
 
-    // هندسة الأصوات النظامية
-    let audioCtx = null; let bounceInterval = null;
-    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
+    // هندسة الأصوات (النظام والموسيقى)
+    let sysAudioCtx = null; let bounceInterval = null;
+    function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
     
     function playSysSound(type) {
         try {
-            initAudio();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
+            initSysAudio();
+            const osc = sysAudioCtx.createOscillator(); const gain = sysAudioCtx.createGain();
+            osc.connect(gain); gain.connect(sysAudioCtx.destination);
             if(type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             } else if(type === 'error') {
-                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, sysAudioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.2);
             } else if(type === 'bounce') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(250, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             } else if (type === 'open') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.5);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, sysAudioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.6);
             }
         } catch(e){}
     }
 
     document.addEventListener('click', (e) => { if(e.target.tagName === 'BUTTON' || e.target.closest('.card') || e.target.closest('.icon-btn')) playSysSound('click'); });
+
+    function initVolumeControl() {
+        let volSlider = document.getElementById('bg-vol-slider');
+        let volIcon = document.getElementById('bg-vol-icon');
+        let savedVol = localStorage.getItem('bgMusicVolume');
+        if (savedVol === null) savedVol = 0.5; 
+        
+        if (volSlider) {
+            volSlider.value = savedVol;
+            volSlider.oninput = function() {
+                localStorage.setItem('bgMusicVolume', this.value);
+                localStorage.setItem('bgMusicMuted', 'false');
+                applyVolumeUI();
+            };
+        }
+        if (volIcon) {
+            volIcon.onclick = function() {
+                let muted = localStorage.getItem('bgMusicMuted') === 'true';
+                localStorage.setItem('bgMusicMuted', !muted);
+                applyVolumeUI();
+            };
+        }
+        applyVolumeUI();
+    }
+
+    function applyVolumeUI() {
+        let bgMusic = document.getElementById('bg-music');
+        let volSlider = document.getElementById('bg-vol-slider');
+        let volIcon = document.getElementById('bg-vol-icon');
+        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5);
+        let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+        
+        if(bgMusic) bgMusic.volume = isMuted ? 0 : vol;
+        
+        if (volSlider) volSlider.value = vol;
+        if (volIcon) {
+            if (isMuted || vol === 0) { volIcon.innerText = '🔇'; } 
+            else if (vol < 0.5) { volIcon.innerText = '🔉'; } 
+            else { volIcon.innerText = '🔊'; }
+        }
+    }
 
     // خصائص البطاقات الديناميكية
     let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
@@ -263,7 +315,7 @@
     window.onload = function() {
         verifyParentModeStrict(); applyGlobalModes();
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
-        initializeDropdown();
+        initializeDropdown(); initVolumeControl();
     };
 
     function verifyParentModeStrict() { let isParent = localStorage.getItem('isParentMode'); if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false'); }
@@ -354,48 +406,36 @@
         assignedCards = { last5: [], random5: [], friday: [], chests: {} };
         if(globalStagesList.length === 0) return;
 
-        // 1. Last 5
         let cL5 = cardsConfig.last5;
         if(cL5 && cL5.games.includes('matchg')) {
             let count = (cL5.count.type === 'fixed') ? cL5.count.val : 5;
             assignedCards.last5 = globalStagesList.slice(-count).map(s => s.id);
         }
 
-        // 2. Active Chests (Hareef & LongBreath)
         ['hareef', 'longBreath'].forEach(type => {
             let cData = JSON.parse(localStorage.getItem(`activeChest_${type}_matchg`));
             if(cData && cData.expiry > Date.now()) { assignedCards.chests[type] = cData; } 
             else { localStorage.removeItem(`activeChest_${type}_matchg`); }
         });
 
-        // 3. Random 5 (Daily)
         let cR5 = cardsConfig.random5;
         if(cR5 && cR5.games.includes('matchg')) {
-            let now = Date.now();
-            let savedR5 = JSON.parse(localStorage.getItem('dynRandom5_matchg')) || {};
+            let now = Date.now(); let savedR5 = JSON.parse(localStorage.getItem('dynRandom5_matchg')) || {};
             if(!savedR5.expiry || now > savedR5.expiry || savedR5.total !== globalStagesList.length) {
-                let exclude = [...assignedCards.last5];
-                for(let key in assignedCards.chests) exclude.push(...assignedCards.chests[key].stages);
-                let count = (cR5.count.type === 'fixed') ? cR5.count.val : 5;
-                let newR5 = pickStages(count, exclude);
-                savedR5 = { stages: newR5, expiry: now + (24*3600000), total: globalStagesList.length };
-                localStorage.setItem('dynRandom5_matchg', JSON.stringify(savedR5));
+                let exclude = [...assignedCards.last5]; for(let key in assignedCards.chests) exclude.push(...assignedCards.chests[key].stages);
+                let count = (cR5.count.type === 'fixed') ? cR5.count.val : 5; let newR5 = pickStages(count, exclude);
+                savedR5 = { stages: newR5, expiry: now + (24*3600000), total: globalStagesList.length }; localStorage.setItem('dynRandom5_matchg', JSON.stringify(savedR5));
             }
             assignedCards.random5 = savedR5.stages || [];
         }
 
-        // 4. Friday Event
         let cFri = cardsConfig.friday;
         if(cFri && cFri.games.includes('matchg') && cFri.trigger.days.includes(new Date().getDay())) {
-            let savedFri = JSON.parse(localStorage.getItem('dynFriday_matchg')) || {};
-            let todayStr = new Date().toDateString();
+            let savedFri = JSON.parse(localStorage.getItem('dynFriday_matchg')) || {}; let todayStr = new Date().toDateString();
             if(savedFri.date !== todayStr || savedFri.total !== globalStagesList.length) {
-                let exclude = [...assignedCards.last5, ...assignedCards.random5];
-                for(let key in assignedCards.chests) exclude.push(...assignedCards.chests[key].stages);
-                let count = (cFri.count.type === 'fixed') ? cFri.count.val : 5;
-                let newFri = pickStages(count, exclude);
-                savedFri = { stages: newFri, date: todayStr, total: globalStagesList.length };
-                localStorage.setItem('dynFriday_matchg', JSON.stringify(savedFri));
+                let exclude = [...assignedCards.last5, ...assignedCards.random5]; for(let key in assignedCards.chests) exclude.push(...assignedCards.chests[key].stages);
+                let count = (cFri.count.type === 'fixed') ? cFri.count.val : 5; let newFri = pickStages(count, exclude);
+                savedFri = { stages: newFri, date: todayStr, total: globalStagesList.length }; localStorage.setItem('dynFriday_matchg', JSON.stringify(savedFri));
             }
             assignedCards.friday = savedFri.stages || [];
         }
@@ -510,25 +550,15 @@
         clearInterval(timerInterval); timerInterval = setInterval(() => { secondsElapsed++; document.getElementById('timer-display').innerText = secondsElapsed; updateLiveStars(secondsElapsed); }, 1000);
     }
 
-    function getRandomStep(min, max, step) {
-        let steps = Math.floor((max - min) / step);
-        let randStep = Math.floor(Math.random() * (steps + 1));
-        return min + (randStep * step);
-    }
+    function getRandomStep(min, max, step) { let steps = Math.floor((max - min) / step); let randStep = Math.floor(Math.random() * (steps + 1)); return min + (randStep * step); }
 
     function handleLongBreathHistory() {
         let lbConfig = cardsConfig.longBreath;
         if(lbConfig && lbConfig.games.includes('matchg')) {
-            let history = JSON.parse(localStorage.getItem('longBreathHistory_matchg')) || [];
-            history.push(Date.now());
-            let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000);
-            history = history.filter(t => t >= cutoff);
+            let history = JSON.parse(localStorage.getItem('longBreathHistory_matchg')) || []; history.push(Date.now());
+            let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); history = history.filter(t => t >= cutoff);
             localStorage.setItem('longBreathHistory_matchg', JSON.stringify(history));
-            if(history.length >= lbConfig.trigger.reqGames) {
-                localStorage.setItem('longBreathHistory_matchg', '[]');
-                triggerDynamicChest('longBreath', lbConfig);
-                return true;
-            }
+            if(history.length >= lbConfig.trigger.reqGames) { localStorage.setItem('longBreathHistory_matchg', '[]'); triggerDynamicChest('longBreath', lbConfig); return true; }
         }
         return false;
     }
@@ -540,7 +570,7 @@
 
         let exclude = [...assignedCards.last5, ...assignedCards.random5, ...assignedCards.friday];
         let selected = pickStages(count, exclude);
-        if(selected.length === 0) selected = globalStagesList.slice(0, count).map(s=>s.id); // fallback
+        if(selected.length === 0) selected = globalStagesList.slice(0, count).map(s=>s.id); 
 
         let activeData = { mult: mult, stages: selected, expiry: Date.now() + (dur * 3600000) };
         localStorage.setItem(`activeChest_${type}_matchg`, JSON.stringify(activeData));
@@ -558,8 +588,9 @@
 
     function openDynamicChest() {
         let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
-        clearInterval(bounceInterval); playSound('open');
+        clearInterval(bounceInterval); playSysSound('open');
         icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempChestReward;
+        if(!r) return;
         document.getElementById('chest-details').innerHTML = `حصلت على <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعة!</span>`;
         document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
     }

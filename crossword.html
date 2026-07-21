@@ -35,7 +35,12 @@
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
-        /* تنسيقات البطاقات */
+        /* التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; }
+        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
+
         .hot-badge { font-size:11px; color:#fff; background:rgba(0,0,0,0.4); padding:2px 5px; border-radius:4px; margin-right: 5px; display: inline-block;}
 
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
@@ -56,7 +61,6 @@
         
         .cw-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 1100px; margin: 0 auto;}
         
-        /* التلميح الذكي العائم */
         .sticky-hint { position: sticky; top: 10px; z-index: 1000; background: #fff; padding: 12px 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border-right: 6px solid var(--warning); border-left: 6px solid var(--warning); font-size: clamp(16px, 4vw, 22px); font-weight: bold; color: var(--dark); margin: 0 auto 20px auto; max-width: 90%; display: none; transition: all 0.3s ease; text-align: center; }
 
         .cw-board-container { background: #fff; padding: 10px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow-x: auto; width: 100%; display: flex; justify-content: center; box-sizing: border-box; direction: ltr;}
@@ -93,8 +97,8 @@
 </head>
 <body>
 
-    <!-- ملف الصوت في الخلفية للعبة الكلمات المتقاطعة -->
-    <audio id="bg-music" src="music/5.mp3" loop autoplay></audio>
+    <!-- موسيقى الخلفية للعبة الكلمات المتقاطعة -->
+    <audio id="bg-music" src="5.mp3" loop autoplay></audio>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
     <div id="flash-effect" class="hareef-flash"></div>
@@ -106,6 +110,12 @@
         </div>
         <div class="left-header-group">
             <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
+            
+            <div class="volume-container" title="التحكم بموسيقى الخلفية">
+                <span id="bg-vol-icon" class="vol-icon">🔊</span>
+                <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.01">
+            </div>
+
             <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
             <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
         </div>
@@ -222,46 +232,62 @@
         return 'مستوى ' + code;
     }
 
-    // هندسة الأصوات النظامية
-    let audioCtx = null; let bounceInterval = null;
-    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
+    // هندسة الأصوات النظامية والموسيقى
+    let sysAudioCtx = null; let bounceInterval = null;
+    function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
     
     function playSysSound(type) {
         try {
-            initAudio();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
+            initSysAudio();
+            const osc = sysAudioCtx.createOscillator(); const gain = sysAudioCtx.createGain();
+            osc.connect(gain); gain.connect(sysAudioCtx.destination);
             if(type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             } else if(type === 'bounce') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(250, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             } else if (type === 'open') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.5);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, sysAudioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.6);
             }
         } catch(e){}
     }
     document.addEventListener('click', (e) => { if(e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn')) playSysSound('click'); });
 
-    // خصائص البطاقات الديناميكية
-    let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
-    if(!cardsConfig) {
-        cardsConfig = {
-            last5: { id: 'last5', name: "آخر 5 مراحل", color: "#e74a3b", mult: {type:"fixed", val:1.5}, count: {type:"fixed", val:5}, games: ['crossword'] },
-            random5: { id: 'random5', name: "بطاقة ملتهبة عشوائية", color: "#f6c23e", mult: {type:"fixed", val:1.5}, count: {type:"fixed", val:5}, games: ['crossword'] },
-            friday: { id: 'friday', name: "حدث يوم الجمعة", color: "#1cc88a", mult: {type:"fixed", val:2}, count: {type:"fixed", val:5}, trigger: {days: [5]}, games: ['crossword'] },
-            hareef: { id: 'hareef', name: "الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, trigger: {reqWins:5}, games: ['crossword'] },
-            longBreath: { id: 'longBreath', name: "النفس الطويل", color: "#3498db", mult: {type:"range", min:2, max:6}, dur: {type:"range", min:1, max:6}, count: {type:"range", min:1, max:5}, trigger: {reqGames:30, reqHours:1}, games: ['crossword'] }
-        };
+    function initVolumeControl() {
+        let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
+        let savedVol = localStorage.getItem('bgMusicVolume'); if (savedVol === null) savedVol = 0.5; 
+        if (volSlider) { volSlider.value = savedVol; volSlider.oninput = function() { localStorage.setItem('bgMusicVolume', this.value); localStorage.setItem('bgMusicMuted', 'false'); applyVolumeUI(); }; }
+        if (volIcon) { volIcon.onclick = function() { let muted = localStorage.getItem('bgMusicMuted') === 'true'; localStorage.setItem('bgMusicMuted', !muted); applyVolumeUI(); }; }
+        applyVolumeUI();
     }
+
+    function applyVolumeUI() {
+        let bgMusic = document.getElementById('bg-music'); let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
+        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5); let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+        if(bgMusic) bgMusic.volume = isMuted ? 0 : vol;
+        if (volSlider) volSlider.value = vol;
+        if (volIcon) { if (isMuted || vol === 0) volIcon.innerText = '🔇'; else if (vol < 0.5) volIcon.innerText = '🔉'; else volIcon.innerText = '🔊'; }
+    }
+
+    // المحرك الديناميكي
+    const DEFAULT_CARDS_CONFIG = {
+        last5: { id: 'last5', name: "آخر 5 مراحل", color: "#e74a3b", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:0}, count: {type:"fixed", val:5}, games: ['crossword'], trigger: {type:'fixed'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "نقاط مضاعفة لأحدث 5 مراحل تم إضافتها لتشجيع الطفل." },
+        random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['crossword'], trigger: {type:'random'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "مراحل عشوائية يومية بنقاط مضاعفة." },
+        friday: { id: 'friday', name: "الحدث الدوري", color: "#1cc88a", mult: {type:"fixed", val:2}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['crossword'], trigger: {type:'periodic', days: [5]}, canEditTrigger: true, receive: "تلقائي بدون احتفال", timers: 2, desc: "حدث يتفعل في أيام محددة ليضاعف النقاط." },
+        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, games: ['crossword'], trigger: {type:'consecutive', reqWins:5}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "مكافأة تُمنح عند الفوز بعدد معين من المرات المتتالية في نفس اللعبة بـ 5 نجوم. (المراحل المختومة مسبقاً بـ 5 نجوم لا تحسب ضمن السلسلة ولا تكسرها)." },
+        longBreath: { id: 'longBreath', name: "بطاقة النفس الطويل", color: "#3498db", mult: {type:"range", min:2, max:6}, dur: {type:"range", min:1, max:6}, count: {type:"range", min:1, max:5}, games: ['crossword'], trigger: {type:'speedrun', reqGames:30, reqHours:1}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "جائزة إضافية للطفل الذي ينهي ألعاباً كثيرة في وقت قصير." }
+    };
+
+    let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
+    if(!cardsConfig) { cardsConfig = DEFAULT_CARDS_CONFIG; localStorage.setItem('gameCardsConfig', JSON.stringify(cardsConfig)); }
 
     let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
     let gameProgress = JSON.parse(localStorage.getItem('crosswordGameProgress')) || {};
@@ -269,7 +295,6 @@
     
     let currentLevel = ""; let globalStagesList = []; const WORDS_PER_STAGE = 10;
     let activeStage = null; let timerInterval; let secondsElapsed = 0;
-    
     let cwGridData = {}; let placedWordsInfo = []; 
     window.currentStageTotalLetters = 0; window.typingDirection = null; 
 
@@ -278,34 +303,34 @@
     window.onload = function() {
         verifyParentModeStrict(); applyGlobalModes();
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
-        initializeDropdown();
+        initializeDropdown(); initVolumeControl();
     };
 
     function verifyParentModeStrict() { let isParent = localStorage.getItem('isParentMode'); if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false'); }
-
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         let banner = document.getElementById('parent-mode-banner'); if(banner) banner.style.display = isParent ? 'block' : 'none';
         document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
-        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
+        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? 'inline-block' : 'none');
     }
-
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal'); const gameScreen = document.getElementById('game-screen');
         if(modal.style.display === 'flex') { modal.style.display = 'none'; } else if (gameScreen.style.display === 'block') { showStagesScreen(); } else { window.location.href = 'game.html'; }
+    }
+    function toggleModal(id) {
+        const modal = document.getElementById(id);
+        if(modal.style.display === 'flex') { modal.style.display = 'none'; } else { modal.style.display = 'flex'; }
     }
 
     function initializeDropdown() {
         const selectElement = document.getElementById('level-select'); selectElement.innerHTML = ''; let hasCompletedLevels = false;
         let optionAll = document.createElement('option'); optionAll.value = "ALL"; optionAll.textContent = "جميع المستويات"; selectElement.appendChild(optionAll);
         let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
-
         availableLevelsList.forEach(lvl => {
             if (appProgress.levels[lvl].savedWords && appProgress.levels[lvl].savedWords.length > 0) {
                 let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl); selectElement.appendChild(option); hasCompletedLevels = true;
             }
         });
-        
         if (!hasCompletedLevels) {
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
             document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">عذراً، يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل لتتمكن من اللعب.</p>'; selectElement.disabled = true; return;
@@ -348,8 +373,7 @@
     }
 
     function loadGameData() {
-        globalStagesList = [];
-        let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); }); let absoluteId = 1;
+        globalStagesList = []; let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); }); let absoluteId = 1;
         availableLevelsList.forEach(lvl => {
             let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0; let levelWords = (allLevelsData[lvl] || []).slice(0, savedCount); if(levelWords.length === 0) return;
             let tStages = Math.ceil(levelWords.length / WORDS_PER_STAGE);
@@ -652,8 +676,9 @@
 
     function openDynamicChest() {
         let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
-        clearInterval(bounceInterval); playSound('open');
+        clearInterval(bounceInterval); playSysSound('open');
         icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempChestReward;
+        if(!r) return;
         document.getElementById('chest-details').innerHTML = `حصلت على <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعة!</span>`;
         document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
     }
@@ -671,7 +696,6 @@
         if(stars > previousStars) {
             basePoints = (stars - previousStars) * starPrice;
             
-            // حساب المضاعف الديناميكي
             let finalMultiplier = 1;
             if(window.currentActiveCard) {
                 let c = window.currentActiveCard.config;
@@ -709,7 +733,7 @@
         let cHareef = cardsConfig.hareef;
         if(cHareef && cHareef.games.includes('crossword')) {
             if(previousStars === 5) {
-                // التجاهل الكامل (لا تكسر السلسلة ولا تزيدها)
+                // التجاهل الكامل للمرحلة المختومة مسبقاً
             } else {
                 if(stars === 5) {
                     let cons = parseInt(localStorage.getItem('consecutive5_crossword')) || 0; cons++; localStorage.setItem('consecutive5_crossword', cons);

@@ -36,6 +36,12 @@
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
+        /* التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; }
+        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
+
         .hot-badge { font-size:11px; color:#fff; background:rgba(0,0,0,0.4); padding:2px 5px; border-radius:4px; margin-right: 5px; display: inline-block;}
         
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
@@ -75,6 +81,7 @@
         .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
         .modal-btn:hover { opacity: 0.9; }
 
+        /* صندوق الحريف المطور */
         #chest-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; z-index:3000; flex-direction:column; }
         .chest-box { font-size: 100px; cursor: pointer; animation: bounceChest 0.4s infinite alternate ease-in; filter: drop-shadow(0 0 25px rgba(241,196,15,1)); transition: transform 0.3s;}
         @keyframes bounceChest { from { transform: translateY(0) scale(1); } to { transform: translateY(-50px) scale(1.2); } }
@@ -83,14 +90,83 @@
         @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
 
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
+
+        .report-selectors { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
+        .report-selectors select { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; min-width: 150px;}
+        .report-block { margin-bottom: 15px; padding: 12px; background: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+        .report-block h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 16px; border-bottom: 2px dashed #eee; padding-bottom: 5px;}
+        .stat-item { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--dark); font-weight: bold; font-size: 15px;}
+        .stat-val { color: var(--danger); font-size: 16px;}
+        .stat-val.good { color: var(--success); }
+
+        /* البطاقات السحرية */
+        .magic-card-item { display:flex; flex-direction:column; border-radius:10px; padding:15px; margin-bottom:15px; text-align:right; box-shadow:0 4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3); position: relative; }
+        .magic-card-item * { color: #fff !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .mc-title { font-size: 18px; font-weight: bold; margin:0 0 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.4); padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center;}
+        .mc-desc { font-size: 14px; margin:0 0 10px 0; line-height: 1.4;}
+        .mc-timer { font-size: 15px; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 5px; display: inline-block; }
+        .btn-help-icon { background: rgba(255,255,255,0.2); border: 1px solid #fff; border-radius: 50%; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;}
+        .btn-help-icon:hover { background: #fff; color: #333 !important; text-shadow: none; }
+
+        /* محرر البطاقات الديناميكي */
+        .event-editor-row { display: flex; flex-direction: column; text-align: right; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .event-editor-row h4 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 5px; cursor: pointer; display: flex; justify-content: space-between;}
+        .event-details { display: none; margin-top: 15px; }
+        .prop-group { margin-bottom: 12px; }
+        .prop-group label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 14px; color: var(--dark);}
+        .prop-group input[type="text"], .prop-group input[type="number"], .prop-group input[type="color"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .radio-inline { display: flex; gap: 15px; margin-bottom: 5px; }
+        .range-inputs { display: flex; gap: 10px; }
+        .range-inputs input { width: 50%; }
+        .games-checkboxes label { display: inline-block; margin-left: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 20px; font-size: 13px; color: #333;}
     </style>
 </head>
 <body>
 
-    <!-- ملف الصوت في الخلفية للعبة ترتيب الحروف -->
-    <audio id="bg-music" src="music/4.mp3" loop autoplay></audio>
+    <!-- موسيقى الخلفية -->
+    <audio id="bg-music" src="4.mp3" loop autoplay></audio>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
+
+    <div class="top-icons">
+        <button class="btn-top-action" onclick="window.location.href='index.html?screen=dashboard'" title="العودة للوحة التحكم">🔙</button>
+        <button class="btn-top-action" onclick="toggleModal('admin-modal')" title="إعدادات الألعاب لولي الأمر">⚙️</button>
+        <button class="btn-top-action" onclick="toggleEventsAdminModal()" title="إعدادات الأحداث والبطاقات">📅</button>
+        <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
+        <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
+        <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
+        <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
+        <button class="btn-top-action" onclick="openMagicCardsModal()" title="البطاقات السحرية والأحداث">🃏</button>
+    </div>
+
+    <!-- نافذة الشرح التفصيلي للبطاقات -->
+    <div id="info-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('info-modal')">✖</button>
+            <h3 id="info-title" style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;"></h3>
+            <div id="info-body" style="text-align: right; max-height: 60vh; overflow-y: auto; padding: 10px; line-height: 1.6; font-size: 16px; color: var(--dark);"></div>
+        </div>
+    </div>
+
+    <!-- البطاقات السحرية للمستخدم -->
+    <div id="magic-cards-modal" class="custom-modal">
+        <div class="modal-content-box" style="background:#f0f2f5;">
+            <button class="btn-close-modal" onclick="toggleModal('magic-cards-modal')">✖</button>
+            <h3 style="color: var(--purple); margin-top:0; border-bottom: 2px solid #ddd; padding-bottom: 10px;">🃏 البطاقات السحرية النشطة</h3>
+            <div id="magic-cards-container" style="max-height: 65vh; overflow-y: auto; padding: 5px;"></div>
+        </div>
+    </div>
+
+    <!-- محرر البطاقات لولي الأمر -->
+    <div id="events-admin-modal" class="custom-modal">
+        <div class="modal-content-box" style="background:#f8f9fc; text-align: right;">
+            <button class="btn-close-modal" onclick="toggleModal('events-admin-modal')">✖</button>
+            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📅 محرك الأحداث والبطاقات الديناميكي</h3>
+            <div id="dynamic-cards-editor" class="parent-only-inputs" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
+            <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top: 15px;" onclick="saveDynamicCardsConfig()">💾 حفظ جميع الخصائص والآليات</button>
+        </div>
+    </div>
+
     <div id="flash-effect" class="hareef-flash"></div>
 
     <div class="header-stats">
@@ -100,8 +176,11 @@
         </div>
         <div class="left-header-group">
             <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
+            <div class="volume-container" title="التحكم بموسيقى الخلفية">
+                <span id="bg-vol-icon" class="vol-icon">🔊</span>
+                <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.01">
+            </div>
             <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
-            <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
         </div>
     </div>
 
@@ -215,51 +294,67 @@
         return 'مستوى ' + code;
     }
 
-    // هندسة الأصوات النظامية
-    let audioCtx = null; let bounceInterval = null;
-    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
+    // هندسة الأصوات النظامية والموسيقى
+    let sysAudioCtx = null; let bounceInterval = null;
+    function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
     
     function playSysSound(type) {
         try {
-            initAudio();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
+            initSysAudio();
+            const osc = sysAudioCtx.createOscillator(); const gain = sysAudioCtx.createGain();
+            osc.connect(gain); gain.connect(sysAudioCtx.destination);
             if(type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             } else if(type === 'error') {
-                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, sysAudioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.2);
             } else if(type === 'bounce') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(250, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             } else if (type === 'open') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.5);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, sysAudioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.6);
             }
         } catch(e){}
     }
     document.addEventListener('click', (e) => { if(e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn')) playSysSound('click'); });
 
-    // خصائص البطاقات الديناميكية
-    let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
-    if(!cardsConfig) {
-        cardsConfig = {
-            last5: { id: 'last5', name: "آخر 5 مراحل", color: "#e74a3b", mult: {type:"fixed", val:1.5}, count: {type:"fixed", val:5}, games: ['arrange'] },
-            random5: { id: 'random5', name: "بطاقة ملتهبة عشوائية", color: "#f6c23e", mult: {type:"fixed", val:1.5}, count: {type:"fixed", val:5}, games: ['arrange'] },
-            friday: { id: 'friday', name: "حدث يوم الجمعة", color: "#1cc88a", mult: {type:"fixed", val:2}, count: {type:"fixed", val:5}, trigger: {days: [5]}, games: ['arrange'] },
-            hareef: { id: 'hareef', name: "الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, trigger: {reqWins:5}, games: ['arrange'] },
-            longBreath: { id: 'longBreath', name: "النفس الطويل", color: "#3498db", mult: {type:"range", min:2, max:6}, dur: {type:"range", min:1, max:6}, count: {type:"range", min:1, max:5}, trigger: {reqGames:30, reqHours:1}, games: ['arrange'] }
-        };
+    function initVolumeControl() {
+        let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
+        let savedVol = localStorage.getItem('bgMusicVolume'); if (savedVol === null) savedVol = 0.5; 
+        if (volSlider) { volSlider.value = savedVol; volSlider.oninput = function() { localStorage.setItem('bgMusicVolume', this.value); localStorage.setItem('bgMusicMuted', 'false'); applyVolumeUI(); }; }
+        if (volIcon) { volIcon.onclick = function() { let muted = localStorage.getItem('bgMusicMuted') === 'true'; localStorage.setItem('bgMusicMuted', !muted); applyVolumeUI(); }; }
+        applyVolumeUI();
     }
+
+    function applyVolumeUI() {
+        let bgMusic = document.getElementById('bg-music'); let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
+        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5); let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+        if(bgMusic) bgMusic.volume = isMuted ? 0 : vol;
+        if (volSlider) volSlider.value = vol;
+        if (volIcon) { if (isMuted || vol === 0) volIcon.innerText = '🔇'; else if (vol < 0.5) volIcon.innerText = '🔉'; else volIcon.innerText = '🔊'; }
+    }
+
+    // المحرك الديناميكي
+    const DEFAULT_CARDS_CONFIG = {
+        last5: { id: 'last5', name: "آخر 5 مراحل", color: "#e74a3b", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:0}, count: {type:"fixed", val:5}, games: ['scramble','arrange'], trigger: {type:'fixed'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "نقاط مضاعفة لأحدث 5 مراحل تم إضافتها لتشجيع الطفل." },
+        random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: {type:"fixed", val:1.5}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['scramble','arrange'], trigger: {type:'random'}, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "مراحل عشوائية يومية بنقاط مضاعفة." },
+        friday: { id: 'friday', name: "الحدث الدوري", color: "#1cc88a", mult: {type:"fixed", val:2}, dur: {type:"fixed", val:24}, count: {type:"fixed", val:5}, games: ['scramble','arrange'], trigger: {type:'periodic', days: [5]}, canEditTrigger: true, receive: "تلقائي بدون احتفال", timers: 2, desc: "حدث يتفعل في أيام محددة ليضاعف النقاط." },
+        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: {type:"range", min:3, max:6}, dur: {type:"range", min:1, max:5}, count: {type:"range", min:1, max:4}, games: ['scramble','arrange'], trigger: {type:'consecutive', reqWins:5}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "مكافأة تُمنح عند الفوز بعدد معين من المرات المتتالية في نفس اللعبة بـ 5 نجوم. (المراحل المختومة مسبقاً بـ 5 نجوم لا تحسب ضمن السلسلة ولا تكسرها)." },
+        longBreath: { id: 'longBreath', name: "بطاقة النفس الطويل", color: "#3498db", mult: {type:"range", min:2, max:6}, dur: {type:"range", min:1, max:6}, count: {type:"range", min:1, max:5}, games: ['scramble','arrange'], trigger: {type:'speedrun', reqGames:30, reqHours:1}, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "جائزة إضافية للطفل الذي ينهي ألعاباً كثيرة في وقت قصير." }
+    };
+
+    let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
+    if(!cardsConfig) { cardsConfig = DEFAULT_CARDS_CONFIG; localStorage.setItem('gameCardsConfig', JSON.stringify(cardsConfig)); }
 
     let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
     let gameProgress = JSON.parse(localStorage.getItem('scrambleGameProgress')) || {};
@@ -271,39 +366,200 @@
     let currentBlanks = []; let activeBlankIndex = 0; 
     let consecutiveErrors = 0; let totalErrors = 0; let starPenalty = 0; window.currentStageTotalLetters = 0; 
 
-    let assignedCards = { last5: [], random5: [], friday: [], chests: {} };
+    let assignedCards = { last5: [], random5: [], friday: [], chests: {} }; let magicCardEventInterval = null;
 
     window.onload = function() {
         verifyParentModeStrict(); applyGlobalModes();
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
-        initializeDropdown();
+        initializeDropdown(); initVolumeControl();
     };
 
     function verifyParentModeStrict() { let isParent = localStorage.getItem('isParentMode'); if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false'); }
-
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         let banner = document.getElementById('parent-mode-banner'); if(banner) banner.style.display = isParent ? 'block' : 'none';
         document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
-        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
+        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? 'inline-block' : 'none');
     }
-
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal'); const gameScreen = document.getElementById('game-screen');
         if(modal.style.display === 'flex') { modal.style.display = 'none'; } else if (gameScreen.style.display === 'block') { showStagesScreen(); } else { window.location.href = 'game.html'; }
+    }
+    function toggleModal(id) {
+        const modal = document.getElementById(id);
+        if(modal.style.display === 'flex') { if(id === 'magic-cards-modal') clearInterval(magicCardEventInterval); modal.style.display = 'none'; } 
+        else { modal.style.display = 'flex'; }
+    }
+
+    // --- المحرك الديناميكي للبطاقات ---
+    function toggleEventsAdminModal() { renderDynamicCardsEditor(); toggleModal('events-admin-modal'); }
+    function renderDynamicCardsEditor() {
+        let container = document.getElementById('dynamic-cards-editor'); container.innerHTML = '';
+        for(let key in cardsConfig) {
+            let c = cardsConfig[key];
+            let html = `<div class="event-editor-row"><h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'">📝 ${c.name} (انقر للتعديل)</h4>
+                <div class="event-details">
+                    <div class="prop-group"><label>اسم البطاقة:</label><input type="text" id="cfg_${key}_name" value="${c.name}"></div>
+                    <div class="prop-group"><label>لون البطاقة:</label><input type="color" id="cfg_${key}_color" value="${c.color}"></div>
+                    <div class="prop-group"><label>المضاعف:</label>
+                        <div class="radio-inline"><label><input type="radio" name="r_mult_${key}" value="fixed" ${c.mult.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'mult', '${key}')"> ثابت</label> <label><input type="radio" name="r_mult_${key}" value="range" ${c.mult.type==='range'?'checked':''} onchange="toggleInputs(this, 'mult', '${key}')"> عشوائي</label></div>
+                        <input type="number" step="0.5" id="cfg_${key}_mult_val" value="${c.mult.val}" style="display:${c.mult.type==='fixed'?'block':'none'};">
+                        <div class="range-inputs" id="cfg_${key}_mult_range" style="display:${c.mult.type==='range'?'flex':'none'};"><input type="number" step="0.5" id="cfg_${key}_mult_min" value="${c.mult.min}"><input type="number" step="0.5" id="cfg_${key}_mult_max" value="${c.mult.max}"></div>
+                    </div>
+                    <div class="prop-group"><label>مدة الحدث (ساعات):</label>
+                        <div class="radio-inline"><label><input type="radio" name="r_dur_${key}" value="fixed" ${c.dur.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> ثابت</label> <label><input type="radio" name="r_dur_${key}" value="range" ${c.dur.type==='range'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> عشوائي</label></div>
+                        <input type="number" step="0.5" id="cfg_${key}_dur_val" value="${c.dur.val}" style="display:${c.dur.type==='fixed'?'block':'none'};">
+                        <div class="range-inputs" id="cfg_${key}_dur_range" style="display:${c.dur.type==='range'?'flex':'none'};"><input type="number" step="0.5" id="cfg_${key}_dur_min" value="${c.dur.min}"><input type="number" step="0.5" id="cfg_${key}_dur_max" value="${c.dur.max}"></div>
+                    </div>
+                    <div class="prop-group"><label>عدد المراحل:</label>
+                        <div class="radio-inline"><label><input type="radio" name="r_cnt_${key}" value="fixed" ${c.count.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'count', '${key}')"> ثابت</label> <label><input type="radio" name="r_cnt_${key}" value="range" ${c.count.type==='range'?'checked':''} onchange="toggleInputs(this, 'count', '${key}')"> عشوائي</label></div>
+                        <input type="number" step="1" id="cfg_${key}_cnt_val" value="${c.count.val}" style="display:${c.count.type==='fixed'?'block':'none'};">
+                        <div class="range-inputs" id="cfg_${key}_cnt_range" style="display:${c.count.type==='range'?'flex':'none'};"><input type="number" step="1" id="cfg_${key}_cnt_min" value="${c.count.min}"><input type="number" step="1" id="cfg_${key}_cnt_max" value="${c.count.max}"></div>
+                    </div>
+                    <div class="prop-group"><label>الألعاب المشمولة:</label>
+                        <div class="games-checkboxes">
+                            <label><input type="checkbox" onchange="document.querySelectorAll('.chk_games_${key}').forEach(el=>el.checked=this.checked)"> الكل</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="matchg" ${c.games.includes('matchg')?'checked':''}> المطابقة</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="listen" ${c.games.includes('listen')?'checked':''}> الأمثلة</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="missing" ${c.games.includes('missing')?'checked':''}> الناقصة</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="arrange" ${c.games.includes('arrange')||c.games.includes('scramble')?'checked':''}> الترتيب</label>
+                            <label><input type="checkbox" class="chk_games_${key}" value="crossword" ${c.games.includes('crossword')?'checked':''}> المتقاطعة</label>
+                        </div>
+                    </div>`;
+            if(c.canEditTrigger) {
+                html += `<div style="border-top:2px dashed #ccc; padding-top:10px; margin-top:10px;"><h5 style="color:var(--danger); margin-top:0;">إعدادات الآلية (الشرط)</h5>`;
+                if(c.trigger.type === 'periodic') { html += `<div class="prop-group"><label>أيام الحدث (الأحد=0.. الجمعة=5):</label><input type="text" id="cfg_${key}_trig_days" value="${c.trigger.days.join(',')}"></div>`; }
+                else if(c.trigger.type === 'consecutive') { html += `<div class="prop-group"><label>الانتصارات المتتالية بـ 5 نجوم:</label><input type="number" id="cfg_${key}_trig_wins" value="${c.trigger.reqWins}"></div>`; }
+                else if(c.trigger.type === 'speedrun') { html += `<div class="prop-group"><label>إنجاز (ألعاب) في (ساعات):</label><div style="display:flex; gap:10px;"><input type="number" id="cfg_${key}_trig_games" value="${c.trigger.reqGames}"><input type="number" id="cfg_${key}_trig_hrs" value="${c.trigger.reqHours}"></div></div>`; }
+                html += `</div>`;
+            }
+            html += `<div class="prop-group" style="background:#f1f1f1; padding:8px; border-radius:5px;"><span style="color:#777; font-size:13px;">استلام: <b>${c.receive}</b> | عدادات: <b>${c.timers}</b></span></div></div></div>`;
+            container.innerHTML += html;
+        }
+    }
+    function toggleInputs(r, p, k) { document.getElementById(`cfg_${k}_${p}_val`).style.display = r.value==='fixed'?'block':'none'; document.getElementById(`cfg_${k}_${p}_range`).style.display = r.value==='range'?'flex':'none'; }
+    function saveDynamicCardsConfig() {
+        for(let key in cardsConfig) {
+            let c = cardsConfig[key];
+            c.name = document.getElementById(`cfg_${key}_name`).value; c.color = document.getElementById(`cfg_${key}_color`).value;
+            c.mult.type = document.querySelector(`input[name="r_mult_${key}"]:checked`).value; c.mult.val = parseFloat(document.getElementById(`cfg_${key}_mult_val`).value)||1; c.mult.min = parseFloat(document.getElementById(`cfg_${key}_mult_min`).value)||1; c.mult.max = parseFloat(document.getElementById(`cfg_${key}_mult_max`).value)||2;
+            c.dur.type = document.querySelector(`input[name="r_dur_${key}"]:checked`).value; c.dur.val = parseFloat(document.getElementById(`cfg_${key}_dur_val`).value)||0; c.dur.min = parseFloat(document.getElementById(`cfg_${key}_dur_min`).value)||1; c.dur.max = parseFloat(document.getElementById(`cfg_${key}_dur_max`).value)||24;
+            c.count.type = document.querySelector(`input[name="r_cnt_${key}"]:checked`).value; c.count.val = parseInt(document.getElementById(`cfg_${key}_cnt_val`).value)||5; c.count.min = parseInt(document.getElementById(`cfg_${key}_cnt_min`).value)||1; c.count.max = parseInt(document.getElementById(`cfg_${key}_cnt_max`).value)||5;
+            let games = []; document.querySelectorAll(`.chk_games_${key}:checked`).forEach(el => games.push(el.value)); c.games = games;
+            if(c.canEditTrigger) {
+                if(c.trigger.type === 'periodic') c.trigger.days = document.getElementById(`cfg_${key}_trig_days`).value.split(',').map(Number);
+                else if(c.trigger.type === 'consecutive') c.trigger.reqWins = parseInt(document.getElementById(`cfg_${key}_trig_wins`).value)||5;
+                else if(c.trigger.type === 'speedrun') { c.trigger.reqGames = parseInt(document.getElementById(`cfg_${key}_trig_games`).value)||30; c.trigger.reqHours = parseInt(document.getElementById(`cfg_${key}_trig_hrs`).value)||1; }
+            }
+        }
+        localStorage.setItem('gameCardsConfig', JSON.stringify(cardsConfig)); alert('تم حفظ الخصائص بنجاح! 💾'); toggleModal('events-admin-modal');
+    }
+
+    // عرض البطاقات للمستخدم مع شرح ديناميكي
+    function openMagicCardsModal() { renderMagicCards(); toggleModal('magic-cards-modal'); clearInterval(magicCardEventInterval); magicCardEventInterval = setInterval(updateMagicCardsTimers, 1000); }
+    function getDescHelp(key) {
+        let c = cardsConfig[key]; let title = document.getElementById('info-title'); let body = document.getElementById('info-body');
+        title.innerText = "معلومات البطاقة: " + c.name;
+        let multText = c.mult.type === 'fixed' ? `ثابت (${c.mult.val}x)` : `عشوائي من (${c.mult.min}x) إلى (${c.mult.max}x)`;
+        let durText = c.dur.type === 'fixed' ? `ثابت (${c.dur.val} ساعة)` : `عشوائي من (${c.dur.min}) إلى (${c.dur.max}) ساعة`;
+        let countText = c.count.type === 'fixed' ? `ثابت (${c.count.val} مراحل)` : `عشوائي من (${c.count.min}) إلى (${c.count.max}) مراحل`;
+        
+        let descHTML = `<p style="font-size: 18px; font-weight: bold; color: var(--dark);">${c.desc}</p><ul style="list-style-type: none; padding: 0;">`;
+        descHTML += `<li style="margin-bottom: 8px;">🔸 <b>مضاعفة النقاط:</b> ${multText}</li>`;
+        if(key !== 'last5') descHTML += `<li style="margin-bottom: 8px;">🔸 <b>مدة البطاقة:</b> ${durText}</li>`;
+        descHTML += `<li style="margin-bottom: 8px;">🔸 <b>عدد المراحل:</b> ${countText}</li>`;
+        
+        if (c.trigger.type === 'consecutive') {
+            descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> الفوز بـ ${c.trigger.reqWins} مراحل متتالية بخمس نجوم.</li>`;
+            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا حققت شروط صندوق جديد قبل لعب البطاقات القديمة، ستفقد البطاقات القديمة وتُستبدل بالجديدة!</div>`;
+        } else if (c.trigger.type === 'speedrun') {
+            descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> إنجاز ${c.trigger.reqGames} مراحل خلال ${c.trigger.reqHours} ساعة.</li>`;
+            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا حققت شروط صندوق جديد قبل لعب القديمة، ستفقدها!</div>`;
+        } else if (c.trigger.type === 'periodic') {
+            let daysNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']; let dNames = c.trigger.days.map(d => daysNames[d]).join(' و ');
+            descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> تتفعل تلقائياً أيام: ${dNames}.</li>`;
+        }
+        descHTML += `</ul>`; body.innerHTML = descHTML; toggleModal('info-modal');
+    }
+
+    function renderMagicCards() {
+        const container = document.getElementById('magic-cards-container'); container.innerHTML = ''; let html = '';
+        let c1 = cardsConfig.last5; let c1Mult = c1.mult.type==='fixed' ? c1.mult.val : `من ${c1.mult.min} إلى ${c1.mult.max}`;
+        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c1.color}, #555);">
+            <div class="mc-title"><span>🔥 ${c1.name}</span> <div class="btn-help-icon" onclick="getDescHelp('last5')">i</div></div>
+            <div class="mc-desc">مضاعفة النقاط بمقدار (${c1Mult}x) مطبقة دائماً على أحدث المراحل المضافة.</div></div>`;
+
+        let c2 = cardsConfig.random5; let c2Mult = c2.mult.type==='fixed' ? c2.mult.val : `من ${c2.mult.min} إلى ${c2.mult.max}`;
+        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c2.color}, #555);">
+            <div class="mc-title"><span>🌟 ${c2.name}</span> <div class="btn-help-icon" onclick="getDescHelp('random5')">i</div></div>
+            <div class="mc-desc">مراحل عشوائية بمضاعفة (${c2Mult}x).</div><div class="mc-timer" id="mc-timer-random5">يتم التحديث كل 24 ساعة.</div></div>`;
+
+        let c3 = cardsConfig.friday;
+        html += `<div class="magic-card-item" id="card-friday-container">
+            <div class="mc-title"><span>📅 ${c3.name}</span> <div class="btn-help-icon" onclick="getDescHelp('friday')">i</div></div>
+            <div class="mc-desc" id="mc-desc-friday"></div><div class="mc-timer" id="mc-timer-friday">جاري الحساب...</div></div>`;
+
+        ['hareef', 'longBreath'].forEach(type => {
+            let c = cardsConfig[type]; let found = false;
+            let hareefGames = ['matchg', 'listen', 'missing', 'arrange', 'crossword'];
+            let hareefNames = {'matchg':'المطابقة', 'listen':'الصائد', 'missing':'الناقصة', 'arrange':'الترتيب', 'crossword':'المتقاطعة'};
+            hareefGames.forEach(g => {
+                let activeData = JSON.parse(localStorage.getItem(`activeChest_${type}_${g}`));
+                if(activeData && activeData.expiry > Date.now()) {
+                    found = true;
+                    html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c.color}, #555);">
+                        <div class="mc-title"><span>🏅 ${c.name} - ${hareefNames[g]}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
+                        <div class="mc-desc">لديك ${activeData.stages.length} مرحلة عشوائية بنقاط مضروبة بـ (${activeData.mult}x).</div>
+                        <div class="mc-timer" id="mc-timer-${type}-${g}" data-expiry="${activeData.expiry}">⏳ متبقي: ...</div></div>`;
+                }
+            });
+            if(!found) {
+                html += `<div class="magic-card-item" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); filter: grayscale(50%);">
+                    <div class="mc-title"><span>🏅 ${c.name}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
+                    <div class="mc-desc">لا تملك هذه البطاقة. حقق شرطها المخصص لتربحها!</div></div>`;
+            }
+        });
+        container.innerHTML = html; updateMagicCardsTimers();
+    }
+
+    function updateMagicCardsTimers() {
+        let c3 = cardsConfig.friday; let today = new Date().getDay();
+        let elFriday = document.getElementById('mc-timer-friday'); let descFriday = document.getElementById('mc-desc-friday'); let containerFriday = document.getElementById('card-friday-container');
+        if(elFriday) {
+            let now = new Date();
+            if(c3.trigger.days.includes(today)) {
+                descFriday.innerText = `الحدث فعال! نقاط مضاعفة (${c3.mult.type==='fixed'?c3.mult.val:'متغيرة'}x).`;
+                let end = new Date(); end.setHours(23, 59, 59, 999); let diff = end - now;
+                let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
+                elFriday.innerText = `ينتهي الحدث بعد: ${h}س ${m}د ${s}ث`;
+                containerFriday.style.background = `linear-gradient(135deg, ${c3.color}, #555)`; containerFriday.style.filter = "none";
+            } else {
+                descFriday.innerText = `الحدث متوقف حالياً.`; containerFriday.style.background = `linear-gradient(135deg, #95a5a6, #7f8c8d)`; containerFriday.style.filter = "grayscale(50%)";
+                let daysToNext = 1; while(!c3.trigger.days.includes((today + daysToNext) % 7)) daysToNext++;
+                let nextDate = new Date(); nextDate.setDate(now.getDate() + daysToNext); nextDate.setHours(0, 0, 0, 0);
+                let diff = nextDate - now; let d = Math.floor(diff/(24*3600000)); let h = Math.floor((diff%(24*3600000))/3600000); let m = Math.floor((diff%3600000)/60000);
+                elFriday.innerText = `يفتح بعد: ${d>0?d+' يوم و ':''}${h}س ${m}د`;
+            }
+        }
+        document.querySelectorAll('[id^="mc-timer-hareef-"], [id^="mc-timer-longBreath-"]').forEach(el => {
+            let expiry = parseInt(el.getAttribute('data-expiry'));
+            if(expiry > Date.now()) {
+                let diff = expiry - Date.now();
+                let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
+                el.innerText = `⏳ متبقي: ${h}س ${m}د ${s}ث`;
+            } else { el.innerText = "انتهت الصلاحية!"; }
+        });
     }
 
     function initializeDropdown() {
         const selectElement = document.getElementById('level-select'); selectElement.innerHTML = ''; let hasCompletedLevels = false;
         let optionAll = document.createElement('option'); optionAll.value = "ALL"; optionAll.textContent = "جميع المستويات"; selectElement.appendChild(optionAll);
         let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
-
         availableLevelsList.forEach(lvl => {
             if (appProgress.levels[lvl].savedWords && appProgress.levels[lvl].savedWords.length > 0) {
                 let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl); selectElement.appendChild(option); hasCompletedLevels = true;
             }
         });
-        
         if (!hasCompletedLevels) {
             selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
             document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>'; selectElement.disabled = true; return;
@@ -346,8 +602,7 @@
     }
 
     function loadGameData() {
-        globalStagesList = [];
-        let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); }); let absoluteId = 1;
+        globalStagesList = []; let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); }); let absoluteId = 1;
         availableLevelsList.forEach(lvl => {
             let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0; let levelWords = (allLevelsData[lvl] || []).slice(0, savedCount); if(levelWords.length === 0) return;
             let tStages = Math.ceil(levelWords.length / WORDS_PER_STAGE);
@@ -564,8 +819,9 @@
 
     function openDynamicChest() {
         let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
-        clearInterval(bounceInterval); playSound('open');
+        clearInterval(bounceInterval); playSysSound('open');
         icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempChestReward;
+        if(!r) return;
         document.getElementById('chest-details').innerHTML = `حصلت على <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعة!</span>`;
         document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
     }
@@ -583,7 +839,6 @@
         if(stars > previousStars) {
             basePoints = (stars - previousStars) * starPrice;
             
-            // حساب المضاعف الديناميكي
             let finalMultiplier = 1;
             if(window.currentActiveCard) {
                 let c = window.currentActiveCard.config;
@@ -621,7 +876,7 @@
         let cHareef = cardsConfig.hareef;
         if(cHareef && (cHareef.games.includes('arrange') || cHareef.games.includes('scramble'))) {
             if(previousStars === 5) {
-                // التجاهل الكامل (لا تكسر السلسلة ولا تزيدها)
+                // التجاهل الكامل للمرحلة المختومة مسبقاً (لا تكسر السلسلة ولا تزيدها)
             } else {
                 if(stars === 5) {
                     let cons = parseInt(localStorage.getItem('consecutive5_scramble')) || 0; cons++; localStorage.setItem('consecutive5_scramble', cons);

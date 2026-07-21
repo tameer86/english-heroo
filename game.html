@@ -27,10 +27,16 @@
         .game-btn { color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block; font-weight: bold; width: 80%; max-width: 400px; }
         .game-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-        .top-icons { position: relative; display: flex; justify-content: center; gap: 20px; z-index: 50; flex-wrap: wrap; margin-top: 50px; margin-bottom: 30px; }
+        .top-icons { position: relative; display: flex; justify-content: center; align-items: center; gap: 15px; z-index: 50; flex-wrap: wrap; margin-top: 50px; margin-bottom: 30px; }
         
         .btn-top-action { background: none; border: none; font-size: 32px; cursor: pointer; transition: transform 0.3s; user-select: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         .btn-top-action:hover { transform: scale(1.2); }
+
+        /* شريط التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 2px solid var(--primary); }
+        .vol-icon { font-size: 24px; cursor: pointer; user-select: none; transition: 0.2s; width: 30px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 90px; cursor: pointer; accent-color: var(--primary); }
 
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; }
         .modal-content-box { background: #f8f9fc; width: 95%; max-width: 600px; padding: 25px; border-radius: 15px; text-align: center; position: relative; max-height: 95vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
@@ -122,7 +128,6 @@
     </style>
 </head>
 <body>
-     <audio id="bg-music" src="music/game.mp3" loop autoplay></audio>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
 
@@ -135,6 +140,12 @@
         <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
         <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
         <button class="btn-top-action" onclick="openMagicCardsModal()" title="البطاقات السحرية والأحداث">🃏</button>
+        
+        <!-- شريط الصوت الجديد -->
+        <div class="volume-container" title="التحكم بصوت موسيقى الألعاب">
+            <span id="bg-vol-icon" class="vol-icon">🔊</span>
+            <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.01">
+        </div>
     </div>
 
     <h1> مرحباً بك في قسم الألعاب </h1>
@@ -146,6 +157,15 @@
         <a href="missing_letters.html" id="link-missing" class="game-btn" style="background-color: var(--success);">لعبة الحروف الناقصة 🔠</a>
         <a href="scramble_letters.html" id="link-arrange" class="game-btn" style="background-color: var(--warning); color: #2c3e50;">لعبة ترتيب الحروف 🔀</a>
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
+    </div>
+
+    <!-- نافذة الشرح التفصيلي للبطاقات ذات التمرير -->
+    <div id="info-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('info-modal')">✖</button>
+            <h3 id="info-title" style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;"></h3>
+            <div id="info-body" style="text-align: right; max-height: 60vh; overflow-y: auto; padding: 10px; line-height: 1.6; font-size: 16px; color: var(--dark);"></div>
+        </div>
     </div>
 
     <!-- البطاقات السحرية للمستخدم -->
@@ -164,11 +184,11 @@
         <div class="modal-content-box" style="background:#f8f9fc; text-align: right;">
             <button class="btn-close-modal" onclick="toggleModal('events-admin-modal')">✖</button>
             <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📅 محرك الأحداث والبطاقات الديناميكي</h3>
-            <p style="font-size: 13px; color: #555;">من هنا يمكنك التحكم بخصائص جميع البطاقات التي ستظهر في الألعاب بشكل ديناميكي.</p>
+            <p style="font-size: 13px; color: #555;">من هنا يمكنك التحكم بخصائص وآليات جميع البطاقات التي ستظهر في الألعاب بشكل ديناميكي.</p>
             <div id="dynamic-cards-editor" class="parent-only-inputs" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;">
                 <!-- يعبأ برمجيا -->
             </div>
-            <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top: 15px;" onclick="saveDynamicCardsConfig()">💾 حفظ جميع الخصائص</button>
+            <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top: 15px;" onclick="saveDynamicCardsConfig()">💾 حفظ جميع الخصائص والآليات</button>
         </div>
     </div>
 
@@ -334,19 +354,19 @@
     <div><img src="images/mon.jpeg" alt="صورة تحفيزية للألعاب" class="game-image" style="margin-top: 35px; width: clamp(240px, 42vw, 480px); height: auto; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);"></div>
 
 <script>
-    // أصوات النظام الأساسية باستخدام AudioContext
-    let audioCtx = null;
-    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
+    // أصوات النظام الأساسية (لا تتأثر بالموسيقى)
+    let sysAudioCtx = null;
+    function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
     function playSysSound(type) {
         try {
-            initAudio();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
+            initSysAudio();
+            const osc = sysAudioCtx.createOscillator(); const gain = sysAudioCtx.createGain();
+            osc.connect(gain); gain.connect(sysAudioCtx.destination);
             if(type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             }
         } catch(e){}
     }
@@ -354,13 +374,52 @@
         if(e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn') || e.target.closest('.game-btn')) playSysSound('click');
     });
 
+    // التحكم بالصوت (Volume Control) للموسيقى الخلفية بشكل عام
+    function initVolumeControl() {
+        let volSlider = document.getElementById('bg-vol-slider');
+        let volIcon = document.getElementById('bg-vol-icon');
+        let savedVol = localStorage.getItem('bgMusicVolume');
+        if (savedVol === null) savedVol = 0.5; 
+        
+        if (volSlider) {
+            volSlider.value = savedVol;
+            volSlider.oninput = function() {
+                localStorage.setItem('bgMusicVolume', this.value);
+                localStorage.setItem('bgMusicMuted', 'false');
+                applyVolumeUI();
+            };
+        }
+        if (volIcon) {
+            volIcon.onclick = function() {
+                let muted = localStorage.getItem('bgMusicMuted') === 'true';
+                localStorage.setItem('bgMusicMuted', !muted);
+                applyVolumeUI();
+            };
+        }
+        applyVolumeUI();
+    }
+
+    function applyVolumeUI() {
+        let volSlider = document.getElementById('bg-vol-slider');
+        let volIcon = document.getElementById('bg-vol-icon');
+        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5);
+        let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+        
+        if (volSlider) volSlider.value = vol;
+        if (volIcon) {
+            if (isMuted || vol === 0) { volIcon.innerText = '🔇'; } 
+            else if (vol < 0.5) { volIcon.innerText = '🔉'; } 
+            else { volIcon.innerText = '🔊'; }
+        }
+    }
+
     // المحرك الديناميكي للبطاقات
     const DEFAULT_CARDS_CONFIG = {
-        last5: { id: 'last5', name: "بطاقة آخر 5 مراحل", color: "#e74a3b", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 0, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'fixed' }, receive: "تلقائي بدون احتفال", timers: 1, desc: "نقاط مضاعفة لأحدث 5 مراحل تم إضافتها في اللعبة." },
-        random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 24, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 10 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'random' }, receive: "تلقائي بدون احتفال", timers: 1, desc: "5 مراحل عشوائية غير مختومة (أولوية 0 نجوم) يتم توزيعها يومياً بمضاعف خاص." },
-        friday: { id: 'friday', name: "حدث الجمعة الدوري", color: "#1cc88a", mult: { type: "fixed", val: 2, min: 1, max: 4 }, dur: { type: "fixed", val: 24, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 10 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'periodic', days: [5] }, receive: "تلقائي بدون احتفال", timers: 2, desc: "حدث دوري يعطي مضاعفات لعدد محدد من المراحل العشوائية في أيام معينة." },
-        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: { type: "range", val: 3, min: 3, max: 6 }, dur: { type: "range", val: 3, min: 1, max: 5 }, count: { type: "range", val: 3, min: 1, max: 4 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'consecutive', reqWins: 5 }, receive: "صندوق احتفالي", timers: 1, desc: "بطاقة تُربح عند إتمام سلسلة انتصارات متتالية بخمس نجوم في نفس اللعبة." },
-        longBreath: { id: 'longBreath', name: "بطاقة النفس الطويل", color: "#3498db", mult: { type: "range", val: 4, min: 2, max: 6 }, dur: { type: "range", val: 3, min: 1, max: 6 }, count: { type: "range", val: 3, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'speedrun', reqGames: 30, reqHours: 1 }, receive: "صندوق احتفالي", timers: 1, desc: "بطاقة تُمنح لمن ينجز عدداً كبيراً من الألعاب خلال مدة زمنية قصيرة." }
+        last5: { id: 'last5', name: "بطاقة آخر 5 مراحل", color: "#e74a3b", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 0, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'fixed' }, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "تُطبق أوتوماتيكياً على أحدث 5 مراحل تم حفظها لزيادة التحدي." },
+        random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 24, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 10 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'random' }, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "مراحل عشوائية غير مختومة بنجوم يتم إشعالها لتشجيع الطفل على لعبها." },
+        friday: { id: 'friday', name: "الحدث الدوري", color: "#1cc88a", mult: { type: "fixed", val: 2, min: 1, max: 4 }, dur: { type: "fixed", val: 24, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 10 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'periodic', days: [5] }, canEditTrigger: true, receive: "تلقائي بدون احتفال", timers: 2, desc: "حدث يتفعل في أيام محددة من الأسبوع ليضاعف نقاط المراحل المشمولة فيه." },
+        hareef: { id: 'hareef', name: "صندوق الحريف", color: "#9b59b6", mult: { type: "range", val: 3, min: 3, max: 6 }, dur: { type: "range", val: 3, min: 1, max: 5 }, count: { type: "range", val: 3, min: 1, max: 4 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'consecutive', reqWins: 5 }, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "مكافأة رائعة تُمنح عند الفوز بعدد معين من المرات المتتالية في نفس اللعبة بـ 5 نجوم (المراحل المختومة مسبقاً بـ 5 نجوم لا تحسب ضمن السلسلة ولا تكسرها)." },
+        longBreath: { id: 'longBreath', name: "بطاقة النفس الطويل", color: "#3498db", mult: { type: "range", val: 4, min: 2, max: 6 }, dur: { type: "range", val: 3, min: 1, max: 6 }, count: { type: "range", val: 3, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'speedrun', reqGames: 30, reqHours: 1 }, canEditTrigger: true, receive: "صندوق احتفالي", timers: 1, desc: "جائزة إضافية للطفل النشيط الذي ينهي عدداً كبيراً من الألعاب خلال مدة زمنية قصيرة." }
     };
 
     let cardsConfig = JSON.parse(localStorage.getItem('gameCardsConfig'));
@@ -384,24 +443,14 @@
         applyGlobalModes();
         loadGamesState();
         checkNewFameAchievements(); 
+        initVolumeControl();
     };
 
     function verifyParentModeStrict() {
         let isParent = localStorage.getItem('isParentMode');
-        if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false');
-    }
-
-    function applyGlobalModes() {
-        let isParent = localStorage.getItem('isParentMode') === 'true';
-        document.querySelectorAll('.parent-only-inputs').forEach(el => {
-            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') { if(el.type === 'checkbox') el.disabled = !isParent; else el.disabled = !isParent; }
-            else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box') || el.classList.contains('admin-row')) {
-                let inputs = el.querySelectorAll('input, select'); inputs.forEach(inp => inp.disabled = !isParent);
-            }
-        });
-        document.querySelectorAll('.parent-only-btn').forEach(btn => {
-            if (btn.tagName === 'BUTTON') { btn.style.display = isParent ? 'inline-block' : 'none'; if(isParent && !btn.style.width && !btn.parentElement.style.display) btn.style.width = '100%'; }
-        });
+        if(isParent !== 'true' && isParent !== 'false') {
+            localStorage.setItem('isParentMode', 'false');
+        }
     }
 
     function logBankStatement(desc, amount, isIncoming) {
@@ -421,10 +470,49 @@
         list.forEach(item => {
             let cls = item.isIncoming ? 'statement-in' : 'statement-out';
             let sign = item.isIncoming ? '+' : '-';
-            html += `<div class="statement-item"><div><span class="${cls}"><b>${sign}${item.amount}</b> جنيه</span> <span style="color:#aaa; font-size:11px;">(${item.date})</span></div><div>${item.desc}</div></div>`;
+            html += `<div class="statement-item">
+                <div><span class="${cls}"><b>${sign}${item.amount}</b> جنيه</span> <span style="color:#aaa; font-size:11px;">(${item.date})</span></div>
+                <div>${item.desc}</div>
+            </div>`;
         });
         if(html === '') html = '<div style="text-align:center; color:#999;">لا توجد حركات مالية بعد.</div>';
-        let box = document.getElementById('bank-statement-list'); if(box) box.innerHTML = html;
+        let box = document.getElementById('bank-statement-list');
+        if(box) box.innerHTML = html;
+    }
+
+    function openNewsModal() {
+        fetch('news.txt')
+            .then(response => {
+                if(!response.ok) throw new Error('لا يوجد أخبار حالياً');
+                return response.text();
+            })
+            .then(text => {
+                document.getElementById('news-content').innerText = text;
+                toggleModal('news-modal');
+            })
+            .catch(err => {
+                document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.';
+                toggleModal('news-modal');
+            });
+    }
+
+    function applyGlobalModes() {
+        let isParent = localStorage.getItem('isParentMode') === 'true';
+        document.querySelectorAll('.parent-only-inputs').forEach(el => {
+            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') {
+                if(el.type === 'checkbox') el.disabled = !isParent;
+                else el.disabled = !isParent;
+            } else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box') || el.classList.contains('admin-row')) {
+                let inputs = el.querySelectorAll('input, select');
+                inputs.forEach(inp => inp.disabled = !isParent);
+            }
+        });
+        document.querySelectorAll('.parent-only-btn').forEach(btn => {
+            if (btn.tagName === 'BUTTON') {
+                btn.style.display = isParent ? 'inline-block' : 'none';
+                if(isParent && !btn.style.width && !btn.parentElement.style.display) btn.style.width = '100%';
+            }
+        });
     }
 
     function toggleModal(id) {
@@ -439,7 +527,7 @@
         }
     }
 
-    // --- المحرك الديناميكي للبطاقات ---
+    // --- المحرك الديناميكي للبطاقات (واجهة ولي الأمر) ---
     function toggleEventsAdminModal() {
         renderDynamicCardsEditor();
         toggleModal('events-admin-modal');
@@ -503,16 +591,18 @@
                     </div>`;
 
             if(c.canEditTrigger) {
+                html += `<div style="border-top:2px dashed #ccc; padding-top:10px; margin-top:10px;"><h5 style="color:var(--danger); margin-top:0;">إعدادات الآلية (الشرط)</h5>`;
                 if(c.trigger.type === 'periodic') {
-                    html += `<div class="prop-group"><label>أيام الحدث (الجمعة=5، السبت=6...):</label>
+                    html += `<div class="prop-group"><label>أيام الحدث (الأحد=0, الاثنين=1... الجمعة=5):</label>
                         <input type="text" id="cfg_${key}_trig_days" value="${c.trigger.days.join(',')}" placeholder="مثال: 5,6"></div>`;
                 } else if(c.trigger.type === 'consecutive') {
-                    html += `<div class="prop-group"><label>عدد الانتصارات المتتالية لربحها:</label>
+                    html += `<div class="prop-group"><label>عدد الانتصارات المتتالية بـ 5 نجوم لربحها:</label>
                         <input type="number" id="cfg_${key}_trig_wins" value="${c.trigger.reqWins}"></div>`;
                 } else if(c.trigger.type === 'speedrun') {
                     html += `<div class="prop-group"><label>إنجاز (عدد ألعاب) في (عدد ساعات):</label>
                         <div style="display:flex; gap:10px;"><input type="number" id="cfg_${key}_trig_games" value="${c.trigger.reqGames}" placeholder="ألعاب"><input type="number" id="cfg_${key}_trig_hrs" value="${c.trigger.reqHours}" placeholder="ساعات"></div></div>`;
                 }
+                html += `</div>`;
             }
             
             html += `<div class="prop-group" style="background:#f1f1f1; padding:8px; border-radius:5px;"><span style="color:#777; font-size:13px;">طريقة الاستلام: <b>${c.receive}</b> | نوع العداد: <b>${c.timers} عداد</b></span></div>
@@ -527,9 +617,7 @@
         if(prop === 'count') { document.getElementById(`cfg_${key}_cnt_val`).style.display = radioEl.value==='fixed'?'block':'none'; document.getElementById(`cfg_${key}_cnt_range`).style.display = radioEl.value==='range'?'flex':'none'; }
     }
 
-    function toggleGamesCheckboxes(masterChk, key) {
-        document.querySelectorAll(`.chk_games_${key}`).forEach(el => el.checked = masterChk.checked);
-    }
+    function toggleGamesCheckboxes(masterChk, key) { document.querySelectorAll(`.chk_games_${key}`).forEach(el => el.checked = masterChk.checked); }
 
     function saveDynamicCardsConfig() {
         for(let key in cardsConfig) {
@@ -562,27 +650,58 @@
             }
         }
         localStorage.setItem('gameCardsConfig', JSON.stringify(cardsConfig));
-        alert('تم حفظ خصائص البطاقات الديناميكية بنجاح! 💾');
+        alert('تم حفظ جميع الخصائص والآليات بنجاح! 💾');
         toggleModal('events-admin-modal');
     }
 
-    // عرض البطاقات للمستخدم في أيقونة البطاقات
+    // عرض البطاقات للمستخدم مع إزالة التظليل وشرح ديناميكي
     function openMagicCardsModal() { renderMagicCards(); toggleModal('magic-cards-modal'); clearInterval(magicCardEventInterval); magicCardEventInterval = setInterval(updateMagicCardsTimers, 1000); }
 
-    function getDescHelp(key) { alert(cardsConfig[key].desc); }
+    function getDescHelp(key) {
+        let c = cardsConfig[key];
+        let title = document.getElementById('info-title');
+        let body = document.getElementById('info-body');
+        
+        title.innerText = "معلومات البطاقة: " + c.name;
+        
+        let multText = c.mult.type === 'fixed' ? `ثابت (${c.mult.val}x)` : `عشوائي من (${c.mult.min}x) إلى (${c.mult.max}x)`;
+        let durText = c.dur.type === 'fixed' ? `ثابت (${c.dur.val} ساعة)` : `عشوائي من (${c.dur.min}) إلى (${c.dur.max}) ساعة`;
+        let countText = c.count.type === 'fixed' ? `ثابت (${c.count.val} مراحل)` : `عشوائي من (${c.count.min}) إلى (${c.count.max}) مراحل`;
+        
+        let descHTML = `<p style="font-size: 18px; font-weight: bold; color: var(--dark);">${c.desc}</p>`;
+        descHTML += `<ul style="list-style-type: none; padding: 0;">`;
+        descHTML += `<li style="margin-bottom: 8px;">🔸 <b>مضاعفة النقاط:</b> ${multText}</li>`;
+        if(key !== 'last5') descHTML += `<li style="margin-bottom: 8px;">🔸 <b>مدة البطاقة:</b> ${durText}</li>`;
+        descHTML += `<li style="margin-bottom: 8px;">🔸 <b>عدد المراحل:</b> ${countText}</li>`;
+        
+        if (c.trigger.type === 'consecutive') {
+            descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> الفوز بـ ${c.trigger.reqWins} مراحل متتالية بخمس نجوم في نفس اللعبة.</li>`;
+            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا قمت بتحقيق شروط الحصول على صندوق جديد من هذه البطاقة قبل أن تلعب البطاقات القديمة التي تملكها، فسوف تفقد البطاقات القديمة وتُستبدل بالجديدة!</div>`;
+        } else if (c.trigger.type === 'speedrun') {
+            descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> إنجاز ${c.trigger.reqGames} مراحل خلال ${c.trigger.reqHours} ساعة.</li>`;
+            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا قمت بتحقيق شروط الحصول على صندوق جديد من هذه البطاقة قبل أن تلعب البطاقات القديمة، فسوف تفقد البطاقات القديمة وتُستبدل بالجديدة!</div>`;
+        } else if (c.trigger.type === 'periodic') {
+            let daysNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+            let dNames = c.trigger.days.map(d => daysNames[d]).join(' و ');
+            descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> تتفعل تلقائياً في الأيام التالية: ${dNames}.</li>`;
+        }
+        descHTML += `</ul>`;
+        body.innerHTML = descHTML;
+        toggleModal('info-modal');
+    }
 
     function renderMagicCards() {
         const container = document.getElementById('magic-cards-container'); container.innerHTML = '';
         let html = '';
         
-        // 1. بطاقة آخر 5
+        // 1. بطاقة آخر 5 (زاهية دائماً)
         let c1 = cardsConfig.last5;
         let c1MultText = c1.mult.type==='fixed' ? c1.mult.val : `من ${c1.mult.min} إلى ${c1.mult.max}`;
         html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c1.color}, #555);">
             <div class="mc-title"><span>🔥 ${c1.name}</span> <div class="btn-help-icon" onclick="getDescHelp('last5')">i</div></div>
-            <div class="mc-desc">مضاعفة النقاط بمقدار (${c1MultText}x) مطبقة دائماً على أحدث المراحل.</div></div>`;
+            <div class="mc-desc">مضاعفة النقاط بمقدار (${c1MultText}x) مطبقة دائماً على أحدث المراحل المضافة.</div></div>`;
 
-        // 2. العشوائية
+        // 2. العشوائية (زاهية دائماً)
         let c2 = cardsConfig.random5;
         let c2MultText = c2.mult.type==='fixed' ? c2.mult.val : `من ${c2.mult.min} إلى ${c2.mult.max}`;
         html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c2.color}, #555);">
@@ -590,13 +709,13 @@
             <div class="mc-desc">مراحل عشوائية بمضاعفة (${c2MultText}x).</div>
             <div class="mc-timer" id="mc-timer-random5">يتم التحديث كل 24 ساعة.</div></div>`;
 
-        // 3. الجمعة (دوري)
+        // 3. الجمعة (دوري) (باهتة إذا لم تكن فعالة)
         let c3 = cardsConfig.friday;
-        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c3.color}, #555);" id="card-friday-container">
+        html += `<div class="magic-card-item" id="card-friday-container">
             <div class="mc-title"><span>📅 ${c3.name}</span> <div class="btn-help-icon" onclick="getDescHelp('friday')">i</div></div>
             <div class="mc-desc" id="mc-desc-friday"></div><div class="mc-timer" id="mc-timer-friday">جاري الحساب...</div></div>`;
 
-        // 4 & 5. الحريف و النفس الطويل (مبنية على المكتسبات)
+        // 4 & 5. الحريف و النفس الطويل
         ['hareef', 'longBreath'].forEach(type => {
             let c = cardsConfig[type];
             let found = false;
@@ -607,13 +726,15 @@
                 let activeData = JSON.parse(localStorage.getItem(`activeChest_${type}_${g}`));
                 if(activeData && activeData.expiry > Date.now()) {
                     found = true;
+                    // بطاقة حائز عليها -> زاهية ومشرقة
                     html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c.color}, #555);">
-                        <div class="mc-title"><span>🏅 ${c.name} - لعبة ${hareefNames[g]}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
+                        <div class="mc-title"><span>🏅 ${c.name} - ${hareefNames[g]}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
                         <div class="mc-desc">لديك ${activeData.stages.length} مرحلة عشوائية بنقاط مضروبة بـ (${activeData.mult}x).</div>
                         <div class="mc-timer" id="mc-timer-${type}-${g}" data-expiry="${activeData.expiry}">⏳ متبقي: ...</div></div>`;
                 }
             });
             if(!found) {
+                // بطاقة غير مملوكة -> باهتة
                 html += `<div class="magic-card-item" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); filter: grayscale(50%);">
                     <div class="mc-title"><span>🏅 ${c.name}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
                     <div class="mc-desc">لا تملك هذه البطاقة. حقق شرطها المخصص لتربحها!</div></div>`;
@@ -624,11 +745,8 @@
     }
 
     function updateMagicCardsTimers() {
-        // Friday
-        let c3 = cardsConfig.friday;
-        let today = new Date().getDay();
-        let elFriday = document.getElementById('mc-timer-friday');
-        let descFriday = document.getElementById('mc-desc-friday');
+        let c3 = cardsConfig.friday; let today = new Date().getDay();
+        let elFriday = document.getElementById('mc-timer-friday'); let descFriday = document.getElementById('mc-desc-friday'); let containerFriday = document.getElementById('card-friday-container');
         if(elFriday) {
             let now = new Date();
             if(c3.trigger.days.includes(today)) {
@@ -636,16 +754,16 @@
                 let end = new Date(); end.setHours(23, 59, 59, 999); let diff = end - now;
                 let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
                 elFriday.innerText = `ينتهي الحدث بعد: ${h}س ${m}د ${s}ث`;
-                document.getElementById('card-friday-container').style.filter = "none";
+                containerFriday.style.background = `linear-gradient(135deg, ${c3.color}, #555)`; containerFriday.style.filter = "none";
             } else {
-                descFriday.innerText = `الحدث متوقف حالياً.`; document.getElementById('card-friday-container').style.filter = "grayscale(50%)";
+                descFriday.innerText = `الحدث متوقف حالياً.`;
+                containerFriday.style.background = `linear-gradient(135deg, #95a5a6, #7f8c8d)`; containerFriday.style.filter = "grayscale(50%)";
                 let daysToNext = 1; while(!c3.trigger.days.includes((today + daysToNext) % 7)) daysToNext++;
                 let nextDate = new Date(); nextDate.setDate(now.getDate() + daysToNext); nextDate.setHours(0, 0, 0, 0);
                 let diff = nextDate - now; let d = Math.floor(diff/(24*3600000)); let h = Math.floor((diff%(24*3600000))/3600000); let m = Math.floor((diff%3600000)/60000);
                 elFriday.innerText = `يفتح بعد: ${d>0?d+' يوم و ':''}${h}س ${m}د`;
             }
         }
-        // Active Chests
         document.querySelectorAll('[id^="mc-timer-hareef-"], [id^="mc-timer-longBreath-"]').forEach(el => {
             let expiry = parseInt(el.getAttribute('data-expiry'));
             if(expiry > Date.now()) {
@@ -656,34 +774,33 @@
         });
     }
 
-    function openNewsModal() {
-        fetch('news.txt')
-            .then(response => { if(!response.ok) throw new Error('لا يوجد أخبار حالياً'); return response.text(); })
-            .then(text => { document.getElementById('news-content').innerText = text; toggleModal('news-modal'); })
-            .catch(err => { document.getElementById('news-content').innerText = 'لا توجد أخبار أو تحديثات حالياً.'; toggleModal('news-modal'); });
-    }
-
     function openReportsModal() {
         document.getElementById('main-report-type').value = 'points';
-        toggleReportInputs(); document.getElementById('report-results').style.display = 'none'; toggleModal('reports-modal');
+        toggleReportInputs();
+        document.getElementById('report-results').style.display = 'none';
+        toggleModal('reports-modal');
     }
 
     function toggleReportInputs() {
         let type = document.getElementById('main-report-type').value;
         let timeSelectors = document.getElementById('time-selectors');
-        if (type === 'points') { timeSelectors.style.display = 'flex'; updateReportRangeOptions(); } else { timeSelectors.style.display = 'none'; }
+        if (type === 'points') { timeSelectors.style.display = 'flex'; updateReportRangeOptions(); } 
+        else { timeSelectors.style.display = 'none'; }
         document.getElementById('report-results').style.display = 'none';
     }
 
     function updateReportRangeOptions() {
-        let type = document.getElementById('report-type').value; let selectNum = document.getElementById('report-num'); selectNum.innerHTML = '';
+        let type = document.getElementById('report-type').value;
+        let selectNum = document.getElementById('report-num'); selectNum.innerHTML = '';
         let max = 0; if(type === 'hours') max = 24; if(type === 'days') max = 7; if(type === 'weeks') max = 4; if(type === 'months') max = 12;
         for(let i = 1; i <= max; i++) { let opt = document.createElement('option'); opt.value = i; opt.text = i; selectNum.appendChild(opt); }
     }
 
     function generateSelectedReport() {
         let type = document.getElementById('main-report-type').value;
-        if (type === 'points') generatePointsReport(); else if (type === 'progress') generateProgressReport(); else if (type === 'performance') generatePerformanceReport();
+        if (type === 'points') generatePointsReport();
+        else if (type === 'progress') generateProgressReport();
+        else if (type === 'performance') generatePerformanceReport();
     }
 
     function generatePointsReport() {
@@ -696,7 +813,8 @@
         let gameNames = { matchg: 'لعبة المطابقة 🎴', listen: 'صائد الأمثلة 🎧', missing: 'الحروف الناقصة 🔠', scramble: 'ترتيب الحروف 🔀', crossword: 'الكلمات المتقاطعة 🧩' };
         let resultHTML = `<div class="report-block"><h4>إجمالي النقاط في الفترة: <span class="stat-val good">${totals.total}</span></h4></div><div class="report-block"><h4>التفصيل حسب الألعاب:</h4>`;
         for(let key in gameNames) { resultHTML += `<div class="stat-item"><span>${gameNames[key]}</span> <span class="stat-val">${totals[key]} نقطة</span></div>`; }
-        resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
+        resultHTML += `</div>`;
+        let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
     function getGameStats(storageKey) {
@@ -721,21 +839,34 @@
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
-    function openFullImage(imgSrc) { document.getElementById('full-size-img').src = imgSrc; document.getElementById('image-modal').style.display = 'flex'; }
-    function closeImageModal(e) { if (e.target.id === 'image-modal' || e.target.tagName === 'BUTTON') { document.getElementById('image-modal').style.display = 'none'; } }
+    function openFullImage(imgSrc) {
+        document.getElementById('full-size-img').src = imgSrc;
+        document.getElementById('image-modal').style.display = 'flex';
+    }
+
+    function closeImageModal(e) {
+        if (e.target.id === 'image-modal' || e.target.tagName === 'BUTTON') {
+            document.getElementById('image-modal').style.display = 'none';
+        }
+    }
 
     function checkNewFameAchievements() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         let score = Math.floor(appProg.cumulativeScore || 0);
         let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
-        appProg.notifiedBadges = appProg.notifiedBadges || []; appProg.claimedStagesFame = appProg.claimedStagesFame || [];
-        let needsSave = false; let absoluteBadgeIndex = 1;
+        
+        appProg.notifiedBadges = appProg.notifiedBadges || [];
+        appProg.claimedStagesFame = appProg.claimedStagesFame || [];
+        let needsSave = false;
+        let absoluteBadgeIndex = 1;
 
         fameStages.forEach(stage => {
             stage.badges.forEach(badge => {
                 let currentBadgeVal = absoluteBadgeIndex;
                 if (score >= badge.req && !appProg.notifiedBadges.includes(badge.id)) {
-                    appProg.notifiedBadges.push(badge.id); appProg.bankBalance = (appProg.bankBalance || 0) + currentBadgeVal; needsSave = true;
+                    appProg.notifiedBadges.push(badge.id);
+                    appProg.bankBalance = (appProg.bankBalance || 0) + currentBadgeVal;
+                    needsSave = true;
                     logBankStatement(`مكافأة وسام: ${badge.name}`, currentBadgeVal, true);
                     celebrationQueue.push({ type: 'badge', title: "مبروك! تم فتح وسام", name: badge.name, desc: `تخطيت ${badge.req.toLocaleString()} نقطة! وحصلت على ${currentBadgeVal} جنيه 💰`, img: badge.img });
                 }
@@ -743,12 +874,18 @@
             });
 
             if (score >= stage.end && !appProg.claimedStagesFame.includes(stage.num)) {
-                let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; let totalReward = baseReward + bonusReward;
-                appProg.bankBalance = (appProg.bankBalance || 0) + totalReward; appProg.claimedStagesFame.push(stage.num); needsSave = true;
+                let baseReward = 15 * stage.num * stage.num;
+                let bonusReward = parseFloat(stageBonuses[stage.num]) || 0;
+                let totalReward = baseReward + bonusReward;
+
+                appProg.bankBalance = (appProg.bankBalance || 0) + totalReward;
+                appProg.claimedStagesFame.push(stage.num);
+                needsSave = true;
                 logBankStatement(`مكافأة ختم مرحلة: ${stage.name}`, totalReward, true);
                 celebrationQueue.push({ type: 'stage', title: "إنجاز أسطوري! 🏆", name: `ختم مرحلة: ${stage.name}`, desc: `تخطيت ${stage.end.toLocaleString()} نقطة! وحصلت على ${totalReward} جنيه 💰`, img: stage.img });
             }
         });
+
         if(needsSave) localStorage.setItem('appProgress', JSON.stringify(appProg));
         processCelebrationQueue();
     }
@@ -756,68 +893,111 @@
     function processCelebrationQueue() {
         if(celebrationQueue.length > 0) {
             let item = celebrationQueue.shift();
-            document.getElementById('cel-title').innerText = item.title; document.getElementById('cel-name').innerText = item.name;
+            document.getElementById('cel-title').innerText = item.title;
+            document.getElementById('cel-name').innerText = item.name;
             document.getElementById('cel-desc').innerText = item.desc;
-            let imgEl = document.getElementById('cel-img'); imgEl.src = item.img; imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; 
+            let imgEl = document.getElementById('cel-img');
+            imgEl.src = item.img;
+            imgEl.onerror = () => { imgEl.src = 'images/mon.jpeg'; }; 
             document.getElementById('celebration-modal').style.display = 'flex';
         }
     }
 
-    function closeCelebration() { document.getElementById('celebration-modal').style.display = 'none'; setTimeout(processCelebrationQueue, 500); }
+    function closeCelebration() {
+        document.getElementById('celebration-modal').style.display = 'none';
+        setTimeout(processCelebrationQueue, 500);
+    }
 
-    function openFameModal() { renderHallOfFame(); toggleModal('fame-modal'); }
+    function openFameModal() {
+        renderHallOfFame();
+        toggleModal('fame-modal');
+    }
 
     function renderHallOfFame() {
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let score = Math.floor(appProg.cumulativeScore || 0);
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; document.getElementById('fame-total-points').innerText = score.toLocaleString();
-        const wrapper = document.getElementById('stages-wrapper'); wrapper.innerHTML = ''; let badgeGlobalIndex = 1;
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let score = Math.floor(appProg.cumulativeScore || 0);
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
+        document.getElementById('fame-total-points').innerText = score.toLocaleString();
+        const wrapper = document.getElementById('stages-wrapper');
+        wrapper.innerHTML = '';
+
+        let badgeGlobalIndex = 1;
 
         fameStages.forEach(stage => {
-            let isStageUnlocked = score >= stage.start; let stageClass = isStageUnlocked ? '' : 'locked-stage'; let progressPercent = 0;
-            if (score >= stage.end) { progressPercent = 100; } else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
+            let isStageUnlocked = score >= stage.start;
+            let stageClass = isStageUnlocked ? '' : 'locked-stage';
+            let progressPercent = 0;
+            if (score >= stage.end) { progressPercent = 100; } 
+            else if (score >= stage.start) { progressPercent = ((score - stage.start) / (stage.end - stage.start)) * 100; }
+            
             let stageReward = 15 * stage.num * stage.num + (parseFloat(stageBonuses[stage.num]) || 0);
-            let imgClickAction = isStageUnlocked ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"` : `onclick="alert('قيمة الجائزة عند ختم هذه المرحلة: ${stageReward} جنيه فلسطيني')" style="cursor: pointer;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"`;
+            
+            let imgClickAction = isStageUnlocked 
+                ? `onclick="openFullImage('${stage.img}')" style="cursor: zoom-in;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"` 
+                : `onclick="alert('قيمة الجائزة عند ختم هذه المرحلة: ${stageReward} جنيه فلسطيني')" style="cursor: pointer;" title="جائزة هذه المرحلة: ${stageReward} جنيه فلسطيني"`;
 
             let html = `<div class="stage-card ${stageClass}"><img src="${stage.img}" class="stage-main-img" onerror="this.src='images/mon.jpeg'" ${imgClickAction}><h3 class="stage-title">مرحلة ${stage.num}: ${stage.name}<span class="stage-points-req">${stage.start.toLocaleString()} - ${stage.end.toLocaleString()} نقطة</span></h3><p class="stage-desc">${stage.desc}</p><div class="progress-bar-container"><div class="progress-fill" style="width: ${progressPercent}%;"></div></div><div class="badges-grid">`;
+
             stage.badges.forEach(badge => {
-                let isBadgeUnlocked = score >= badge.req; let badgeClass = isBadgeUnlocked ? '' : 'locked-badge'; let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>'; let badgeReward = badgeGlobalIndex;
+                let isBadgeUnlocked = score >= badge.req;
+                let badgeClass = isBadgeUnlocked ? '' : 'locked-badge';
+                let lockOverlay = isBadgeUnlocked ? '' : '<div class="lock-icon">🔒</div>';
+                let badgeReward = badgeGlobalIndex;
                 html += `<div class="badge-item ${badgeClass}" title="جائزة هذا الوسام: ${badgeReward} جنيه" onclick="alert('قيمة جائزة هذا الوسام: ${badgeReward} جنيه فلسطيني')"><div class="badge-img-wrapper"><img src="${badge.img}" class="badge-img" onerror="this.src='images/mon.jpeg'">${lockOverlay}</div><div class="badge-title">${badge.name}</div><div class="badge-req">${badge.req.toLocaleString()}</div></div>`;
                 badgeGlobalIndex++;
             });
-            html += `</div></div>`; wrapper.innerHTML += html;
+            html += `</div></div>`;
+            wrapper.innerHTML += html;
         });
     }
 
     function saveMainSettings() {
-        const gameState = {
-            matchg: document.getElementById('chk-matchg').checked, listen: document.getElementById('chk-listen').checked,
-            missing: document.getElementById('chk-missing').checked, arrange: document.getElementById('chk-arrange').checked, crossword: document.getElementById('chk-crossword').checked
-        };
-        localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState)); applyGamesState(gameState);
+        const matchgActive = document.getElementById('chk-matchg').checked;
+        const listenActive = document.getElementById('chk-listen').checked;
+        const missingActive = document.getElementById('chk-missing').checked;
+        const arrangeActive = document.getElementById('chk-arrange').checked;
+        const crosswordActive = document.getElementById('chk-crossword').checked;
+
+        const gameState = { matchg: matchgActive, listen: listenActive, missing: missingActive, arrange: arrangeActive, crossword: crosswordActive };
+        localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState));
+        applyGamesState(gameState);
 
         if (document.getElementById('chk-reset-all').checked) {
             if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟')) {
                 let pList = ['matchGameProgress', 'listenGameProgress', 'missingGameProgress', 'scrambleGameProgress', 'crosswordGameProgress'];
-                pList.forEach(key => { let prog = JSON.parse(localStorage.getItem(key)) || {}; for (let lvl in prog) prog[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem(key, JSON.stringify(prog)); });
-                document.getElementById('chk-reset-all').checked = false; alert('تم تصفير جميع الألعاب بنجاح! 🔄');
+                pList.forEach(key => {
+                    let prog = JSON.parse(localStorage.getItem(key)) || {};
+                    for (let lvl in prog) prog[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } };
+                    localStorage.setItem(key, JSON.stringify(prog));
+                });
+                document.getElementById('chk-reset-all').checked = false;
+                alert('تم تصفير جميع الألعاب بنجاح! 🔄');
             }
         }
-        
+
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         let exchVal = parseInt(document.getElementById('edit-exch-points').value);
         let spinVal = parseInt(document.getElementById('edit-spin-cost').value);
         if(!isNaN(exchVal) && exchVal >= 0) appProg.exchangedPoints = exchVal;
-        if(!isNaN(spinVal) && spinVal > 0) { let wheelSet = JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 }; wheelSet.spinCost = spinVal; localStorage.setItem('wheelSettings', JSON.stringify(wheelSet)); }
+        if(!isNaN(spinVal) && spinVal > 0) {
+            let wheelSet = JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 };
+            wheelSet.spinCost = spinVal;
+            localStorage.setItem('wheelSettings', JSON.stringify(wheelSet));
+        }
         localStorage.setItem('appProgress', JSON.stringify(appProg));
         updateBankUI();
 
-        alert('تم حفظ الإعدادات بنجاح!'); toggleModal('admin-modal');
+        alert('تم حفظ الإعدادات بنجاح!');
+        toggleModal('admin-modal');
     }
 
     function loadGamesState() {
         const savedState = JSON.parse(localStorage.getItem('disabledGamesConfig')) || { matchg: true, listen: true, missing: true, arrange: true, crossword: true };
-        document.getElementById('chk-matchg').checked = savedState.matchg !== false; document.getElementById('chk-listen').checked = savedState.listen !== false;
-        document.getElementById('chk-missing').checked = savedState.missing !== false; document.getElementById('chk-arrange').checked = savedState.arrange !== false; document.getElementById('chk-crossword').checked = savedState.crossword !== false;
+        document.getElementById('chk-matchg').checked = savedState.matchg !== false;
+        document.getElementById('chk-listen').checked = savedState.listen !== false;
+        document.getElementById('chk-missing').checked = savedState.missing !== false;
+        document.getElementById('chk-arrange').checked = savedState.arrange !== false;
+        document.getElementById('chk-crossword').checked = savedState.crossword !== false;
         applyGamesState(savedState);
     }
 
@@ -831,45 +1011,102 @@
     }
 
     function addStageBonus() {
-        let stageSelect = document.getElementById('stage-bonus-select').value; let bonusVal = parseFloat(document.getElementById('stage-bonus-val').value);
+        let stageSelect = document.getElementById('stage-bonus-select').value;
+        let bonusVal = parseFloat(document.getElementById('stage-bonus-val').value);
         if(isNaN(bonusVal)) { alert("الرجاء إدخال مبلغ صحيح!"); return; }
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; stageBonuses[stageSelect] = (parseFloat(stageBonuses[stageSelect]) || 0) + bonusVal; localStorage.setItem('stageBonuses', JSON.stringify(stageBonuses));
-        document.getElementById('stage-bonus-val').value = ''; alert(`تم إضافة ${bonusVal} جنيه فلسطيني إلى المرحلة ${stageSelect} بنجاح!`);
+        
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
+        stageBonuses[stageSelect] = (parseFloat(stageBonuses[stageSelect]) || 0) + bonusVal;
+        localStorage.setItem('stageBonuses', JSON.stringify(stageBonuses));
+        document.getElementById('stage-bonus-val').value = '';
+        alert(`تم إضافة ${bonusVal} جنيه فلسطيني إلى المرحلة ${stageSelect} بنجاح!`);
         if(document.getElementById('bonus-report-box').style.display === 'block') showBonusReport();
     }
 
     function showBonusReport() {
-        let box = document.getElementById('bonus-report-box'); let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; let html = '<ul>';
-        for(let i=1; i<=7; i++) { let base = 15 * i * i; let bonus = parseFloat(stageBonuses[i]) || 0; html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه فلسطيني</span></li>`; }
-        html += '</ul>'; box.innerHTML = html; box.style.display = 'block';
+        let box = document.getElementById('bonus-report-box');
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
+        let html = '<ul>';
+        for(let i=1; i<=7; i++) {
+            let base = 15 * i * i;
+            let bonus = parseFloat(stageBonuses[i]) || 0;
+            html += `<li style="margin-bottom:5px;">مرحلة ${i}: أساسي (${base}) + إضافي (${bonus}) = <span style="color:var(--success)">${base + bonus} جنيه فلسطيني</span></li>`;
+        }
+        html += '</ul>';
+        box.innerHTML = html; box.style.display = 'block';
     }
     
     function addManualPoints() {
         let pts = parseInt(document.getElementById('manual-points-val').value);
         if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للمكافأة!"); return; }
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; appProg.cumulativeScore = (appProg.cumulativeScore || 0) + pts; localStorage.setItem('appProgress', JSON.stringify(appProg));
-        document.getElementById('manual-points-val').value = ''; alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة! 🎉`); checkNewFameAchievements(); updateBankUI();
+        
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        appProg.cumulativeScore = (appProg.cumulativeScore || 0) + pts;
+        localStorage.setItem('appProgress', JSON.stringify(appProg));
+        
+        document.getElementById('manual-points-val').value = '';
+        alert(`تمت إضافة ${pts} نقطة بنجاح كمكافأة! 🎉`);
+        
+        checkNewFameAchievements(); updateBankUI();
         if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
     }
 
     function subtractManualPoints() {
         let pts = parseInt(document.getElementById('manual-points-val').value);
         if(isNaN(pts) || pts <= 0) { alert("الرجاء إدخال قيمة نقاط صحيحة للخصم!"); return; }
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let currentScore = Math.floor(appProg.cumulativeScore || 0);
-        if(pts > currentScore) pts = currentScore; appProg.cumulativeScore -= pts; let newScore = appProg.cumulativeScore;
-        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {}; let newNotifiedBadges = []; let badgesValueLost = 0; let absoluteBadgeIndex = 1;
-        fameStages.forEach(stage => { stage.badges.forEach(badge => { if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) { if(newScore >= badge.req) { newNotifiedBadges.push(badge.id); } else { badgesValueLost += absoluteBadgeIndex; } } absoluteBadgeIndex++; }); });
-        appProg.notifiedBadges = newNotifiedBadges; let newClaimedStages = []; let stagesValueLost = 0;
-        fameStages.forEach(stage => { if(appProg.claimedStagesFame && appProg.claimedStagesFame.includes(stage.num)) { if(newScore >= stage.end) { newClaimedStages.push(stage.num); } else { let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; stagesValueLost += (baseReward + bonusReward); } } });
-        appProg.claimedStagesFame = newClaimedStages; let totalLostMoney = badgesValueLost + stagesValueLost; appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; 
-        localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('manual-points-val').value = '';
-        let msg = `تم خصم ${pts} نقطة بنجاح كعقاب.`; if (totalLostMoney > 0) { msg += `\nتم سحب جوائز من البنك بقيمة ${totalLostMoney} جنيه.`; logBankStatement("سحب عقابي لتراجع المراحل", totalLostMoney, false); }
-        alert(msg); updateBankUI(); if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
+        
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+        let currentScore = Math.floor(appProg.cumulativeScore || 0);
+        
+        if(pts > currentScore) pts = currentScore; 
+        appProg.cumulativeScore -= pts;
+        let newScore = appProg.cumulativeScore;
+        
+        let stageBonuses = JSON.parse(localStorage.getItem('stageBonuses')) || {};
+        let newNotifiedBadges = []; let badgesValueLost = 0; let absoluteBadgeIndex = 1;
+        
+        fameStages.forEach(stage => {
+            stage.badges.forEach(badge => {
+                if(appProg.notifiedBadges && appProg.notifiedBadges.includes(badge.id)) {
+                    if(newScore >= badge.req) { newNotifiedBadges.push(badge.id); } 
+                    else { badgesValueLost += absoluteBadgeIndex; }
+                }
+                absoluteBadgeIndex++;
+            });
+        });
+        appProg.notifiedBadges = newNotifiedBadges;
+
+        let newClaimedStages = []; let stagesValueLost = 0;
+        fameStages.forEach(stage => {
+            if(appProg.claimedStagesFame && appProg.claimedStagesFame.includes(stage.num)) {
+                if(newScore >= stage.end) { newClaimedStages.push(stage.num); } 
+                else { let baseReward = 15 * stage.num * stage.num; let bonusReward = parseFloat(stageBonuses[stage.num]) || 0; stagesValueLost += (baseReward + bonusReward); }
+            }
+        });
+        appProg.claimedStagesFame = newClaimedStages;
+
+        let totalLostMoney = badgesValueLost + stagesValueLost;
+        appProg.bankBalance = (appProg.bankBalance || 0) - totalLostMoney; 
+        
+        localStorage.setItem('appProgress', JSON.stringify(appProg));
+        document.getElementById('manual-points-val').value = '';
+        
+        let msg = `تم خصم ${pts} نقطة بنجاح كعقاب.`;
+        if (totalLostMoney > 0) {
+            msg += `\nنظراً لتراجع مستوى النقاط، تم سحب جوائز من البنك بقيمة ${totalLostMoney} جنيه.`;
+            logBankStatement("سحب عقابي بسبب تراجع المراحل", totalLostMoney, false);
+        }
+        alert(msg);
+        updateBankUI();
+        if(document.getElementById('fame-modal').style.display === 'flex') { renderHallOfFame(); }
     }
 
     let wheelAngle = 0, isSpinning = false, reqAnim, chosenPrize = 0;
 
-    function getWheelSettings() { return JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 }; }
+    function getWheelSettings() {
+        let set = JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 };
+        return set;
+    }
 
     function updateBankUI() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
@@ -882,35 +1119,71 @@
 
     function handleSpinClick() {
         let btn = document.getElementById('btn-spin');
-        if(isSpinning) { stopWheel(); btn.innerText = 'ابدأ الدوران 🎡'; btn.classList.remove('stop-mode'); btn.disabled = true; } else {
-            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let total = Math.floor(appProg.cumulativeScore || 0); let exch = appProg.exchangedPoints || 0; let cost = getWheelSettings().spinCost;
-            if (total - exch < cost) { alert(`رصيد نقاطك لا يكفي! تحتاج للوصول إلى ${exch + cost} نقطة.`); return; }
-            appProg.exchangedPoints = exch + cost; localStorage.setItem('appProgress', JSON.stringify(appProg)); updateBankUI();
-            let array = new Uint32Array(1); window.crypto.getRandomValues(array); let rand = Math.floor((array[0] / (0xFFFFFFFF + 1)) * 100) + 1; 
+        if(isSpinning) {
+            stopWheel();
+            btn.innerText = 'ابدأ الدوران 🎡'; btn.classList.remove('stop-mode'); btn.disabled = true; 
+        } else {
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+            let total = Math.floor(appProg.cumulativeScore || 0);
+            let exch = appProg.exchangedPoints || 0;
+            let cost = getWheelSettings().spinCost;
+            if (total - exch < cost) { alert(`رصيد نقاطك لا يكفي! تحتاج للوصول إلى ${exch + cost} نقطة للمحاولة.`); return; }
+            appProg.exchangedPoints = exch + cost;
+            localStorage.setItem('appProgress', JSON.stringify(appProg));
+            updateBankUI();
+            
+            let array = new Uint32Array(1); window.crypto.getRandomValues(array);
+            let secureRandom = (array[0] / (0xFFFFFFFF + 1)); let rand = Math.floor(secureRandom * 100) + 1; 
             if (rand <= 30) chosenPrize = 1; else if (rand <= 60) chosenPrize = 2; else if (rand <= 80) chosenPrize = 3; else if (rand <= 90) chosenPrize = 4; else chosenPrize = 5;
-            isSpinning = true; document.getElementById('wheel').style.transition = 'none'; animateSpin(); btn.innerText = 'توقف 🛑'; btn.classList.add('stop-mode');
+
+            isSpinning = true; document.getElementById('wheel').style.transition = 'none';
+            animateSpin(); btn.innerText = 'توقف 🛑'; btn.classList.add('stop-mode');
         }
     }
 
-    function animateSpin() { if(isSpinning) { wheelAngle = (wheelAngle + 15) % 360; document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`; reqAnim = requestAnimationFrame(animateSpin); } }
+    function animateSpin() {
+        if(isSpinning) { wheelAngle = (wheelAngle + 15) % 360; document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`; reqAnim = requestAnimationFrame(animateSpin); }
+    }
 
     function stopWheel() {
-        isSpinning = false; cancelAnimationFrame(reqAnim); let prizeAngleMap = { 1: 324, 2: 252, 3: 180, 4: 108, 5: 36 }; let finalTarget = prizeAngleMap[chosenPrize] + (Math.floor(Math.random() * 60) - 30);
-        let finalAngle = wheelAngle + (3 * 360) + (finalTarget - (wheelAngle % 360)); if (finalTarget < (wheelAngle % 360)) finalAngle += 360;
-        let wheelEl = document.getElementById('wheel'); wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)'; wheelEl.style.transform = `rotate(${finalAngle}deg)`;
+        isSpinning = false; cancelAnimationFrame(reqAnim);
+        let prizeAngleMap = { 1: 324, 2: 252, 3: 180, 4: 108, 5: 36 };
+        let finalTarget = prizeAngleMap[chosenPrize] + (Math.floor(Math.random() * 60) - 30);
+        let finalAngle = wheelAngle + (3 * 360) + (finalTarget - (wheelAngle % 360));
+        if (finalTarget < (wheelAngle % 360)) finalAngle += 360;
+        let wheelEl = document.getElementById('wheel');
+        wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)'; wheelEl.style.transform = `rotate(${finalAngle}deg)`;
         setTimeout(() => {
             wheelEl.style.transition = 'none'; wheelAngle = finalAngle % 360; wheelEl.style.transform = `rotate(${wheelAngle}deg)`;
-            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize; localStorage.setItem('appProgress', JSON.stringify(appProg));
-            logBankStatement("جائزة عجلة الحظ", chosenPrize, true); updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه.`); document.getElementById('btn-spin').disabled = false;
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+            appProg.bankBalance = (appProg.bankBalance || 0) + chosenPrize;
+            localStorage.setItem('appProgress', JSON.stringify(appProg));
+            logBankStatement("جائزة عجلة الحظ", chosenPrize, true);
+            updateBankUI(); alert(`مبروك! 🎊 ربحت ${chosenPrize} جنيه. أضيفت لرصيدك!`);
+            document.getElementById('btn-spin').disabled = false;
         }, 3500);
     }
 
     function withdrawBank() {
-        let amount = parseFloat(document.getElementById('withdraw-amount').value); if(isNaN(amount) || amount === 0) { alert("أدخل مبلغاً صحيحاً!"); return; }
+        let amount = parseFloat(document.getElementById('withdraw-amount').value);
+        if(isNaN(amount) || amount === 0) { alert("أدخل مبلغاً صحيحاً!"); return; }
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        if(amount > 0) { if(amount > (appProg.bankBalance || 0)) { alert("الرصيد لا يكفي للسحب!"); return; } appProg.bankBalance -= amount; logBankStatement("سحب مصروف", amount, false); alert(`تم سحب ${amount} جنيه بنجاح.`); } 
-        else { let deposit = Math.abs(amount); appProg.bankBalance = (appProg.bankBalance || 0) + deposit; logBankStatement("إيداع نقدي", deposit, true); alert(`تم إيداع ${deposit} جنيه بنجاح.`); }
-        localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('withdraw-amount').value = ''; updateBankUI(); 
+        
+        if(amount > 0) {
+            if(amount > (appProg.bankBalance || 0)) { alert("الرصيد لا يكفي للسحب!"); return; }
+            appProg.bankBalance -= amount;
+            logBankStatement("سحب مصروف من البنك", amount, false);
+            alert(`تم سحب ${amount} جنيه بنجاح.`);
+        } else {
+            let deposit = Math.abs(amount);
+            appProg.bankBalance = (appProg.bankBalance || 0) + deposit;
+            logBankStatement("إيداع نقدي في البنك", deposit, true);
+            alert(`تم إيداع ${deposit} جنيه في رصيدك بنجاح.`);
+        }
+
+        localStorage.setItem('appProgress', JSON.stringify(appProg));
+        document.getElementById('withdraw-amount').value = '';
+        updateBankUI(); 
     }
 </script>
 
