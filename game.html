@@ -62,12 +62,6 @@
         .statement-item { border-bottom: 1px dashed #ccc; padding: 5px 0; display: flex; justify-content: space-between; }
         .statement-in { color: var(--success); } .statement-out { color: var(--danger); }
 
-/* التحكم بالصوت */
-        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; }
-        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
-        .vol-icon:hover { transform: scale(1.1); }
-        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
-
         #fame-content { max-width: 800px; width: 95%; background: #2c3e50; color: white; }
         .fame-header { color: var(--gold); font-size: 28px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); margin-bottom: 5px; margin-top: 0;}
         .fame-score-badge { display: inline-block; background: var(--gold); color: #000; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 18px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
@@ -129,14 +123,20 @@
         .range-inputs { display: flex; gap: 10px; }
         .range-inputs input { width: 50%; }
         .games-checkboxes label { display: inline-block; margin-left: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 20px; font-size: 13px; color: #333;}
+        
+        /* التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; position: absolute; top: 15px; left: 15px; z-index: 1000; }
+        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
     </style>
 </head>
 <body>
     <audio id="bg-music" src="music\game.mp3" loop autoplay></audio>
-	
-	 <div class="volume-container" style="position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; display: flex; align-items: center; gap: 10px;">
-        <div id="bg-vol-icon" class="vol-icon" style="font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;">🔊</div>
-        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5" style="width: 80px; cursor: pointer; accent-color: var(--primary);">
+
+    <div class="volume-container">
+        <div id="bg-vol-icon" class="vol-icon">🔊</div>
+        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5">
     </div>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
@@ -348,8 +348,32 @@
     </div>
 
 <script>
-   // التحكم بالصوت والإجبار على خفضه
-function initVolumeControl() {
+    // الأصوات التفاعلية للمحرك
+    let sysAudioCtx = null;
+    function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
+    
+    function playSysSound(type) {
+        try {
+            initSysAudio();
+            const osc = sysAudioCtx.createOscillator(); const gain = sysAudioCtx.createGain();
+            osc.connect(gain); gain.connect(sysAudioCtx.destination);
+            if(type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, sysAudioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, sysAudioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
+            }
+        } catch(e){}
+    }
+
+    document.addEventListener('click', (e) => { 
+        if(e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.icon-btn') || e.target.closest('.game-btn') || e.target.closest('.btn-top-action') || e.target.closest('.btn-spin') || e.target.closest('.btn-close-modal') || e.target.closest('.btn-admin-action') || e.target.closest('.btn-withdraw') || e.target.closest('.badge-item') || e.target.closest('.stage-card') || e.target.closest('.btn-help-icon') || e.target.closest('.wheel-box')) {
+            playSysSound('click'); 
+        }
+    });
+
+    // التحكم بالصوت والإجبار على خفضه
+    function initVolumeControl() {
         let volSlider = document.getElementById('bg-vol-slider'); 
         let volIcon = document.getElementById('bg-vol-icon');
         
@@ -397,6 +421,7 @@ function initVolumeControl() {
             else volIcon.innerText = '🔊'; 
         }
     }
+
     // المحرك الديناميكي للبطاقات والتزامن مع الإعدادات
     const DEFAULT_CARDS_CONFIG = {
         last5: { id: 'last5', name: "بطاقة آخر 5 مراحل", color: "#e74a3b", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 0, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'fixed' }, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "تُطبق أوتوماتيكياً على أحدث 5 مراحل تم حفظها لزيادة التحدي." },
@@ -444,6 +469,7 @@ function initVolumeControl() {
         applyGlobalModes();
         loadGamesState();
         checkNewFameAchievements(); 
+        initVolumeControl();
     };
 
     function verifyParentModeStrict() {
@@ -1037,25 +1063,6 @@ function initVolumeControl() {
         localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('withdraw-amount').value = ''; updateBankUI(); 
     }
 </script>
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-        let bgMusic = document.getElementById('bg-music');
-        if (bgMusic) {
-            // قراءة مستوى الصوت المحفوظ من الصفحة الرئيسية
-            let savedVol = localStorage.getItem('bgMusicVolume');
-            let vol = (savedVol !== null && savedVol !== '') ? parseFloat(savedVol) : 0.5;
-            if (isNaN(vol)) vol = 0.5;
-            
-            // قراءة حالة الكتم
-            let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
-            let finalVol = isMuted ? 0 : vol;
-            
-            // التطبيق الفوري والإجباري على المتصفح
-            bgMusic.volume = finalVol;
-            bgMusic.onplay = () => { bgMusic.volume = finalVol; };
-            bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
-        }
-    });
-</script>
+
 </body>
 </html>
