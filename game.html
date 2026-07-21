@@ -62,7 +62,11 @@
         .statement-item { border-bottom: 1px dashed #ccc; padding: 5px 0; display: flex; justify-content: space-between; }
         .statement-in { color: var(--success); } .statement-out { color: var(--danger); }
 
-
+/* التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; }
+        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
 
         #fame-content { max-width: 800px; width: 95%; background: #2c3e50; color: white; }
         .fame-header { color: var(--gold); font-size: 28px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); margin-bottom: 5px; margin-top: 0;}
