@@ -36,13 +36,6 @@
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
-
-
-
-
-
-
-
         .hot-badge { font-size:11px; color:#fff; background:rgba(0,0,0,0.4); padding:2px 5px; border-radius:4px; margin-right: 5px; display: inline-block;}
 
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
@@ -326,7 +319,15 @@
 
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal'); const gameScreen = document.getElementById('game-screen');
-        if(modal.style.display === 'flex') { modal.style.display = 'none'; } else if (gameScreen.style.display === 'block') { showStagesScreen(); } else { window.location.href = 'game.html'; }
+        if(modal.style.display === 'flex') { 
+            modal.style.display = 'none'; 
+        } else if (gameScreen.style.display === 'block') { 
+            // تعديل سد ثغرة التحايل: تصفير السلسلة عند الخروج باستخدام الزر الداخلي أثناء اللعب
+            localStorage.setItem('consecutive5_matchg', 0);
+            showStagesScreen(); 
+        } else { 
+            window.location.href = 'game.html'; 
+        }
     }
 
     function initializeDropdown() {
@@ -689,6 +690,20 @@
             bgMusic.volume = finalVol;
             bgMusic.onplay = () => { bgMusic.volume = finalVol; };
             bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
+        }
+    });
+
+    // --- إضافة سد ثغرة التحايل بواسطة سهم الجوال أو تحديث الصفحة أثناء اللعب ---
+    window.addEventListener('beforeunload', function() {
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && gameScreen.style.display === 'block') {
+            localStorage.setItem('consecutive5_matchg', 0);
+        }
+    });
+    window.addEventListener('pagehide', function() {
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && gameScreen.style.display === 'block') {
+            localStorage.setItem('consecutive5_matchg', 0);
         }
     });
 </script>

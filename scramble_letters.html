@@ -83,234 +83,17 @@
         @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
 
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
-
-        .report-selectors { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
-        .report-selectors select { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; font-family: inherit; min-width: 150px;}
-        .report-block { margin-bottom: 15px; padding: 12px; background: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-        .report-block h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 16px; border-bottom: 2px dashed #eee; padding-bottom: 5px;}
-        .stat-item { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--dark); font-weight: bold; font-size: 15px;}
-        .stat-val { color: var(--danger); font-size: 16px;}
-        .stat-val.good { color: var(--success); }
-
-        /* البطاقات السحرية */
-        .magic-card-item { display:flex; flex-direction:column; border-radius:10px; padding:15px; margin-bottom:15px; text-align:right; box-shadow:0 4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3); position: relative; }
-        .magic-card-item * { color: #fff !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
-        .mc-title { font-size: 18px; font-weight: bold; margin:0 0 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.4); padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center;}
-        .mc-desc { font-size: 14px; margin:0 0 10px 0; line-height: 1.4;}
-        .mc-timer { font-size: 15px; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 5px; display: inline-block; }
-        .btn-help-icon { background: rgba(255,255,255,0.2); border: 1px solid #fff; border-radius: 50%; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;}
-        .btn-help-icon:hover { background: #fff; color: #333 !important; text-shadow: none; }
-
-        /* محرر البطاقات الديناميكي */
-        .event-editor-row { display: flex; flex-direction: column; text-align: right; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
-        .event-editor-row h4 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 5px; cursor: pointer; display: flex; justify-content: space-between;}
-        .event-details { display: none; margin-top: 15px; }
-        .prop-group { margin-bottom: 12px; }
-        .prop-group label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 14px; color: var(--dark);}
-        .prop-group input[type="text"], .prop-group input[type="number"], .prop-group input[type="color"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .radio-inline { display: flex; gap: 15px; margin-bottom: 5px; }
-        .range-inputs { display: flex; gap: 10px; }
-        .range-inputs input { width: 50%; }
-        .games-checkboxes label { display: inline-block; margin-left: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 20px; font-size: 13px; color: #333;}
-        
-        /* التحكم بالصوت */
-        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; position: absolute; top: 15px; left: 15px; z-index: 1000; }
-        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
-        .vol-icon:hover { transform: scale(1.1); }
-        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
     </style>
 </head>
 <body>
     <audio id="bg-music" src="music\4.mp3" loop autoplay></audio>
 
-   
+    <div class="volume-container">
+        <div id="bg-vol-icon" class="vol-icon">🔊</div>
+        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5">
+    </div>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
-
-    <!-- نافذة الشرح التفصيلي للبطاقات ذات التمرير -->
-    <div id="info-modal" class="custom-modal">
-        <div class="modal-content-box">
-            <button class="btn-close-modal" onclick="toggleModal('info-modal')">✖</button>
-            <h3 id="info-title" style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;"></h3>
-            <div id="info-body" style="text-align: right; max-height: 60vh; overflow-y: auto; padding: 10px; line-height: 1.6; font-size: 16px; color: var(--dark);"></div>
-        </div>
-    </div>
-
-    <!-- البطاقات السحرية للمستخدم -->
-    <div id="magic-cards-modal" class="custom-modal">
-        <div class="modal-content-box" style="background:#f0f2f5;">
-            <button class="btn-close-modal" onclick="toggleModal('magic-cards-modal')">✖</button>
-            <h3 style="color: var(--purple); margin-top:0; border-bottom: 2px solid #ddd; padding-bottom: 10px;">🃏 البطاقات السحرية النشطة</h3>
-            <div id="magic-cards-container" style="max-height: 65vh; overflow-y: auto; padding: 5px;"></div>
-        </div>
-    </div>
-
-    <!-- محرر البطاقات الديناميكي لولي الأمر -->
-    <div id="events-admin-modal" class="custom-modal">
-        <div class="modal-content-box" style="background:#f8f9fc; text-align: right;">
-            <button class="btn-close-modal" onclick="toggleModal('events-admin-modal')">✖</button>
-            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📅 محرك الأحداث والبطاقات الديناميكي</h3>
-            <p style="font-size: 13px; color: #555;">من هنا يمكنك التحكم بخصائص وآليات جميع البطاقات التي ستظهر في الألعاب بشكل ديناميكي.</p>
-            <div id="dynamic-cards-editor" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
-            <button id="btn-save-dynamic-cards" class="btn-admin-action" style="background:var(--success); margin-top: 15px;" onclick="saveDynamicCardsConfig()">💾 حفظ جميع الخصائص والآليات</button>
-        </div>
-    </div>
-
-    <div id="news-modal" class="custom-modal">
-        <div class="modal-content-box">
-            <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
-            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📰 أخبار وتحديثات اللعبة</h3>
-            <div id="news-content" style="text-align: right; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; min-height: 100px; max-height: 350px; overflow-y: auto; line-height: 1.6; white-space: pre-wrap; font-weight:bold; color:var(--dark);">جاري التحميل...</div>
-        </div>
-    </div>
-
-    <div id="reports-modal" class="custom-modal">
-        <div class="modal-content-box">
-            <button class="btn-close-modal" onclick="toggleModal('reports-modal')">✖</button>
-            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📊 تقارير الأداء والإنجاز</h3>
-            
-            <div style="margin-bottom: 15px; text-align: right;">
-                <label style="font-weight: bold; color: var(--dark); display: block; margin-bottom: 5px;">اختر نوع التقرير:</label>
-                <select id="main-report-type" onchange="toggleReportInputs()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--primary); font-weight: bold; font-family: inherit;">
-                    <option value="points">1. تقرير النقاط المكتسبة (زمني)</option>
-                    <option value="progress">2. تقرير إنجاز المراحل والنجوم (حجم الإنجاز)</option>
-                    <option value="performance">3. تقرير تحليل الأداء (السرعة والدقة)</option>
-                </select>
-            </div>
-
-            <div id="time-selectors" class="report-selectors">
-                <select id="report-type" onchange="updateReportRangeOptions()">
-                    <option value="hours">في آخر عدد ساعات</option>
-                    <option value="days">في آخر عدد أيام</option>
-                    <option value="weeks">في آخر عدد أسابيع</option>
-                    <option value="months">في آخر عدد أشهر</option>
-                </select>
-                <select id="report-num"></select>
-            </div>
-            
-            <button class="btn-admin-action" style="background: var(--info); margin-bottom: 15px;" onclick="generateSelectedReport()">عرض التقرير 🔍</button>
-            <div id="report-results" style="display: none; background: #f8f9fc; padding: 10px; border-radius: 8px; text-align: right; max-height: 400px; overflow-y: auto;"></div>
-        </div>
-    </div>
-
-    <div id="admin-modal" class="custom-modal">
-        <div class="modal-content-box" style="background: white;">
-            <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
-            <h3 style="color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top:0;">⚙️ إعدادات التحكم بالألعاب</h3>
-            
-            <div class="admin-checkbox-group parent-only-inputs">
-                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تفعيل أو تعطيل الألعاب للطفل:</strong>
-                <label><input type="checkbox" id="chk-matchg" checked> تفعيل لعبة المطابقة والذاكرة</label>
-                <label><input type="checkbox" id="chk-listen" checked> تفعيل لعبة صائد الأمثلة المسموعة</label>
-                <label><input type="checkbox" id="chk-missing" checked> تفعيل لعبة الحروف الناقصة</label>
-                <label><input type="checkbox" id="chk-arrange" checked> تفعيل لعبة ترتيب الحروف</label>
-                <label><input type="checkbox" id="chk-crossword" checked> تفعيل لعبة الكلمات المتقاطعة</label>
-            </div>
-
-            <div class="admin-row parent-only-inputs" style="margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 6px;">
-                <label><input type="checkbox" id="chk-reset-all"> تصفير جميع ألعاب البرنامج (سيتم مسح التقدم)</label>
-            </div>
-
-            <div class="admin-row parent-only-inputs" style="margin-top:15px; background:#f8f9fc; padding:10px; border-radius:5px; border:1px dashed #ccc; text-align:right;">
-                <label style="font-size:13px; color:var(--primary);">النقاط المستبدلة للبنك:</label>
-                <input type="number" id="edit-exch-points" placeholder="النقاط المستبدلة">
-                <label style="font-size:13px; color:var(--primary); margin-top:10px;">تكلفة لفة العجل بالنقاط (الافتراضي 3000):</label>
-                <input type="number" id="edit-spin-cost" placeholder="التكلفة">
-            </div>
-
-            <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
-
-            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
-                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">⚖️ إدارة نقاط الطفل (مكافأة / خصم)</h4>
-                <input type="number" id="manual-points-val" class="parent-only-inputs" placeholder="أدخل عدد النقاط (مثال: 5000)">
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top:0;" onclick="addManualPoints()">➕ إضافة كمكافأة</button>
-                    <button class="btn-admin-action parent-only-btn" style="background:var(--danger); margin-top:0;" onclick="subtractManualPoints()">➖ خصم كعقاب</button>
-                </div>
-            </div>
-
-            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
-                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">🎁 جوائز المراحل الإضافية</h4>
-                <select id="stage-bonus-select" class="parent-only-inputs">
-                    <option value="1">مرحلة 1: الحفاضة الفولاذية</option>
-                    <option value="2">مرحلة 2: الديناصور الثرثار</option>
-                    <option value="3">مرحلة 3: نينجا الكلمات الصامت</option>
-                    <option value="4">مرحلة 4: زومبي الحفظ الذكي</option>
-                    <option value="5">مرحلة 5: ساحرة الأبجدية العجوز</option>
-                    <option value="6">مرحلة 6: السايبورغ اللغوي</option>
-                    <option value="7">مرحلة 7: حاكم مجرة الأنجلو سنفورية</option>
-                </select>
-                <input type="number" id="stage-bonus-val" class="parent-only-inputs" placeholder="المبلغ المضاف (جنيه فلسطيني)">
-                <button class="btn-admin-action parent-only-btn" style="background:var(--info);" onclick="addStageBonus()">➕ إضافة الجائزة</button>
-                <button class="btn-admin-action parent-only-btn" style="background:var(--warning); color:#000;" onclick="showBonusReport()">📊 تقرير جوائز المراحل</button>
-                <div id="bonus-report-box" style="display:none; text-align:right; font-size:14px; background:#f1f1f1; padding:10px; border-radius:5px; margin-top:10px; max-height:150px; overflow-y:auto; font-weight:bold; color:var(--dark);"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- بنك الأبطال -->
-    <div id="bank-modal" class="custom-modal">
-        <div class="modal-content-box">
-            <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
-            <h2 style="color: var(--warning); margin-top: 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">💰 بنك الأبطال 🎡</h2>
-            
-            <div class="bank-stats">
-                <div>النقاط التراكمية: <span id="stat-total">0</span></div>
-                <div>النقاط المستبدلة باللعب: <span id="stat-exch">0</span></div>
-                <div>الرصيد البنكي الحالي: <span id="stat-bank" style="color: var(--success);">0</span> جنيه فلسطيني</div>
-            </div>
-
-            <div class="wheel-box">
-                <div class="wheel-pointer">▼</div>
-                <div class="wheel" id="wheel">
-                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(36deg);">1 جنيه</span></div>
-                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(108deg);">2 جنيه</span></div>
-                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(180deg);">3 جنيه</span></div>
-                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(252deg);">4 جنيه</span></div>
-                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(324deg);">5 جنيه</span></div>
-                </div>
-            </div>
-
-            <button id="btn-spin" class="btn-spin" onclick="handleSpinClick()">ابدأ الدوران 🎡</button>
-
-            <div class="withdraw-box parent-only-inputs">
-                <h4 style="margin-top:0; color:var(--success);">💳 سحب وإيداع (لولي الأمر)</h4>
-                <p style="font-size:12px; margin:0 0 10px 0; color:#555;">ملاحظة: للسحب أدخل رقماً عادياً (مثال: 5). للإيداع وإضافة رصيد أدخل رقماً سالباً (مثال: -5).</p>
-                <input type="number" id="withdraw-amount" placeholder="القيمة المراد سحبها أو إيداعها">
-                <button class="btn-withdraw parent-only-btn" onclick="withdrawBank()">تنفيذ العملية</button>
-            </div>
-
-            <h4 style="text-align:right; margin:15px 0 5px 0; color:var(--dark);">🧾 كشف حساب البنك</h4>
-            <div class="bank-statement-box" id="bank-statement-list"></div>
-        </div>
-    </div>
-
-    <!-- الشرف و الأوسمة -->
-    <div id="fame-modal" class="custom-modal">
-        <div class="modal-content-box" id="fame-content">
-            <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
-            <h2 class="fame-header">🏆 لوحة الشرف والأوسمة 🏆</h2>
-            <div class="fame-score-badge">رصيد نقاطك: <span id="fame-total-points">0</span> ⚡</div>
-            <div id="stages-wrapper"></div>
-        </div>
-    </div>
-
-    <div id="celebration-modal" class="custom-modal">
-        <div class="modal-content-box celebration-content">
-            <h1 style="margin-top:0; color:#e74a3b; font-size:30px;">🎉 إنجاز جديد! 🎉</h1>
-            <h2 id="cel-title" style="color:#2c3e50;">مبروك! تم فتح وسام</h2>
-            <img id="cel-img" src="" class="celebration-img" alt="Achievement">
-            <h3 id="cel-name" style="color:#8e44ad; font-size:26px; margin-bottom:5px;">اسم الوسام</h3>
-            <p id="cel-desc" style="font-weight:bold; font-size:16px;"></p>
-            <button class="btn-withdraw" style="background:#e74a3b; margin-top:20px;" onclick="closeCelebration()">رائع! استمرار 🚀</button>
-        </div>
-    </div>
-
-    <div id="image-modal" class="custom-modal" onclick="closeImageModal(event)">
-        <button class="btn-close-modal" style="top: 20px; right: 20px; z-index: 1001;" onclick="closeImageModal(event)">✖</button>
-        <img id="full-size-img" src="" class="full-size-image" alt="صورة المرحلة المكبرة">
-    </div>
-
     <div id="flash-effect" class="hareef-flash"></div>
 
     <div class="header-stats">
@@ -522,10 +305,20 @@
         document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
         document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? 'inline-block' : 'none');
     }
+
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal'); const gameScreen = document.getElementById('game-screen');
-        if(modal.style.display === 'flex') { modal.style.display = 'none'; } else if (gameScreen.style.display === 'block') { showStagesScreen(); } else { window.location.href = 'game.html'; }
+        if(modal.style.display === 'flex') { 
+            modal.style.display = 'none'; 
+        } else if (gameScreen.style.display === 'block') { 
+            // تعديل سد ثغرة التحايل: تصفير السلسلة عند الخروج الداخلي
+            localStorage.setItem('consecutive5_scramble', 0);
+            showStagesScreen(); 
+        } else { 
+            window.location.href = 'game.html'; 
+        }
     }
+
     function toggleModal(id) {
         const modal = document.getElementById(id);
         if(modal.style.display === 'flex') { if(id === 'magic-cards-modal') clearInterval(magicCardEventInterval); modal.style.display = 'none'; } 
@@ -1065,6 +858,20 @@
             bgMusic.volume = finalVol;
             bgMusic.onplay = () => { bgMusic.volume = finalVol; };
             bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
+        }
+    });
+
+    // --- إضافة سد ثغرة التحايل بواسطة سهم الجوال أو تحديث الصفحة أثناء اللعب ---
+    window.addEventListener('beforeunload', function() {
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && gameScreen.style.display === 'block') {
+            localStorage.setItem('consecutive5_scramble', 0);
+        }
+    });
+    window.addEventListener('pagehide', function() {
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && gameScreen.style.display === 'block') {
+            localStorage.setItem('consecutive5_scramble', 0);
         }
     });
 </script>

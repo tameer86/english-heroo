@@ -312,7 +312,15 @@
     }
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal'); const gameScreen = document.getElementById('game-screen');
-        if(modal.style.display === 'flex') { modal.style.display = 'none'; } else if (gameScreen.style.display === 'block') { showStagesScreen(); } else { window.location.href = 'game.html'; }
+        if(modal.style.display === 'flex') { 
+            modal.style.display = 'none'; 
+        } else if (gameScreen.style.display === 'block') { 
+            // تعديل سد ثغرة التحايل: تصفير السلسلة عند الخروج الداخلي
+            localStorage.setItem('consecutive5_crossword', 0);
+            showStagesScreen(); 
+        } else { 
+            window.location.href = 'game.html'; 
+        }
     }
     function toggleModal(id) {
         const modal = document.getElementById(id);
@@ -777,6 +785,20 @@
             bgMusic.volume = finalVol;
             bgMusic.onplay = () => { bgMusic.volume = finalVol; };
             bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
+        }
+    });
+
+    // --- إضافة سد ثغرة التحايل بواسطة سهم الجوال أو تحديث الصفحة أثناء اللعب ---
+    window.addEventListener('beforeunload', function() {
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && gameScreen.style.display === 'block') {
+            localStorage.setItem('consecutive5_crossword', 0);
+        }
+    });
+    window.addEventListener('pagehide', function() {
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && gameScreen.style.display === 'block') {
+            localStorage.setItem('consecutive5_crossword', 0);
         }
     });
 </script>
