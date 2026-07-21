@@ -123,20 +123,14 @@
         .range-inputs { display: flex; gap: 10px; }
         .range-inputs input { width: 50%; }
         .games-checkboxes label { display: inline-block; margin-left: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 20px; font-size: 13px; color: #333;}
-        
-        /* التحكم بالصوت */
-        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; position: absolute; top: 15px; left: 15px; z-index: 1000; }
-        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
-        .vol-icon:hover { transform: scale(1.1); }
-        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
     </style>
 </head>
 <body>
     <audio id="bg-music" src="music\game.mp3" loop autoplay></audio>
 
-    <div class="volume-container">
-        <div id="bg-vol-icon" class="vol-icon">🔊</div>
-        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5">
+    <div class="volume-container" style="position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; display: flex; align-items: center; gap: 10px;">
+        <div id="bg-vol-icon" class="vol-icon" style="font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;">🔊</div>
+        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5" style="width: 80px; cursor: pointer; accent-color: var(--primary);">
     </div>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
@@ -372,20 +366,54 @@
         }
     });
 
+    // التحكم بالصوت والإجبار على خفضه
     function initVolumeControl() {
-        let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
-        let savedVol = localStorage.getItem('bgMusicVolume'); if (savedVol === null) savedVol = 0.5; 
-        if (volSlider) { volSlider.value = savedVol; volSlider.oninput = function() { localStorage.setItem('bgMusicVolume', this.value); localStorage.setItem('bgMusicMuted', 'false'); applyVolumeUI(); }; }
-        if (volIcon) { volIcon.onclick = function() { let muted = localStorage.getItem('bgMusicMuted') === 'true'; localStorage.setItem('bgMusicMuted', !muted); applyVolumeUI(); }; }
+        let volSlider = document.getElementById('bg-vol-slider'); 
+        let volIcon = document.getElementById('bg-vol-icon');
+        
+        let savedVol = localStorage.getItem('bgMusicVolume'); 
+        if (savedVol === null) savedVol = 0.5; 
+        
+        if (volSlider) { 
+            volSlider.value = savedVol; 
+            volSlider.oninput = function() { 
+                localStorage.setItem('bgMusicVolume', this.value); 
+                localStorage.setItem('bgMusicMuted', 'false'); 
+                applyVolumeUI(); 
+            }; 
+        }
+        if (volIcon) { 
+            volIcon.onclick = function() { 
+                let muted = localStorage.getItem('bgMusicMuted') === 'true'; 
+                localStorage.setItem('bgMusicMuted', !muted); 
+                applyVolumeUI(); 
+            }; 
+        }
         applyVolumeUI();
     }
 
     function applyVolumeUI() {
-        let bgMusic = document.getElementById('bg-music'); let volSlider = document.getElementById('bg-vol-slider'); let volIcon = document.getElementById('bg-vol-icon');
-        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5); let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
-        if(bgMusic) bgMusic.volume = isMuted ? 0 : vol;
+        let bgMusic = document.getElementById('bg-music'); 
+        let volSlider = document.getElementById('bg-vol-slider'); 
+        let volIcon = document.getElementById('bg-vol-icon');
+        
+        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5); 
+        let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+        let finalVol = isMuted ? 0 : vol;
+
+        if(bgMusic) {
+            bgMusic.volume = finalVol;
+            // قوة الإجبار: لمنع المتصفح من تجاهل الصوت عند التفعيل التلقائي
+            bgMusic.onplay = () => { bgMusic.volume = finalVol; };
+            bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
+        }
+        
         if (volSlider) volSlider.value = vol;
-        if (volIcon) { if (isMuted || vol === 0) volIcon.innerText = '🔇'; else if (vol < 0.5) volIcon.innerText = '🔉'; else volIcon.innerText = '🔊'; }
+        if (volIcon) { 
+            if (isMuted || vol === 0) volIcon.innerText = '🔇'; 
+            else if (vol < 0.5) volIcon.innerText = '🔉'; 
+            else volIcon.innerText = '🔊'; 
+        }
     }
 
     // المحرك الديناميكي للبطاقات والتزامن مع الإعدادات

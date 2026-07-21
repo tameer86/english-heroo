@@ -8,10 +8,10 @@
     (function checkActivation() {
         if (!localStorage.getItem('app_is_activated')) {
             alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
-            window.location.replace("index.html");
+            window.location.replace("index.html"); 
         }
     })();
-</script>
+    </script>
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
     <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
@@ -119,27 +119,25 @@
         .range-inputs { display: flex; gap: 10px; }
         .range-inputs input { width: 50%; }
         .games-checkboxes label { display: inline-block; margin-left: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 20px; font-size: 13px; color: #333;}
+        
+        /* التحكم بالصوت */
+        .volume-container { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; position: absolute; top: 15px; left: 15px; z-index: 1000; }
+        .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
+        .vol-icon:hover { transform: scale(1.1); }
+        .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
     </style>
 </head>
 <body>
-
-    <!-- موسيقى الخلفية -->
     <audio id="bg-music" src="music\4.mp3" loop autoplay></audio>
+
+    <div class="volume-container" style="position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; display: flex; align-items: center; gap: 10px;">
+        <div id="bg-vol-icon" class="vol-icon" style="font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;">🔊</div>
+        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5" style="width: 80px; cursor: pointer; accent-color: var(--primary);">
+    </div>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
 
-    <div class="top-icons">
-        <button class="btn-top-action" onclick="window.location.href='index.html?screen=dashboard'" title="العودة للوحة التحكم">🔙</button>
-        <button class="btn-top-action" onclick="toggleModal('admin-modal')" title="إعدادات الألعاب لولي الأمر">⚙️</button>
-        <button class="btn-top-action" onclick="toggleEventsAdminModal()" title="إعدادات الأحداث والبطاقات">📅</button>
-        <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
-        <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
-        <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
-        <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
-        <button class="btn-top-action" onclick="openMagicCardsModal()" title="البطاقات السحرية والأحداث">🃏</button>
-    </div>
-
-    <!-- نافذة الشرح التفصيلي للبطاقات -->
+    <!-- نافذة الشرح التفصيلي للبطاقات ذات التمرير -->
     <div id="info-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('info-modal')">✖</button>
@@ -157,14 +155,170 @@
         </div>
     </div>
 
-    <!-- محرر البطاقات لولي الأمر -->
+    <!-- محرر البطاقات الديناميكي لولي الأمر -->
     <div id="events-admin-modal" class="custom-modal">
         <div class="modal-content-box" style="background:#f8f9fc; text-align: right;">
             <button class="btn-close-modal" onclick="toggleModal('events-admin-modal')">✖</button>
             <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📅 محرك الأحداث والبطاقات الديناميكي</h3>
-            <div id="dynamic-cards-editor" class="parent-only-inputs" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
-            <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top: 15px;" onclick="saveDynamicCardsConfig()">💾 حفظ جميع الخصائص والآليات</button>
+            <p style="font-size: 13px; color: #555;">من هنا يمكنك التحكم بخصائص وآليات جميع البطاقات التي ستظهر في الألعاب بشكل ديناميكي.</p>
+            <div id="dynamic-cards-editor" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
+            <button id="btn-save-dynamic-cards" class="btn-admin-action" style="background:var(--success); margin-top: 15px;" onclick="saveDynamicCardsConfig()">💾 حفظ جميع الخصائص والآليات</button>
         </div>
+    </div>
+
+    <div id="news-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
+            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📰 أخبار وتحديثات اللعبة</h3>
+            <div id="news-content" style="text-align: right; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; min-height: 100px; max-height: 350px; overflow-y: auto; line-height: 1.6; white-space: pre-wrap; font-weight:bold; color:var(--dark);">جاري التحميل...</div>
+        </div>
+    </div>
+
+    <div id="reports-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('reports-modal')">✖</button>
+            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📊 تقارير الأداء والإنجاز</h3>
+            
+            <div style="margin-bottom: 15px; text-align: right;">
+                <label style="font-weight: bold; color: var(--dark); display: block; margin-bottom: 5px;">اختر نوع التقرير:</label>
+                <select id="main-report-type" onchange="toggleReportInputs()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--primary); font-weight: bold; font-family: inherit;">
+                    <option value="points">1. تقرير النقاط المكتسبة (زمني)</option>
+                    <option value="progress">2. تقرير إنجاز المراحل والنجوم (حجم الإنجاز)</option>
+                    <option value="performance">3. تقرير تحليل الأداء (السرعة والدقة)</option>
+                </select>
+            </div>
+
+            <div id="time-selectors" class="report-selectors">
+                <select id="report-type" onchange="updateReportRangeOptions()">
+                    <option value="hours">في آخر عدد ساعات</option>
+                    <option value="days">في آخر عدد أيام</option>
+                    <option value="weeks">في آخر عدد أسابيع</option>
+                    <option value="months">في آخر عدد أشهر</option>
+                </select>
+                <select id="report-num"></select>
+            </div>
+            
+            <button class="btn-admin-action" style="background: var(--info); margin-bottom: 15px;" onclick="generateSelectedReport()">عرض التقرير 🔍</button>
+            <div id="report-results" style="display: none; background: #f8f9fc; padding: 10px; border-radius: 8px; text-align: right; max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <div id="admin-modal" class="custom-modal">
+        <div class="modal-content-box" style="background: white;">
+            <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
+            <h3 style="color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top:0;">⚙️ إعدادات التحكم بالألعاب</h3>
+            
+            <div class="admin-checkbox-group parent-only-inputs">
+                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تفعيل أو تعطيل الألعاب للطفل:</strong>
+                <label><input type="checkbox" id="chk-matchg" checked> تفعيل لعبة المطابقة والذاكرة</label>
+                <label><input type="checkbox" id="chk-listen" checked> تفعيل لعبة صائد الأمثلة المسموعة</label>
+                <label><input type="checkbox" id="chk-missing" checked> تفعيل لعبة الحروف الناقصة</label>
+                <label><input type="checkbox" id="chk-arrange" checked> تفعيل لعبة ترتيب الحروف</label>
+                <label><input type="checkbox" id="chk-crossword" checked> تفعيل لعبة الكلمات المتقاطعة</label>
+            </div>
+
+            <div class="admin-row parent-only-inputs" style="margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 6px;">
+                <label><input type="checkbox" id="chk-reset-all"> تصفير جميع ألعاب البرنامج (سيتم مسح التقدم)</label>
+            </div>
+
+            <div class="admin-row parent-only-inputs" style="margin-top:15px; background:#f8f9fc; padding:10px; border-radius:5px; border:1px dashed #ccc; text-align:right;">
+                <label style="font-size:13px; color:var(--primary);">النقاط المستبدلة للبنك:</label>
+                <input type="number" id="edit-exch-points" placeholder="النقاط المستبدلة">
+                <label style="font-size:13px; color:var(--primary); margin-top:10px;">تكلفة لفة العجل بالنقاط (الافتراضي 3000):</label>
+                <input type="number" id="edit-spin-cost" placeholder="التكلفة">
+            </div>
+
+            <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
+
+            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
+                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">⚖️ إدارة نقاط الطفل (مكافأة / خصم)</h4>
+                <input type="number" id="manual-points-val" class="parent-only-inputs" placeholder="أدخل عدد النقاط (مثال: 5000)">
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top:0;" onclick="addManualPoints()">➕ إضافة كمكافأة</button>
+                    <button class="btn-admin-action parent-only-btn" style="background:var(--danger); margin-top:0;" onclick="subtractManualPoints()">➖ خصم كعقاب</button>
+                </div>
+            </div>
+
+            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
+                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">🎁 جوائز المراحل الإضافية</h4>
+                <select id="stage-bonus-select" class="parent-only-inputs">
+                    <option value="1">مرحلة 1: الحفاضة الفولاذية</option>
+                    <option value="2">مرحلة 2: الديناصور الثرثار</option>
+                    <option value="3">مرحلة 3: نينجا الكلمات الصامت</option>
+                    <option value="4">مرحلة 4: زومبي الحفظ الذكي</option>
+                    <option value="5">مرحلة 5: ساحرة الأبجدية العجوز</option>
+                    <option value="6">مرحلة 6: السايبورغ اللغوي</option>
+                    <option value="7">مرحلة 7: حاكم مجرة الأنجلو سنفورية</option>
+                </select>
+                <input type="number" id="stage-bonus-val" class="parent-only-inputs" placeholder="المبلغ المضاف (جنيه فلسطيني)">
+                <button class="btn-admin-action parent-only-btn" style="background:var(--info);" onclick="addStageBonus()">➕ إضافة الجائزة</button>
+                <button class="btn-admin-action parent-only-btn" style="background:var(--warning); color:#000;" onclick="showBonusReport()">📊 تقرير جوائز المراحل</button>
+                <div id="bonus-report-box" style="display:none; text-align:right; font-size:14px; background:#f1f1f1; padding:10px; border-radius:5px; margin-top:10px; max-height:150px; overflow-y:auto; font-weight:bold; color:var(--dark);"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بنك الأبطال -->
+    <div id="bank-modal" class="custom-modal">
+        <div class="modal-content-box">
+            <button class="btn-close-modal" onclick="toggleModal('bank-modal')">✖</button>
+            <h2 style="color: var(--warning); margin-top: 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">💰 بنك الأبطال 🎡</h2>
+            
+            <div class="bank-stats">
+                <div>النقاط التراكمية: <span id="stat-total">0</span></div>
+                <div>النقاط المستبدلة باللعب: <span id="stat-exch">0</span></div>
+                <div>الرصيد البنكي الحالي: <span id="stat-bank" style="color: var(--success);">0</span> جنيه فلسطيني</div>
+            </div>
+
+            <div class="wheel-box">
+                <div class="wheel-pointer">▼</div>
+                <div class="wheel" id="wheel">
+                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(36deg);">1 جنيه</span></div>
+                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(108deg);">2 جنيه</span></div>
+                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(180deg);">3 جنيه</span></div>
+                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(252deg);">4 جنيه</span></div>
+                    <div class="wheel-text"><span style="transform: translateX(-50%) rotate(324deg);">5 جنيه</span></div>
+                </div>
+            </div>
+
+            <button id="btn-spin" class="btn-spin" onclick="handleSpinClick()">ابدأ الدوران 🎡</button>
+
+            <div class="withdraw-box parent-only-inputs">
+                <h4 style="margin-top:0; color:var(--success);">💳 سحب وإيداع (لولي الأمر)</h4>
+                <p style="font-size:12px; margin:0 0 10px 0; color:#555;">ملاحظة: للسحب أدخل رقماً عادياً (مثال: 5). للإيداع وإضافة رصيد أدخل رقماً سالباً (مثال: -5).</p>
+                <input type="number" id="withdraw-amount" placeholder="القيمة المراد سحبها أو إيداعها">
+                <button class="btn-withdraw parent-only-btn" onclick="withdrawBank()">تنفيذ العملية</button>
+            </div>
+
+            <h4 style="text-align:right; margin:15px 0 5px 0; color:var(--dark);">🧾 كشف حساب البنك</h4>
+            <div class="bank-statement-box" id="bank-statement-list"></div>
+        </div>
+    </div>
+
+    <!-- الشرف و الأوسمة -->
+    <div id="fame-modal" class="custom-modal">
+        <div class="modal-content-box" id="fame-content">
+            <button class="btn-close-modal" onclick="toggleModal('fame-modal')">✖</button>
+            <h2 class="fame-header">🏆 لوحة الشرف والأوسمة 🏆</h2>
+            <div class="fame-score-badge">رصيد نقاطك: <span id="fame-total-points">0</span> ⚡</div>
+            <div id="stages-wrapper"></div>
+        </div>
+    </div>
+
+    <div id="celebration-modal" class="custom-modal">
+        <div class="modal-content-box celebration-content">
+            <h1 style="margin-top:0; color:#e74a3b; font-size:30px;">🎉 إنجاز جديد! 🎉</h1>
+            <h2 id="cel-title" style="color:#2c3e50;">مبروك! تم فتح وسام</h2>
+            <img id="cel-img" src="" class="celebration-img" alt="Achievement">
+            <h3 id="cel-name" style="color:#8e44ad; font-size:26px; margin-bottom:5px;">اسم الوسام</h3>
+            <p id="cel-desc" style="font-weight:bold; font-size:16px;"></p>
+            <button class="btn-withdraw" style="background:#e74a3b; margin-top:20px;" onclick="closeCelebration()">رائع! استمرار 🚀</button>
+        </div>
+    </div>
+
+    <div id="image-modal" class="custom-modal" onclick="closeImageModal(event)">
+        <button class="btn-close-modal" style="top: 20px; right: 20px; z-index: 1001;" onclick="closeImageModal(event)">✖</button>
+        <img id="full-size-img" src="" class="full-size-image" alt="صورة المرحلة المكبرة">
     </div>
 
     <div id="flash-effect" class="hareef-flash"></div>
@@ -176,8 +330,8 @@
         </div>
         <div class="left-header-group">
             <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
-            
             <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
+            <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
         </div>
     </div>
 
@@ -902,6 +1056,27 @@
         clearInterval(timerInterval);
         document.getElementById('result-modal').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('stages-screen').style.display = 'block'; assignDynamicCards(); renderStages();
     }
+</script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        let bgMusic = document.getElementById('bg-music');
+        if (bgMusic) {
+            // قراءة مستوى الصوت المحفوظ من الصفحة الرئيسية
+            let savedVol = localStorage.getItem('bgMusicVolume');
+            let vol = (savedVol !== null && savedVol !== '') ? parseFloat(savedVol) : 0.5;
+            if (isNaN(vol)) vol = 0.5;
+            
+            // قراءة حالة الكتم
+            let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+            let finalVol = isMuted ? 0 : vol;
+            
+            // التطبيق الفوري والإجباري على المتصفح
+            bgMusic.volume = finalVol;
+            bgMusic.onplay = () => { bgMusic.volume = finalVol; };
+            bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
+        }
+    });
 </script>
 
 </body>

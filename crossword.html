@@ -760,6 +760,25 @@
         document.getElementById('result-modal').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('stages-screen').style.display = 'block'; assignDynamicCards(); renderStages();
     }
 </script>
-
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        let bgMusic = document.getElementById('bg-music');
+        if (bgMusic) {
+            // قراءة مستوى الصوت المحفوظ من الصفحة الرئيسية
+            let savedVol = localStorage.getItem('bgMusicVolume');
+            let vol = (savedVol !== null && savedVol !== '') ? parseFloat(savedVol) : 0.5;
+            if (isNaN(vol)) vol = 0.5;
+            
+            // قراءة حالة الكتم
+            let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
+            let finalVol = isMuted ? 0 : vol;
+            
+            // التطبيق الفوري والإجباري على المتصفح
+            bgMusic.volume = finalVol;
+            bgMusic.onplay = () => { bgMusic.volume = finalVol; };
+            bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
+        }
+    });
+</script>
 </body>
 </html>
