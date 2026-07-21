@@ -31,19 +31,17 @@
         .icon-btn:hover { transform: scale(1.15); }
         #stages-screen { display: block; }
         .stages-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto;}
+        
         .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
-        .stage-btn.locked { background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
-        /* تنسيقات البطاقات السحرية */
-        .hot-stage-last10 { background: linear-gradient(45deg, #e74a3b, #c0392b) !important; color: white !important; border: 2px solid #ff9ff3; }
-        .hot-stage-daily { background: linear-gradient(45deg, #3498db, #2980b9) !important; color: white !important; border: 2px solid #81ecec; animation: pulseDaily 2s infinite;}
-        .hot-stage-hareef { background: linear-gradient(45deg, #8e44ad, #9b59b6) !important; color: white !important; border: 2px solid #f1c40f; animation: pulseHareef 1.5s infinite;}
-        
-        @keyframes pulseDaily { 0% {box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);} 100% {box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);} }
-        @keyframes pulseHareef { 0% {box-shadow: 0 0 0 0 rgba(142, 68, 173, 0.8);} 70% {box-shadow: 0 0 0 15px rgba(142, 68, 173, 0);} 100% {box-shadow: 0 0 0 0 rgba(142, 68, 173, 0);} }
-        .hot-badge { font-size:12px; color:#ffeb3b; background:rgba(0,0,0,0.5); padding:2px 5px; border-radius:4px; margin-right: 5px; }
+        /* تنسيقات البطاقات المعدلة */
+        .hot-stage-last { background: linear-gradient(45deg, #e74a3b, #c0392b) !important; color: white !important; border: 2px solid #fff; box-shadow: 0 0 10px #e74a3b;}
+        .hot-stage-random { background: linear-gradient(45deg, #f6c23e, #f39c12) !important; color: white !important; border: 2px dashed #fff; animation: pulseHot 1.5s infinite;}
+        .hareef-stage { background: linear-gradient(45deg, #9b59b6, #8e44ad) !important; color: white !important; border: 2px solid #fff; box-shadow: 0 0 10px #9b59b6;}
+        @keyframes pulseHot { 0% {box-shadow: 0 0 0 0 rgba(246, 194, 62, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(246, 194, 62, 0);} 100% {box-shadow: 0 0 0 0 rgba(246, 194, 62, 0);} }
+        .hot-badge { font-size:11px; color:#fff; background:rgba(0,0,0,0.4); padding:2px 5px; border-radius:4px; margin-right: 5px; }
         
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
         .modal-content-box { background: #fff; width: 95%; max-width: 500px; padding: 25px; border-radius: 15px; text-align: right; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); direction: rtl;}
@@ -51,7 +49,7 @@
         .btn-close-modal:hover { opacity: 0.8; }
         .modal-content-box h3 { color: var(--primary); margin-top: 0; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px;}
         .settings-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
-        .settings-row label { font-weight: bold; min-width: 170px; color: var(--dark);}
+        .settings-row label { font-weight: bold; min-width: 150px; color: var(--dark);}
         .settings-row input[type="number"] { padding: 8px; width: 80px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; text-align: center;}
         .action-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 25px; justify-content: center;}
         .action-btns button { padding: 10px 20px; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px; flex-grow: 1;}
@@ -75,52 +73,30 @@
         .char-box.filled { color: var(--success); border-bottom: 4px solid var(--success); background: transparent; transform: scale(1);}
         .char-box.space { border-bottom: none; width: clamp(10px, 3vw, 20px); background: transparent; }
 
-        #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 2500; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 450px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
+        #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2500; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
         .modal-content h2 { margin-top: 0; color: var(--primary);}
         .stars-display { font-size: clamp(25px, 5vw, 40px); color: #f1c40f; margin: 15px 0; letter-spacing: 5px;}
         .modal-btn { background: var(--success); color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;}
         .modal-btn:hover { opacity: 0.9; }
 
-        .points-breakdown { text-align: right; background: #f8f9fc; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; border: 1px solid #e3e6f0; }
-        .points-breakdown div { margin-bottom: 5px; font-size: 15px; color: var(--dark); }
-        .points-breakdown .total-row { border-top: 2px dashed #ccc; padding-top: 10px; font-size: 18px; color: var(--danger); margin-top: 10px; }
+        /* صندوق الحريف */
+        #chest-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; z-index:3000; flex-direction:column; }
+        .chest-box { font-size: 100px; cursor: pointer; animation: bounceChest 0.8s infinite alternate; filter: drop-shadow(0 0 20px rgba(241,196,15,0.8)); transition: transform 0.3s;}
+        @keyframes bounceChest { from { transform: translateY(0) scale(1); } to { transform: translateY(-30px) scale(1.1); } }
+        .chest-open { animation: none; transform: scale(1.5) !important; cursor: default;}
+        .hareef-flash { position:absolute; top:0; left:0; width:100%; height:100%; background:#fff; z-index:3001; opacity:0; pointer-events:none; }
+        @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
 
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
-
-        /* صندوق الكنز للحريف */
-        #chest-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 3000; flex-direction: column; }
-        .chest-container { cursor: pointer; animation: chestBounce 1s infinite; position: relative; }
-        .chest-emoji { font-size: 120px; user-select: none; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
-        .chest-text { color: var(--gold); font-size: 24px; font-weight: bold; margin-top: 20px; text-shadow: 2px 2px 4px #000; }
-        @keyframes chestBounce { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
-        .flash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3500; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     </style>
 </head>
 <body>
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
-    <div class="flash-screen" id="flash-screen"></div>
+    <div id="flash-effect" class="hareef-flash"></div>
 
-    <div class="top-icons" style="position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 50; flex-wrap: wrap;">
-        <button class="icon-btn btn-top-action" onclick="window.location.href='index.html?screen=dashboard'" title="العودة للوحة التحكم">🔙</button>
-        <button class="icon-btn btn-top-action" onclick="toggleModal('admin-modal')" title="إعدادات الألعاب لولي الأمر">⚙️</button>
-        <button class="icon-btn btn-top-action" onclick="toggleModal('event-modal')" title="إعدادات الأحداث">📅</button>
-        <button class="icon-btn btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
-        <button class="icon-btn btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
-        <button class="icon-btn btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
-        <button class="icon-btn btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
-    </div>
-
-    <div id="news-modal" class="custom-modal">
-        <div class="modal-content-box">
-            <button class="btn-close-modal" onclick="toggleModal('news-modal')">✖</button>
-            <h3 style="color: var(--primary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📰 أخبار وتحديثات اللعبة</h3>
-            <div id="news-content" style="text-align: right; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; min-height: 100px; max-height: 350px; overflow-y: auto; line-height: 1.6; white-space: pre-wrap; font-weight:bold; color:var(--dark);">جاري التحميل...</div>
-        </div>
-    </div>
-
-    <div class="header-stats" style="margin-top: 80px;">
+    <div class="header-stats">
         <div class="level-selector">
             <label for="level-select">اختر المستوى للعب: </label>
             <select id="level-select" onchange="onLevelChange()"></select>
@@ -128,6 +104,7 @@
         <div class="left-header-group">
             <div class="score-text">النقاط التراكمية: <span id="total-score">0</span> 🏆</div>
             <button class="icon-btn" onclick="toggleSettingsModal()" title="إعدادات اللعبة">⚙️</button>
+            <button class="icon-btn" onclick="handleGlobalBack()" title="الرجوع">🔙</button>
         </div>
     </div>
 
@@ -141,8 +118,9 @@
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleSettingsModal()">✖</button>
             <h3>⚙️ إعدادات الأوقات وإدارة المراحل</h3>
-            <p style="font-size:12px; color:var(--info); font-weight:bold; text-align:center;">يتم احتساب الوقت الكلي بضرب (التسعيرة) بعدد حروف الكلمة في المرحلة.</p>
             
+            <p style="font-size:12px; color:var(--info); font-weight:bold; text-align:center;">ملاحظة: يتم احتساب الوقت الكلي بضرب (الثواني المدخلة) في (مجموع عدد حروف الكلمات) للمرحلة كاملة.</p>
+
             <div class="settings-row parent-only-btn" style="background:#e2e8f0; padding:10px; border-radius:8px;">
                 <label style="color:#334155; margin-bottom:5px;">إضافة/إنقاص وقت للجميع:</label>
                 <input type="number" id="bulk-time" placeholder="ثواني" style="width:60px;" step="0.5">
@@ -150,11 +128,11 @@
                 <button onclick="adjustBulkTime(-1)" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">➖ إنقاص</button>
             </div>
 
-            <div class="settings-row"><label>الوقت للحرف الواحد لـ 5 نجوم:</label> <input type="number" id="time-5" class="parent-only-inputs" value="1.5" step="0.5"> ث</div>
-            <div class="settings-row"><label>الوقت للحرف الواحد لـ 4 نجوم:</label> <input type="number" id="time-4" class="parent-only-inputs" value="2.5" step="0.5"> ث</div>
-            <div class="settings-row"><label>الوقت للحرف الواحد لـ 3 نجوم:</label> <input type="number" id="time-3" class="parent-only-inputs" value="3.5" step="0.5"> ث</div>
-            <div class="settings-row"><label>الوقت للحرف الواحد لـ 2 نجوم:</label> <input type="number" id="time-2" class="parent-only-inputs" value="4.5" step="0.5"> ث</div>
-            <div class="settings-row"><label>الوقت للحرف الواحد لـ 1 نجمة:</label> <input type="number" id="time-1" class="parent-only-inputs" value="5.5" step="0.5"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 5 نجوم:</label> <input type="number" id="time-5" class="parent-only-inputs" value="2" step="0.5"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 4 نجوم:</label> <input type="number" id="time-4" class="parent-only-inputs" value="3" step="0.5"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 3 نجوم:</label> <input type="number" id="time-3" class="parent-only-inputs" value="4" step="0.5"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 2 نجوم:</label> <input type="number" id="time-2" class="parent-only-inputs" value="5" step="0.5"> ث</div>
+            <div class="settings-row"><label>الوقت للحرف لـ 1 نجمة:</label> <input type="number" id="time-1" class="parent-only-inputs" value="6" step="0.5"> ث</div>
             <div class="settings-row"><label>نقاط النجمة الواحدة:</label> <input type="number" id="star-price" class="parent-only-inputs" value="8"></div>
             
             <div class="settings-row" style="background:#f8f9fc; padding:15px; border-radius:8px; border: 1px solid #e3e6f0;">
@@ -200,27 +178,28 @@
         <div class="modal-content">
             <h2 id="modal-title">أحسنت! رتبت الكلمات بنجاح 🎉</h2>
             <div class="stars-display" id="modal-stars">⭐⭐⭐</div>
+            <p style="font-size: 16px; color: var(--dark);">وقت الإجابة الكلي: <strong id="modal-time" style="color: var(--danger);"></strong> ثانية</p>
             
-            <div class="points-breakdown">
-                <div>وقت الإجابة: <span id="modal-time" style="color:var(--danger)"></span> ثانية</div>
-                <div>النقاط الأساسية: <span id="modal-base-points">0</span></div>
-                <div id="modal-bonus-row" style="display:none;">مكافأة البطاقات/الأحداث: <span id="modal-bonus-points" style="color:var(--success)">0</span></div>
-                <div class="total-row">مجموع النقاط: <span id="modal-total-points">0</span> 🏆</div>
+            <div style="background:#f8f9fc; padding:10px; border-radius:8px; margin:15px 0; text-align:right; font-size:14px; border:1px solid #eee;">
+                <div>النقاط الأساسية: <span id="modal-points-base" style="font-weight:bold;">0</span></div>
+                <div>علاوة البطاقات والأحداث: <span id="modal-points-bonus" style="font-weight:bold; color:var(--success);">0</span></div>
+                <div style="border-top:1px dashed #ccc; padding-top:5px; margin-top:5px; font-size:18px;">المجموع: <span id="modal-points-total" style="font-weight:bold; color:var(--primary);">0</span></div>
             </div>
 
+            <p id="modal-points-msg" style="color: var(--success); font-weight: bold; font-size: 15px;"></p>
             <button class="modal-btn" onclick="showStagesScreen()">متابعة</button>
         </div>
     </div>
 
     <div id="chest-modal">
-        <div class="chest-container" onclick="openChest()">
-            <div class="chest-emoji">🎁</div>
-        </div>
-        <div class="chest-text">لقد ربحت صندوق مفاجآت! انقر لفتحه</div>
+        <h2 style="color:#fff; text-shadow:0 2px 4px #000; font-size:30px; margin-bottom:30px; text-align:center;">إنجاز أسطوري! 5 انتصارات متتالية!</h2>
+        <div id="chest-icon" class="chest-box" onclick="openHareefChest()">🧰</div>
+        <div id="chest-details" style="display:none; text-align:center; color:#fff; margin-top:20px; font-size:20px; font-weight:bold; line-height:1.6;"></div>
+        <button id="chest-btn" style="display:none; background:var(--success); color:#fff; border:none; padding:10px 30px; font-size:20px; border-radius:10px; margin-top:20px; cursor:pointer;" onclick="closeChestModal()">استلام المجد 🏆</button>
     </div>
 
 <script>
-    const LEVEL_ORDER = ['CLASS1', 'CLASS2', 'CLASS3', 'CLASS4', 'CLASS5', 'CLASS6', 'CLASS7', 'CLASS8', 'CLASS9', 'CLASS10', 'CLASS11', 'CLASS12', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    const LEVEL_ORDER = ['CLASS1','CLASS2','CLASS3','CLASS4','CLASS5','CLASS6','CLASS7','CLASS8','CLASS9','CLASS10','CLASS11','CLASS12','A1','A2','B1','B2','C1','C2'];
     const allLevelsData = {
         "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
         "B1": typeof levelB1_Words !== 'undefined' ? levelB1_Words : [], "B2": typeof levelB2_Words !== 'undefined' ? levelB2_Words : [],
@@ -242,7 +221,6 @@
     let appProgress = JSON.parse(localStorage.getItem('appProgress')) || { cumulativeScore: 0, levels: {} };
     let gameProgress = JSON.parse(localStorage.getItem('scrambleGameProgress')) || {};
     let gameTimeSettings = JSON.parse(localStorage.getItem('scrambleGameSettings')) || {};
-    let hareefSettings = JSON.parse(localStorage.getItem('hareefSettings')) || { name: "الحريف", mults: [3,4,5,6], minH: 1, maxH: 5, maxCards: 4, targetWins: 5, games: ["matchg", "listen", "missing", "scramble", "crossword"] };
     
     let currentLevel = "";
     let globalStagesList = [];
@@ -251,33 +229,40 @@
     let activeStage = null;
     let currentWordIndex = 0;
     let stageWords = [];
-    
     let timerInterval;
     let secondsElapsed = 0;
-    
     let currentBlanks = []; 
     let activeBlankIndex = 0; 
-    window.currentWordLength = 0; // لحساب الوقت الديناميكي
-
     let consecutiveErrors = 0;
     let totalErrors = 0;
     let starPenalty = 0;
+    window.currentStageTotalLetters = 0; 
 
     window.onload = function() {
+        verifyParentModeStrict();
         applyGlobalModes();
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
         initializeDropdown();
     };
+
+    function verifyParentModeStrict() {
+        let isParent = localStorage.getItem('isParentMode');
+        if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false');
+    }
 
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         let banner = document.getElementById('parent-mode-banner');
         if(banner) banner.style.display = isParent ? 'block' : 'none';
 
-        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || { isActive: true, days: [5], multiplier: 2 };
+        let defaultEvent = { isActive: true, days: [5], multiplier: 2 };
+        let eventData = JSON.parse(localStorage.getItem('gameEventData')) || defaultEvent;
         let today = new Date().getDay();
-        window.isFridayEventActive = (eventData.isActive && eventData.days.includes(today));
-        window.fridayMultiplier = eventData.multiplier || 2;
+        if(eventData.isActive && eventData.days.includes(today)) window.currentEventMultiplier = eventData.multiplier;
+        else window.currentEventMultiplier = 1;
+
+        document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
+        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
     }
 
     function handleGlobalBack() {
@@ -289,18 +274,21 @@
     }
 
     function initializeDropdown() {
-        const selectElement = document.getElementById('level-select');
-        selectElement.innerHTML = ''; let hasCompletedLevels = false;
+        const selectElement = document.getElementById('level-select'); selectElement.innerHTML = ''; 
+        let hasCompletedLevels = false;
         let optionAll = document.createElement('option'); optionAll.value = "ALL"; optionAll.textContent = "جميع المستويات"; selectElement.appendChild(optionAll);
-
         let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
+
         availableLevelsList.forEach(lvl => {
-            let lData = appProgress.levels[lvl]; let isLevelFinished = lData.savedWords && lData.savedWords.length > 0;
-            if (isLevelFinished) { let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl); selectElement.appendChild(option); hasCompletedLevels = true; }
+            if (appProgress.levels[lvl].savedWords && appProgress.levels[lvl].savedWords.length > 0) {
+                let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl); selectElement.appendChild(option); hasCompletedLevels = true;
+            }
         });
         
         if (!hasCompletedLevels) {
-            selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>'; document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>'; selectElement.disabled = true; return;
+            selectElement.innerHTML = '<option value="">لا يوجد مستويات مكتملة</option>';
+            document.getElementById('stages-container').innerHTML = '<p style="color:var(--danger); font-size:20px; font-weight:bold;">يجب عليك إتمام حفظ كلمات مستوى واحد أو صف واحد بالكامل في الحفظ اليومي لتتمكن من اللعب فيه.</p>';
+            selectElement.disabled = true; return;
         }
         selectElement.value = "ALL"; currentLevel = "ALL"; loadGameData(); loadSettingsUI();
     }
@@ -309,35 +297,52 @@
 
     function getLevelTimes(level) {
         let levelKey = level === "ALL" ? "GLOBAL_DEFAULT" : level;
-        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 1.5, t4: 2.5, t3: 3.5, t2: 4.5, t1: 5.5, starPrice: 8 };
+        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 2, t4: 3, t3: 4, t2: 5, t1: 6, starPrice: 8 };
         return gameTimeSettings[levelKey] || defaultTimes;
     }
 
     function loadSettingsUI() {
         if(!currentLevel) return; let t = getLevelTimes(currentLevel);
-        document.getElementById('time-5').value = t.t5; document.getElementById('time-4').value = t.t4; document.getElementById('time-3').value = t.t3; document.getElementById('time-2').value = t.t2; document.getElementById('time-1').value = t.t1; document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 8;
+        document.getElementById('time-5').value = t.t5; document.getElementById('time-4').value = t.t4;
+        document.getElementById('time-3').value = t.t3; document.getElementById('time-2').value = t.t2;
+        document.getElementById('time-1').value = t.t1; document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 8;
     }
 
     function toggleSettingsModal() {
         let modal = document.getElementById('settings-modal');
-        if(modal.style.display === 'flex') { modal.style.display = 'none'; } else { 
-            modal.style.display = 'flex'; loadSettingsUI(); 
-            let isParent = localStorage.getItem('isParentMode') === 'true';
-            document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent); document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
-        }
+        if(modal.style.display === 'flex') { modal.style.display = 'none'; } else { loadSettingsUI(); modal.style.display = 'flex'; applyGlobalModes(); }
     }
 
-    function adjustBulkTime(sign) { let val = parseFloat(document.getElementById('bulk-time').value) || 0; if(val === 0) return; for(let i=1; i<=5; i++) { let el = document.getElementById('time-' + i); if(el) el.value = Math.max(0, (parseFloat(el.value) + (val * sign))).toFixed(1); } }
+    function adjustBulkTime(sign) {
+        let val = parseFloat(document.getElementById('bulk-time').value) || 0; if(val === 0) return;
+        for(let i=1; i<=5; i++) { let el = document.getElementById('time-' + i); if(el) el.value = Math.max(0, (parseFloat(el.value) + (val * sign))).toFixed(1); }
+    }
 
     function saveTimeSettings() {
-        let t5 = parseFloat(document.getElementById('time-5').value) || 1.5; let t4 = parseFloat(document.getElementById('time-4').value) || 2.5; let t3 = parseFloat(document.getElementById('time-3').value) || 3.5; let t2 = parseFloat(document.getElementById('time-2').value) || 4.5; let t1 = parseFloat(document.getElementById('time-1').value) || 5.5; let starPrice = parseInt(document.getElementById('star-price').value) || 8;
-        if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب أن يكون الوقت منطقياً بحيث وقت الـ 5 نجوم هو الأقل."); return; }
+        let t5 = parseFloat(document.getElementById('time-5').value) || 2; let t4 = parseFloat(document.getElementById('time-4').value) || 3;
+        let t3 = parseFloat(document.getElementById('time-3').value) || 4; let t2 = parseFloat(document.getElementById('time-2').value) || 5;
+        let t1 = parseFloat(document.getElementById('time-1').value) || 6; let starPrice = parseInt(document.getElementById('star-price').value) || 8;
+        if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
         let newSettings = { t5, t4, t3, t2, t1, starPrice };
+        
         let applyScope = document.querySelector('input[name="apply-scope"]:checked').value;
-        if(applyScope === 'all') { gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; let selectElement = document.getElementById('level-select'); for (let i = 0; i < selectElement.options.length; i++) { if(selectElement.options[i].value && selectElement.options[i].value !== "ALL") { gameTimeSettings[selectElement.options[i].value] = newSettings; } } } else { if(currentLevel && currentLevel !== "ALL") gameTimeSettings[currentLevel] = newSettings; if(currentLevel === "ALL") gameTimeSettings['GLOBAL_DEFAULT'] = newSettings; }
+        if(applyScope === 'all') {
+            gameTimeSettings['GLOBAL_DEFAULT'] = newSettings;
+            let selectElement = document.getElementById('level-select');
+            for (let i = 0; i < selectElement.options.length; i++) { if(selectElement.options[i].value && selectElement.options[i].value !== "ALL") gameTimeSettings[selectElement.options[i].value] = newSettings; }
+        } else {
+            if(currentLevel && currentLevel !== "ALL") gameTimeSettings[currentLevel] = newSettings;
+            if(currentLevel === "ALL") gameTimeSettings['GLOBAL_DEFAULT'] = newSettings;
+        }
         localStorage.setItem('scrambleGameSettings', JSON.stringify(gameTimeSettings));
+
         let resetOpt = document.querySelector('input[name="reset-opt"]:checked').value;
-        if(resetOpt === 'current' && currentLevel && currentLevel !== "ALL") { gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress)); renderStages(); } else if (resetOpt === 'all' || (resetOpt === 'current' && currentLevel === "ALL")) { for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress)); renderStages(); }
+        if(resetOpt === 'current' && currentLevel && currentLevel !== "ALL") {
+            gameProgress[currentLevel] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress)); renderStages();
+        } else if (resetOpt === 'all' || (resetOpt === 'current' && currentLevel === "ALL")) {
+            for(let lvl in gameProgress) gameProgress[lvl] = { 1: { unlocked: true, stars: 0, time: 0 } }; localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress)); renderStages();
+        }
+        
         alert("تم حفظ الإعدادات بنجاح."); toggleSettingsModal();
     }
 
@@ -346,88 +351,113 @@
         let availableLevelsList = Object.keys(appProgress.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
         let absoluteId = 1;
         availableLevelsList.forEach(lvl => {
-            let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0; let levelWords = (allLevelsData[lvl] || []).slice(0, savedCount); if(levelWords.length === 0) return;
+            let savedCount = appProgress.levels[lvl].savedWords ? appProgress.levels[lvl].savedWords.length : 0;
+            let levelWords = (allLevelsData[lvl] || []).slice(0, savedCount);
+            if(levelWords.length === 0) return;
             let tStages = Math.ceil(levelWords.length / WORDS_PER_STAGE);
             for(let s = 1; s <= tStages; s++) {
-                let startIndex = (s - 1) * WORDS_PER_STAGE; let endIndex = startIndex + WORDS_PER_STAGE; let stageWords = levelWords.slice(startIndex, endIndex);
-                if (stageWords.length < WORDS_PER_STAGE && levelWords.length >= WORDS_PER_STAGE) { let needed = WORDS_PER_STAGE - stageWords.length; let previousWords = levelWords.slice(0, startIndex); previousWords.sort(() => Math.random() - 0.5); stageWords = stageWords.concat(previousWords.slice(0, needed)); }
+                let startIndex = (s - 1) * WORDS_PER_STAGE; let endIndex = startIndex + WORDS_PER_STAGE;
+                let stageWords = levelWords.slice(startIndex, endIndex);
+                if (stageWords.length < WORDS_PER_STAGE && levelWords.length >= WORDS_PER_STAGE) {
+                    let needed = WORDS_PER_STAGE - stageWords.length; let previousWords = levelWords.slice(0, startIndex); previousWords.sort(() => Math.random() - 0.5); stageWords = stageWords.concat(previousWords.slice(0, needed));
+                }
                 globalStagesList.push({ id: absoluteId++, level: lvl, localStage: s, words: stageWords });
             }
         });
-        updateGlobalHotStages(); renderStages();
+        updateGlobalHotStages('scramble'); renderStages();
     }
 
-    function getActiveHareefStageIds() {
+    function updateGlobalHotStages(gameKey) {
         let now = new Date().getTime();
-        let hareefData = JSON.parse(localStorage.getItem('hareefCardsData')) || [];
-        let validCards = hareefData.filter(c => c.game === 'scramble' && c.expiry > now);
-        let ids = []; validCards.forEach(c => ids.push(...c.stages)); return { ids: ids, cards: validCards };
-    }
-
-    function updateGlobalHotStages() {
-        let now = new Date().getTime();
-        let savedData = JSON.parse(localStorage.getItem('hotStagesData_scramble')) || {};
-        let hareefInfo = getActiveHareefStageIds();
-
-        let tomorrow = new Date(); tomorrow.setHours(24,0,0,0);
-        let last10 = []; let randomDaily = savedData.randomDaily || [];
-
-        if (globalStagesList.length > 0) {
-            last10 = globalStagesList.slice(-10).map(s => s.id);
-            if (!savedData.expiry || now > savedData.expiry || savedData.totalStages !== globalStagesList.length) {
-                let pool = globalStagesList.filter(s => !last10.includes(s.id) && !hareefInfo.ids.includes(s.id));
-                let eligible = pool.filter(s => { let prog = (gameProgress[s.level] && gameProgress[s.level][s.localStage]) ? gameProgress[s.level][s.localStage].stars : 0; return prog === 0; });
-                eligible.sort(() => Math.random() - 0.5);
-                randomDaily = eligible.slice(0, 10).map(s => s.id);
-                savedData = { last10, randomDaily, expiry: tomorrow.getTime(), totalStages: globalStagesList.length };
-                localStorage.setItem('hotStagesData_scramble', JSON.stringify(savedData));
+        let savedData = JSON.parse(localStorage.getItem('hotStagesData_' + gameKey)) || {};
+        if (!savedData.expiry || now > savedData.expiry || savedData.totalStages !== globalStagesList.length) {
+            let last10 = []; let random10 = [];
+            if (globalStagesList.length > 0) {
+                last10 = globalStagesList.slice(-10).map(s => s.id);
+                let pool = globalStagesList.filter(s => !last10.includes(s.id));
+                let poolWithStars = pool.map(s => { let prog = (gameProgress[s.level] && gameProgress[s.level][s.localStage]) ? gameProgress[s.level][s.localStage].stars : 0; return { id: s.id, stars: prog }; });
+                poolWithStars.sort((a, b) => a.stars - b.stars);
+                let eligible = poolWithStars.filter(s => s.stars === 0);
+                if(eligible.length < 10) eligible = poolWithStars.filter(s => s.stars < 5);
+                let selectedRandom = []; let currentStarLevel = 0;
+                while(selectedRandom.length < 10 && currentStarLevel <= 5 && eligible.length > 0) {
+                    let tierStages = eligible.filter(s => s.stars === currentStarLevel); tierStages.sort(() => Math.random() - 0.5);
+                    while(tierStages.length > 0 && selectedRandom.length < 10) { selectedRandom.push(tierStages.pop().id); }
+                    currentStarLevel++;
+                }
+                random10 = selectedRandom;
             }
+            savedData = { last10, random10, expiry: now + (24 * 60 * 60 * 1000), totalStages: globalStagesList.length };
+            localStorage.setItem('hotStagesData_' + gameKey, JSON.stringify(savedData));
         }
-        window.currentHotLast10 = last10; window.currentHotDaily = randomDaily;
+        window.currentHotLast10 = savedData.last10 || []; window.currentHotRandom10 = savedData.random10 || [];
     }
 
     function renderStages() {
         const container = document.getElementById('stages-container'); container.innerHTML = '';
         if(globalStagesList.length === 0) return;
 
-        let hareefInfo = getActiveHareefStageIds();
+        let hareefActive = JSON.parse(localStorage.getItem('hareefActive_scramble'));
+        if(hareefActive && hareefActive.expiry < Date.now()) { localStorage.removeItem('hareefActive_scramble'); hareefActive = null; }
+
         let renderedStages = currentLevel === "ALL" ? globalStagesList : globalStagesList.filter(s => s.level === currentLevel);
 
         renderedStages.forEach(stage => {
             let btn = document.createElement('button'); btn.className = 'stage-btn';
             
-            let isLast10 = window.currentHotLast10.includes(stage.id);
-            let isDaily = window.currentHotDaily.includes(stage.id);
-            let hareefCard = hareefInfo.cards.find(c => c.stages.includes(stage.id));
-            let isHareef = !!hareefCard;
+            let isLastHot = window.currentHotLast10.includes(stage.id);
+            let isRandomHot = window.currentHotRandom10.includes(stage.id);
+            let isHareef = hareefActive && hareefActive.stages.includes(stage.id);
 
-            let levelData = gameProgress[stage.level] || {}; let starsCount = levelData[stage.localStage]?.stars || 0; let timeSpent = levelData[stage.localStage]?.time ? ` | ${levelData[stage.localStage].time}ث` : ''; let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
-            let prefix = stage.level.startsWith('CLASS') ? stage.level.replace('CLASS', '') : stage.level; let displayName = currentLevel === "ALL" ? `${prefix}.${stage.localStage}` : `مرحلة ${stage.localStage}`;
-
-            let cardType = 'normal'; let multVal = 1;
+            let levelData = gameProgress[stage.level] || {};
+            let starsCount = levelData[stage.localStage]?.stars || 0; 
+            let timeSpent = levelData[stage.localStage]?.time ? ` | ${levelData[stage.localStage].time}ث` : '';
+            let starsHTML = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
+            
+            let prefix = stage.level.startsWith('CLASS') ? stage.level.replace('CLASS', '') : stage.level;
+            let displayName = currentLevel === "ALL" ? `${prefix}.${stage.localStage}` : `مرحلة ${stage.localStage}`;
 
             if(isHareef) {
-                btn.classList.add('hot-stage-hareef'); btn.innerHTML = `${displayName} <span class="hot-badge">✨ ${hareefCard.multiplier}x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`; cardType = 'hareef'; multVal = hareefCard.multiplier;
-            } else if(isDaily) {
-                btn.classList.add('hot-stage-daily'); btn.innerHTML = `${displayName} <span class="hot-badge">⚡ 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`; cardType = 'daily'; multVal = 1.5;
-            } else if(isLast10) {
-                btn.classList.add('hot-stage-last10'); btn.innerHTML = `${displayName} <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`; cardType = 'last10'; multVal = 1.5;
+                btn.classList.add('hareef-stage');
+                btn.innerHTML = `${displayName} <span class="hot-badge">🏅 ${hareefActive.mult}x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+            } else if(isLastHot) {
+                btn.classList.add('hot-stage-last');
+                btn.innerHTML = `${displayName} <span class="hot-badge">🔥 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+            } else if(isRandomHot) {
+                btn.classList.add('hot-stage-random');
+                btn.innerHTML = `${displayName} <span class="hot-badge">🌟 1.5x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
             } else {
                 btn.innerHTML = `${displayName} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
             }
             
-            btn.onclick = () => { activeStage = stage; window.currentStageCardInfo = { type: cardType, mult: multVal, hareefCardObj: hareefCard }; startGame(); };
+            btn.onclick = () => {
+                window.currentStageIsLastHot = isLastHot;
+                window.currentStageIsRandomHot = isRandomHot;
+                window.currentStageHareefMult = isHareef ? hareefActive.mult : 1;
+                startGame(stage);
+            };
             container.appendChild(btn);
         });
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
     }
 
     function startGame(stageObj) {
-        activeStage = stageObj; currentWordIndex = 0; window.currentWordLength = 0;
+        activeStage = stageObj; currentWordIndex = 0;
         document.getElementById('stages-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'block';
-        let prefix = activeStage.level.startsWith('CLASS') ? activeStage.level.replace('CLASS', '') : activeStage.level; let displayStr = currentLevel === "ALL" ? `${prefix}.${activeStage.localStage}` : activeStage.localStage; document.getElementById('current-stage-display').innerText = displayStr;
-        consecutiveErrors = 0; totalErrors = 0; starPenalty = 0;
-        stageWords = [...activeStage.words]; stageWords.sort(() => Math.random() - 0.5);
+        let prefix = activeStage.level.startsWith('CLASS') ? activeStage.level.replace('CLASS', '') : activeStage.level;
+        let displayStr = currentLevel === "ALL" ? `${prefix}.${activeStage.localStage}` : activeStage.localStage;
+        document.getElementById('current-stage-display').innerText = displayStr;
+        
+        consecutiveErrors = 0; totalErrors = 0; starPenalty = 0; window.currentStageTotalLetters = 0;
+        stageWords = [...activeStage.words];
+        
+        // حساب جميع الحروف في المرحلة لضبط الوقت
+        stageWords.forEach(w => {
+            let enWord = w.en.trim();
+            for(let i=0; i<enWord.length; i++) { if(enWord[i].match(/[a-z]/i)) window.currentStageTotalLetters++; }
+        });
+
+        stageWords.sort(() => Math.random() - 0.5);
         startTimer(); loadWord();
     }
 
@@ -437,39 +467,53 @@
         let wordObj = stageWords[currentWordIndex]; let enWord = wordObj.en.trim(); let arWord = wordObj.ar;
         document.getElementById('arabic-display').innerText = arWord;
         let englishDisplay = document.getElementById('english-display'); let lettersPool = document.getElementById('letters-pool');
-        englishDisplay.innerHTML = ''; lettersPool.innerHTML = '';
-        currentBlanks = []; activeBlankIndex = 0;
+        englishDisplay.innerHTML = ''; lettersPool.innerHTML = ''; currentBlanks = []; activeBlankIndex = 0;
 
         let missingChars = []; 
         for(let i=0; i<enWord.length; i++) {
             let char = enWord[i]; let box = document.createElement('div'); box.className = 'char-box';
             if(!char.match(/[a-z]/i)) { box.innerText = char; if(char === ' ') box.classList.add('space'); englishDisplay.appendChild(box); continue; }
-            box.classList.add('hidden-char'); box.dataset.char = char.toLowerCase(); missingChars.push(char.toLowerCase()); currentBlanks.push(box); englishDisplay.appendChild(box);
+            
+            box.classList.add('hidden-char'); box.dataset.char = char.toLowerCase();
+            missingChars.push(char.toLowerCase()); currentBlanks.push(box);
+            englishDisplay.appendChild(box);
         }
-        
-        window.currentWordLength += missingChars.length; // تراكم الحروف لغايات حساب الوقت النهائي
 
-        if(currentBlanks.length > 0) { currentBlanks[0].classList.add('active-blank'); } else { setTimeout(() => { currentWordIndex++; loadWord(); }, 500); return; }
+        if(currentBlanks.length > 0) { currentBlanks[0].classList.add('active-blank'); } 
+        else { setTimeout(() => { currentWordIndex++; loadWord(); }, 500); return; }
 
         let poolChars = [...missingChars]; poolChars.sort(() => Math.random() - 0.5);
-        poolChars.forEach(char => { let btn = document.createElement('button'); btn.className = 'letter-btn'; btn.innerText = char; btn.onclick = () => onLetterClick(char, btn); lettersPool.appendChild(btn); });
+        poolChars.forEach(char => {
+            let btn = document.createElement('button'); btn.className = 'letter-btn'; btn.innerText = char;
+            btn.onclick = () => onLetterClick(char, btn); lettersPool.appendChild(btn);
+        });
     }
 
-    function handleMistake() { consecutiveErrors++; totalErrors++; if (consecutiveErrors === 2) { starPenalty++; consecutiveErrors = 0; totalErrors = 0; } else if (totalErrors === 3) { starPenalty++; consecutiveErrors = 0; totalErrors = 0; } updateLiveStars(secondsElapsed); }
+    function handleMistake() {
+        consecutiveErrors++; totalErrors++;
+        if (consecutiveErrors === 2) { starPenalty++; consecutiveErrors = 0; totalErrors = 0; } 
+        else if (totalErrors === 3) { starPenalty++; consecutiveErrors = 0; totalErrors = 0; }
+        updateLiveStars(secondsElapsed);
+    }
+
     function handleCorrect() { consecutiveErrors = 0; }
 
     function onLetterClick(char, btnElement) {
         if (activeBlankIndex >= currentBlanks.length || btnElement.classList.contains('used')) return;
         let activeBlank = currentBlanks[activeBlankIndex]; let expectedChar = activeBlank.dataset.char;
         if (char === expectedChar) {
-            btnElement.classList.add('used'); activeBlank.classList.remove('hidden-char', 'active-blank'); activeBlank.classList.add('filled'); activeBlank.innerText = char; activeBlankIndex++; handleCorrect();
-            if (activeBlankIndex < currentBlanks.length) { currentBlanks[activeBlankIndex].classList.add('active-blank'); } else { setTimeout(() => { currentWordIndex++; loadWord(); }, 600); }
-        } else { btnElement.classList.remove('wrong'); void btnElement.offsetWidth; btnElement.classList.add('wrong'); handleMistake(); }
+            btnElement.classList.add('used'); activeBlank.classList.remove('hidden-char', 'active-blank'); activeBlank.classList.add('filled'); activeBlank.innerText = char;
+            activeBlankIndex++; handleCorrect();
+            if (activeBlankIndex < currentBlanks.length) { currentBlanks[activeBlankIndex].classList.add('active-blank'); } 
+            else { setTimeout(() => { currentWordIndex++; loadWord(); }, 600); }
+        } else {
+            btnElement.classList.remove('wrong'); void btnElement.offsetWidth; btnElement.classList.add('wrong'); handleMistake();
+        }
     }
 
     function getStarsForTime(time) {
         let t = getLevelTimes(activeStage.level);
-        let letters = window.currentWordLength || 10; // عدد الحروف الكلي
+        let letters = window.currentStageTotalLetters || 10;
         if(time <= (t.t5 * letters)) return 5; if(time <= (t.t4 * letters)) return 4; if(time <= (t.t3 * letters)) return 3; if(time <= (t.t2 * letters)) return 2; if(time <= (t.t1 * letters)) return 1; return 0;
     }
 
@@ -485,15 +529,15 @@
         let time = secondsElapsed; let stars = Math.max(0, getStarsForTime(time) - starPenalty);
         let levelData = gameProgress[activeStage.level] || {}; let previousStars = levelData[activeStage.localStage]?.stars || 0;
         let t = getLevelTimes(activeStage.level); let starPrice = t.starPrice !== undefined ? t.starPrice : 8;
-
+        
         let basePoints = 0; let bonusPoints = 0; let totalPoints = 0;
 
         if(stars > previousStars) {
             basePoints = (stars - previousStars) * starPrice;
-            let cardMult = window.currentStageCardInfo.mult || 1;
-            let fridayMult = window.isFridayEventActive ? window.fridayMultiplier : 1;
+            let hotMult = (window.currentStageIsLastHot || window.currentStageIsRandomHot) ? 1.5 : 1;
+            let finalMultiplier = (window.currentEventMultiplier || 1) * hotMult * (window.currentStageHareefMult || 1);
             
-            totalPoints = Math.round(basePoints * cardMult * fridayMult);
+            totalPoints = Math.round(basePoints * finalMultiplier);
             bonusPoints = totalPoints - basePoints;
 
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + totalPoints;
@@ -501,58 +545,73 @@
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
             levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time };
             
-            let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || []; pointsHistory.push({ time: Date.now(), game: 'scramble', points: totalPoints }); localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
-        } else if (!levelData[activeStage.localStage]) { levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time }; }
-
-        gameProgress[activeStage.level] = levelData; localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
-
-        // التحقق من الحريف
-        if(stars === 5 && hareefSettings.games.includes("scramble")) {
-            let winTracker = parseInt(localStorage.getItem('hareefWins_scramble')) || 0; winTracker++;
-            if(winTracker >= hareefSettings.targetWins) { winTracker = 0; generateHareefReward('scramble'); setTimeout(showChestModal, 800); }
-            localStorage.setItem('hareefWins_scramble', winTracker);
-        } else { localStorage.setItem('hareefWins_scramble', 0); }
-
-        // تنظيف بطاقة الحريف
-        if(window.currentStageCardInfo.type === 'hareef') {
-            let hObj = window.currentStageCardInfo.hareefCardObj; let hData = JSON.parse(localStorage.getItem('hareefCardsData')) || [];
-            let index = hData.findIndex(c => c.expiry === hObj.expiry && c.game === hObj.game);
-            if(index !== -1) { hData[index].stages = hData[index].stages.filter(id => id !== activeStage.id); if(hData[index].stages.length === 0) hData.splice(index, 1); localStorage.setItem('hareefCardsData', JSON.stringify(hData)); }
+            let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
+            pointsHistory.push({ time: Date.now(), game: 'scramble', points: totalPoints });
+            localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
+        } else if (!levelData[activeStage.localStage]) {
+            levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time };
         }
 
-        showResultModal(stars, time, basePoints, bonusPoints, totalPoints);
+        gameProgress[activeStage.level] = levelData;
+        localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
+
+        // نظام الحريف
+        let hareefSettings = JSON.parse(localStorage.getItem('hareefSettings')) || { name: "الحريف", mults: [3,4,5,6], maxStages: 4, minHours: 1, maxHours: 5, reqWins: 5, games: {arrange:true} };
+        if(hareefSettings.games['arrange']) {
+            if(stars === 5) {
+                let cons = parseInt(localStorage.getItem('consecutive5_scramble')) || 0; cons++; localStorage.setItem('consecutive5_scramble', cons);
+                if(cons >= hareefSettings.reqWins) { localStorage.setItem('consecutive5_scramble', 0); triggerHareefChest(hareefSettings); } 
+                else { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
+            } else { localStorage.setItem('consecutive5_scramble', 0); showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
+        } else { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
+
+        if(window.currentStageHareefMult > 1) {
+            let hData = JSON.parse(localStorage.getItem('hareefActive_scramble'));
+            if(hData) { hData.stages = hData.stages.filter(id => id !== activeStage.id); if(hData.stages.length === 0) localStorage.removeItem('hareefActive_scramble'); else localStorage.setItem('hareefActive_scramble', JSON.stringify(hData)); }
+        }
     }
 
-    function showResultModal(stars, time, base, bonus, total) {
+    function triggerHareefChest(hSet) {
+        document.getElementById('flash-effect').style.animation = 'flashAnim 1s ease-out forwards';
+        document.getElementById('chest-modal').style.display = 'flex';
+        document.getElementById('chest-icon').className = 'chest-box'; document.getElementById('chest-icon').innerText = '🧰';
+        document.getElementById('chest-details').style.display = 'none'; document.getElementById('chest-btn').style.display = 'none';
+        setTimeout(() => { document.getElementById('flash-effect').style.animation = ''; }, 1000);
+
+        let validStages = globalStagesList.filter(s => { let p = gameProgress[s.level]?.[s.localStage]?.stars || 0; return p === 0 && !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id); });
+        if(validStages.length < hSet.maxStages) { let backup = globalStagesList.filter(s => !window.currentHotLast10.includes(s.id) && !window.currentHotRandom10.includes(s.id)); backup.sort((a,b) => (gameProgress[a.level]?.[a.localStage]?.stars || 0) - (gameProgress[b.level]?.[b.localStage]?.stars || 0)); validStages = backup; }
+        
+        validStages.sort(() => Math.random() - 0.5); let numStages = Math.floor(Math.random() * hSet.maxStages) + 1;
+        let selected = validStages.slice(0, numStages).map(s => s.id); let mult = hSet.mults[Math.floor(Math.random() * hSet.mults.length)];
+        let hours = Math.floor(Math.random() * (hSet.maxHours - hSet.minHours + 1)) + hSet.minHours;
+
+        let activeData = { mult: mult, stages: selected, expiry: Date.now() + (hours * 3600000) };
+        localStorage.setItem('hareefActive_scramble', JSON.stringify(activeData));
+        window.tempHareefReward = { name: hSet.name, mult: mult, count: selected.length, hours: hours };
+    }
+
+    function openHareefChest() {
+        let icon = document.getElementById('chest-icon'); if(icon.classList.contains('chest-open')) return;
+        icon.className = 'chest-box chest-open'; icon.innerText = '💎'; let r = window.tempHareefReward;
+        document.getElementById('chest-details').innerHTML = `حصلت على بطاقة <b>${r.name}</b>!<br>لديك <span style="color:#f1c40f">${r.count} مراحل</span> عشوائية بنقاط <span style="color:#1cc88a">${r.mult}x</span> أضعاف!<br><span style="color:#e74a3b; font-size:16px;">⏳ ينتهي العرض خلال ${r.hours} ساعات!</span>`;
+        document.getElementById('chest-details').style.display = 'block'; document.getElementById('chest-btn').style.display = 'inline-block';
+    }
+
+    function closeChestModal() { document.getElementById('chest-modal').style.display = 'none'; showStagesScreen(); }
+
+    function showResultModal(stars, time, bBase, bBonus, bTotal) {
         document.getElementById('modal-stars').innerText = '★'.repeat(stars) + '☆'.repeat(5 - Math.max(0, stars));
         document.getElementById('modal-time').innerText = time;
-        document.getElementById('modal-base-points').innerText = base;
-        if(bonus > 0) { document.getElementById('modal-bonus-row').style.display = 'block'; document.getElementById('modal-bonus-points').innerText = bonus; } else { document.getElementById('modal-bonus-row').style.display = 'none'; }
-        document.getElementById('modal-total-points').innerText = total;
+        document.getElementById('modal-points-base').innerText = bBase; document.getElementById('modal-points-bonus').innerText = bBonus; document.getElementById('modal-points-total').innerText = bTotal;
+        let msgElement = document.getElementById('modal-points-msg');
+        if(bTotal > 0) { msgElement.innerText = `رائع! كسبت ${bTotal} نقطة إضافية للعلامة التراكمية! 🏆`; } 
+        else { msgElement.innerText = `لم تحصل على نقاط جديدة. حاول بوقت أسرع وبأخطاء أقل لرفع نجومك! 💪`; }
         document.getElementById('result-modal').style.display = 'flex';
     }
 
     function showStagesScreen() {
-        clearInterval(timerInterval); document.getElementById('result-modal').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('stages-screen').style.display = 'block'; updateGlobalHotStages(); renderStages();
-    }
-
-    /* --- وظائف صندوق الحريف --- */
-    function generateHareefReward(gameKey) {
-        let pool = globalStagesList.filter(s => !window.currentHotLast10.includes(s.id) && !window.currentHotDaily.includes(s.id));
-        let eligible = pool.filter(s => { let prog = (gameProgress[s.level] && gameProgress[s.level][s.localStage]) ? gameProgress[s.level][s.localStage].stars : 0; return prog === 0; });
-        if(eligible.length === 0) eligible = pool; eligible.sort(() => Math.random() - 0.5);
-        let numCards = Math.floor(Math.random() * hareefSettings.maxCards) + 1; let selectedIds = eligible.slice(0, numCards).map(s => s.id);
-        let mult = hareefSettings.mults[Math.floor(Math.random() * hareefSettings.mults.length)];
-        let hours = Math.floor(Math.random() * (hareefSettings.maxH - hareefSettings.minH + 1)) + hareefSettings.minH; let expiry = new Date().getTime() + (hours * 60 * 60 * 1000);
-        let newCard = { name: hareefSettings.name, game: gameKey, stages: selectedIds, multiplier: mult, expiry: expiry };
-        let hData = JSON.parse(localStorage.getItem('hareefCardsData')) || []; hData.push(newCard); localStorage.setItem('hareefCardsData', JSON.stringify(hData));
-    }
-
-    function showChestModal() { let flash = document.getElementById('flash-screen'); flash.style.opacity = '1'; setTimeout(() => { flash.style.opacity = '0'; }, 300); document.getElementById('result-modal').style.display = 'none'; document.getElementById('chest-modal').style.display = 'flex'; }
-    function openChest() {
-        let chestCont = document.querySelector('.chest-container'); chestCont.style.animation = 'none'; chestCont.innerHTML = '<div class="chest-emoji">🎉</div>';
-        document.querySelector('.chest-text').innerText = `تهانينا! تفقد "البطاقات السحرية" لتجد بطاقات الحريف الخاصة بك!`;
-        setTimeout(() => { document.getElementById('chest-modal').style.display = 'none'; showStagesScreen(); }, 2500);
+        clearInterval(timerInterval);
+        document.getElementById('result-modal').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('stages-screen').style.display = 'block'; renderStages();
     }
 </script>
 
