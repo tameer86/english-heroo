@@ -350,30 +350,38 @@
     </div>
 
 <script>
-    // أصوات النظام والموسيقى الخلفية وتفعيلها عند أول نقرة
-    let sysAudioCtx = null;
-    function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
+    // أصوات النظام والموسيقى الخلفية وتفعيلها بشكل آمن ومستقر
+    let audioCtx = null;
+    function initAudio() { 
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+        if(audioCtx.state === 'suspended') audioCtx.resume(); 
+    }
+    
     function playSysSound(type) {
         try {
-            initSysAudio();
-            const osc = sysAudioCtx.createOscillator(); const gain = sysAudioCtx.createGain();
-            osc.connect(gain); gain.connect(sysAudioCtx.destination);
+            initAudio();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
             if(type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, sysAudioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, sysAudioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
             }
         } catch(e){}
     }
 
     document.addEventListener('click', (e) => {
-        if(e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn') || e.target.closest('.game-btn')) playSysSound('click');
+        // حماية من الخطأ عند الضغط على نصوص أو عناصر لا تملك خصائص العناصر
+        if(e.target && e.target.closest && (e.target.tagName === 'BUTTON' || e.target.closest('.icon-btn') || e.target.closest('.game-btn'))) {
+            playSysSound('click');
+        }
         
-        // تشغيل الموسيقى عند أول تفاعل للمستخدم (لحل مشكلة حظر المتصفحات للتشغيل التلقائي)
+        // تشغيل الموسيقى عند أول تفاعل للمستخدم مع الحماية من الأخطاء
         let bgMusic = document.getElementById('bg-music');
         if (bgMusic && bgMusic.paused) {
-            let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5);
+            let vol = parseFloat(localStorage.getItem('bgMusicVolume'));
+            if(isNaN(vol)) vol = 0.5;
             let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
             bgMusic.volume = isMuted ? 0 : vol;
             let playPromise = bgMusic.play();
@@ -386,19 +394,23 @@
     function initVolumeControl() {
         let volSlider = document.getElementById('bg-vol-slider');
         let volIcon = document.getElementById('bg-vol-icon');
-        let savedVol = localStorage.getItem('bgMusicVolume');
-        if (savedVol === null) savedVol = 0.5; 
+        
+        // قراءة دقيقة لتفادي قيم NaN التي تعطل الكود
+        let savedVol = parseFloat(localStorage.getItem('bgMusicVolume'));
+        if (isNaN(savedVol)) savedVol = 0.5; 
         
         if (volSlider) {
             volSlider.value = savedVol;
-            volSlider.oninput = function() {
+            volSlider.addEventListener('input', function() {
                 localStorage.setItem('bgMusicVolume', this.value);
                 localStorage.setItem('bgMusicMuted', 'false');
                 applyVolumeUI();
-            };
+            });
         }
+        
         if (volIcon) {
-            volIcon.onclick = function() {
+            volIcon.onclick = function(e) {
+                e.stopPropagation(); // منع النقر من الانتقال للـ document لضمان عدم حدوث تداخلات
                 let muted = localStorage.getItem('bgMusicMuted') === 'true';
                 localStorage.setItem('bgMusicMuted', !muted);
                 applyVolumeUI();
@@ -411,7 +423,9 @@
         let bgMusic = document.getElementById('bg-music');
         let volSlider = document.getElementById('bg-vol-slider');
         let volIcon = document.getElementById('bg-vol-icon');
-        let vol = parseFloat(localStorage.getItem('bgMusicVolume') || 0.5);
+        
+        let vol = parseFloat(localStorage.getItem('bgMusicVolume'));
+        if(isNaN(vol)) vol = 0.5;
         let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
         
         if(bgMusic) bgMusic.volume = isMuted ? 0 : vol;
