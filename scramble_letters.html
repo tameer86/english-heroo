@@ -4,14 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة ترتيب الحروف</title>
-	<script>
-    (function checkActivation() {
-        if (!localStorage.getItem('app_is_activated')) {
-            alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
-            window.location.replace("index.html"); 
-        }
-    })();
-    </script>
+
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
     <script src="C1.js"></script><script src="C2.js"></script>
     <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
@@ -130,10 +123,7 @@
 <body>
     <audio id="bg-music" src="music\4.mp3" loop autoplay></audio>
 
-    <div class="volume-container" style="position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #ccc; display: flex; align-items: center; gap: 10px;">
-        <div id="bg-vol-icon" class="vol-icon" style="font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;">🔊</div>
-        <input type="range" id="bg-vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="0.5" style="width: 80px; cursor: pointer; accent-color: var(--primary);">
-    </div>
+   
 
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
 
