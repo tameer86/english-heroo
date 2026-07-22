@@ -1088,37 +1088,58 @@
         localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('withdraw-amount').value = ''; updateBankUI(); 
     }
 	
+
+
+
+
+
+
 // دالة للتحقق من وجود أخبار جديدة عند فتح الصفحة
 function checkNewsStatus() {
     fetch('news.txt')
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
-            // إذا كان الملف غير فارغ والسطر الأول هو stat=1
+            // التحقق من السطر الأول
             if (lines.length > 0 && lines[0].trim() === 'stat=1') {
-                document.getElementById('news-badge').style.display = 'block'; // تشغيل اللمبة الحمراء
+                lines.shift(); // نحذف سطر stat للمقارنة
+                let currentNews = lines.join('\n').trim(); // نجمع باقي النص
+                let lastReadNews = localStorage.getItem('last_read_news'); // نجلب آخر خبر قرأه اللاعب
+
+                // إذا كان الخبر الحالي مختلفاً عن آخر خبر تمت قراءته (أي خبر جديد لم يُقرأ بعد)
+                if (currentNews !== lastReadNews) {
+                    document.getElementById('news-badge').style.display = 'block'; // تشغيل اللمبة
+                } else {
+                    document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة لأن الخبر مقروء
+                }
             } else {
-                document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة
+                document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة إذا كان stat=0
             }
         })
         .catch(error => console.log('لم يتم العثور على ملف الأخبار أو تعذر قراءته:', error));
 }
 
-// الدالة المعدلة لفتح نافذة الأخبار (تتجاهل السطر الأول)
+// الدالة المعدلة لفتح نافذة الأخبار (تقوم بتسجيل القراءة وإطفاء اللمبة فوراً)
 function openNewsModal() {
     fetch('news.txt')
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
             
-            // فحص السطر الأول، إذا كان يحتوي على stat=، نقوم بحذفه من العرض
+            // فحص السطر الأول لحذفه من العرض
             if (lines.length > 0 && lines[0].trim().startsWith('stat=')) {
-                lines.shift(); // هذه التعليمة تحذف السطر الأول
+                lines.shift(); 
             }
             
-            // تجميع باقي الأسطر لعرضها
             let content = lines.join('\n').trim();
             document.getElementById('news-content').innerText = content || 'لا توجد أخبار جديدة حالياً.';
+            
+            // حفظ الخبر كـ "مقروء" في ذاكرة المتصفح
+            localStorage.setItem('last_read_news', content);
+            
+            // إطفاء اللمبة الحمراء فوراً بمجرد فتح النافذة
+            let badge = document.getElementById('news-badge');
+            if (badge) badge.style.display = 'none';
             
             toggleModal('news-modal');
         })
