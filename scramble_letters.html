@@ -308,7 +308,7 @@
     let consecutiveErrors = 0; let totalErrors = 0; let starPenalty = 0; window.currentStageTotalLetters = 0; 
 
     // متغيرات المساعدة (Hint Bulb)
-    window.hintUses = 0; window.hintPenalty = 0; window.isHintActive = false; window.hintedBlank = null; window.currentHintCost = 3;
+    window.hintUses = 0; window.hintPenalty = 0; window.isHintActive = false; window.hintedBlank = null; window.currentHintCost = 1;
 
     let assignedCards = { last5: [], random5: [], friday: [], chests: {} }; let magicCardEventInterval = null;
 
@@ -521,7 +521,7 @@
 
     function getLevelTimes(level) {
         let levelKey = level === "ALL" ? "GLOBAL_DEFAULT" : level;
-        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 1.5, t4: 2.5, t3: 3.5, t2: 4.5, t1: 5.5, starPrice: 8, hintEnabled: true, hintCost: 3 };
+        let defaultTimes = gameTimeSettings['GLOBAL_DEFAULT'] || { t5: 1.5, t4: 2.5, t3: 3.5, t2: 4.5, t1: 5.5, starPrice: 8, hintEnabled: true, hintCost: 1 };
         return gameTimeSettings[levelKey] || defaultTimes;
     }
 
@@ -531,7 +531,7 @@
         document.getElementById('time-3').value = t.t3; document.getElementById('time-2').value = t.t2;
         document.getElementById('time-1').value = t.t1; document.getElementById('star-price').value = t.starPrice !== undefined ? t.starPrice : 8;
         document.getElementById('hint-enabled').checked = t.hintEnabled !== false;
-        document.getElementById('hint-cost').value = t.hintCost || 3;
+        document.getElementById('hint-cost').value = t.hintCost || 1;
     }
 
     function toggleSettingsModal() {
@@ -544,7 +544,7 @@
     function saveTimeSettings() {
         let t5 = parseFloat(document.getElementById('time-5').value) || 1.5; let t4 = parseFloat(document.getElementById('time-4').value) || 2.5; let t3 = parseFloat(document.getElementById('time-3').value) || 3.5; let t2 = parseFloat(document.getElementById('time-2').value) || 4.5; let t1 = parseFloat(document.getElementById('time-1').value) || 5.5; let starPrice = parseInt(document.getElementById('star-price').value) || 8;
         let hintEnabled = document.getElementById('hint-enabled').checked;
-        let hintCost = parseInt(document.getElementById('hint-cost').value) || 3;
+        let hintCost = parseInt(document.getElementById('hint-cost').value) || 1;
         
         if(!(t5 < t4 && t4 < t3 && t3 < t2 && t2 < t1)) { alert("تنبيه: يجب ترتيب الأوقات بشكل منطقي."); return; }
         let newSettings = { t5, t4, t3, t2, t1, starPrice, hintEnabled, hintCost };
@@ -666,7 +666,7 @@
         window.hintUses = 0; window.hintPenalty = 0; window.isHintActive = false; window.hintedBlank = null;
 
         let t = getLevelTimes(activeStage.level);
-        window.currentHintCost = t.hintCost || 3;
+        window.currentHintCost = t.hintCost || 1;
         document.getElementById('hint-bulb-btn').style.display = (t.hintEnabled !== false) ? 'flex' : 'none';
 
         stageWords = [...activeStage.words];

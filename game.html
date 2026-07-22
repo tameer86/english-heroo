@@ -129,7 +129,28 @@
         .vol-icon { font-size: 22px; cursor: pointer; user-select: none; transition: 0.2s; width: 25px; text-align: center;}
         .vol-icon:hover { transform: scale(1.1); }
         .vol-slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
-    </style>
+		
+		/* النقطة الحمراء النابضة لأيقونة الأخبار */
+.news-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 14px;
+    height: 14px;
+    background-color: var(--danger);
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7); }
+    70% { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(231, 74, 59, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 74, 59, 0); }
+}
+   	/* النقطة الحمراء النابضة لأيقونة الأخبار */
+
+   </style>
 </head>
 <body>
     <audio id="bg-music" src="music\game.mp3" loop autoplay></audio>
@@ -148,7 +169,10 @@
         <button class="btn-top-action" onclick="toggleModal('bank-modal')" title="بنك الأبطال وقرص الحظ">💰</button>
         <button class="btn-top-action" onclick="openFameModal()" title="لوحة الشرف والأوسمة">🏆</button>
         <button class="btn-top-action" onclick="openReportsModal()" title="تقارير الإنجاز">📊</button>
-        <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة">📰</button>
+        <button class="btn-top-action" onclick="openNewsModal()" title="أخبار وتحديثات اللعبة" style="position: relative;">
+    📰
+    <span id="news-badge" class="news-badge" style="display: none;"></span>
+</button>
         <button class="btn-top-action" onclick="openMagicCardsModal()" title="البطاقات السحرية والأحداث">🃏</button>
     </div>
 
@@ -470,6 +494,7 @@
         loadGamesState();
         checkNewFameAchievements(); 
         initVolumeControl();
+		checkNewsStatus(); // السطر الجديد الذي أضفناه لفحص اللمبة الحمراء
     };
 
     function verifyParentModeStrict() {
@@ -1062,6 +1087,46 @@
         }
         localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('withdraw-amount').value = ''; updateBankUI(); 
     }
+	
+// دالة للتحقق من وجود أخبار جديدة عند فتح الصفحة
+function checkNewsStatus() {
+    fetch('news.txt')
+        .then(response => response.text())
+        .then(data => {
+            let lines = data.split('\n');
+            // إذا كان الملف غير فارغ والسطر الأول هو stat=1
+            if (lines.length > 0 && lines[0].trim() === 'stat=1') {
+                document.getElementById('news-badge').style.display = 'block'; // تشغيل اللمبة الحمراء
+            } else {
+                document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة
+            }
+        })
+        .catch(error => console.log('لم يتم العثور على ملف الأخبار أو تعذر قراءته:', error));
+}
+
+// الدالة المعدلة لفتح نافذة الأخبار (تتجاهل السطر الأول)
+function openNewsModal() {
+    fetch('news.txt')
+        .then(response => response.text())
+        .then(data => {
+            let lines = data.split('\n');
+            
+            // فحص السطر الأول، إذا كان يحتوي على stat=، نقوم بحذفه من العرض
+            if (lines.length > 0 && lines[0].trim().startsWith('stat=')) {
+                lines.shift(); // هذه التعليمة تحذف السطر الأول
+            }
+            
+            // تجميع باقي الأسطر لعرضها
+            let content = lines.join('\n').trim();
+            document.getElementById('news-content').innerText = content || 'لا توجد أخبار جديدة حالياً.';
+            
+            toggleModal('news-modal');
+        })
+        .catch(error => {
+            document.getElementById('news-content').innerText = 'لا توجد أخبار جديدة حالياً أو تعذر تحميل الملف.';
+            toggleModal('news-modal');
+        });
+}
 </script>
 
 </body>
