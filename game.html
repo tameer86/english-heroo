@@ -36,7 +36,7 @@
 
         .admin-row { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; text-align: right;}
         .admin-row input, .admin-row select { padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; font-weight: bold; }
-        .admin-checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; background: var(--light); padding: 12px; border-radius: 6px; text-align: right; border: 1px solid #ddd;}
+        .admin-checkbox-group { display: flex; flex-direction: column; gap: 10px; background: var(--light); padding: 12px; border-radius: 6px; text-align: right; border: 1px solid #ddd;}
         .btn-admin-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; color: white; cursor: pointer; background-color: var(--danger); margin-top: 10px; }
 
         .bank-stats { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; font-weight: bold; color: var(--dark); border: 2px solid var(--primary); text-align: right; }
@@ -51,7 +51,7 @@
         .withdraw-box { margin-top: 15px; padding: 15px; background: white; border-radius: 10px; border: 2px solid var(--success); text-align: right; }
         .withdraw-box input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-weight: bold;}
         .btn-withdraw { width: 100%; background: var(--success); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer;}
-        .bank-statement-box { margin-top: 15px; max-height: 150px; overflow-y: auto; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd; text-align: right; font-size: 13px; }
+        .bank-statement-box { margin-top: 5px; max-height: 150px; overflow-y: auto; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd; text-align: right; font-size: 13px; }
         .statement-item { border-bottom: 1px dashed #ccc; padding: 5px 0; display: flex; justify-content: space-between; }
         .statement-in { color: var(--success); } .statement-out { color: var(--danger); }
 
@@ -84,7 +84,6 @@
 
         #image-modal { z-index: 3000; cursor: pointer; align-items: center;}
         .full-size-image { max-width: 95%; max-height: 90vh; border-radius: 15px; border: 4px solid var(--gold); box-shadow: 0 10px 40px rgba(0,0,0,0.6); animation: popIn 0.3s ease-out; object-fit: contain; cursor: default; margin: auto;}
-        .game-image { margin-top: 35px; width: clamp(240px, 42vw, 480px); height: auto; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
 
@@ -97,7 +96,7 @@
         .stat-val.good { color: var(--success); }
 
         /* البطاقات السحرية */
-        .magic-card-item { display:flex; flex-direction:column; border-radius:10px; padding:15px; margin-bottom:15px; text-align:right; box-shadow:0 4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3); position: relative; }
+        .magic-card-item { display:flex; flex-direction:column; border-radius:10px; padding:15px; margin-bottom:15px; text-align:right; box-shadow:0 4px 10px rgba(0,0,0,0.2); position: relative; border: none; }
         .magic-card-item * { color: #fff !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
         .mc-title { font-size: 18px; font-weight: bold; margin:0 0 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.4); padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center;}
         .mc-desc { font-size: 14px; margin:0 0 10px 0; line-height: 1.4;}
@@ -143,7 +142,7 @@
         }
 
         /* تنسيقات إضافية لإعدادات عجلة الحظ */
-        .wheel-config-row { background: #fdfdfd; border: 1px solid #eee; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
+        .wheel-config-row { background: transparent; padding: 0px; border-radius: 6px; margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
         .wheel-config-row > div { flex: 1; min-width: 120px; }
         .wheel-config-row label { font-size: 12px; color: var(--dark); display: block; margin-bottom: 3px; font-weight: normal;}
         .wheel-config-row input, .wheel-config-row select { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;}
@@ -186,7 +185,7 @@
         <a href="crossword.html" id="link-crossword" class="game-btn" style="background-color: var(--danger);">لعبة الكلمات المتقاطعة 🧩</a>
     </div>
 
-    <!-- نافذة الشرح التفصيلي للبطاقات ذات التمرير -->
+    <!-- نافذة الشرح التفصيلي للبطاقات -->
     <div id="info-modal" class="custom-modal">
         <div class="modal-content-box">
             <button class="btn-close-modal" onclick="toggleModal('info-modal')">✖</button>
@@ -252,77 +251,89 @@
         </div>
     </div>
 
-    <!-- إعدادات الألعاب لولي الأمر (مع إعدادات عجلة الحظ المضافة) -->
+    <!-- إعدادات الألعاب لولي الأمر (المطوية) -->
     <div id="admin-modal" class="custom-modal">
-        <div class="modal-content-box" style="background: white;">
+        <div class="modal-content-box" style="background: #f8f9fc;">
             <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
             <h3 style="color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top:0;">⚙️ إعدادات التحكم بالألعاب</h3>
             
-            <div class="admin-checkbox-group parent-only-inputs">
-                <strong style="color: var(--dark); margin-bottom: 5px; display: block;">تفعيل أو تعطيل الألعاب للطفل:</strong>
-                <label><input type="checkbox" id="chk-matchg" checked> تفعيل لعبة المطابقة والذاكرة</label>
-                <label><input type="checkbox" id="chk-listen" checked> تفعيل لعبة صائد الأمثلة المسموعة</label>
-                <label><input type="checkbox" id="chk-missing" checked> تفعيل لعبة الحروف الناقصة</label>
-                <label><input type="checkbox" id="chk-arrange" checked> تفعيل لعبة ترتيب الحروف</label>
-                <label><input type="checkbox" id="chk-crossword" checked> تفعيل لعبة الكلمات المتقاطعة</label>
-            </div>
-
-            <div class="admin-row parent-only-inputs" style="margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 6px;">
-                <label><input type="checkbox" id="chk-reset-all"> تصفير جميع ألعاب البرنامج (سيتم مسح التقدم)</label>
-            </div>
-
-            <!-- إعدادات عجلة الحظ الديناميكية -->
-            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px; text-align:right;">
-                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">🎡 إعدادات عجلة الحظ الديناميكية</h4>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <div style="flex:2;">
-                        <label style="font-size:13px; color:var(--dark);">اسم العجلة:</label>
-                        <input type="text" id="cfg-wheel-name" placeholder="مثال: عجلة الحظ">
+            <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px;">
+                <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'" style="margin: 0; cursor: pointer; color: var(--primary);">🎮 تفعيل أو تعطيل الألعاب</h4>
+                <div style="display:none; margin-top: 15px;">
+                    <div class="admin-checkbox-group">
+                        <label><input type="checkbox" id="chk-matchg" checked> تفعيل لعبة المطابقة والذاكرة</label>
+                        <label><input type="checkbox" id="chk-listen" checked> تفعيل لعبة صائد الأمثلة المسموعة</label>
+                        <label><input type="checkbox" id="chk-missing" checked> تفعيل لعبة الحروف الناقصة</label>
+                        <label><input type="checkbox" id="chk-arrange" checked> تفعيل لعبة ترتيب الحروف</label>
+                        <label><input type="checkbox" id="chk-crossword" checked> تفعيل لعبة الكلمات المتقاطعة</label>
                     </div>
-                    <div style="flex:1;">
-                        <label style="font-size:13px; color:var(--dark);">عدد الخانات (1-8):</label>
-                        <input type="number" id="cfg-wheel-count" min="1" max="8" value="5" onchange="renderWheelConfigUI()">
+                    <div class="admin-row" style="margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 6px;">
+                        <label><input type="checkbox" id="chk-reset-all"> تصفير جميع ألعاب البرنامج (سيتم مسح التقدم)</label>
                     </div>
                 </div>
-                <div id="wheel-dynamic-settings-container" style="max-height: 250px; overflow-y:auto; padding-right:5px;">
-                    <!-- سيتم توليد إعدادات الخانات هنا عبر الجافاسكريبت -->
+            </div>
+
+            <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px;">
+                <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'" style="margin: 0; cursor: pointer; color: var(--primary);">🎡 إعدادات عجلة الحظ الديناميكية</h4>
+                <div style="display:none; margin-top: 15px; text-align:right;">
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <div style="flex:2;">
+                            <label style="font-size:13px; color:var(--dark);">اسم العجلة:</label>
+                            <input type="text" id="cfg-wheel-name" placeholder="مثال: عجلة الحظ">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:13px; color:var(--dark);">عدد الخانات (1-8):</label>
+                            <input type="number" id="cfg-wheel-count" min="1" max="8" value="5" onchange="renderWheelConfigUI()">
+                        </div>
+                    </div>
+                    <div id="wheel-dynamic-settings-container" style="max-height: 250px; overflow-y:auto; padding-right:5px;">
+                        <!-- سيتم توليد إعدادات الخانات هنا عبر الجافاسكريبت -->
+                    </div>
                 </div>
             </div>
 
-            <div class="admin-row parent-only-inputs" style="margin-top:15px; background:#f8f9fc; padding:10px; border-radius:5px; border:1px dashed #ccc; text-align:right;">
-                <label style="font-size:13px; color:var(--primary);">النقاط المستبدلة للبنك:</label>
-                <input type="number" id="edit-exch-points" placeholder="النقاط المستبدلة">
-                <label style="font-size:13px; color:var(--primary); margin-top:10px;">تكلفة لفة العجل بالنقاط (الافتراضي 3000):</label>
-                <input type="number" id="edit-spin-cost" placeholder="التكلفة">
+            <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px;">
+                <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'" style="margin: 0; cursor: pointer; color: var(--primary);">💰 إعدادات البنك والنقاط</h4>
+                <div style="display:none; margin-top: 15px;">
+                    <div class="admin-row" style="background:#f1f1f1; padding:10px; border-radius:5px; border:1px dashed #ccc; text-align:right;">
+                        <label style="font-size:13px; color:var(--primary);">النقاط المستبدلة للبنك:</label>
+                        <input type="number" id="edit-exch-points" placeholder="النقاط المستبدلة">
+                        <label style="font-size:13px; color:var(--primary); margin-top:10px;">تكلفة لفة العجل بالنقاط (الافتراضي 3000):</label>
+                        <input type="number" id="edit-spin-cost" placeholder="التكلفة">
+                    </div>
+                    <div class="admin-row" style="margin-top:15px; border-top:2px dashed #ccc; padding-top:15px;">
+                        <label style="color:var(--dark); margin-bottom:5px; display:block;">إدارة نقاط الطفل (مكافأة / خصم):</label>
+                        <input type="number" id="manual-points-val" placeholder="أدخل عدد النقاط (مثال: 5000)">
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn-admin-action" style="background:var(--success); margin-top:0;" onclick="addManualPoints()">➕ إضافة مكافأة</button>
+                            <button class="btn-admin-action" style="background:var(--danger); margin-top:0;" onclick="subtractManualPoints()">➖ خصم عقاب</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px;">
+                <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'" style="margin: 0; cursor: pointer; color: var(--primary);">🎁 جوائز المراحل الإضافية</h4>
+                <div style="display:none; margin-top: 15px;">
+                    <div class="admin-row">
+                        <select id="stage-bonus-select">
+                            <option value="1">مرحلة 1: الحفاضة الفولاذية</option>
+                            <option value="2">مرحلة 2: الديناصور الثرثار</option>
+                            <option value="3">مرحلة 3: نينجا الكلمات الصامت</option>
+                            <option value="4">مرحلة 4: زومبي الحفظ الذكي</option>
+                            <option value="5">مرحلة 5: ساحرة الأبجدية العجوز</option>
+                            <option value="6">مرحلة 6: السايبورغ اللغوي</option>
+                            <option value="7">مرحلة 7: حاكم مجرة الأنجلو سنفورية</option>
+                        </select>
+                        <input type="number" id="stage-bonus-val" placeholder="المبلغ المضاف (جنيه فلسطيني)">
+                        <button class="btn-admin-action" style="background:var(--info);" onclick="addStageBonus()">➕ إضافة الجائزة</button>
+                        <button class="btn-admin-action" style="background:var(--warning); color:#000;" onclick="showBonusReport()">📊 تقرير جوائز المراحل</button>
+                        <div id="bonus-report-box" style="display:none; text-align:right; font-size:14px; background:#fff; padding:10px; border-radius:5px; margin-top:10px; max-height:150px; overflow-y:auto; border:1px solid #ddd; font-weight:bold; color:var(--dark);"></div>
+                    </div>
+                </div>
             </div>
 
             <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
-
-            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
-                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">⚖️ إدارة نقاط الطفل (مكافأة / خصم)</h4>
-                <input type="number" id="manual-points-val" class="parent-only-inputs" placeholder="أدخل عدد النقاط (مثال: 5000)">
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn-admin-action parent-only-btn" style="background:var(--success); margin-top:0;" onclick="addManualPoints()">➕ إضافة كمكافأة</button>
-                    <button class="btn-admin-action parent-only-btn" style="background:var(--danger); margin-top:0;" onclick="subtractManualPoints()">➖ خصم كعقاب</button>
-                </div>
-            </div>
-
-            <div class="admin-row parent-only-inputs" style="margin-top:20px; border-top:2px dashed #ccc; padding-top:15px;">
-                <h4 style="color:var(--primary); margin-top:0; margin-bottom:10px;">🎁 جوائز المراحل الإضافية</h4>
-                <select id="stage-bonus-select" class="parent-only-inputs">
-                    <option value="1">مرحلة 1: الحفاضة الفولاذية</option>
-                    <option value="2">مرحلة 2: الديناصور الثرثار</option>
-                    <option value="3">مرحلة 3: نينجا الكلمات الصامت</option>
-                    <option value="4">مرحلة 4: زومبي الحفظ الذكي</option>
-                    <option value="5">مرحلة 5: ساحرة الأبجدية العجوز</option>
-                    <option value="6">مرحلة 6: السايبورغ اللغوي</option>
-                    <option value="7">مرحلة 7: حاكم مجرة الأنجلو سنفورية</option>
-                </select>
-                <input type="number" id="stage-bonus-val" class="parent-only-inputs" placeholder="المبلغ المضاف (جنيه فلسطيني)">
-                <button class="btn-admin-action parent-only-btn" style="background:var(--info);" onclick="addStageBonus()">➕ إضافة الجائزة</button>
-                <button class="btn-admin-action parent-only-btn" style="background:var(--warning); color:#000;" onclick="showBonusReport()">📊 تقرير جوائز المراحل</button>
-                <div id="bonus-report-box" style="display:none; text-align:right; font-size:14px; background:#f1f1f1; padding:10px; border-radius:5px; margin-top:10px; max-height:150px; overflow-y:auto; font-weight:bold; color:var(--dark);"></div>
-            </div>
         </div>
     </div>
 
@@ -346,9 +357,12 @@
 
             <button id="btn-spin" class="btn-spin" onclick="handleSpinClick()">ابدأ الدوران 🎡</button>
 
-            <!-- زر وسجل عجلة الحظ (متاح للجميع) -->
-            <button class="btn-admin-action" onclick="toggleWheelLog()" style="background:var(--info); width:auto; padding:8px 20px; margin-bottom:10px; display:inline-block; border-radius:20px; color:var(--dark);">📜 سجل عجلة الحظ</button>
+            <!-- زر وسجل عجلة الحظ وكشف الحساب -->
+            <h4 onclick="toggleWheelLog()" style="text-align:right; margin:15px 0 5px 0; color:var(--dark); cursor:pointer; user-select:none;">📜 سجل عجلة الحظ</h4>
             <div id="wheel-log-box" style="display:none; max-height:150px; overflow-y:auto; background:#fff; border:1px solid #ddd; padding:10px; margin-bottom:15px; border-radius:5px; text-align:right;"></div>
+
+            <h4 onclick="toggleBankStatement()" style="text-align:right; margin:15px 0 5px 0; color:var(--dark); cursor:pointer; user-select:none;">🧾 كشف حساب البنك</h4>
+            <div class="bank-statement-box" id="bank-statement-list" style="display:none;"></div>
 
             <div class="withdraw-box parent-only-inputs">
                 <h4 style="margin-top:0; color:var(--success);">💳 سحب وإيداع (لولي الأمر)</h4>
@@ -356,9 +370,6 @@
                 <input type="number" id="withdraw-amount" placeholder="القيمة المراد سحبها أو إيداعها">
                 <button class="btn-withdraw parent-only-btn" onclick="withdrawBank()">تنفيذ العملية</button>
             </div>
-
-            <h4 style="text-align:right; margin:15px 0 5px 0; color:var(--dark);">🧾 كشف حساب البنك</h4>
-            <div class="bank-statement-box" id="bank-statement-list"></div>
         </div>
     </div>
 
@@ -404,7 +415,6 @@
                 gain.gain.setValueAtTime(0.1, sysAudioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, sysAudioCtx.currentTime + 0.1);
                 osc.start(); osc.stop(sysAudioCtx.currentTime + 0.1);
             } else if (type === 'tick') {
-                // صوت تكة العجلة (قصير ويشبه البلاستيك/الخشب)
                 osc.type = 'triangle'; 
                 osc.frequency.setValueAtTime(300, sysAudioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(100, sysAudioCtx.currentTime + 0.05);
@@ -421,11 +431,9 @@
         }
     });
 
-    // التحكم بالصوت والإجبار على خفضه
     function initVolumeControl() {
         let volSlider = document.getElementById('bg-vol-slider'); 
         let volIcon = document.getElementById('bg-vol-icon');
-        
         let savedVol = localStorage.getItem('bgMusicVolume'); 
         if (savedVol === null) savedVol = 0.5; 
         
@@ -470,27 +478,19 @@
         }
     }
 
-    // إعدادات عجلة الحظ الافتراضية
     const DEFAULT_WHEEL_CONFIG = {
-        name: "عجلة الحظ",
-        count: 5,
+        name: "عجلة الحظ", count: 5,
         slices: [
-            { type: "money", val: "1", prob: 30, color: "#e74a3b" },
-            { type: "money", val: "2", prob: 25, color: "#f1c40f" },
-            { type: "money", val: "3", prob: 25, color: "#1cc88a" },
-            { type: "points", val: "1000", prob: 20, color: "#3498db" },
+            { type: "money", val: "1", prob: 30, color: "#e74a3b" }, { type: "money", val: "2", prob: 25, color: "#f1c40f" },
+            { type: "money", val: "3", prob: 25, color: "#1cc88a" }, { type: "points", val: "1000", prob: 20, color: "#3498db" },
             { type: "money", val: "5", prob: 0, color: "#9b59b6" }
         ]
     };
-
     const EXTRA_WHEEL_COLORS = ["#e67e22", "#8e44ad", "#2ecc71"];
 
     function getAdvancedWheelConfig() {
         let conf = JSON.parse(localStorage.getItem('advancedWheelConfig'));
-        if (!conf || !conf.slices) {
-            conf = DEFAULT_WHEEL_CONFIG;
-            localStorage.setItem('advancedWheelConfig', JSON.stringify(conf));
-        }
+        if (!conf || !conf.slices) { conf = DEFAULT_WHEEL_CONFIG; localStorage.setItem('advancedWheelConfig', JSON.stringify(conf)); }
         return conf;
     }
 
@@ -503,11 +503,8 @@
 
     function handleWheelTypeChange(selectEl, index) {
         let valInput = document.getElementById(`w-val-${index}`);
-        if(selectEl.value === 'physical') {
-            valInput.type = 'text'; valInput.placeholder = 'اسم الجائزة';
-        } else {
-            valInput.type = 'number'; valInput.placeholder = selectEl.value==='money'?'المبلغ':'النقاط';
-        }
+        if(selectEl.value === 'physical') { valInput.type = 'text'; valInput.placeholder = 'اسم الجائزة'; } 
+        else { valInput.type = 'number'; valInput.placeholder = selectEl.value==='money'?'المبلغ':'النقاط'; }
     }
 
     function renderWheelConfigUI(confData = null) {
@@ -516,65 +513,56 @@
         if(countInput < 1) countInput = 1; if(countInput > 8) countInput = 8;
         document.getElementById('cfg-wheel-count').value = countInput;
 
-        let container = document.getElementById('wheel-dynamic-settings-container');
-        container.innerHTML = '';
+        let container = document.getElementById('wheel-dynamic-settings-container'); container.innerHTML = '';
         
         for(let i=0; i<countInput; i++) {
-            let slice = conf.slices && conf.slices[i] ? conf.slices[i] : { 
-                type: "money", val: "1", prob: 0, color: i < 5 ? DEFAULT_WHEEL_CONFIG.slices[i].color : EXTRA_WHEEL_COLORS[(i-5)%3] 
-            };
-            
+            let slice = conf.slices && conf.slices[i] ? conf.slices[i] : { type: "money", val: "1", prob: 0, color: i < 5 ? DEFAULT_WHEEL_CONFIG.slices[i].color : EXTRA_WHEEL_COLORS[(i-5)%3] };
             let isNum = slice.type !== 'physical';
             
             let html = `
-            <div class="wheel-config-row">
-                <div style="flex:0.2; font-weight:bold; text-align:center;">${i+1}</div>
-                <div>
-                    <label>النوع:</label>
-                    <select id="w-type-${i}" onchange="handleWheelTypeChange(this, ${i})">
-                        <option value="money" ${slice.type==='money'?'selected':''}>مالي (جنيه)</option>
-                        <option value="points" ${slice.type==='points'?'selected':''}>نقاط</option>
-                        <option value="physical" ${slice.type==='physical'?'selected':''}>جائزة عينية</option>
-                    </select>
-                </div>
-                <div>
-                    <label>القيمة:</label>
-                    <input type="${isNum?'number':'text'}" id="w-val-${i}" value="${slice.val}" placeholder="${isNum?'قيمة':'اسم الجائزة'}">
-                </div>
-                <div>
-                    <label>الاحتمال (%):</label>
-                    <input type="number" id="w-prob-${i}" min="0" max="100" value="${slice.prob}">
-                </div>
-                <div style="flex:0.5">
-                    <label>اللون:</label>
-                    <input type="color" id="w-color-${i}" value="${slice.color}" style="height:35px; padding:2px;">
+            <div class="event-editor-row" style="background:#fdfdfd; border: 1px solid #eee; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                <h5 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='flex'?'none':'flex'" style="margin: 0; cursor: pointer; color: var(--dark); font-size: 14px;">⚙️ إعدادات الخانة ${i+1}</h5>
+                <div class="wheel-config-row" style="display:none; margin-top: 10px; border:none; padding:0; background:transparent;">
+                    <div>
+                        <label>النوع:</label>
+                        <select id="w-type-${i}" onchange="handleWheelTypeChange(this, ${i})">
+                            <option value="money" ${slice.type==='money'?'selected':''}>مالي (جنيه)</option>
+                            <option value="points" ${slice.type==='points'?'selected':''}>نقاط</option>
+                            <option value="physical" ${slice.type==='physical'?'selected':''}>جائزة عينية</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>القيمة:</label>
+                        <input type="${isNum?'number':'text'}" id="w-val-${i}" value="${slice.val}" placeholder="${isNum?'قيمة':'اسم الجائزة'}">
+                    </div>
+                    <div>
+                        <label>الاحتمال (%):</label>
+                        <input type="number" id="w-prob-${i}" min="0" max="100" value="${slice.prob}">
+                    </div>
+                    <div style="flex:0.5">
+                        <label>اللون:</label>
+                        <input type="color" id="w-color-${i}" value="${slice.color}" style="height:35px; padding:2px;">
+                    </div>
                 </div>
             </div>`;
             container.innerHTML += html;
         }
-        applyGlobalModes(); // تطبيق إغلاق وضع الأب على الحقول المولدة حديثاً
+        applyGlobalModes();
     }
 
     function buildDynamicWheelUI() {
         let conf = getAdvancedWheelConfig();
-        let titleEl = document.getElementById('dynamic-wheel-title');
-        if(titleEl) titleEl.innerText = `💰 ${conf.name} 🎡`;
-
-        let wheelEl = document.getElementById('wheel');
-        let sliceAngle = 360 / conf.count;
-        
-        let gradientParts = [];
-        let html = '';
+        let titleEl = document.getElementById('dynamic-wheel-title'); if(titleEl) titleEl.innerText = `💰 ${conf.name} 🎡`;
+        let wheelEl = document.getElementById('wheel'); let sliceAngle = 360 / conf.count;
+        let gradientParts = []; let html = '';
         
         for(let i=0; i<conf.count; i++) {
-            let startDeg = i * sliceAngle;
-            let endDeg = (i+1) * sliceAngle;
+            let startDeg = i * sliceAngle; let endDeg = (i+1) * sliceAngle;
             gradientParts.push(`${conf.slices[i].color} ${startDeg}deg ${endDeg}deg`);
             
             let textRotation = startDeg + (sliceAngle / 2);
             let displayVal = conf.slices[i].val;
-            if(conf.slices[i].type === 'money') displayVal += ' جنيه';
-            else if(conf.slices[i].type === 'points') displayVal += ' ن';
+            if(conf.slices[i].type === 'money') displayVal += ' جنيه'; else if(conf.slices[i].type === 'points') displayVal += ' ن';
             
             html += `<div class="wheel-text"><span style="transform: translateX(-50%) rotate(${textRotation}deg);">${displayVal}</span></div>`;
         }
@@ -585,48 +573,31 @@
 
     function toggleWheelLog() {
         let box = document.getElementById('wheel-log-box');
-        if(box.style.display === 'none') {
-            renderWheelLog();
-            box.style.display = 'block';
-        } else {
-            box.style.display = 'none';
-        }
+        if(box.style.display === 'none') { renderWheelLog(); box.style.display = 'block'; } else { box.style.display = 'none'; }
+    }
+
+    function toggleBankStatement() {
+        let box = document.getElementById('bank-statement-list');
+        if(box.style.display === 'none') { renderBankStatement(); box.style.display = 'block'; } else { box.style.display = 'none'; }
     }
 
     function logWheelAction(prizeText, pointsBefore, pointsAfter, bankBefore, bankAfter) {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         appProg.wheelStatement = appProg.wheelStatement || [];
-        appProg.wheelStatement.unshift({
-            date: new Date().toLocaleString('ar-EG'),
-            prize: prizeText,
-            ptsB: pointsBefore, ptsA: pointsAfter,
-            bnkB: bankBefore, bnkA: bankAfter
-        });
+        appProg.wheelStatement.unshift({ date: new Date().toLocaleString('ar-EG'), prize: prizeText, ptsB: pointsBefore, ptsA: pointsAfter, bnkB: bankBefore, bnkA: bankAfter });
         if(appProg.wheelStatement.length > 50) appProg.wheelStatement.pop();
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
-        renderWheelLog();
+        localStorage.setItem('appProgress', JSON.stringify(appProg)); renderWheelLog();
     }
 
     function renderWheelLog() {
-        let box = document.getElementById('wheel-log-box');
-        if(!box) return;
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let statement = appProg.wheelStatement || [];
+        let box = document.getElementById('wheel-log-box'); if(!box) return;
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {}; let statement = appProg.wheelStatement || [];
         if(statement.length === 0) { box.innerHTML = '<div style="text-align:center; padding:10px;">لا يوجد سجل حالياً.</div>'; return; }
-        
         let html = '';
-        statement.forEach(item => {
-            html += `<div class="wheel-log-entry">
-                <strong style="color:var(--primary);">${item.date}</strong><br>
-                <span style="color:var(--danger); font-weight:bold;">النتيجة: ${item.prize}</span><br>
-                <span style="color:#555;">النقاط: ${item.ptsB} ⬅️ ${item.ptsA} | البنك: ${item.bnkB} ⬅️ ${item.bnkA}</span>
-            </div>`;
-        });
+        statement.forEach(item => { html += `<div class="wheel-log-entry"><strong style="color:var(--primary);">${item.date}</strong><br><span style="color:var(--danger); font-weight:bold;">النتيجة: ${item.prize}</span><br><span style="color:#555;">النقاط: ${item.ptsB} ⬅️ ${item.ptsA} | البنك: ${item.bnkB} ⬅️ ${item.bnkA}</span></div>`; });
         box.innerHTML = html;
     }
 
-
-    // المحرك الديناميكي للبطاقات والتزامن مع الإعدادات
     const DEFAULT_CARDS_CONFIG = {
         last5: { id: 'last5', name: "بطاقة آخر 5 مراحل", color: "#e74a3b", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 0, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 5 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'fixed' }, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "تُطبق أوتوماتيكياً على أحدث 5 مراحل تم حفظها لزيادة التحدي." },
         random5: { id: 'random5', name: "البطاقة العشوائية الملتهبة", color: "#f6c23e", mult: { type: "fixed", val: 1.5, min: 1, max: 3 }, dur: { type: "fixed", val: 24, min: 1, max: 24 }, count: { type: "fixed", val: 5, min: 1, max: 10 }, games: ['matchg','listen','missing','arrange','crossword'], trigger: { type: 'random' }, canEditTrigger: false, receive: "تلقائي بدون احتفال", timers: 1, desc: "مراحل عشوائية غير مختومة بنجوم يتم إشعالها لتشجيع الطفل على لعبها." },
@@ -640,16 +611,8 @@
         cardsConfig = DEFAULT_CARDS_CONFIG;
     } else {
         if(cardsConfig.friday) cardsConfig.friday.canEditTrigger = true;
-        if(cardsConfig.hareef) {
-            cardsConfig.hareef.canEditTrigger = true;
-            if(!cardsConfig.hareef.mult.min) { cardsConfig.hareef.mult.min = 1.5; cardsConfig.hareef.mult.max = 4.5; }
-            if(!cardsConfig.hareef.count.min) { cardsConfig.hareef.count.min = 1; cardsConfig.hareef.count.max = 4; }
-        }
-        if(cardsConfig.longBreath) {
-            cardsConfig.longBreath.canEditTrigger = true;
-            if(!cardsConfig.longBreath.mult.min) { cardsConfig.longBreath.mult.min = 1.5; cardsConfig.longBreath.mult.max = 4.5; }
-            if(!cardsConfig.longBreath.count.min) { cardsConfig.longBreath.count.min = 1; cardsConfig.longBreath.count.max = 4; }
-        }
+        if(cardsConfig.hareef) { cardsConfig.hareef.canEditTrigger = true; if(!cardsConfig.hareef.mult.min) { cardsConfig.hareef.mult.min = 1.5; cardsConfig.hareef.mult.max = 4.5; } if(!cardsConfig.hareef.count.min) { cardsConfig.hareef.count.min = 1; cardsConfig.hareef.count.max = 4; } }
+        if(cardsConfig.longBreath) { cardsConfig.longBreath.canEditTrigger = true; if(!cardsConfig.longBreath.mult.min) { cardsConfig.longBreath.mult.min = 1.5; cardsConfig.longBreath.mult.max = 4.5; } if(!cardsConfig.longBreath.count.min) { cardsConfig.longBreath.count.min = 1; cardsConfig.longBreath.count.max = 4; } }
         if(cardsConfig.last5) cardsConfig.last5.canEditTrigger = false;
         if(cardsConfig.random5) cardsConfig.random5.canEditTrigger = false;
     }
@@ -675,110 +638,86 @@
         checkNewFameAchievements(); 
         initVolumeControl();
 		checkNewsStatus(); 
-        loadWheelAdminData(); // استدعاء دالة تحميل عجلة الحظ
-        buildDynamicWheelUI(); // رسم العجلة
+        loadWheelAdminData(); 
+        buildDynamicWheelUI(); 
     };
 
     function verifyParentModeStrict() {
         let isParent = localStorage.getItem('isParentMode');
-        if(isParent !== 'true' && isParent !== 'false') {
-            localStorage.setItem('isParentMode', 'false');
-        }
+        if(isParent !== 'true' && isParent !== 'false') localStorage.setItem('isParentMode', 'false');
     }
 
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         document.querySelectorAll('.parent-only-inputs').forEach(el => {
-            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') {
-                if(el.type === 'checkbox') el.disabled = !isParent;
-                else el.disabled = !isParent;
-            } else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box') || el.classList.contains('admin-row') || el.classList.contains('event-editor-row') || el.classList.contains('wheel-config-row')) {
-                let inputs = el.querySelectorAll('input, select');
-                inputs.forEach(inp => inp.disabled = !isParent);
+            if(el.tagName === 'INPUT' || el.tagName === 'SELECT') { if(el.type === 'checkbox') el.disabled = !isParent; else el.disabled = !isParent; } 
+            else if (el.classList.contains('admin-checkbox-group') || el.classList.contains('withdraw-box') || el.classList.contains('admin-row') || el.classList.contains('event-editor-row') || el.classList.contains('wheel-config-row')) {
+                let inputs = el.querySelectorAll('input, select'); inputs.forEach(inp => inp.disabled = !isParent);
             }
         });
-        document.querySelectorAll('.parent-only-btn').forEach(btn => {
-            if (btn.tagName === 'BUTTON') {
-                btn.style.display = isParent ? 'block' : 'none';
-            }
-        });
+        document.querySelectorAll('.parent-only-btn').forEach(btn => { if (btn.tagName === 'BUTTON') btn.style.display = isParent ? 'block' : 'none'; });
     }
 
     function toggleModal(id) {
-    // التحقق المضاف: منع فتح نافذة الإعدادات إذا لم يكن في وضع ولي الأمر
-    if (id === 'admin-modal' && localStorage.getItem('isParentMode') !== 'true') {
-        alert("عذراً، هذه الإعدادات مخصصة لولي الأمر فقط! 🛡️ لا تملك صلاحية الدخول.");
-        return; // إنهاء الدالة فوراً وعدم فتح النافذة
-    }
+        if (id === 'admin-modal' && localStorage.getItem('isParentMode') !== 'true') {
+            alert("عذراً، هذه الإعدادات مخصصة لولي الأمر فقط! 🛡️ لا تملك صلاحية الدخول.");
+            return; 
+        }
 
-    const modal = document.getElementById(id);
-    if(modal.style.display === 'flex') {
-        if(id === 'bank-modal' && isSpinning) return; 
-        if(id === 'magic-cards-modal') clearInterval(magicCardEventInterval);
-        modal.style.display = 'none';
-    } else {
-        if(id === 'bank-modal') { updateBankUI(); renderBankStatement(); }
-        modal.style.display = 'flex';
+        const modal = document.getElementById(id);
+        if(modal.style.display === 'flex') {
+            if(id === 'bank-modal' && isSpinning) return; 
+            if(id === 'magic-cards-modal') clearInterval(magicCardEventInterval);
+            modal.style.display = 'none';
+        } else {
+            if(id === 'bank-modal') { updateBankUI(); renderBankStatement(); renderWheelLog(); }
+            modal.style.display = 'flex';
+        }
     }
-}
 
     function logBankStatement(desc, amount, isIn) {
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        appProg.bankStatement = appProg.bankStatement || [];
-        appProg.bankStatement.unshift({ desc: desc, amount: amount, isIn: isIn, date: new Date().toLocaleString('ar-EG') });
-        if(appProg.bankStatement.length > 50) appProg.bankStatement.pop();
-        localStorage.setItem('appProgress', JSON.stringify(appProg));
+        // مفصولة تماماً عن appProgress لحماية البيانات وجعلها دائمة
+        let statement = JSON.parse(localStorage.getItem('bankStatementData'));
+        if(!statement) { // Migration fallback
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+            statement = appProg.bankStatement || [];
+        }
+        statement.unshift({ desc: desc, amount: amount, isIn: isIn, date: new Date().toLocaleString('ar-EG') });
+        if(statement.length > 50) statement.pop();
+        localStorage.setItem('bankStatementData', JSON.stringify(statement));
         renderBankStatement();
     }
 
     function renderBankStatement() {
         let list = document.getElementById('bank-statement-list');
         if(!list) return;
-        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
-        let statement = appProg.bankStatement || [];
+        let statement = JSON.parse(localStorage.getItem('bankStatementData'));
+        if(!statement) {
+            let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
+            statement = appProg.bankStatement || [];
+            localStorage.setItem('bankStatementData', JSON.stringify(statement));
+        }
         list.innerHTML = '';
         if(statement.length === 0) { list.innerHTML = '<div style="text-align:center; padding:10px;">لا توجد حركات بنكية بعد.</div>'; return; }
         statement.forEach(item => {
             let colorClass = item.isIn ? 'statement-in' : 'statement-out';
             let sign = item.isIn ? '+' : '-';
-            list.innerHTML += `<div class="statement-item">
-                <div><span>${item.desc}</span><br><span style="font-size:10px; color:#888;">${item.date}</span></div>
-                <div class="${colorClass}" style="font-weight:bold; font-size:16px;">${sign}${item.amount}</div>
-            </div>`;
+            list.innerHTML += `<div class="statement-item"><div><span>${item.desc}</span><br><span style="font-size:10px; color:#888;">${item.date}</span></div><div class="${colorClass}" style="font-weight:bold; font-size:16px;">${sign}${item.amount}</div></div>`;
         });
     }
 
-    // --- المحرك الديناميكي للبطاقات (واجهة ولي الأمر) ---
     function toggleEventsAdminModal() {
-    // منع فتح نافذة الأحداث الديناميكية للمستخدم العادي
-    if (localStorage.getItem('isParentMode') !== 'true') {
-        alert("عذراً، إعدادات البطاقات والأحداث مخصصة لولي الأمر فقط! 🛡️");
-        return;
+        if (localStorage.getItem('isParentMode') !== 'true') { alert("عذراً، إعدادات البطاقات والأحداث مخصصة لولي الأمر فقط! 🛡️"); return; }
+        renderDynamicCardsEditor(); toggleModal('events-admin-modal');
     }
-    renderDynamicCardsEditor();
-    toggleModal('events-admin-modal');
-}
 
     function renderDynamicCardsEditor() {
         let container = document.getElementById('dynamic-cards-editor'); container.innerHTML = '';
         for(let key in cardsConfig) {
-            let c = cardsConfig[key];
-            let durHTML = '';
-            if(key === 'last5') {
-                durHTML = `<div class="prop-group"><label>مدة الحدث:</label><div style="background:#e9ecef; padding:8px; border-radius:5px; text-align:center; font-weight:bold; color:var(--danger);">غير مرتبطة بالوقت</div></div>`;
-            } else {
-                durHTML = `
-                <div class="prop-group"><label>مدة الحدث (بالساعات):</label>
-                    <div class="radio-inline">
-                        <label><input type="radio" class="parent-only-inputs" name="r_dur_${key}" value="fixed" ${c.dur.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> ثابت</label>
-                        <label><input type="radio" class="parent-only-inputs" name="r_dur_${key}" value="range" ${c.dur.type==='range'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> عشوائي</label>
-                    </div>
-                    <input type="number" step="0.5" id="cfg_${key}_dur_val" value="${c.dur.val}" class="parent-only-inputs" style="display:${c.dur.type==='fixed'?'block':'none'};">
-                    <div class="range-inputs parent-only-inputs" id="cfg_${key}_dur_range" style="display:${c.dur.type==='range'?'flex':'none'};">
-                        <input type="number" step="0.5" id="cfg_${key}_dur_min" class="parent-only-inputs" value="${c.dur.min}" placeholder="الحد الأدنى">
-                        <input type="number" step="0.5" id="cfg_${key}_dur_max" class="parent-only-inputs" value="${c.dur.max}" placeholder="الحد الأعلى">
-                    </div>
-                </div>`;
+            let c = cardsConfig[key]; let durHTML = '';
+            if(key === 'last5') { durHTML = `<div class="prop-group"><label>مدة الحدث:</label><div style="background:#e9ecef; padding:8px; border-radius:5px; text-align:center; font-weight:bold; color:var(--danger);">غير مرتبطة بالوقت</div></div>`; } 
+            else {
+                durHTML = `<div class="prop-group"><label>مدة الحدث (بالساعات):</label><div class="radio-inline"><label><input type="radio" class="parent-only-inputs" name="r_dur_${key}" value="fixed" ${c.dur.type==='fixed'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> ثابت</label><label><input type="radio" class="parent-only-inputs" name="r_dur_${key}" value="range" ${c.dur.type==='range'?'checked':''} onchange="toggleInputs(this, 'dur', '${key}')"> عشوائي</label></div><input type="number" step="0.5" id="cfg_${key}_dur_val" class="parent-only-inputs" value="${c.dur.val}" style="display:${c.dur.type==='fixed'?'block':'none'};"><div class="range-inputs parent-only-inputs" id="cfg_${key}_dur_range" style="display:${c.dur.type==='range'?'flex':'none'};"><input type="number" step="0.5" id="cfg_${key}_dur_min" class="parent-only-inputs" value="${c.dur.min}" placeholder="الحد الأدنى"><input type="number" step="0.5" id="cfg_${key}_dur_max" class="parent-only-inputs" value="${c.dur.max}" placeholder="الحد الأعلى"></div></div>`;
             }
 
             let html = `<div class="event-editor-row parent-only-inputs">
@@ -826,16 +765,9 @@
 
             if(c.canEditTrigger) {
                 html += `<div style="border-top:2px dashed #ccc; padding-top:10px; margin-top:10px;"><h5 style="color:var(--danger); margin-top:0;">إعدادات الآلية (الشرط)</h5>`;
-                if(c.trigger.type === 'periodic') {
-                    html += `<div class="prop-group"><label>أيام الحدث (الأحد=0, الاثنين=1... الجمعة=5):</label>
-                        <input type="text" id="cfg_${key}_trig_days" class="parent-only-inputs" value="${c.trigger.days.join(',')}" placeholder="مثال: 5,6"></div>`;
-                } else if(c.trigger.type === 'consecutive') {
-                    html += `<div class="prop-group"><label>الانتصارات المتتالية بـ 5 نجوم لربحها:</label>
-                        <input type="number" id="cfg_${key}_trig_wins" class="parent-only-inputs" value="${c.trigger.reqWins}"></div>`;
-                } else if(c.trigger.type === 'speedrun') {
-                    html += `<div class="prop-group"><label>إنجاز (عدد ألعاب) في (عدد ساعات):</label>
-                        <div style="display:flex; gap:10px;"><input type="number" id="cfg_${key}_trig_games" class="parent-only-inputs" value="${c.trigger.reqGames}" placeholder="ألعاب"><input type="number" id="cfg_${key}_trig_hrs" class="parent-only-inputs" value="${c.trigger.reqHours}" placeholder="ساعات"></div></div>`;
-                }
+                if(c.trigger.type === 'periodic') { html += `<div class="prop-group"><label>أيام الحدث (الأحد=0, الاثنين=1... الجمعة=5):</label><input type="text" id="cfg_${key}_trig_days" class="parent-only-inputs" value="${c.trigger.days.join(',')}" placeholder="مثال: 5,6"></div>`; } 
+                else if(c.trigger.type === 'consecutive') { html += `<div class="prop-group"><label>الانتصارات المتتالية بـ 5 نجوم لربحها:</label><input type="number" id="cfg_${key}_trig_wins" class="parent-only-inputs" value="${c.trigger.reqWins}"></div>`; } 
+                else if(c.trigger.type === 'speedrun') { html += `<div class="prop-group"><label>إنجاز (عدد ألعاب) في (عدد ساعات):</label><div style="display:flex; gap:10px;"><input type="number" id="cfg_${key}_trig_games" class="parent-only-inputs" value="${c.trigger.reqGames}" placeholder="ألعاب"><input type="number" id="cfg_${key}_trig_hrs" class="parent-only-inputs" value="${c.trigger.reqHours}" placeholder="ساعات"></div></div>`; }
                 html += `</div>`;
             }
             
@@ -843,7 +775,7 @@
                 </div></div>`;
             container.innerHTML += html;
         }
-        applyGlobalModes(); // إعادة تطبيق القفل على الحقول الجديدة المولدة
+        applyGlobalModes(); 
     }
 
     function toggleInputs(radioEl, prop, key) {
@@ -852,16 +784,13 @@
         if(prop === 'count') { document.getElementById(`cfg_${key}_cnt_val`).style.display = radioEl.value==='fixed'?'block':'none'; document.getElementById(`cfg_${key}_cnt_range`).style.display = radioEl.value==='range'?'flex':'none'; }
     }
 
-    function toggleGamesCheckboxes(masterChk, key) {
-        document.querySelectorAll(`.chk_games_${key}`).forEach(el => el.checked = masterChk.checked);
-    }
+    function toggleGamesCheckboxes(masterChk, key) { document.querySelectorAll(`.chk_games_${key}`).forEach(el => el.checked = masterChk.checked); }
 
     function saveDynamicCardsConfig() {
         for(let key in cardsConfig) {
             let c = cardsConfig[key];
             c.name = document.getElementById(`cfg_${key}_name`).value;
             c.color = document.getElementById(`cfg_${key}_color`).value;
-            
             c.mult.type = document.querySelector(`input[name="r_mult_${key}"]:checked`).value;
             c.mult.val = parseFloat(document.getElementById(`cfg_${key}_mult_val`).value) || 1;
             c.mult.min = parseFloat(document.getElementById(`cfg_${key}_mult_min`).value) || 1;
@@ -873,7 +802,6 @@
                 c.dur.min = parseFloat(document.getElementById(`cfg_${key}_dur_min`).value) || 1;
                 c.dur.max = parseFloat(document.getElementById(`cfg_${key}_dur_max`).value) || 24;
             }
-
             c.count.type = document.querySelector(`input[name="r_cnt_${key}"]:checked`).value;
             c.count.val = parseInt(document.getElementById(`cfg_${key}_cnt_val`).value) || 5;
             c.count.min = parseInt(document.getElementById(`cfg_${key}_cnt_min`).value) || 1;
@@ -906,8 +834,7 @@
         let durText = c.dur.type === 'fixed' ? `ثابت (${c.dur.val} ساعة)` : `عشوائي من (${c.dur.min}) إلى (${c.dur.max}) ساعة`;
         let countText = c.count.type === 'fixed' ? `ثابت (${c.count.val} مراحل)` : `عشوائي من (${c.count.min}) إلى (${c.count.max}) مراحل`;
         
-        let descHTML = `<p style="font-size: 18px; font-weight: bold; color: var(--dark);">${c.desc}</p>`;
-        descHTML += `<ul style="list-style-type: none; padding: 0;">`;
+        let descHTML = `<p style="font-size: 18px; font-weight: bold; color: var(--dark);">${c.desc}</p><ul style="list-style-type: none; padding: 0;">`;
         descHTML += `<li style="margin-bottom: 8px;">🔸 <b>مضاعفة النقاط:</b> ${multText}</li>`;
         if(key !== 'last5') descHTML += `<li style="margin-bottom: 8px;">🔸 <b>مدة البطاقة:</b> ${durText}</li>`;
         descHTML += `<li style="margin-bottom: 8px;">🔸 <b>عدد المراحل:</b> ${countText}</li>`;
@@ -919,28 +846,24 @@
             descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> إنجاز ${c.trigger.reqGames} مراحل خلال ${c.trigger.reqHours} ساعة.</li>`;
             descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا قمت بتحقيق شروط الحصول على صندوق جديد من هذه البطاقة قبل أن تلعب البطاقات القديمة، فسوف تفقد البطاقات القديمة وتُستبدل بالجديدة!</div>`;
         } else if (c.trigger.type === 'periodic') {
-            let daysNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-            let dNames = c.trigger.days.map(d => daysNames[d]).join(' و ');
+            let daysNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']; let dNames = c.trigger.days.map(d => daysNames[d]).join(' و ');
             descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> تتفعل تلقائياً في الأيام التالية: ${dNames}.</li>`;
         }
-        descHTML += `</ul>`;
-        body.innerHTML = descHTML;
-        toggleModal('info-modal');
+        descHTML += `</ul>`; body.innerHTML = descHTML; toggleModal('info-modal');
     }
 
     function renderMagicCards() {
-        const container = document.getElementById('magic-cards-container'); container.innerHTML = '';
-        let html = '';
+        const container = document.getElementById('magic-cards-container'); container.innerHTML = ''; let html = '';
         
         let c1 = cardsConfig.last5;
         let c1MultText = c1.mult.type==='fixed' ? c1.mult.val : `من ${c1.mult.min} إلى ${c1.mult.max}`;
-        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c1.color}, #555);">
+        html += `<div class="magic-card-item" style="background-color: ${c1.color};">
             <div class="mc-title"><span>🔥 ${c1.name}</span> <div class="btn-help-icon" onclick="getDescHelp('last5')">i</div></div>
             <div class="mc-desc">مضاعفة النقاط بمقدار (${c1MultText}x) مطبقة دائماً على أحدث المراحل المضافة.</div></div>`;
 
         let c2 = cardsConfig.random5;
         let c2MultText = c2.mult.type==='fixed' ? c2.mult.val : `من ${c2.mult.min} إلى ${c2.mult.max}`;
-        html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c2.color}, #555);">
+        html += `<div class="magic-card-item" style="background-color: ${c2.color};">
             <div class="mc-title"><span>🌟 ${c2.name}</span> <div class="btn-help-icon" onclick="getDescHelp('random5')">i</div></div>
             <div class="mc-desc">مراحل عشوائية بمضاعفة (${c2MultText}x).</div>
             <div class="mc-timer" id="mc-timer-random5">جاري حساب الوقت...</div></div>`;
@@ -951,8 +874,7 @@
             <div class="mc-desc" id="mc-desc-friday"></div><div class="mc-timer" id="mc-timer-friday">جاري الحساب...</div></div>`;
 
         ['hareef', 'longBreath'].forEach(type => {
-            let c = cardsConfig[type];
-            let found = false;
+            let c = cardsConfig[type]; let found = false;
             let hareefGames = ['matchg', 'listen', 'missing', 'arrange', 'crossword'];
             let hareefNames = {'matchg':'المطابقة', 'listen':'الصائد', 'missing':'الناقصة', 'arrange':'الترتيب', 'crossword':'المتقاطعة'};
             
@@ -960,14 +882,14 @@
                 let activeData = JSON.parse(localStorage.getItem(`activeChest_${type}_${g}`));
                 if(activeData && activeData.expiry > Date.now()) {
                     found = true;
-                    html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c.color}, #555);">
+                    html += `<div class="magic-card-item" style="background-color: ${c.color};">
                         <div class="mc-title"><span>🏅 ${c.name} - ${hareefNames[g]}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
                         <div class="mc-desc">لديك ${activeData.stages.length} مرحلة عشوائية بنقاط مضروبة بـ (${activeData.mult}x).</div>
                         <div class="mc-timer" id="mc-timer-${type}-${g}" data-expiry="${activeData.expiry}">⏳ متبقي: ...</div></div>`;
                 }
             });
             if(!found) {
-                html += `<div class="magic-card-item" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); filter: grayscale(50%);">
+                html += `<div class="magic-card-item" style="background-color: #95a5a6; filter: grayscale(50%);">
                     <div class="mc-title"><span>🏅 ${c.name}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
                     <div class="mc-desc">لا تملك هذه البطاقة. حقق شرطها المخصص لتربحها!</div></div>`;
             }
@@ -977,11 +899,8 @@
     }
 
     function updateMagicCardsTimers() {
-        let c3 = cardsConfig.friday;
-        let today = new Date().getDay();
-        let elFriday = document.getElementById('mc-timer-friday');
-        let descFriday = document.getElementById('mc-desc-friday');
-        let containerFriday = document.getElementById('card-friday-container');
+        let c3 = cardsConfig.friday; let today = new Date().getDay();
+        let elFriday = document.getElementById('mc-timer-friday'); let descFriday = document.getElementById('mc-desc-friday'); let containerFriday = document.getElementById('card-friday-container');
         if(elFriday) {
             let now = new Date();
             if(c3.trigger.days.includes(today)) {
@@ -989,10 +908,10 @@
                 let end = new Date(); end.setHours(23, 59, 59, 999); let diff = end - now;
                 let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
                 elFriday.innerText = `ينتهي الحدث بعد: ${h}س ${m}د ${s}ث`;
-                if(containerFriday) { containerFriday.style.background = `linear-gradient(135deg, ${c3.color}, #555)`; containerFriday.style.filter = "none"; }
+                if(containerFriday) { containerFriday.style.backgroundColor = c3.color; containerFriday.style.filter = "none"; }
             } else {
                 descFriday.innerText = `الحدث متوقف حالياً.`; 
-                if(containerFriday) { containerFriday.style.background = `linear-gradient(135deg, #95a5a6, #7f8c8d)`; containerFriday.style.filter = "grayscale(50%)"; }
+                if(containerFriday) { containerFriday.style.backgroundColor = "#95a5a6"; containerFriday.style.filter = "grayscale(50%)"; }
                 let daysToNext = 1; while(!c3.trigger.days.includes((today + daysToNext) % 7)) daysToNext++;
                 let nextDate = new Date(); nextDate.setDate(now.getDate() + daysToNext); nextDate.setHours(0, 0, 0, 0);
                 let diff = nextDate - now; let d = Math.floor(diff/(24*3600000)); let h = Math.floor((diff%(24*3600000))/3600000); let m = Math.floor((diff%3600000)/60000);
@@ -1002,27 +921,15 @@
         
         let r5Timer = document.getElementById('mc-timer-random5');
         if(r5Timer) {
-            let keys = ['hotStagesData_matchg', 'hotStagesData_listen', 'hotStagesData_missing', 'hotStagesData_arrange', 'hotStagesData_crossword'];
-            let expiry = 0;
-            for(let k of keys) {
-                let d = JSON.parse(localStorage.getItem(k));
-                if(d && d.expiry > expiry) expiry = d.expiry;
-            }
-            if(expiry > Date.now()) {
-                let diff = expiry - Date.now();
-                let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
-                r5Timer.innerText = `التجديد بعد: ${h}س ${m}د ${s}ث`;
-            } else {
-                r5Timer.innerText = "جاهزة للتجديد عند اللعب!";
-            }
+            let keys = ['hotStagesData_matchg', 'hotStagesData_listen', 'hotStagesData_missing', 'hotStagesData_arrange', 'hotStagesData_crossword']; let expiry = 0;
+            for(let k of keys) { let d = JSON.parse(localStorage.getItem(k)); if(d && d.expiry > expiry) expiry = d.expiry; }
+            if(expiry > Date.now()) { let diff = expiry - Date.now(); let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000); r5Timer.innerText = `التجديد بعد: ${h}س ${m}د ${s}ث`; } else { r5Timer.innerText = "جاهزة للتجديد عند اللعب!"; }
         }
 
         document.querySelectorAll('[id^="mc-timer-hareef-"], [id^="mc-timer-longBreath-"]').forEach(el => {
             let expiry = parseInt(el.getAttribute('data-expiry'));
             if(expiry > Date.now()) {
-                let diff = expiry - Date.now();
-                let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000);
-                el.innerText = `⏳ متبقي: ${h}س ${m}د ${s}ث`;
+                let diff = expiry - Date.now(); let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000); el.innerText = `⏳ متبقي: ${h}س ${m}د ${s}ث`;
             } else { el.innerText = "انتهت الصلاحية!"; }
         });
     }
@@ -1035,7 +942,8 @@
     function toggleReportInputs() {
         let type = document.getElementById('main-report-type').value;
         let timeSelectors = document.getElementById('time-selectors');
-        if (type === 'points') { timeSelectors.style.display = 'flex'; updateReportRangeOptions(); } else { timeSelectors.style.display = 'none'; }
+        timeSelectors.style.display = 'flex'; 
+        updateReportRangeOptions();
         document.getElementById('report-results').style.display = 'none';
     }
 
@@ -1043,6 +951,13 @@
         let type = document.getElementById('report-type').value; let selectNum = document.getElementById('report-num'); selectNum.innerHTML = '';
         let max = 0; if(type === 'hours') max = 24; if(type === 'days') max = 7; if(type === 'weeks') max = 4; if(type === 'months') max = 12;
         for(let i = 1; i <= max; i++) { let opt = document.createElement('option'); opt.value = i; opt.text = i; selectNum.appendChild(opt); }
+    }
+
+    function getFilterLabel() {
+        let selectType = document.getElementById('report-type');
+        let typeText = selectType.options[selectType.selectedIndex].text;
+        let num = document.getElementById('report-num').value;
+        return ` (${typeText.replace('عدد', num)})`;
     }
 
     function generateSelectedReport() {
@@ -1058,15 +973,12 @@
         let totals = { total: 0, matchg: 0, listen: 0, missing: 0, scramble: 0, crossword: 0 };
         filteredHistory.forEach(item => { totals.total += item.points; if(totals[item.game] !== undefined) totals[item.game] += item.points; });
         let gameNames = { matchg: 'لعبة المطابقة 🎴', listen: 'صائد الأمثلة 🎧', missing: 'الحروف الناقصة 🔠', scramble: 'ترتيب الحروف 🔀', crossword: 'الكلمات المتقاطعة 🧩' };
-        let resultHTML = `<div class="report-block"><h4>إجمالي النقاط في الفترة: <span class="stat-val good">${totals.total}</span></h4></div><div class="report-block"><h4>التفصيل حسب الألعاب:</h4>`;
+        let resultHTML = `<div class="report-block"><h4>إجمالي النقاط المكتسبة ${getFilterLabel()}: <span class="stat-val good">${totals.total}</span></h4></div><div class="report-block"><h4>التفصيل حسب الألعاب:</h4>`;
         for(let key in gameNames) { resultHTML += `<div class="stat-item"><span>${gameNames[key]}</span> <span class="stat-val">${totals[key]} نقطة</span></div>`; }
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
-
-
-  // دوال توليد تقارير الإنجاز والأداء مفلترة زمنياً بالاعتماد على الطابع الزمني (timestamp) للمراحل.
-  
-    function getGameStats(storageKey, cutoffTime) {
+// دوال توليد تقارير الإنجاز والأداء مفلترة زمنياً بالاعتماد على الطابع الزمني (timestamp) للمراحل.
+   function getGameStats(storageKey, cutoffTime) {
         let prog = JSON.parse(localStorage.getItem(storageKey)) || {}; let stagesCompleted = 0; let totalStars = 0; let totalTime = 0;
         for (let lvl in prog) { 
             for (let stg in prog[lvl]) { 
@@ -1105,7 +1017,6 @@
         for (let key in gamesData) { let stats = gamesData[key].data; if (stats.stagesCompleted === 0) continue; resultHTML += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><div style="color: var(--primary); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div><div class="stat-item"><span>متوسط الدقة:</span> <span class="stat-val good">${stats.avgStars} / 5 ⭐</span></div><div class="stat-item"><span>متوسط السرعة:</span> <span class="stat-val">${stats.avgTime} ثانية</span></div></div>`; }
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
-	
 	// دوال توليد تقارير الإنجاز والأداء مفلترة زمنياً بالاعتماد على الطابع الزمني (timestamp) للمراحل.
 
     function checkNewFameAchievements() {
@@ -1191,7 +1102,6 @@
         if(!isNaN(spinVal) && spinVal > 0) { let wheelSet = JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 }; wheelSet.spinCost = spinVal; localStorage.setItem('wheelSettings', JSON.stringify(wheelSet)); }
         localStorage.setItem('appProgress', JSON.stringify(appProg));
         
-        // حفظ إعدادات العجلة
         let wCount = parseInt(document.getElementById('cfg-wheel-count').value);
         let newWheelConf = { name: document.getElementById('cfg-wheel-name').value, count: wCount, slices: [] };
         for(let i=0; i<wCount; i++) {
@@ -1204,7 +1114,7 @@
         localStorage.setItem('advancedWheelConfig', JSON.stringify(newWheelConf));
         
         updateBankUI(); 
-        buildDynamicWheelUI(); // إعادة رسم العجلة
+        buildDynamicWheelUI();
         alert('تم حفظ الإعدادات بنجاح!'); 
         toggleModal('admin-modal');
     }
@@ -1260,8 +1170,8 @@
 
     let wheelAngle = 0, isSpinning = false, reqAnim;
     let selectedWheelPrizeIndex = 0;
-    let spinFrameCount = 0; // لضبط سرعة الصوت أثناء الدوران السريع
-    let tickTimeout; // للتحكم بالصوت أثناء التباطؤ
+    let spinFrameCount = 0; 
+    let tickTimeout; 
 
     function getWheelSettings() { return JSON.parse(localStorage.getItem('wheelSettings')) || { spinCost: 3000 }; }
 
@@ -1288,7 +1198,6 @@
             localStorage.setItem('appProgress', JSON.stringify(appProg)); 
             updateBankUI();
 
-            // نظام الأوزان الجديد للاختيار
             let conf = getAdvancedWheelConfig();
             let totalProb = 0;
             conf.slices.forEach(s => totalProb += s.prob);
@@ -1318,13 +1227,8 @@
         if(isSpinning) { 
             wheelAngle = (wheelAngle + 15) % 360; 
             document.getElementById('wheel').style.transform = `rotate(${wheelAngle}deg)`; 
-            
-            // إضافة صوت الدوران السريع (تكة كل إطارين)
             spinFrameCount++;
-            if(spinFrameCount % 2 === 0) {
-                playSysSound('tick');
-            }
-
+            if(spinFrameCount % 2 === 0) { playSysSound('tick'); }
             reqAnim = requestAnimationFrame(animateSpin); 
         } 
     }
@@ -1336,34 +1240,26 @@
         let sliceAngle = 360 / conf.count;
         let targetSliceCenter = (selectedWheelPrizeIndex * sliceAngle) + (sliceAngle / 2);
         
-        // حساب الزاوية المطلوبة للتوقف عند السهم العلوي (والذي يمثل الزاوية 0 من الأعلى)
-        // العجلة تبدأ زاويتها 0 من الأعلى وتدور مع عقارب الساعة
         let finalTarget = 360 - targetSliceCenter;
-        
         let extraSpins = 3 * 360;
         let finalAngle = wheelAngle + extraSpins + (finalTarget - (wheelAngle % 360));
         if (finalTarget < (wheelAngle % 360)) finalAngle += 360; 
         
-       let wheelEl = document.getElementById('wheel');
+        let wheelEl = document.getElementById('wheel');
         wheelEl.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)'; 
         wheelEl.style.transform = `rotate(${finalAngle}deg)`;
         
-        // --- محاكاة صوت التباطؤ ليتوافق مع حركة الـ CSS ---
-        let tickDelay = 30; // بداية التكات سريعة جداً
-        let startTime = Date.now();
+        let tickDelay = 30; let startTime = Date.now();
         function decelerateTicks() {
             let elapsed = Date.now() - startTime;
-            if (elapsed < 3400) { // نستمر بالصوت حتى قبل التوقف التام بقليل
+            if (elapsed < 3400) { 
                 playSysSound('tick');
-                // زيادة التباطؤ (الوقت بين التكات يزداد تدريجياً ليتناسب مع بطء العجلة)
                 let progress = elapsed / 3500;
                 tickDelay = 30 + (progress * progress * 400); 
                 tickTimeout = setTimeout(decelerateTicks, tickDelay);
             }
         }
-        clearTimeout(tickTimeout);
-        decelerateTicks();
-        // ---------------------------------------------------
+        clearTimeout(tickTimeout); decelerateTicks();
 
         setTimeout(() => {
             wheelEl.style.transition = 'none'; 
@@ -1383,6 +1279,7 @@
                 appProg.bankBalance = (appProg.bankBalance || 0) + amount;
                 bnkA = appProg.bankBalance;
                 logMsg = `${amount} جنيه`;
+                localStorage.setItem('appProgress', JSON.stringify(appProg));
                 logBankStatement("جائزة عجلة الحظ", amount, true); 
                 alert(`مبروك! 🎊 ربحت ${amount} جنيه. أضيفت لرصيدك البنكي!`);
             } else if (prize.type === 'points') {
@@ -1390,14 +1287,15 @@
                 appProg.cumulativeScore = (appProg.cumulativeScore || 0) + amount;
                 ptsA = appProg.cumulativeScore;
                 logMsg = `${amount} نقطة`;
+                localStorage.setItem('appProgress', JSON.stringify(appProg));
                 alert(`مبروك! 🎊 ربحت ${amount} نقطة. تمت إضافتها لعدادك العام!`);
                 checkNewFameAchievements();
             } else if (prize.type === 'physical') {
                 logMsg = `جائزة عينية: ${prize.val}`;
+                localStorage.setItem('appProgress', JSON.stringify(appProg));
                 alert(`مبروك! 🎊 لقد ربحت جائزة مميزة: ${prize.val}! اطلبها من والديك الآن!`);
             }
             
-            localStorage.setItem('appProgress', JSON.stringify(appProg));
             logWheelAction(logMsg, ptsB, ptsA, bnkB, bnkA);
             updateBankUI(); 
             
@@ -1412,14 +1310,13 @@
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
         if(amount > 0) {
             if(amount > (appProg.bankBalance || 0)) { alert("الرصيد لا يكفي للسحب!"); return; }
-            appProg.bankBalance -= amount; logBankStatement("سحب مصروف من البنك", amount, false); alert(`تم سحب ${amount} جنيه بنجاح.`);
+            appProg.bankBalance -= amount; localStorage.setItem('appProgress', JSON.stringify(appProg)); logBankStatement("سحب مصروف من البنك", amount, false); alert(`تم سحب ${amount} جنيه بنجاح.`);
         } else {
-            let deposit = Math.abs(amount); appProg.bankBalance = (appProg.bankBalance || 0) + deposit; logBankStatement("إيداع نقدي في البنك", deposit, true); alert(`تم إيداع ${deposit} جنيه في رصيدك بنجاح.`);
+            let deposit = Math.abs(amount); appProg.bankBalance = (appProg.bankBalance || 0) + deposit; localStorage.setItem('appProgress', JSON.stringify(appProg)); logBankStatement("إيداع نقدي في البنك", deposit, true); alert(`تم إيداع ${deposit} جنيه في رصيدك بنجاح.`);
         }
-        localStorage.setItem('appProgress', JSON.stringify(appProg)); document.getElementById('withdraw-amount').value = ''; updateBankUI(); 
+        document.getElementById('withdraw-amount').value = ''; updateBankUI(); 
     }
 	
-// --- التعديل السحري لمنع الذاكرة المخبأة (Cache) 🚀 ---
 function checkNewsStatus() {
     let newsUrl = 'news.txt';
     if (window.location.protocol !== 'file:') { newsUrl += '?v=' + new Date().getTime(); }
