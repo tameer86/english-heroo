@@ -1094,14 +1094,9 @@
 
 
 
-
-
-
-
 // دالة للتحقق من وجود أخبار جديدة عند فتح الصفحة
 function checkNewsStatus() {
-    // أضفنا التاريخ بالثواني لمنع المتصفح من قراءة نسخة قديمة مخزنة
-    fetch('news.txt?v=' + new Date().getTime())
+    fetch('news.txt')
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
@@ -1111,7 +1106,7 @@ function checkNewsStatus() {
                 let currentNews = lines.join('\n').trim(); // نجمع باقي النص
                 let lastReadNews = localStorage.getItem('last_read_news'); // نجلب آخر خبر قرأه اللاعب
 
-                // إذا كان الخبر الحالي مختلفاً عن آخر خبر تمت قراءته
+                // إذا كان الخبر الحالي مختلفاً عن آخر خبر تمت قراءته (أي خبر جديد لم يُقرأ بعد)
                 if (currentNews !== lastReadNews) {
                     document.getElementById('news-badge').style.display = 'block'; // تشغيل اللمبة
                 } else {
@@ -1121,13 +1116,12 @@ function checkNewsStatus() {
                 document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة إذا كان stat=0
             }
         })
-        .catch(error => console.log('لم يتم العثور على ملف الأخبار:', error));
+        .catch(error => console.log('لم يتم العثور على ملف الأخبار أو تعذر قراءته:', error));
 }
 
-// الدالة المعدلة لفتح نافذة الأخبار
+// الدالة المعدلة لفتح نافذة الأخبار (تقوم بتسجيل القراءة وإطفاء اللمبة فوراً)
 function openNewsModal() {
-    // أضفنا نفس التعديل هنا لضمان جلب الخبر الجديد دائماً
-    fetch('news.txt?v=' + new Date().getTime())
+    fetch('news.txt')
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
@@ -1150,10 +1144,11 @@ function openNewsModal() {
             toggleModal('news-modal');
         })
         .catch(error => {
-            document.getElementById('news-content').innerText = 'لا توجد أخبار جديدة حالياً.';
+            document.getElementById('news-content').innerText = 'لا توجد أخبار جديدة حالياً أو تعذر تحميل الملف.';
             toggleModal('news-modal');
         });
 }
+</script>
 
 </body>
 </html>
