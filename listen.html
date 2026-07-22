@@ -620,13 +620,13 @@
             appProgress.cumulativeScore = (appProgress.cumulativeScore || 0) + totalPoints;
             localStorage.setItem('appProgress', JSON.stringify(appProgress));
             document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore);
-            levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time };
+            levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time, timestamp: Date.now() };
             
             let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
             pointsHistory.push({ time: Date.now(), game: 'listen', points: totalPoints });
             localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
         } else if (!levelData[activeStage.localStage]) { 
-            levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time }; 
+            levelData[activeStage.localStage] = { unlocked: true, stars: stars, time: time, timestamp: Date.now() };
         }
 
         gameProgress[activeStage.level] = levelData; 

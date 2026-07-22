@@ -1063,27 +1063,50 @@
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
-    function getGameStats(storageKey) {
+
+  // دوال توليد تقارير الإنجاز والأداء مفلترة زمنياً بالاعتماد على الطابع الزمني (timestamp) للمراحل.
+  
+    function getGameStats(storageKey, cutoffTime) {
         let prog = JSON.parse(localStorage.getItem(storageKey)) || {}; let stagesCompleted = 0; let totalStars = 0; let totalTime = 0;
-        for (let lvl in prog) { for (let stg in prog[lvl]) { let data = prog[lvl][stg]; if (data.stars > 0 || data.time > 0) { stagesCompleted++; totalStars += data.stars || 0; totalTime += data.time || 0; } } }
+        for (let lvl in prog) { 
+            for (let stg in prog[lvl]) { 
+                let data = prog[lvl][stg]; 
+                // استثناء المراحل القديمة التي لا تقع ضمن فترة الفلتر
+                if (cutoffTime && data.timestamp && data.timestamp < cutoffTime) continue;
+                // استثناء المراحل التي لُعبت قبل إضافة هذا التحديث (ليس لها طابع زمني)
+                if (cutoffTime && !data.timestamp) continue;
+
+                if (data.stars > 0 || data.time > 0) { stagesCompleted++; totalStars += data.stars || 0; totalTime += data.time || 0; } 
+            } 
+        }
         let avgStars = stagesCompleted > 0 ? (totalStars / stagesCompleted).toFixed(1) : 0; let avgTime = stagesCompleted > 0 ? (totalTime / stagesCompleted).toFixed(1) : 0;
         return { stagesCompleted, totalStars, avgStars, avgTime };
     }
 
     function generateProgressReport() {
-        let gamesData = { 'matchg': { name: 'المطابقة والذاكرة', data: getGameStats('matchGameProgress') }, 'listen': { name: 'صائد الأمثلة', data: getGameStats('listenGameProgress') }, 'missing': { name: 'الحروف الناقصة', data: getGameStats('missingGameProgress') }, 'scramble': { name: 'ترتيب الحروف', data: getGameStats('scrambleGameProgress') }, 'crossword': { name: 'الكلمات المتقاطعة', data: getGameStats('crosswordGameProgress') } };
-        let totalCompletedStages = 0; let totalAcquiredStars = 0; let resultHTML = `<div class="report-block"><h4>تفاصيل الإنجاز الشامل:</h4>`;
+        let type = document.getElementById('report-type').value; let num = parseInt(document.getElementById('report-num').value); let multiplier = 1;
+        if(type === 'hours') multiplier = 60 * 60 * 1000; if(type === 'days') multiplier = 24 * 60 * 60 * 1000; if(type === 'weeks') multiplier = 7 * 24 * 60 * 60 * 1000; if(type === 'months') multiplier = 30 * 24 * 60 * 60 * 1000; 
+        let cutoffTime = Date.now() - (num * multiplier);
+
+        let gamesData = { 'matchg': { name: 'المطابقة والذاكرة', data: getGameStats('matchGameProgress', cutoffTime) }, 'listen': { name: 'صائد الأمثلة', data: getGameStats('listenGameProgress', cutoffTime) }, 'missing': { name: 'الحروف الناقصة', data: getGameStats('missingGameProgress', cutoffTime) }, 'scramble': { name: 'ترتيب الحروف', data: getGameStats('scrambleGameProgress', cutoffTime) }, 'crossword': { name: 'الكلمات المتقاطعة', data: getGameStats('crosswordGameProgress', cutoffTime) } };
+        let totalCompletedStages = 0; let totalAcquiredStars = 0; let resultHTML = `<div class="report-block"><h4>تفاصيل الإنجاز الشامل ${getFilterLabel()}:</h4>`;
         for (let key in gamesData) { let stats = gamesData[key].data; totalCompletedStages += stats.stagesCompleted; totalAcquiredStars += stats.totalStars; resultHTML += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><div style="color: var(--purple); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div><div class="stat-item"><span>المراحل المختومة:</span> <span class="stat-val good">${stats.stagesCompleted}</span></div><div class="stat-item"><span>مجموع النجوم:</span> <span class="stat-val">${stats.totalStars} ⭐</span></div></div>`; }
-        resultHTML = `<div class="report-block" style="background: #e8f5e9; border-color: #c8e6c9;"><h4>إجمالي الإنجاز العام:</h4><div class="stat-item"><span>المراحل المنجزة كلياً:</span> <span class="stat-val good">${totalCompletedStages} مرحلة</span></div><div class="stat-item"><span>النجوم الكلية المكتسبة:</span> <span class="stat-val">${totalAcquiredStars} ⭐</span></div></div>` + resultHTML + `</div>`;
+        resultHTML = `<div class="report-block" style="background: #e8f5e9; border-color: #c8e6c9;"><h4>إجمالي الإنجاز العام ${getFilterLabel()}:</h4><div class="stat-item"><span>المراحل المنجزة كلياً:</span> <span class="stat-val good">${totalCompletedStages} مرحلة</span></div><div class="stat-item"><span>النجوم الكلية المكتسبة:</span> <span class="stat-val">${totalAcquiredStars} ⭐</span></div></div>` + resultHTML + `</div>`;
         let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
 
     function generatePerformanceReport() {
-        let gamesData = { 'matchg': { name: 'المطابقة والذاكرة', data: getGameStats('matchGameProgress') }, 'listen': { name: 'صائد الأمثلة', data: getGameStats('listenGameProgress') }, 'missing': { name: 'الحروف الناقصة', data: getGameStats('missingGameProgress') }, 'scramble': { name: 'ترتيب الحروف', data: getGameStats('scrambleGameProgress') }, 'crossword': { name: 'الكلمات المتقاطعة', data: getGameStats('crosswordGameProgress') } };
-        let resultHTML = `<p style="font-size: 13px; color: var(--dark); margin-bottom: 15px; text-align: center; background: #fff3cd; padding: 5px; border-radius: 5px;">💡 <b>ملاحظة:</b> هذا التقرير يوضح متوسط أداء الطفل.</p><div class="report-block"><h4>تحليل السرعة والدقة:</h4>`;
+        let type = document.getElementById('report-type').value; let num = parseInt(document.getElementById('report-num').value); let multiplier = 1;
+        if(type === 'hours') multiplier = 60 * 60 * 1000; if(type === 'days') multiplier = 24 * 60 * 60 * 1000; if(type === 'weeks') multiplier = 7 * 24 * 60 * 60 * 1000; if(type === 'months') multiplier = 30 * 24 * 60 * 60 * 1000; 
+        let cutoffTime = Date.now() - (num * multiplier);
+
+        let gamesData = { 'matchg': { name: 'المطابقة والذاكرة', data: getGameStats('matchGameProgress', cutoffTime) }, 'listen': { name: 'صائد الأمثلة', data: getGameStats('listenGameProgress', cutoffTime) }, 'missing': { name: 'الحروف الناقصة', data: getGameStats('missingGameProgress', cutoffTime) }, 'scramble': { name: 'ترتيب الحروف', data: getGameStats('scrambleGameProgress', cutoffTime) }, 'crossword': { name: 'الكلمات المتقاطعة', data: getGameStats('crosswordGameProgress', cutoffTime) } };
+        let resultHTML = `<p style="font-size: 13px; color: var(--dark); margin-bottom: 15px; text-align: center; background: #fff3cd; padding: 5px; border-radius: 5px;">💡 <b>ملاحظة:</b> هذا التقرير يوضح متوسط أداء الطفل.</p><div class="report-block"><h4>تحليل السرعة والدقة ${getFilterLabel()}:</h4>`;
         for (let key in gamesData) { let stats = gamesData[key].data; if (stats.stagesCompleted === 0) continue; resultHTML += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><div style="color: var(--primary); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div><div class="stat-item"><span>متوسط الدقة:</span> <span class="stat-val good">${stats.avgStars} / 5 ⭐</span></div><div class="stat-item"><span>متوسط السرعة:</span> <span class="stat-val">${stats.avgTime} ثانية</span></div></div>`; }
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
+	
+	// دوال توليد تقارير الإنجاز والأداء مفلترة زمنياً بالاعتماد على الطابع الزمني (timestamp) للمراحل.
 
     function checkNewFameAchievements() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
