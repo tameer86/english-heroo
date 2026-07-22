@@ -494,7 +494,7 @@
         loadGamesState();
         checkNewFameAchievements(); 
         initVolumeControl();
-		checkNewsStatus(); // السطر الجديد الذي أضفناه لفحص اللمبة الحمراء
+		checkNewsStatus(); 
     };
 
     function verifyParentModeStrict() {
@@ -700,7 +700,6 @@
         toggleModal('events-admin-modal');
     }
 
-    // عرض البطاقات للمستخدم مع إزالة التظليل وشرح ديناميكي
     function openMagicCardsModal() { renderMagicCards(); toggleModal('magic-cards-modal'); clearInterval(magicCardEventInterval); magicCardEventInterval = setInterval(updateMagicCardsTimers, 1000); }
 
     function getDescHelp(key) {
@@ -740,14 +739,12 @@
         const container = document.getElementById('magic-cards-container'); container.innerHTML = '';
         let html = '';
         
-        // 1. بطاقة آخر 5 (زاهية دائماً)
         let c1 = cardsConfig.last5;
         let c1MultText = c1.mult.type==='fixed' ? c1.mult.val : `من ${c1.mult.min} إلى ${c1.mult.max}`;
         html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c1.color}, #555);">
             <div class="mc-title"><span>🔥 ${c1.name}</span> <div class="btn-help-icon" onclick="getDescHelp('last5')">i</div></div>
             <div class="mc-desc">مضاعفة النقاط بمقدار (${c1MultText}x) مطبقة دائماً على أحدث المراحل المضافة.</div></div>`;
 
-        // 2. العشوائية (زاهية دائماً)
         let c2 = cardsConfig.random5;
         let c2MultText = c2.mult.type==='fixed' ? c2.mult.val : `من ${c2.mult.min} إلى ${c2.mult.max}`;
         html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c2.color}, #555);">
@@ -755,13 +752,11 @@
             <div class="mc-desc">مراحل عشوائية بمضاعفة (${c2MultText}x).</div>
             <div class="mc-timer" id="mc-timer-random5">جاري حساب الوقت...</div></div>`;
 
-        // 3. الجمعة (دوري) (باهتة إذا لم تكن فعالة)
         let c3 = cardsConfig.friday;
         html += `<div class="magic-card-item" id="card-friday-container">
             <div class="mc-title"><span>📅 ${c3.name}</span> <div class="btn-help-icon" onclick="getDescHelp('friday')">i</div></div>
             <div class="mc-desc" id="mc-desc-friday"></div><div class="mc-timer" id="mc-timer-friday">جاري الحساب...</div></div>`;
 
-        // 4 & 5. الحريف و النفس الطويل
         ['hareef', 'longBreath'].forEach(type => {
             let c = cardsConfig[type];
             let found = false;
@@ -772,7 +767,6 @@
                 let activeData = JSON.parse(localStorage.getItem(`activeChest_${type}_${g}`));
                 if(activeData && activeData.expiry > Date.now()) {
                     found = true;
-                    // بطاقة حائز عليها -> زاهية ومشرقة
                     html += `<div class="magic-card-item" style="background: linear-gradient(135deg, ${c.color}, #555);">
                         <div class="mc-title"><span>🏅 ${c.name} - ${hareefNames[g]}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
                         <div class="mc-desc">لديك ${activeData.stages.length} مرحلة عشوائية بنقاط مضروبة بـ (${activeData.mult}x).</div>
@@ -780,7 +774,6 @@
                 }
             });
             if(!found) {
-                // بطاقة غير مملوكة -> باهتة
                 html += `<div class="magic-card-item" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); filter: grayscale(50%);">
                     <div class="mc-title"><span>🏅 ${c.name}</span> <div class="btn-help-icon" onclick="getDescHelp('${type}')">i</div></div>
                     <div class="mc-desc">لا تملك هذه البطاقة. حقق شرطها المخصص لتربحها!</div></div>`;
@@ -791,7 +784,6 @@
     }
 
     function updateMagicCardsTimers() {
-        // Friday
         let c3 = cardsConfig.friday;
         let today = new Date().getDay();
         let elFriday = document.getElementById('mc-timer-friday');
@@ -815,7 +807,6 @@
             }
         }
         
-        // Random 5 Timer
         let r5Timer = document.getElementById('mc-timer-random5');
         if(r5Timer) {
             let keys = ['hotStagesData_matchg', 'hotStagesData_listen', 'hotStagesData_missing', 'hotStagesData_arrange', 'hotStagesData_crossword'];
@@ -833,7 +824,6 @@
             }
         }
 
-        // Active Chests
         document.querySelectorAll('[id^="mc-timer-hareef-"], [id^="mc-timer-longBreath-"]').forEach(el => {
             let expiry = parseInt(el.getAttribute('data-expiry'));
             if(expiry > Date.now()) {
@@ -1089,45 +1079,50 @@
     }
 	
 
-
-
-
+// --- التعديل السحري لمنع الذاكرة المخبأة (Cache) 🚀 ---
 
 // دالة للتحقق من وجود أخبار جديدة عند فتح الصفحة
 function checkNewsStatus() {
-    // أضفنا التاريخ بالثواني لمنع المتصفح من قراءة نسخة قديمة مخزنة
-    fetch('news.txt?v=' + new Date().getTime())
+    let newsUrl = 'news.txt';
+    // إضافة خدعة تخطي الكاش إذا لم يكن الملف يعمل محلياً من مجلد مباشر
+    if (window.location.protocol !== 'file:') {
+        newsUrl += '?v=' + new Date().getTime();
+    }
+
+    // استخدمنا cache: "no-store" لإجبار المتصفح على جلب الملف الجديد دائماً
+    fetch(newsUrl, { cache: "no-store" })
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
-            // التحقق من السطر الأول
             if (lines.length > 0 && lines[0].trim() === 'stat=1') {
-                lines.shift(); // نحذف سطر stat للمقارنة
-                let currentNews = lines.join('\n').trim(); // نجمع باقي النص
-                let lastReadNews = localStorage.getItem('last_read_news'); // نجلب آخر خبر قرأه اللاعب
+                lines.shift(); 
+                let currentNews = lines.join('\n').trim(); 
+                let lastReadNews = localStorage.getItem('last_read_news'); 
 
-                // إذا كان الخبر الحالي مختلفاً عن آخر خبر تمت قراءته
                 if (currentNews !== lastReadNews) {
-                    document.getElementById('news-badge').style.display = 'block'; // تشغيل اللمبة
+                    document.getElementById('news-badge').style.display = 'block'; 
                 } else {
-                    document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة لأن الخبر مقروء
+                    document.getElementById('news-badge').style.display = 'none'; 
                 }
             } else {
-                document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة إذا كان stat=0
+                document.getElementById('news-badge').style.display = 'none'; 
             }
         })
-        .catch(error => console.log('لم يتم العثور على ملف الأخبار:', error));
+        .catch(error => console.log('لم يتم العثور على ملف الأخبار أو تعذر قراءته:', error));
 }
 
 // الدالة المعدلة لفتح نافذة الأخبار
 function openNewsModal() {
-    // أضفنا نفس التعديل هنا لضمان جلب الخبر الجديد دائماً
-    fetch('news.txt?v=' + new Date().getTime())
+    let newsUrl = 'news.txt';
+    if (window.location.protocol !== 'file:') {
+        newsUrl += '?v=' + new Date().getTime();
+    }
+
+    fetch(newsUrl, { cache: "no-store" })
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
             
-            // فحص السطر الأول لحذفه من العرض
             if (lines.length > 0 && lines[0].trim().startsWith('stat=')) {
                 lines.shift(); 
             }
@@ -1135,17 +1130,15 @@ function openNewsModal() {
             let content = lines.join('\n').trim();
             document.getElementById('news-content').innerText = content || 'لا توجد أخبار جديدة حالياً.';
             
-            // حفظ الخبر كـ "مقروء" في ذاكرة المتصفح
             localStorage.setItem('last_read_news', content);
             
-            // إطفاء اللمبة الحمراء فوراً بمجرد فتح النافذة
             let badge = document.getElementById('news-badge');
             if (badge) badge.style.display = 'none';
             
             toggleModal('news-modal');
         })
         .catch(error => {
-            document.getElementById('news-content').innerText = 'لا توجد أخبار جديدة حالياً.';
+            document.getElementById('news-content').innerText = 'لا توجد أخبار جديدة حالياً أو تعذر تحميل الملف.';
             toggleModal('news-modal');
         });
 }
