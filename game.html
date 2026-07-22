@@ -1094,9 +1094,14 @@
 
 
 
+
+
+
+
 // دالة للتحقق من وجود أخبار جديدة عند فتح الصفحة
 function checkNewsStatus() {
-    fetch('news.txt')
+    // أضفنا التاريخ بالثواني لمنع المتصفح من قراءة نسخة قديمة مخزنة
+    fetch('news.txt?v=' + new Date().getTime())
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
@@ -1106,7 +1111,7 @@ function checkNewsStatus() {
                 let currentNews = lines.join('\n').trim(); // نجمع باقي النص
                 let lastReadNews = localStorage.getItem('last_read_news'); // نجلب آخر خبر قرأه اللاعب
 
-                // إذا كان الخبر الحالي مختلفاً عن آخر خبر تمت قراءته (أي خبر جديد لم يُقرأ بعد)
+                // إذا كان الخبر الحالي مختلفاً عن آخر خبر تمت قراءته
                 if (currentNews !== lastReadNews) {
                     document.getElementById('news-badge').style.display = 'block'; // تشغيل اللمبة
                 } else {
@@ -1116,12 +1121,13 @@ function checkNewsStatus() {
                 document.getElementById('news-badge').style.display = 'none'; // إطفاء اللمبة إذا كان stat=0
             }
         })
-        .catch(error => console.log('لم يتم العثور على ملف الأخبار أو تعذر قراءته:', error));
+        .catch(error => console.log('لم يتم العثور على ملف الأخبار:', error));
 }
 
-// الدالة المعدلة لفتح نافذة الأخبار (تقوم بتسجيل القراءة وإطفاء اللمبة فوراً)
+// الدالة المعدلة لفتح نافذة الأخبار
 function openNewsModal() {
-    fetch('news.txt')
+    // أضفنا نفس التعديل هنا لضمان جلب الخبر الجديد دائماً
+    fetch('news.txt?v=' + new Date().getTime())
         .then(response => response.text())
         .then(data => {
             let lines = data.split('\n');
@@ -1144,11 +1150,10 @@ function openNewsModal() {
             toggleModal('news-modal');
         })
         .catch(error => {
-            document.getElementById('news-content').innerText = 'لا توجد أخبار جديدة حالياً أو تعذر تحميل الملف.';
+            document.getElementById('news-content').innerText = 'لا توجد أخبار جديدة حالياً.';
             toggleModal('news-modal');
         });
 }
-</script>
 
 </body>
 </html>
