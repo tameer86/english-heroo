@@ -705,16 +705,22 @@
     }
 
     function toggleModal(id) {
-        const modal = document.getElementById(id);
-        if(modal.style.display === 'flex') {
-            if(id === 'bank-modal' && isSpinning) return; 
-            if(id === 'magic-cards-modal') clearInterval(magicCardEventInterval);
-            modal.style.display = 'none';
-        } else {
-            if(id === 'bank-modal') { updateBankUI(); renderBankStatement(); }
-            modal.style.display = 'flex';
-        }
+    // التحقق المضاف: منع فتح نافذة الإعدادات إذا لم يكن في وضع ولي الأمر
+    if (id === 'admin-modal' && localStorage.getItem('isParentMode') !== 'true') {
+        alert("عذراً، هذه الإعدادات مخصصة لولي الأمر فقط! 🛡️ لا تملك صلاحية الدخول.");
+        return; // إنهاء الدالة فوراً وعدم فتح النافذة
     }
+
+    const modal = document.getElementById(id);
+    if(modal.style.display === 'flex') {
+        if(id === 'bank-modal' && isSpinning) return; 
+        if(id === 'magic-cards-modal') clearInterval(magicCardEventInterval);
+        modal.style.display = 'none';
+    } else {
+        if(id === 'bank-modal') { updateBankUI(); renderBankStatement(); }
+        modal.style.display = 'flex';
+    }
+}
 
     function logBankStatement(desc, amount, isIn) {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
@@ -744,9 +750,14 @@
 
     // --- المحرك الديناميكي للبطاقات (واجهة ولي الأمر) ---
     function toggleEventsAdminModal() {
-        renderDynamicCardsEditor();
-        toggleModal('events-admin-modal');
+    // منع فتح نافذة الأحداث الديناميكية للمستخدم العادي
+    if (localStorage.getItem('isParentMode') !== 'true') {
+        alert("عذراً، إعدادات البطاقات والأحداث مخصصة لولي الأمر فقط! 🛡️");
+        return;
     }
+    renderDynamicCardsEditor();
+    toggleModal('events-admin-modal');
+}
 
     function renderDynamicCardsEditor() {
         let container = document.getElementById('dynamic-cards-editor'); container.innerHTML = '';
