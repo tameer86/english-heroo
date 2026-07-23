@@ -39,6 +39,8 @@
         #parent-mode-banner { display: none; position: absolute; top: 15px; right: 20px; background: #f6c23e; color: #333; padding: 5px 15px; border-radius: 15px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #fff; font-size: 14px; }
         .stat-card { background: #f8f9fc; border: 1px solid #e3e6f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: right; }
         .stat-card h4 { margin: 0 0 10px 0; color: var(--primary); }
+
+        #login-message-box { display: none; padding: 10px; margin-bottom: 15px; border-radius: 6px; font-weight: bold; text-align: center; font-size: 14px; transition: 0.3s; }
     </style>
     
     <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
@@ -71,6 +73,15 @@
 
         if(!localStorage.getItem('device_uuid')) {
             localStorage.setItem('device_uuid', 'dev_' + Math.random().toString(36).substr(2, 9));
+        }
+
+        // دالة التشفير (SHA-256)
+        async function hashPassword(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
         }
     </script>
 </head>
@@ -171,7 +182,7 @@
 
         <div id="about-screen" class="hidden">
             <h1>حول التطبيق ℹ️</h1>
-            <p style="text-align: right; line-height: 1.6;">    النسخة :  1.28 V <br>المطور و المبرمج : المهندس تامر خطيب <br><br>الوصف: <br>هذا التطبيق هو نظام ذكي مصمم لمساعدتك على حفظ الكلمات والمصطلحات الإنجليزية الأساسية لكل مستوى بالترتيب، واختبار جودة نطقك بدقة، ومتابعة تقدمك التعليمي خطوة بخطوة بالنجوم والتقارير المتقدمة.<br>وهو يتكون من كلمات المنهاج الفلسطيني من الصف الأول حتى الصف الثاني عشر ، بالإضافة الى المستويات الستة المعتمدة من نظام  CEFR (الإطار الأوروبي المرجعي الموحد للغات)، وهو المقياس الأساسي لتحديد مستوى أي شخص في اللغات الأجنبية.</p>
+            <p style="text-align: right; line-height: 1.6;">    النسخة :  1.30 V <br>المطور و المبرمج : المهندس تامر خطيب <br><br>الوصف: <br>هذا التطبيق هو نظام ذكي مصمم لمساعدتك على حفظ الكلمات والمصطلحات الإنجليزية الأساسية لكل مستوى بالترتيب، واختبار جودة نطقك بدقة، ومتابعة تقدمك التعليمي خطوة بخطوة بالنجوم والتقارير المتقدمة.<br>وهو يتكون من كلمات المنهاج الفلسطيني من الصف الأول حتى الصف الثاني عشر ، بالإضافة الى المستويات الستة المعتمدة من نظام  CEFR (الإطار الأوروبي المرجعي الموحد للغات)، وهو المقياس الأساسي لتحديد مستوى أي شخص في اللغات الأجنبية.</p>
             <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
         </div>
 
@@ -216,6 +227,12 @@
             <h1>الإعدادات العامة ⚙️</h1>
             
             <div style="background: var(--light); padding: 15px; border-radius: 12px; border: 2px solid #e3e6f0; margin-bottom: 20px;">
+                <h3 id="parent-login-title" style="color: var(--primary); margin-top: 0; margin-bottom: 10px; font-size: 16px;">الدخول كولي أمر</h3>
+                
+                <!-- صندوق الرسائل الذكي للتسجيل -->
+                <div id="login-message-box"></div>
+
+                <input type="text" id="admin-username-global" placeholder="أدخل اسم المستخدم" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box; margin-bottom: 10px;">
                 <input type="password" id="admin-password-global" placeholder="أدخل كلمة المرور (لولي الأمر)" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold; box-sizing:border-box; margin-bottom: 10px;">
                 <button id="btn-parent-login-global" style="background:var(--primary); margin: 0; width: 100%;" onclick="toggleParentModeGlobal()">تسجيل دخول كولي أمر</button>
             </div>
@@ -324,41 +341,176 @@
         }
     };
 
+    // دالة عرض رسائل الخطأ والنجاح
+    function showLoginMessage(msg, type) {
+        let box = document.getElementById('login-message-box');
+        box.style.display = 'block';
+        box.innerHTML = msg;
+        if(type === 'error') { box.style.background = '#f8d7da'; box.style.color = '#721c24'; box.style.border = '1px solid #f5c6cb'; }
+        else if(type === 'success') { box.style.background = '#d4edda'; box.style.color = '#155724'; box.style.border = '1px solid #c3e6cb'; }
+        else if(type === 'warning') { box.style.background = '#fff3cd'; box.style.color = '#856404'; box.style.border = '1px solid #ffeeba'; }
+    }
+
+    let lockoutTimerInterval = null;
+
     function applyGlobalModes() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         let banner = document.getElementById('parent-mode-banner');
         if(banner) banner.style.display = isParent ? 'block' : 'none';
 
         let loginBtn = document.getElementById('btn-parent-login-global');
+        let userInput = document.getElementById('admin-username-global');
         let passInput = document.getElementById('admin-password-global');
         let apiBox = document.getElementById('gemini-api-box');
+        let title = document.getElementById('parent-login-title');
+        let msgBox = document.getElementById('login-message-box');
+
+        clearInterval(lockoutTimerInterval);
+        
+        let expiry = parseInt(localStorage.getItem('lockoutExpiry')) || 0;
+        let fails = parseInt(localStorage.getItem('totalConsecutiveFails')) || 0;
+        let now = Date.now();
 
         if (isParent) {
             if(loginBtn) { loginBtn.innerText = 'تسجيل خروج من حساب ولي الأمر'; loginBtn.style.backgroundColor = 'var(--danger)'; }
-            if(passInput) passInput.style.display = 'none';
+            if(userInput) { userInput.style.display = 'none'; }
+            if(passInput) { passInput.style.display = 'none'; }
+            if(title) { title.style.display = 'none'; }
             if(apiBox) apiBox.classList.remove('hidden');
+            if(msgBox) msgBox.style.display = 'none';
         } else {
             if(loginBtn) { loginBtn.innerText = 'تسجيل دخول كولي أمر'; loginBtn.style.backgroundColor = 'var(--primary)'; }
+            if(userInput) { 
+                userInput.style.display = 'block'; 
+                let savedUser = localStorage.getItem('savedAdminUser');
+                if (savedUser) userInput.value = savedUser;
+            }
             if(passInput) { passInput.style.display = 'block'; passInput.value = ''; }
             if(apiBox) apiBox.classList.add('hidden');
+            
+            if (title) {
+                title.style.display = 'block';
+                if (expiry > now) {
+                    // النظام مقفل
+                    title.style.color = 'var(--danger)';
+                    if (fails >= 15) {
+                        title.innerText = 'تم قفل الدخول نهائياً! بحاجة لكلمة مرور مدير النظام.';
+                    } else {
+                        updateCountdownUI(expiry);
+                        lockoutTimerInterval = setInterval(() => {
+                            if (Date.now() >= expiry) {
+                                clearInterval(lockoutTimerInterval);
+                                localStorage.setItem('lockoutExpiry', 0);
+                                applyGlobalModes();
+                            } else {
+                                updateCountdownUI(expiry);
+                            }
+                        }, 1000);
+                    }
+                    if(passInput) passInput.placeholder = 'مسموح فقط لمدير النظام (superAdmin)';
+                } else {
+                    // النظام مفتوح
+                    title.innerText = 'الدخول كولي أمر';
+                    title.style.color = 'var(--primary)';
+                    if(passInput) passInput.placeholder = 'أدخل كلمة المرور (لولي الأمر)';
+                    if(msgBox && msgBox.innerHTML.includes('متبقي')) msgBox.style.display = 'none';
+                }
+            }
         }
     }
 
-    function toggleParentModeGlobal() {
+    function updateCountdownUI(expiry) {
+        let title = document.getElementById('parent-login-title');
+        let diff = expiry - Date.now();
+        if (diff <= 0) return;
+        let m = Math.floor(diff / 60000);
+        let s = Math.floor((diff % 60000) / 1000);
+        title.innerText = `الدخول مقفل! متبقي: ${m}د ${s}ث (أو أدخل كمدير نظام)`;
+    }
+
+    async function toggleParentModeGlobal() {
         let isParent = localStorage.getItem('isParentMode') === 'true';
         if (isParent) {
             localStorage.setItem('isParentMode', 'false');
-            alert('تم تسجيل الخروج من وضع ولي الأمر بنجاح.');
-            applyGlobalModes();
-        } else {
-            let pass = document.getElementById('admin-password-global').value;
-            if (pass === 'T@mer2023') {
-                localStorage.setItem('isParentMode', 'true');
-                alert('تم تفعيل وضع ولي الأمر بنجاح!');
-                applyGlobalModes();
+            showLoginMessage('تم تسجيل الخروج من وضع ولي الأمر بنجاح.', 'success');
+            setTimeout(() => { document.getElementById('login-message-box').style.display = 'none'; applyGlobalModes(); }, 1500);
+            return;
+        } 
+        
+        let user = document.getElementById('admin-username-global').value.trim();
+        let pass = document.getElementById('admin-password-global').value;
+        
+        if(!user || !pass) {
+            showLoginMessage('الرجاء إدخال اسم المستخدم وكلمة المرور!', 'error');
+            return;
+        }
+
+        let fails = parseInt(localStorage.getItem('totalConsecutiveFails')) || 0;
+        let expiry = parseInt(localStorage.getItem('lockoutExpiry')) || 0;
+        let now = Date.now();
+
+        try {
+            let response = await fetch('config/passwords.json', { cache: "no-store" });
+            let users = await response.json();
+            
+            let hashedPass = await hashPassword(pass);
+            let validUser = users.find(u => u.username === user && u.password === hashedPass);
+
+            // حالة النظام مقفل (تجميد 15 دقيقة، ساعتين، أو نهائي)
+            if (expiry > now) {
+                if (validUser && validUser.type === 'superAdmin') {
+                    // فك القفل لمدير النظام
+                    localStorage.setItem('totalConsecutiveFails', 0);
+                    localStorage.setItem('lockoutExpiry', 0);
+                    localStorage.setItem('savedAdminUser', user);
+                    localStorage.setItem('isParentMode', 'true');
+                    showLoginMessage('تم فك القفل بنجاح! مرحباً مدير النظام.', 'success');
+                    setTimeout(() => { document.getElementById('login-message-box').style.display = 'none'; applyGlobalModes(); }, 1500);
+                    return;
+                } else {
+                    showLoginMessage('النظام مقفل! الرجاء الانتظار أو الدخول كمدير نظام (superAdmin).', 'error');
+                    return;
+                }
             } else {
-                alert('كلمة المرور غير صحيحة!');
+                // إذا انتهت مدة التجميد، نصفر تاريخ الانتهاء ولكن نحتفظ بعدد الأخطاء لننتقل للمرحلة التالية إذا أخطأ
+                if (expiry !== 0 && expiry <= now) {
+                    localStorage.setItem('lockoutExpiry', 0);
+                    expiry = 0;
+                }
             }
+
+            // فحص البيانات في الوضع الطبيعي
+            if (validUser && (validUser.type === 'admin' || validUser.type === 'superAdmin')) {
+                localStorage.setItem('isParentMode', 'true');
+                localStorage.setItem('totalConsecutiveFails', 0);
+                localStorage.setItem('lockoutExpiry', 0);
+                localStorage.setItem('savedAdminUser', user);
+                showLoginMessage('تم تسجيل الدخول بنجاح!', 'success');
+                setTimeout(() => { document.getElementById('login-message-box').style.display = 'none'; applyGlobalModes(); }, 1500);
+            } else {
+                fails++;
+                localStorage.setItem('totalConsecutiveFails', fails);
+                
+                if (fails === 5) {
+                    localStorage.setItem('lockoutExpiry', Date.now() + (15 * 60 * 1000));
+                    showLoginMessage('تم قفل الدخول! الرجاء الانتظار 15 دقيقة.', 'error');
+                } else if (fails === 10) {
+                    localStorage.setItem('lockoutExpiry', Date.now() + (2 * 60 * 60 * 1000));
+                    showLoginMessage('تم قفل الدخول! الرجاء الانتظار ساعتين.', 'error');
+                } else if (fails >= 15) {
+                    // قفل نهائي (تاريخ بعيد جداً)
+                    localStorage.setItem('lockoutExpiry', new Date('3000-01-01').getTime());
+                    showLoginMessage('تم قفل الدخول نهائياً! تواصل مع مدير النظام.', 'error');
+                } else {
+                    let nextLockAt = (fails < 5) ? 5 : (fails < 10) ? 10 : 15;
+                    let left = nextLockAt - fails;
+                    showLoginMessage(`بيانات غير صحيحة! متبقي ${left} محاولة/محاولات قبل التجميد.`, 'warning');
+                }
+                applyGlobalModes();
+            }
+        } catch (error) {
+            console.error(error);
+            showLoginMessage('حدث خطأ في قراءة ملف كلمات المرور.', 'error');
         }
     }
 
@@ -485,7 +637,6 @@
         hideAllScreens(); 
         document.getElementById('settings-screen').classList.remove('hidden');
         
-        // الحماية من الأخطاء في حال كانت الذاكرة فارغة أو ممسوحة
         let settings = JSON.parse(localStorage.getItem('audioSettings')) || { speed: 1, voiceName: "", geminiApiKey: "" };
         
         document.getElementById('voice-speed').value = settings.speed || 1;
