@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صفحة الألعاب التعليمية</title>
+		<script>
+    (function checkActivation() {
+        if (!localStorage.getItem('app_is_activated')) {
+            alert("عذراً، يجب تفعيل النسخة أولاً من الشاشة الرئيسية!");
+            window.location.replace("index.html"); 
+        }
+    })();
+</script>
 
     <style>
         :root {
@@ -1318,7 +1326,7 @@
     }
 	
 function checkNewsStatus() {
-    let newsUrl = 'news.txt';
+    let newsUrl = 'config/news.txt';
     if (window.location.protocol !== 'file:') { newsUrl += '?v=' + new Date().getTime(); }
     fetch(newsUrl, { cache: "no-store" })
         .then(response => response.text())
@@ -1334,7 +1342,7 @@ function checkNewsStatus() {
 }
 
 function openNewsModal() {
-    let newsUrl = 'news.txt';
+    let newsUrl = 'config/news.txt';
     if (window.location.protocol !== 'file:') { newsUrl += '?v=' + new Date().getTime(); }
     fetch(newsUrl, { cache: "no-store" })
         .then(response => response.text())

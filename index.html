@@ -43,12 +43,12 @@
         #login-message-box { display: none; padding: 10px; margin-bottom: 15px; border-radius: 6px; font-weight: bold; text-align: center; font-size: 14px; transition: 0.3s; }
     </style>
     
-    <script src="A1.js"></script><script src="A2.js"></script><script src="B1.js"></script><script src="B2.js"></script>
-    <script src="C1.js"></script><script src="C2.js"></script>
-    <script src="CLASS1.js"></script><script src="CLASS2.js"></script><script src="CLASS3.js"></script>
-    <script src="CLASS4.js"></script><script src="CLASS5.js"></script><script src="CLASS6.js"></script>
-    <script src="CLASS7.js"></script><script src="CLASS8.js"></script><script src="CLASS9.js"></script>
-    <script src="CLASS10.js"></script><script src="CLASS11.js"></script><script src="CLASS12.js"></script>
+    <script src="words/A1.js"></script><script src="words/A2.js"></script><script src="words/B1.js"></script><script src="words/B2.js"></script>
+    <script src="words/C1.js"></script><script src="words/C2.js"></script>
+    <script src="words/CLASS1.js"></script><script src="words/CLASS2.js"></script><script src="words/CLASS3.js"></script>
+    <script src="words/CLASS4.js"></script><script src="words/CLASS5.js"></script><script src="words/CLASS6.js"></script>
+    <script src="words/CLASS7.js"></script><script src="words/CLASS8.js"></script><script src="words/CLASS9.js"></script>
+    <script src="words/CLASS10.js"></script><script src="words/CLASS11.js"></script><script src="words/CLASS12.js"></script>
     <script>
         const allLevelsData = {
             "A1": typeof levelA1_Words !== 'undefined' ? levelA1_Words : [], "A2": typeof levelA2_Words !== 'undefined' ? levelA2_Words : [],
@@ -181,10 +181,10 @@
         </div>
 
         <div id="about-screen" class="hidden">
-            <h1>حول التطبيق ℹ️</h1>
-            <p style="text-align: right; line-height: 1.6;">    النسخة :  1.30 V <br>المطور و المبرمج : المهندس تامر خطيب <br><br>الوصف: <br>هذا التطبيق هو نظام ذكي مصمم لمساعدتك على حفظ الكلمات والمصطلحات الإنجليزية الأساسية لكل مستوى بالترتيب، واختبار جودة نطقك بدقة، ومتابعة تقدمك التعليمي خطوة بخطوة بالنجوم والتقارير المتقدمة.<br>وهو يتكون من كلمات المنهاج الفلسطيني من الصف الأول حتى الصف الثاني عشر ، بالإضافة الى المستويات الستة المعتمدة من نظام  CEFR (الإطار الأوروبي المرجعي الموحد للغات)، وهو المقياس الأساسي لتحديد مستوى أي شخص في اللغات الأجنبية.</p>
-            <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
-        </div>
+    <h1>حول التطبيق ℹ️</h1>
+    <p id="about-content" style="text-align: right; line-height: 1.6; white-space: pre-wrap;">جاري التحميل...</p>
+    <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
+</div>
 
         <div id="contact-screen" class="hidden">
             <h1>اتصل بنا 📞</h1>
@@ -288,7 +288,7 @@
         }
 
         try {
-            const response = await fetch('serials.json');
+            const response = await fetch('config/serials.json');
             const serials = await response.json();
             const isValid = serials.some(item => item.serial === serialInput);
 
@@ -553,7 +553,20 @@
 
     function showDashboard() { hideAllScreens(); updateLevelStats(); document.getElementById('dashboard-screen').classList.remove('hidden'); }
     function goHome() { hideAllScreens(); document.getElementById('home-screen').classList.remove('hidden'); }
-    function showAbout() { hideAllScreens(); document.getElementById('about-screen').classList.remove('hidden'); }
+    function showAbout() { 
+    hideAllScreens(); 
+    document.getElementById('about-screen').classList.remove('hidden'); 
+    
+    // جلب النص من الملف مع منع التخزين المؤقت لضمان ظهور أي تحديث فوري
+    fetch('config/about.txt?v=' + new Date().getTime(), { cache: "no-store" })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('about-content').innerText = data;
+        })
+        .catch(error => {
+            document.getElementById('about-content').innerText = 'تعذر تحميل معلومات التطبيق.';
+        });
+}
     function showContact() { hideAllScreens(); document.getElementById('contact-screen').classList.remove('hidden'); }
     
     function showReports() {
