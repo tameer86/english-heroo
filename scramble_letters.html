@@ -93,7 +93,6 @@
 <body>
     <audio id="bg-music" src="music\4.mp3" loop autoplay></audio>
 
-
     <div id="parent-mode-banner">وضع ولي الأمر 🛡️</div>
     <div id="flash-effect" class="hareef-flash"></div>
 
@@ -417,10 +416,10 @@
         
         if (c.trigger.type === 'consecutive') {
             descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> الفوز بـ ${c.trigger.reqWins} مراحل متتالية بخمس نجوم.</li>`;
-            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا حققت شروط صندوق جديد قبل لعب البطاقات القديمة، ستفقد البطاقات القديمة وتُستبدل بالجديدة!</div>`;
+            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا حققت شروط الحصول على صندوق جديد من هذه البطاقة قبل أن تلعب البطاقات القديمة التي تملكها، فسوف تفقد البطاقات القديمة وتُستبدل بالجديدة!</div>`;
         } else if (c.trigger.type === 'speedrun') {
             descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> إنجاز ${c.trigger.reqGames} مراحل خلال ${c.trigger.reqHours} ساعة.</li>`;
-            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا حققت شروط صندوق جديد قبل لعب القديمة، ستفقدها!</div>`;
+            descHTML += `<div style="background: #ffeeba; border-right: 4px solid #e74a3b; padding: 10px; margin-top: 15px; color: #856404; font-weight: bold; font-size: 14px;">⚠️ تحذير: إذا حققت شروط الحصول على صندوق جديد من هذه البطاقة قبل أن تلعب القديمة، فسوف تفقدها!</div>`;
         } else if (c.trigger.type === 'periodic') {
             let daysNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']; let dNames = c.trigger.days.map(d => daysNames[d]).join(' و ');
             descHTML += `<li style="margin-bottom: 8px; color: var(--primary);">🎯 <b>الشرط:</b> تتفعل تلقائياً أيام: ${dNames}.</li>`;
@@ -774,13 +773,21 @@
 
     function getRandomStep(min, max, step) { let steps = Math.floor((max - min) / step); let randStep = Math.floor(Math.random() * (steps + 1)); return min + (randStep * step); }
 
-    function handleLongBreathHistory() {
+    function handleLongBreathHistory(isNewFiveStarWin) {
         let lbConfig = cardsConfig.longBreath;
         if(lbConfig && (lbConfig.games.includes('arrange') || lbConfig.games.includes('scramble'))) {
-            let history = JSON.parse(localStorage.getItem('longBreathHistory_scramble')) || []; history.push(Date.now());
-            let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); history = history.filter(t => t >= cutoff);
+            let history = JSON.parse(localStorage.getItem('longBreathHistory_scramble')) || []; 
+            if(isNewFiveStarWin) {
+                history.push(Date.now());
+            }
+            let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); 
+            history = history.filter(t => t >= cutoff);
             localStorage.setItem('longBreathHistory_scramble', JSON.stringify(history));
-            if(history.length >= lbConfig.trigger.reqGames) { localStorage.setItem('longBreathHistory_scramble', '[]'); triggerDynamicChest('longBreath', lbConfig); return true; }
+            if(isNewFiveStarWin && history.length >= lbConfig.trigger.reqGames) { 
+                localStorage.setItem('longBreathHistory_scramble', '[]'); 
+                triggerDynamicChest('longBreath', lbConfig); 
+                return true; 
+            }
         }
         return false;
     }
@@ -877,7 +884,10 @@
         }
 
         let lbTriggered = false;
-        if(!hareefTriggered) { lbTriggered = handleLongBreathHistory(); }
+        if(!hareefTriggered) { 
+            let isNewFiveStarWin = (stars === 5 && previousStars < 5);
+            lbTriggered = handleLongBreathHistory(isNewFiveStarWin); 
+        }
 
         if(!hareefTriggered && !lbTriggered) { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
     }

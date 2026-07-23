@@ -342,6 +342,7 @@
         if(modal.style.display === 'flex') { 
             modal.style.display = 'none'; 
         } else if (gameScreen.style.display === 'block') { 
+            // تعديل سد ثغرة التحايل: تصفير السلسلة عند الخروج الداخلي
             localStorage.setItem('consecutive5_missing', 0);
             showStagesScreen(); 
         } else { 
@@ -639,13 +640,21 @@
 
     function getRandomStep(min, max, step) { let steps = Math.floor((max - min) / step); let randStep = Math.floor(Math.random() * (steps + 1)); return min + (randStep * step); }
 
-    function handleLongBreathHistory() {
+    function handleLongBreathHistory(isNewFiveStarWin) {
         let lbConfig = cardsConfig.longBreath;
         if(lbConfig && lbConfig.games.includes('missing')) {
-            let history = JSON.parse(localStorage.getItem('longBreathHistory_missing')) || []; history.push(Date.now());
-            let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); history = history.filter(t => t >= cutoff);
+            let history = JSON.parse(localStorage.getItem('longBreathHistory_missing')) || []; 
+            if(isNewFiveStarWin) {
+                history.push(Date.now());
+            }
+            let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); 
+            history = history.filter(t => t >= cutoff);
             localStorage.setItem('longBreathHistory_missing', JSON.stringify(history));
-            if(history.length >= lbConfig.trigger.reqGames) { localStorage.setItem('longBreathHistory_missing', '[]'); triggerDynamicChest('longBreath', lbConfig); return true; }
+            if(isNewFiveStarWin && history.length >= lbConfig.trigger.reqGames) { 
+                localStorage.setItem('longBreathHistory_missing', '[]'); 
+                triggerDynamicChest('longBreath', lbConfig); 
+                return true; 
+            }
         }
         return false;
     }
@@ -743,7 +752,10 @@
         }
 
         let lbTriggered = false;
-        if(!hareefTriggered) { lbTriggered = handleLongBreathHistory(); }
+        if(!hareefTriggered) { 
+            let isNewFiveStarWin = (stars === 5 && previousStars < 5);
+            lbTriggered = handleLongBreathHistory(isNewFiveStarWin); 
+        }
 
         if(!hareefTriggered && !lbTriggered) { showResultModal(stars, time, basePoints, bonusPoints, totalPoints); }
     }
