@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<!-- إعدادات PWA -->
+    <link rel="manifest" href="config/manifest.json">
+    <meta name="theme-color" content="#4e73df">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة صائد الأمثلة المسموعة</title>
@@ -700,6 +704,20 @@
             localStorage.setItem('consecutive5_listen', 0);
         }
     });
+</script>
+<script>
+    // تفعيل الـ Service Worker لعمل التطبيق بدون إنترنت (Offline Mode)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('PWA ServiceWorker registered successfully!');
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        });
+    }
 </script>
 </body>
 </html>
