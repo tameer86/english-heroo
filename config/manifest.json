@@ -1,0 +1,24 @@
+{
+  "name": "تطبيق الحفظ الذكي للأبطال",
+  "short_name": "الحفظ الذكي",
+  "description": "تطبيق تعليمي تفاعلي لتعلم اللغة الإنجليزية وحفظ الكلمات بذكاء.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#eef2f7",
+  "theme_color": "#4e73df",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
