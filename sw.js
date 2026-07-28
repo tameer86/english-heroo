@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hero-app-cache-v1';
+const CACHE_NAME = 'hero-app-cache-v2';
 
 // الملفات الأساسية التي يجب حفظها فور فتح التطبيق لأول مرة
 const ASSETS_TO_CACHE = [
@@ -13,6 +13,7 @@ const ASSETS_TO_CACHE = [
   './missing_letters.html',
   './scramble_letters.html',
   './crossword.html',
+  './videoAssistant.html',
   './manifest.json',
   './config/passwords.json',
   './config/serials.json'
@@ -29,7 +30,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// حدث التنشيط: تنظيف الكاش القديم إذا قمت بتحديث التطبيق
+// حدث التنشيط: تنظيف الكاش القديم
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -45,32 +46,28 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// حدث الجلب (Fetch): الخوارزمية الذكية (الكاش أولاً، ثم الإنترنت، مع حفظ أي ملف جديد يطلبه المستخدم)
+// حدث الجلب (Fetch): استراتيجية الشبكة أولاً مع الاحتفاظ بالكاش للعمل بدون إنترنت
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // إذا وجد الملف في الكاش (وضع الأوفلاين)، قم بإرجاعه فوراً
-      if (cachedResponse) {
-        return cachedResponse;
+    fetch(event.request).then((networkResponse) => {
+      // إذا كان الاتصال بالإنترنت ناجحاً، نعيد النتيجة ونحفظ نسخة محدثة في الكاش
+      if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+        return networkResponse;
       }
 
-      // إذا لم يكن في الكاش، اطلبه من الإنترنت
-      return fetch(event.request).then((networkResponse) => {
-        // تأكد أن الاستجابة صالحة
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
-        }
+      let responseToCache = networkResponse.clone();
+      caches.open(CACHE_NAME).then((cache) => {
+        cache.put(event.request, responseToCache);
+      });
 
-        // احفظ نسخة من الملف الجديد (مثل ملفات الصوت والصور التي لم نذكرها بالأعلى) في الكاش للمستقبل
-        let responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return networkResponse;
-      }).catch(() => {
-        // إذا فشل الاتصال بالإنترنت والملف غير موجود بالكاش، نتجاهل الخطأ بصمت لكي لا ينهار التطبيق
-        console.log('أنت الآن في وضع عدم الاتصال (Offline).');
+      return networkResponse;
+    }).catch(() => {
+      // إذا فشل الاتصال بالإنترنت (وضع عدم الاتصال)، نلجأ للنسخة المخزنة
+      return caches.match(event.request).then((cachedResponse) => {
+         if (cachedResponse) {
+             return cachedResponse;
+         }
+         console.log('أنت الآن في وضع عدم الاتصال (Offline).');
       });
     })
   );

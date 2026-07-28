@@ -126,6 +126,7 @@
 
             <hr style="border: 1px solid #eee; margin: 15px 0;">
             <div class="btn-group">
+                <button id="btn-install-app" style="background: var(--warning); color: #333; font-weight: bold; width: 90%; font-size: 18px; margin-bottom: 10px;" onclick="handleInstallClick()">📲 جاري فحص حالة التطبيق...</button>
                 <button style="background: var(--info);" onclick="showAbout()">ℹ️ حول التطبيق</button>
                 <button style="background: #20c997;" onclick="showContact()">📞 اتصل بنا</button>
                 <button style="background: var(--danger);" onclick="clearProgressData()">🗑️ مسح البيانات</button>
@@ -185,10 +186,10 @@
         </div>
 
         <div id="about-screen" class="hidden">
-    <h1>حول التطبيق ℹ️</h1>
-    <p id="about-content" style="text-align: right; line-height: 1.6; white-space: pre-wrap;">جاري التحميل...</p>
-    <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
-</div>
+            <h1>حول التطبيق ℹ️</h1>
+            <p id="about-content" style="text-align: right; line-height: 1.6; white-space: pre-wrap;">جاري التحميل...</p>
+            <button style="background: var(--dark);" onclick="goHome()">🔙 العودة</button>
+        </div>
 
         <div id="contact-screen" class="hidden">
             <h1>اتصل بنا 📞</h1>
@@ -835,6 +836,54 @@
             goHome();
         }, 800);
     }
+
+    // --- PWA Installation Logic ---
+    let deferredPrompt;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        updateInstallButtonUI();
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        updateInstallButtonUI();
+    });
+
+    function updateInstallButtonUI() {
+        let btn = document.getElementById('btn-install-app');
+        if (!btn) return;
+        
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            btn.innerHTML = '✅ التطبيق مثبت وجاهز';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+        } else {
+            btn.innerHTML = '📲 تثبيت التطبيق على الجهاز';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+    }
+
+    async function handleInstallClick() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredPrompt = null;
+                updateInstallButtonUI();
+            }
+        } else {
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                alert('التطبيق مثبت بالفعل على جهازك وتعمل عليه الآن.');
+            } else {
+                alert('لا يمكن تثبيت التطبيق حالياً. إما أن متصفحك لا يدعم الميزة أو تم رفض الإذن مسبقاً، يمكنك التثبيت يدوياً من إعدادات المتصفح (خيار Add to Home Screen).');
+            }
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', updateInstallButtonUI);
 </script>
 <script>
     // تفعيل الـ Service Worker لعمل التطبيق بدون إنترنت (Offline Mode)
