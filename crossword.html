@@ -315,7 +315,8 @@
     let activeStage = null; let timerInterval; let secondsElapsed = 0;
     let cwGridData = {}; let placedWordsInfo = []; 
     window.currentStageTotalLetters = 0; window.typingDirection = null; 
-    
+    window.isSequentialInput = false; window.lastKnownDomain = 'h';
+
     // متغيرات المساعدة (Hint Bulb)
     window.hintUses = 0; window.hintPenalty = 0; window.isHintActive = false; window.currentHintCost = 1;
 
@@ -627,21 +628,21 @@
         let cleanWords = wordsArray.map(w => ({ id: w.id, ar: w.ar, originalEn: w.en.trim(), en: w.en.trim().replace(/[^a-zA-Z]/g, '').toLowerCase() })).filter(w => w.en.length > 0);
         cleanWords.sort((a,b) => b.en.length - a.en.length);
         
-        function getCell(x, y) { return cwGridData[`${x},${y}`]; }
-        function setCell(x, y, char, wordId) { if(!cwGridData[`${x},${y}`]) cwGridData[`${x},${y}`] = { char: char, words: [] }; cwGridData[`${x},${y}`].words.push(wordId); }
+        function getCellVal(x, y) { return cwGridData[`${x},${y}`]; }
+        function setCellVal(x, y, char, wordId) { if(!cwGridData[`${x},${y}`]) cwGridData[`${x},${y}`] = { char: char, words: [] }; cwGridData[`${x},${y}`].words.push(wordId); }
         function canPlaceWord(wordStr, startX, startY, isHoriz) {
             let dx = isHoriz ? 1 : 0; let dy = isHoriz ? 0 : 1;
-            if(getCell(startX - dx, startY - dy)) return false; if(getCell(startX + wordStr.length * dx, startY + wordStr.length * dy)) return false;
+            if(getCellVal(startX - dx, startY - dy)) return false; if(getCellVal(startX + wordStr.length * dx, startY + wordStr.length * dy)) return false;
             let intersections = 0;
             for(let i=0; i<wordStr.length; i++) {
-                let cx = startX + i*dx; let cy = startY + i*dy; let cell = getCell(cx, cy);
+                let cx = startX + i*dx; let cy = startY + i*dy; let cell = getCellVal(cx, cy);
                 if(cell) { if(cell.char !== wordStr[i]) return false; intersections++; } 
-                else { if (isHoriz) { if(getCell(cx, cy-1) || getCell(cx, cy+1)) return false; } else { if(getCell(cx-1, cy) || getCell(cx+1, cy)) return false; } }
+                else { if (isHoriz) { if(getCellVal(cx, cy-1) || getCellVal(cx, cy+1)) return false; } else { if(getCellVal(cx-1, cy) || getCellVal(cx+1, cy)) return false; } }
             } return intersections;
         }
 
         let firstWord = cleanWords[0];
-        for(let i=0; i<firstWord.en.length; i++) setCell(i, 0, firstWord.en[i], firstWord.id);
+        for(let i=0; i<firstWord.en.length; i++) setCellVal(i, 0, firstWord.en[i], firstWord.id);
         placedWordsInfo.push({ id: firstWord.id, ar: firstWord.ar, x: 0, y: 0, isHoriz: true, len: firstWord.en.length });
 
         let unplaced = cleanWords.slice(1); let maxAttempts = 3; 
@@ -662,7 +663,7 @@
                 }
                 if(bestPlacement) {
                     let dx = bestPlacement.isHoriz ? 1 : 0; let dy = bestPlacement.isHoriz ? 0 : 1;
-                    for(let i=0; i<uWord.en.length; i++) { setCell(bestPlacement.x + i*dx, bestPlacement.y + i*dy, uWord.en[i], uWord.id); }
+                    for(let i=0; i<uWord.en.length; i++) { setCellVal(bestPlacement.x + i*dx, bestPlacement.y + i*dy, uWord.en[i], uWord.id); }
                     placedWordsInfo.push({ id: uWord.id, ar: uWord.ar, x: bestPlacement.x, y: bestPlacement.y, isHoriz: bestPlacement.isHoriz, len: uWord.en.length });
                 } else { stillUnplaced.push(uWord); }
             }
@@ -672,7 +673,7 @@
             let maxBottomY = 2;
             for(let key in cwGridData) { let y = parseInt(key.split(',')[1]); if(y > maxBottomY) maxBottomY = y; }
             unplaced.forEach(uWord => {
-                maxBottomY += 2; for(let i=0; i<uWord.en.length; i++) setCell(i, maxBottomY, uWord.en[i], uWord.id);
+                maxBottomY += 2; for(let i=0; i<uWord.en.length; i++) setCellVal(i, maxBottomY, uWord.en[i], uWord.id);
                 placedWordsInfo.push({ id: uWord.id, ar: uWord.ar, x: 0, y: maxBottomY, isHoriz: true, len: uWord.en.length });
             });
         }
@@ -696,13 +697,79 @@
                 let cellData = cwGridData[`${c},${r}`]; let cellDiv = document.createElement('div'); cellDiv.className = 'cw-cell';
                 if(cellData) {
                     let input = document.createElement('input'); input.className = 'cw-input'; input.maxLength = 1; input.dataset.x = c; input.dataset.y = r; input.dataset.expected = cellData.char; input.style.fontSize = fontDynamicSize;
-                    input.onkeydown = (e) => onCellKeydown(e, input); input.oninput = (e) => onCellInput(e, input); input.onfocus = () => highlightActiveWord(c, r); 
+                    input.onkeydown = (e) => onCellKeydown(e, input); 
+                    input.oninput = (e) => onCellInput(e, input); 
+                    input.onmousedown = () => { window.isSequentialInput = false; };
+                    input.onfocus = () => highlightActiveWord(c, r); 
                     cellDiv.appendChild(input);
                     if(cellData.displayNum) { let numSpan = document.createElement('span'); numSpan.className = 'cw-number'; numSpan.innerText = cellData.displayNum; cellDiv.appendChild(numSpan); }
                 } else { cellDiv.classList.add('empty'); }
                 gridEl.appendChild(cellDiv);
             }
         }
+    }
+
+    // دوال الذكاء لتحديد الاتجاه والمسح العكسي
+    function determineDirection(x, y, prevDir) {
+        let hasUp = !!cwGridData[`${x},${y-1}`];
+        let hasDown = !!cwGridData[`${x},${y+1}`];
+        let hasLeft = !!cwGridData[`${x-1},${y}`];
+        let hasRight = !!cwGridData[`${x+1},${y}`];
+
+        let isStartCol = !hasUp && hasDown;
+        let isEndCol = hasUp && !hasDown;
+        let isMidCol = hasUp && hasDown;
+
+        let isStartRow = !hasLeft && hasRight;
+        let isEndRow = hasLeft && !hasRight;
+        let isMidRow = hasLeft && hasRight;
+
+        if (isStartRow && isStartCol) return 'v';
+        if (isEndRow && isEndCol) return '-v';
+        
+        if (isStartCol) return 'v';
+        if (isStartRow) return 'h';
+        if (isEndCol && !isEndRow) return '-v';
+        if (isEndRow && !isEndCol) return '-h';
+        
+        if (isMidRow && !hasUp && !hasDown) return 'h';
+        if (isMidCol && !hasLeft && !hasRight) return 'v';
+
+        if (isMidRow && isMidCol) {
+            if (prevDir === 'v' || prevDir === '-v') return 'v';
+            if (prevDir === 'h' || prevDir === '-h') return 'h';
+            let pwH = placedWordsInfo.find(pw => pw.isHoriz && pwContainsCell(pw, x, y));
+            let pwV = placedWordsInfo.find(pw => !pw.isHoriz && pwContainsCell(pw, x, y));
+            if(window.lastKnownDomain === 'v' && pwV) return 'v';
+            if(window.lastKnownDomain === 'h' && pwH) return 'h';
+            return 'v';
+        }
+
+        return prevDir || 'h';
+    }
+
+    function pwContainsCell(pw, x, y) {
+        if (!pw) return false;
+        let dx = pw.isHoriz ? 1 : 0; let dy = pw.isHoriz ? 0 : 1;
+        for (let i = 0; i < pw.len; i++) { if (pw.x + i*dx === x && pw.y + i*dy === y) return true; }
+        return false;
+    }
+
+    function getWordStatus(pw) {
+        if (!pw) return 'none';
+        let dx = pw.isHoriz ? 1 : 0; let dy = pw.isHoriz ? 0 : 1;
+        let filledCount = 0; let correctCount = 0;
+        for(let i = 0; i < pw.len; i++) {
+            let cx = pw.x + i*dx; let cy = pw.y + i*dy;
+            let inp = document.querySelector(`.cw-input[data-x="${cx}"][data-y="${cy}"]`);
+            if (inp && inp.value !== '') {
+                filledCount++;
+                if (inp.classList.contains('correct') || inp.value.toLowerCase() === inp.dataset.expected) correctCount++;
+            }
+        }
+        if (filledCount === 0) return 'empty';
+        if (correctCount === pw.len) return 'complete';
+        return 'partial';
     }
 
     function highlightActiveWord(x, y) {
@@ -730,56 +797,85 @@
         }
     }
 
-    function getNextInput(x, y, dir) {
-        let nX = x, nY = y; if(dir === 'h') nX++; else if(dir === '-h') nX--; else if(dir === 'v') nY++; else if(dir === '-v') nY--;
-        return document.querySelector(`.cw-input[data-x="${nX}"][data-y="${nY}"]:not(.correct)`);
-    }
-
-    function getPrevInput(x, y, dir) {
-        let nX = x, nY = y; 
-        if(dir === 'h') nX--; 
-        else if(dir === '-h') nX++; 
-        else if(dir === 'v') nY--; 
-        else if(dir === '-v') nY++;
-        return document.querySelector(`.cw-input[data-x="${nX}"][data-y="${nY}"]:not(.correct)`);
-    }
-
     function onCellKeydown(e, inputEl) {
-        // تصحيح اتجاهات الأسهم بناءً على ملاحظات المستخدم لتتوافق بشكل سليم
-        if(e.key === 'ArrowRight') { window.typingDirection = 'h'; } 
-        else if(e.key === 'ArrowLeft') { window.typingDirection = '-h'; } 
-        else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; } 
-        else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; }
+        if(e.key === 'ArrowRight') { window.typingDirection = 'h'; window.lastKnownDomain = 'h'; window.isSequentialInput=false; } 
+        else if(e.key === 'ArrowLeft') { window.typingDirection = '-h'; window.lastKnownDomain = 'h'; window.isSequentialInput=false; } 
+        else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; window.lastKnownDomain = 'v'; window.isSequentialInput=false; } 
+        else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; window.lastKnownDomain = 'v'; window.isSequentialInput=false; }
         
         let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y); 
 
         if (e.key === 'Backspace') {
-            let activeDir = window.typingDirection;
-            if(!activeDir && window.currentActiveWord) activeDir = window.currentActiveWord.isHoriz ? 'h' : 'v';
-            if(!activeDir) activeDir = 'h';
-            
-            if(inputEl.value === '') {
-                e.preventDefault();
-                let prevInput = getPrevInput(curX, curY, activeDir);
-                if(prevInput) {
-                    prevInput.value = '';
-                    prevInput.focus();
-                }
-            }
-        }
+            e.preventDefault(); 
+            let valWasEmpty = (inputEl.value === '');
+            inputEl.value = ''; 
 
+            let dir = window.typingDirection || 'h';
+
+            if (window.isSequentialInput) {
+                let dx = (dir === 'h' || dir === '-h') ? -1 : 0;
+                let dy = (dir === 'v' || dir === '-v') ? -1 : 0;
+                let prevInput = document.querySelector(`.cw-input[data-x="${curX+dx}"][data-y="${curY+dy}"]:not(.correct)`);
+                if (prevInput) { prevInput.focus(); }
+            } else {
+                let wordH = placedWordsInfo.find(pw => pw.isHoriz && pwContainsCell(pw, curX, curY));
+                let wordV = placedWordsInfo.find(pw => !pw.isHoriz && pwContainsCell(pw, curX, curY));
+                let hStatus = getWordStatus(wordH); let vStatus = getWordStatus(wordV);
+
+                if (wordH && wordV) {
+                    if ((hStatus === 'complete' || hStatus === 'empty') && vStatus === 'partial') { dir = 'v'; } 
+                    else if ((vStatus === 'complete' || vStatus === 'empty') && hStatus === 'partial') { dir = 'h'; } 
+                    else { dir = window.lastKnownDomain || 'v'; }
+                } else {
+                    dir = wordH ? 'h' : 'v';
+                }
+
+                let dx = (dir === 'h' || dir === '-h') ? -1 : 0;
+                let dy = (dir === 'v' || dir === '-v') ? -1 : 0;
+                let currX = curX + dx; let currY = curY + dy;
+                let found = false;
+                
+                while(true) {
+                    let inp = document.querySelector(`.cw-input[data-x="${currX}"][data-y="${currY}"]`);
+                    if (!inp) break;
+                    let word = (dir === 'h' || dir === '-h') ? wordH : wordV;
+                    if (word && !pwContainsCell(word, currX, currY)) break;
+
+                    if (!inp.classList.contains('correct') && inp.value !== '') {
+                        inp.focus(); found = true; break;
+                    }
+                    currX += dx; currY += dy;
+                }
+
+                if (!found) {
+                    let prev = document.querySelector(`.cw-input[data-x="${curX+dx}"][data-y="${curY+dy}"]:not(.correct)`);
+                    if(prev) prev.focus();
+                }
+                
+                window.isSequentialInput = true; window.typingDirection = dir; window.lastKnownDomain = dir;
+            }
+            setTimeout(() => checkWordsCompletion(), 10);
+        }
         setTimeout(() => highlightActiveWord(curX, curY), 10);
     }
 
     function onCellInput(e, inputEl) {
         let val = inputEl.value.toLowerCase(); let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y);
         if(val.match(/[a-z]/i)) {
-            let nextInput = null; if(window.typingDirection) { nextInput = getNextInput(curX, curY, window.typingDirection); } 
-            if(!nextInput) {
-                let rightHas = getNextInput(curX, curY, 'h'); let leftHas = getNextInput(curX, curY, '-h'); let downHas = getNextInput(curX, curY, 'v'); let upHas = getNextInput(curX, curY, '-v');
-                if(downHas) { window.typingDirection = 'v'; nextInput = downHas; } else if(upHas && !downHas && !rightHas && !leftHas) { window.typingDirection = '-v'; nextInput = upHas; } else if(rightHas) { window.typingDirection = 'h'; nextInput = rightHas; } else if(leftHas && !rightHas && !downHas && !upHas) { window.typingDirection = '-h'; nextInput = leftHas; }
+            let dir = determineDirection(curX, curY, window.typingDirection);
+            window.typingDirection = dir; window.lastKnownDomain = (dir === 'v' || dir === '-v') ? 'v' : 'h';
+            
+            let dx = 0, dy = 0;
+            if(dir === 'h') dx = 1; else if(dir === '-h') dx = -1;
+            else if(dir === 'v') dy = 1; else if(dir === '-v') dy = -1;
+
+            let nextInput = document.querySelector(`.cw-input[data-x="${curX+dx}"][data-y="${curY+dy}"]:not(.correct)`);
+            
+            if(nextInput) {
+                nextInput.focus(); window.isSequentialInput = true;
+            } else {
+                highlightActiveWord(curX, curY);
             }
-            if(nextInput) { nextInput.focus(); } else { highlightActiveWord(curX, curY); }
         } else { inputEl.value = ''; }
         checkWordsCompletion();
     }
@@ -858,15 +954,17 @@
     function handleLongBreathHistory(isNewFiveStarWin) {
         let lbConfig = cardsConfig.longBreath;
         if(lbConfig && lbConfig.games.includes('crossword')) {
-            let history = JSON.parse(localStorage.getItem('longBreathHistory_crossword')) || []; 
+            let mode = localStorage.getItem('gameProgressionMode') || 'classic';
+            let historyKey = (mode === 'classic') ? 'longBreathHistory_crossword' : 'longBreathHistory_global';
+            let history = JSON.parse(localStorage.getItem(historyKey)) || []; 
             if(isNewFiveStarWin) {
                 history.push(Date.now());
             }
             let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); 
             history = history.filter(t => t >= cutoff);
-            localStorage.setItem('longBreathHistory_crossword', JSON.stringify(history));
+            localStorage.setItem(historyKey, JSON.stringify(history));
             if(isNewFiveStarWin && history.length >= lbConfig.trigger.reqGames) { 
-                localStorage.setItem('longBreathHistory_crossword', '[]'); 
+                localStorage.setItem(historyKey, '[]'); 
                 triggerDynamicChest('longBreath', lbConfig); 
                 return true; 
             }
