@@ -458,6 +458,13 @@
 
 <script>
     const LEVEL_ORDER = ['CLASS1','CLASS2','CLASS3','CLASS4','CLASS5','CLASS6','CLASS7','CLASS8','CLASS9','CLASS10','CLASS11','CLASS12','A1','A2','B1','B2','C1','C2'];
+    
+    function getLevelName(code) {
+        if (code === 'ALL') return 'جميع المستويات';
+        if(code.startsWith('CLASS')) { let num = code.replace('CLASS', ''); let ordinals = {'1':'الأول','2':'الثاني','3':'الثالث','4':'الرابع','5':'الخامس','6':'السادس','7':'السابع','8':'الثامن','9':'التاسع','10':'العاشر','11':'الحادي عشر','12':'الثاني عشر'}; return 'الصف ' + (ordinals[num] || num); }
+        return 'مستوى ' + code;
+    }
+
     // الأصوات التفاعلية للمحرك
     let sysAudioCtx = null;
     function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
