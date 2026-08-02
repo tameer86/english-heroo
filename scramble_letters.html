@@ -40,6 +40,8 @@
         
         .stage-btn { padding: 15px 25px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; background: #3498db; color: white; transition: 0.2s; position: relative; min-width: 120px; font-weight: bold;}
         .stage-btn:hover { opacity: 0.9; transform: translateY(-3px); }
+        .stage-btn.locked-stage { background: #95a5a6; opacity: 0.6; cursor: not-allowed; border: 2px dashed #7f8c8d; }
+        .stage-btn.locked-stage:hover { transform: none; opacity: 0.6; }
         .stage-stars { font-size: 14px; margin-top: 5px; color: #f1c40f; display: block; letter-spacing: 2px;}
 
         /* التحكم بالصوت */
@@ -320,6 +322,82 @@
 
     let assignedCards = { last5: [], random5: [], friday: [], chests: {} }; let magicCardEventInterval = null;
 
+    // الخوارزمية المركزية للتحكم بفتح/قفل المراحل بنظام موازي
+    const GAME_ORDER = ['matchg', 'listen', 'missing', 'scramble', 'crossword'];
+    function isStageUnlocked(stageId, myGame) {
+        let mode = localStorage.getItem('gameProgressionMode') || 'classic';
+        if (mode === 'classic') return true;
+
+        let card = getStageActiveCard(stageId);
+        let perm = JSON.parse(localStorage.getItem('permUnlockedStages')) || [];
+        if (card || perm.includes(stageId)) return true;
+
+        let p = {
+            matchg: JSON.parse(localStorage.getItem('matchGameProgress')) || {},
+            listen: JSON.parse(localStorage.getItem('listenGameProgress')) || {},
+            missing: JSON.parse(localStorage.getItem('missingGameProgress')) || {},
+            scramble: JSON.parse(localStorage.getItem('scrambleGameProgress')) || {},
+            crossword: JSON.parse(localStorage.getItem('crosswordGameProgress')) || {}
+        };
+
+        function getStars(game, s) { return p[game][s.level]?.[s.localStage]?.stars || 0; }
+
+        if (mode === 'sequential') {
+            for (let s of globalStagesList) {
+                for (let g of GAME_ORDER) {
+                    if (getStars(g, s) < 5) {
+                        if (stageId === s.id && myGame === g) return true;
+                        let mySIndex = globalStagesList.findIndex(x => x.id === stageId);
+                        let fSIndex = globalStagesList.findIndex(x => x.id === s.id);
+                        if (mySIndex < fSIndex) return true;
+                        if (mySIndex === fSIndex && GAME_ORDER.indexOf(myGame) < GAME_ORDER.indexOf(g)) return true;
+                        return false; 
+                    }
+                }
+            }
+            return true;
+        }
+
+        if (mode === 'random') {
+            let activeRandId = localStorage.getItem('activeRandomParallelStage');
+            let activeRandStage = globalStagesList.find(x => x.id == activeRandId);
+            
+            if (activeRandStage) {
+                let all5 = true;
+                for(let g of GAME_ORDER) { if(getStars(g, activeRandStage) < 5) { all5 = false; break; } }
+                if(all5) { activeRandId = null; localStorage.removeItem('activeRandomParallelStage'); activeRandStage = null; }
+            }
+
+            if (!activeRandId) {
+                let incomplete = globalStagesList.filter(s => {
+                    for(let g of GAME_ORDER) { if(getStars(g, s) < 5) return true; }
+                    return false;
+                });
+                if (incomplete.length > 0) {
+                    let pick = incomplete[Math.floor(Math.random() * incomplete.length)];
+                    activeRandId = pick.id;
+                    localStorage.setItem('activeRandomParallelStage', activeRandId);
+                    activeRandStage = pick;
+                }
+            }
+
+            let sObj = globalStagesList.find(x => x.id === stageId);
+            if(sObj && getStars(myGame, sObj) >= 5) return true; 
+
+            if (stageId == activeRandId) {
+                for(let g of GAME_ORDER) {
+                    if(getStars(g, activeRandStage) < 5) {
+                        if(myGame === g) return true;
+                        if(GAME_ORDER.indexOf(myGame) < GAME_ORDER.indexOf(g)) return true;
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
     window.onload = function() {
         verifyParentModeStrict(); applyGlobalModes();
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
@@ -499,6 +577,14 @@
                 elFriday.innerText = `يفتح بعد: ${d>0?d+' يوم و ':''}${h}س ${m}د`;
             }
         }
+        
+        let r5Timer = document.getElementById('mc-timer-random5');
+        if(r5Timer) {
+            let keys = ['hotStagesData_matchg', 'hotStagesData_listen', 'hotStagesData_missing', 'hotStagesData_arrange', 'hotStagesData_crossword']; let expiry = 0;
+            for(let k of keys) { let d = JSON.parse(localStorage.getItem(k)); if(d && d.expiry > expiry) expiry = d.expiry; }
+            if(expiry > Date.now()) { let diff = expiry - Date.now(); let h = Math.floor(diff/3600000); let m = Math.floor((diff%3600000)/60000); let s = Math.floor((diff%60000)/1000); r5Timer.innerText = `التجديد بعد: ${h}س ${m}د ${s}ث`; } else { r5Timer.innerText = "جاهزة للتجديد عند اللعب!"; }
+        }
+
         document.querySelectorAll('[id^="mc-timer-hareef-"], [id^="mc-timer-longBreath-"]').forEach(el => {
             let expiry = parseInt(el.getAttribute('data-expiry'));
             if(expiry > Date.now()) {
@@ -646,18 +732,25 @@
             let prefix = stage.level.startsWith('CLASS') ? stage.level.replace('CLASS', '') : stage.level;
             let displayName = currentLevel === "ALL" ? `${prefix}.${stage.localStage}` : `مرحلة ${stage.localStage}`;
 
-            if(activeCard) {
-                let c = activeCard.config;
-                let multVal = (activeCard.dynamicData) ? activeCard.dynamicData.mult : (c.mult.type === 'fixed' ? c.mult.val : c.mult.max);
-                btn.style.background = `linear-gradient(45deg, ${c.color}, #555)`;
-                btn.style.boxShadow = `0 0 10px ${c.color}`;
-                btn.style.border = `2px solid #fff`;
-                btn.innerHTML = `${displayName} <span class="hot-badge">✨ ${multVal}x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+            let isUnlocked = isStageUnlocked(stage.id, 'scramble');
+
+            if (!isUnlocked) {
+                btn.classList.add('locked-stage');
+                btn.innerHTML = `🔒 ${displayName} <br><span class="stage-stars">☆☆☆☆☆ <span style="color:#fff; font-size:12px;">مقفلة</span></span>`;
+                btn.onclick = () => alert("هذه المرحلة مقفلة! قم بإنهاء المراحل السابقة بـ 5 نجوم أولاً حسب التسلسل.");
             } else {
-                btn.innerHTML = `${displayName} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                if(activeCard) {
+                    let c = activeCard.config;
+                    let multVal = (activeCard.dynamicData) ? activeCard.dynamicData.mult : (c.mult.type === 'fixed' ? c.mult.val : c.mult.max);
+                    btn.style.background = `linear-gradient(45deg, ${c.color}, #555)`;
+                    btn.style.boxShadow = `0 0 10px ${c.color}`;
+                    btn.style.border = `2px solid #fff`;
+                    btn.innerHTML = `${displayName} <span class="hot-badge">✨ ${multVal}x</span><br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                } else {
+                    btn.innerHTML = `${displayName} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
+                }
+                btn.onclick = () => { window.currentActiveCard = activeCard; startGame(stage); };
             }
-            
-            btn.onclick = () => { window.currentActiveCard = activeCard; startGame(stage); };
             container.appendChild(btn);
         });
         document.getElementById('total-score').innerText = Math.round(appProgress.cumulativeScore || 0);
@@ -665,6 +758,22 @@
 
     function startGame(stageObj) {
         activeStage = stageObj; currentWordIndex = 0;
+        
+        // استهلاك البطاقات المحدودة فوراً لحمايتها من التحايل وحفظ المضاعف المؤقت
+        if (window.currentActiveCard && ['hareef', 'longBreath'].includes(window.currentActiveCard.id)) {
+            let activeData = window.currentActiveCard.dynamicData;
+            activeData.stages = activeData.stages.filter(id => id !== activeStage.id);
+            if(activeData.stages.length === 0) localStorage.removeItem(`activeChest_${window.currentActiveCard.id}_scramble`);
+            else localStorage.setItem(`activeChest_${window.currentActiveCard.id}_scramble`, JSON.stringify(activeData));
+            
+            let perm = JSON.parse(localStorage.getItem('permUnlockedStages')) || [];
+            if(!perm.includes(activeStage.id)) { perm.push(activeStage.id); localStorage.setItem('permUnlockedStages', JSON.stringify(perm)); }
+        }
+        
+        window.sessionMultiplier = window.currentActiveCard ? 
+            (window.currentActiveCard.dynamicData ? window.currentActiveCard.dynamicData.mult : 
+            (window.currentActiveCard.config.mult.type === 'fixed' ? window.currentActiveCard.config.mult.val : window.currentActiveCard.config.mult.max)) : 1;
+
         document.getElementById('stages-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'block';
         let prefix = activeStage.level.startsWith('CLASS') ? activeStage.level.replace('CLASS', '') : activeStage.level;
         let displayStr = currentLevel === "ALL" ? `${prefix}.${activeStage.localStage}` : activeStage.localStage;
@@ -850,11 +959,7 @@
         if(stars > previousStars) {
             basePoints = (stars - previousStars) * starPrice;
             
-            let finalMultiplier = 1;
-            if(window.currentActiveCard) {
-                let c = window.currentActiveCard.config;
-                finalMultiplier = window.currentActiveCard.dynamicData ? window.currentActiveCard.dynamicData.mult : (c.mult.type === 'fixed' ? c.mult.val : c.mult.max);
-            }
+            let finalMultiplier = window.sessionMultiplier || 1;
             
             totalPoints = Math.round(basePoints * finalMultiplier);
             bonusPoints = totalPoints - basePoints;
@@ -873,14 +978,6 @@
 
         gameProgress[activeStage.level] = levelData;
         localStorage.setItem('scrambleGameProgress', JSON.stringify(gameProgress));
-
-        // خصم المرحلة الملعوبة من الصناديق النشطة لتختفي البطاقة
-        if(window.currentActiveCard && ['hareef', 'longBreath'].includes(window.currentActiveCard.id)) {
-            let activeData = window.currentActiveCard.dynamicData;
-            activeData.stages = activeData.stages.filter(id => id !== activeStage.id);
-            if(activeData.stages.length === 0) localStorage.removeItem(`activeChest_${window.currentActiveCard.id}_scramble`);
-            else localStorage.setItem(`activeChest_${window.currentActiveCard.id}_scramble`, JSON.stringify(activeData));
-        }
 
         // معالجة السلاسل (الحريف)
         let hareefTriggered = false;

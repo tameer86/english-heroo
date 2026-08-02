@@ -269,6 +269,49 @@
             <button class="btn-close-modal" onclick="toggleModal('admin-modal')">✖</button>
             <h3 style="color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top:0;">⚙️ إعدادات التحكم بالألعاب</h3>
             
+            <!-- إضافة نظام التحكم بتسلسل اللعب -->
+            <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px; background:#e8f4f8; border-color:#bce8f1;">
+                <h4 style="margin: 0; color: var(--info);">🔄 نظام فتح المراحل (تسلسل اللعب)</h4>
+                <div style="margin-top: 15px; text-align:right;">
+                    <select id="progression-mode" class="parent-only-inputs" style="width:100%; padding:10px; font-weight:bold; border-radius:5px;">
+                        <option value="classic">النظام الكلاسيكي (جميع المراحل متاحة)</option>
+                        <option value="sequential">اللعب المتوازي التتابعي (مرحلة بمرحلة)</option>
+                        <option value="random">اللعب المتوازي العشوائي (مرحلة عشوائية)</option>
+                    </select>
+                    <p style="font-size:12px; color:#555; margin-top:10px;">* ملاحظة: المراحل التي تمتلك بطاقات فعالة تبقى متاحة للعب دائماً بغض النظر عن النظام.</p>
+                </div>
+            </div>
+
+            <!-- أداة منح النجوم اليدوية -->
+            <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px;">
+                <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'" style="margin: 0; cursor: pointer; color: var(--primary);">⭐ منح النجوم للمراحل (يدوي)</h4>
+                <div style="display:none; margin-top: 15px; text-align:right;">
+                    <div class="admin-row">
+                        <label>اللعبة المستهدفة:</label>
+                        <select id="grant-game" class="parent-only-inputs">
+                            <option value="matchg">المطابقة والذاكرة</option>
+                            <option value="listen">صائد الأمثلة المسموعة</option>
+                            <option value="missing">الحروف الناقصة</option>
+                            <option value="scramble">ترتيب الحروف</option>
+                            <option value="crossword">الكلمات المتقاطعة</option>
+                        </select>
+                    </div>
+                    <div class="admin-row">
+                        <label>المستوى/الصف:</label>
+                        <select id="grant-level" class="parent-only-inputs"></select>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <div class="admin-row" style="flex:1;"><label>من مرحلة:</label><input type="number" id="grant-start" value="1" class="parent-only-inputs"></div>
+                        <div class="admin-row" style="flex:1;"><label>إلى مرحلة:</label><input type="number" id="grant-end" value="3" class="parent-only-inputs"></div>
+                        <div class="admin-row" style="flex:1;"><label>النجوم:</label><input type="number" id="grant-stars" min="0" max="5" value="5" class="parent-only-inputs"></div>
+                    </div>
+                    <div class="admin-row" style="background:#f1f1f1; padding:10px; border-radius:5px;">
+                        <label><input type="checkbox" id="grant-parallel" class="parent-only-inputs"> تطبيق على المراحل الموازية في جميع الألعاب</label>
+                    </div>
+                    <button class="btn-admin-action" style="background:var(--success); margin-top:0;" onclick="grantStarsToStages()">✅ حفظ النجوم</button>
+                </div>
+            </div>
+
             <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px;">
                 <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'" style="margin: 0; cursor: pointer; color: var(--primary);">🎮 تفعيل أو تعطيل الألعاب</h4>
                 <div style="display:none; margin-top: 15px;">
@@ -345,7 +388,7 @@
                 </div>
             </div>
 
-            <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات</button>
+            <button class="btn-admin-action parent-only-btn" style="background:var(--success)" onclick="saveMainSettings()">💾 حفظ الإعدادات الأساسية</button>
         </div>
     </div>
 
@@ -412,6 +455,7 @@
     </div>
 
 <script>
+    const LEVEL_ORDER = ['CLASS1','CLASS2','CLASS3','CLASS4','CLASS5','CLASS6','CLASS7','CLASS8','CLASS9','CLASS10','CLASS11','CLASS12','A1','A2','B1','B2','C1','C2'];
     // الأصوات التفاعلية للمحرك
     let sysAudioCtx = null;
     function initSysAudio() { if(!sysAudioCtx) sysAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(sysAudioCtx.state === 'suspended') sysAudioCtx.resume(); }
@@ -652,7 +696,59 @@
 		checkNewsStatus(); 
         loadWheelAdminData(); 
         buildDynamicWheelUI(); 
+        populateGrantLevelDropdown();
+        loadProgressionMode();
     };
+
+    function populateGrantLevelDropdown() {
+        let select = document.getElementById('grant-level');
+        select.innerHTML = '<option value="ALL">جميع المستويات</option>';
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {levels:{}};
+        let availableLevels = Object.keys(appProg.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
+        availableLevels.forEach(lvl => {
+            let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl); select.appendChild(option);
+        });
+    }
+
+    function loadProgressionMode() {
+        let mode = localStorage.getItem('gameProgressionMode') || 'classic';
+        let select = document.getElementById('progression-mode');
+        if (select) select.value = mode;
+    }
+
+    function grantStarsToStages() {
+        let targetGame = document.getElementById('grant-game').value;
+        let targetLevel = document.getElementById('grant-level').value; 
+        let start = parseInt(document.getElementById('grant-start').value) || 1;
+        let end = parseInt(document.getElementById('grant-end').value) || 1;
+        let stars = parseInt(document.getElementById('grant-stars').value) || 0;
+        let applyAll = document.getElementById('grant-parallel').checked;
+        
+        let gamesToUpdate = applyAll ? ['matchg', 'listen', 'missing', 'scramble', 'crossword'] : [targetGame];
+        let appProg = JSON.parse(localStorage.getItem('appProgress')) || {levels:{}};
+        let levelsToProcess = targetLevel === 'ALL' ? Object.keys(appProg.levels) : [targetLevel];
+        
+        let storageKeys = {
+            'matchg': 'matchGameProgress',
+            'listen': 'listenGameProgress',
+            'missing': 'missingGameProgress',
+            'scramble': 'scrambleGameProgress',
+            'crossword': 'crosswordGameProgress'
+        };
+
+        gamesToUpdate.forEach(game => {
+            let prog = JSON.parse(localStorage.getItem(storageKeys[game])) || {};
+            levelsToProcess.forEach(lvl => {
+                if (!prog[lvl]) prog[lvl] = {};
+                for (let s = start; s <= end; s++) {
+                    let existing = prog[lvl][s] || { time: 0 };
+                    prog[lvl][s] = { unlocked: true, stars: Math.max(existing.stars||0, stars), time: existing.time || 0, timestamp: Date.now() };
+                }
+            });
+            localStorage.setItem(storageKeys[game], JSON.stringify(prog));
+        });
+        alert(`تم إعطاء ${stars} نجوم بنجاح للمراحل من ${start} إلى ${end}!`);
+    }
 
     function verifyParentModeStrict() {
         let isParent = localStorage.getItem('isParentMode');
@@ -688,9 +784,8 @@
     }
 
     function logBankStatement(desc, amount, isIn) {
-        // مفصولة تماماً عن appProgress لحماية البيانات وجعلها دائمة
         let statement = JSON.parse(localStorage.getItem('bankStatementData'));
-        if(!statement) { // Migration fallback
+        if(!statement) { 
             let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
             statement = appProg.bankStatement || [];
         }
@@ -989,15 +1084,13 @@
         for(let key in gameNames) { resultHTML += `<div class="stat-item"><span>${gameNames[key]}</span> <span class="stat-val">${totals[key]} نقطة</span></div>`; }
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
-// دوال توليد تقارير الإنجاز والأداء مفلترة زمنياً بالاعتماد على الطابع الزمني (timestamp) للمراحل.
+
    function getGameStats(storageKey, cutoffTime) {
         let prog = JSON.parse(localStorage.getItem(storageKey)) || {}; let stagesCompleted = 0; let totalStars = 0; let totalTime = 0;
         for (let lvl in prog) { 
             for (let stg in prog[lvl]) { 
                 let data = prog[lvl][stg]; 
-                // استثناء المراحل القديمة التي لا تقع ضمن فترة الفلتر
                 if (cutoffTime && data.timestamp && data.timestamp < cutoffTime) continue;
-                // استثناء المراحل التي لُعبت قبل إضافة هذا التحديث (ليس لها طابع زمني)
                 if (cutoffTime && !data.timestamp) continue;
 
                 if (data.stars > 0 || data.time > 0) { stagesCompleted++; totalStars += data.stars || 0; totalTime += data.time || 0; } 
@@ -1029,7 +1122,6 @@
         for (let key in gamesData) { let stats = gamesData[key].data; if (stats.stagesCompleted === 0) continue; resultHTML += `<div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><div style="color: var(--primary); font-weight: bold; margin-bottom: 5px;">${gamesData[key].name}</div><div class="stat-item"><span>متوسط الدقة:</span> <span class="stat-val good">${stats.avgStars} / 5 ⭐</span></div><div class="stat-item"><span>متوسط السرعة:</span> <span class="stat-val">${stats.avgTime} ثانية</span></div></div>`; }
         resultHTML += `</div>`; let resultsDiv = document.getElementById('report-results'); resultsDiv.innerHTML = resultHTML; resultsDiv.style.display = 'block';
     }
-	// دوال توليد تقارير الإنجاز والأداء مفلترة زمنياً بالاعتماد على الطابع الزمني (timestamp) للمراحل.
 
     function checkNewFameAchievements() {
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {};
@@ -1099,6 +1191,9 @@
         const gameState = { matchg: document.getElementById('chk-matchg').checked, listen: document.getElementById('chk-listen').checked, missing: document.getElementById('chk-missing').checked, arrange: document.getElementById('chk-arrange').checked, crossword: document.getElementById('chk-crossword').checked };
         localStorage.setItem('disabledGamesConfig', JSON.stringify(gameState)); applyGamesState(gameState);
 
+        let progressionMode = document.getElementById('progression-mode').value;
+        localStorage.setItem('gameProgressionMode', progressionMode);
+
         if (document.getElementById('chk-reset-all').checked) {
             if (confirm('⚠️ هل أنت متأكد من تصفير كافة النجوم والمراحل لجميع الألعاب؟')) {
                 let pList = ['matchGameProgress', 'listenGameProgress', 'missingGameProgress', 'scrambleGameProgress', 'crosswordGameProgress'];
@@ -1127,7 +1222,7 @@
         
         updateBankUI(); 
         buildDynamicWheelUI();
-        alert('تم حفظ الإعدادات بنجاح!'); 
+        alert('تم حفظ الإعدادات الأساسية بنجاح!'); 
         toggleModal('admin-modal');
     }
 
