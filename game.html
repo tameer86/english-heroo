@@ -282,7 +282,7 @@
                 </div>
             </div>
 
-            <!-- أداة منح النجوم اليدوية -->
+            <!-- أداة منح النجوم اليدوية (مكدسة عمودياً لمنع التمرير الأفقي) -->
             <div class="event-editor-row parent-only-inputs" style="padding: 10px; margin-bottom: 10px;">
                 <h4 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'" style="margin: 0; cursor: pointer; color: var(--primary);">⭐ منح النجوم للمراحل (يدوي)</h4>
                 <div style="display:none; margin-top: 15px; text-align:right;">
@@ -300,12 +300,13 @@
                         <label>المستوى/الصف:</label>
                         <select id="grant-level" class="parent-only-inputs"></select>
                     </div>
-                    <div style="display:flex; gap:10px;">
-                        <div class="admin-row" style="flex:1;"><label>من مرحلة:</label><input type="number" id="grant-start" value="1" class="parent-only-inputs"></div>
-                        <div class="admin-row" style="flex:1;"><label>إلى مرحلة:</label><input type="number" id="grant-end" value="3" class="parent-only-inputs"></div>
-                        <!-- حقل عدد النجوم المطلوب -->
-                        <div class="admin-row" style="flex:1;"><label>النجوم:</label><input type="number" id="grant-stars" min="0" max="5" value="5" class="parent-only-inputs"></div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; background: #f1f1f1; padding: 10px; border-radius: 5px;">
+                        <div class="admin-row" style="margin:0;"><label>من مرحلة:</label><input type="number" id="grant-start" value="1" class="parent-only-inputs"></div>
+                        <div class="admin-row" style="margin:0;"><label>إلى مرحلة:</label><input type="number" id="grant-end" value="3" class="parent-only-inputs"></div>
+                        <div class="admin-row" style="margin:0;"><label>النجوم (0-5):</label><input type="number" id="grant-stars" min="0" max="5" value="5" class="parent-only-inputs"></div>
                     </div>
+                    
                     <div class="admin-row" style="background:#f1f1f1; padding:10px; border-radius:5px;">
                         <label><input type="checkbox" id="grant-parallel" class="parent-only-inputs"> تطبيق على المراحل الموازية في جميع الألعاب</label>
                     </div>
@@ -707,9 +708,18 @@
         select.innerHTML = ''; // تم إزالة خيار جميع المستويات حسب الطلب لتظهر الصفوف فقط
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {levels:{}};
         let availableLevels = Object.keys(appProg.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
+        
+        let hasLevels = false;
         availableLevels.forEach(lvl => {
-            let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl); select.appendChild(option);
+            if (appProg.levels[lvl].savedWords && appProg.levels[lvl].savedWords.length > 0) {
+                let option = document.createElement('option'); option.value = lvl; option.textContent = getLevelName(lvl); select.appendChild(option);
+                hasLevels = true;
+            }
         });
+        
+        if (!hasLevels) {
+            select.innerHTML = '<option value="">لا يوجد صفوف/مستويات مفتوحة</option>';
+        }
     }
 
     function loadProgressionMode() {
