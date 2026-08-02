@@ -797,6 +797,34 @@
         }
     }
 
+    function getNextInputJumping(x, y, dir) {
+        let dx = 0, dy = 0;
+        if(dir === 'h') dx = 1; else if(dir === '-h') dx = -1;
+        else if(dir === 'v') dy = 1; else if(dir === '-v') dy = -1;
+        
+        let currX = x + dx; let currY = y + dy;
+        while(true) {
+            let inp = document.querySelector(`.cw-input[data-x="${currX}"][data-y="${currY}"]`);
+            if (!inp) return null;
+            if (!inp.classList.contains('correct')) return inp;
+            currX += dx; currY += dy;
+        }
+    }
+
+    function getPrevInputJumping(x, y, dir) {
+        let dx = 0, dy = 0;
+        if(dir === 'h') dx = -1; else if(dir === '-h') dx = 1;
+        else if(dir === 'v') dy = -1; else if(dir === '-v') dy = 1;
+        
+        let currX = x + dx; let currY = y + dy;
+        while(true) {
+            let inp = document.querySelector(`.cw-input[data-x="${currX}"][data-y="${currY}"]`);
+            if (!inp) return null;
+            if (!inp.classList.contains('correct')) return inp;
+            currX += dx; currY += dy;
+        }
+    }
+
     function onCellKeydown(e, inputEl) {
         if(e.key === 'ArrowRight') { window.typingDirection = 'h'; window.lastKnownDomain = 'h'; window.isSequentialInput=false; } 
         else if(e.key === 'ArrowLeft') { window.typingDirection = '-h'; window.lastKnownDomain = 'h'; window.isSequentialInput=false; } 
@@ -805,78 +833,56 @@
         
         let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y); 
 
-        if (e.key === 'Backspace') {
-            e.preventDefault(); 
-            let valWasEmpty = (inputEl.value === '');
-            inputEl.value = ''; 
-
+        if (e.key === 'Enter') {
+            e.preventDefault();
             let dir = window.typingDirection || 'h';
+            let nextInput = getNextInputJumping(curX, curY, dir);
+            if (nextInput) { nextInput.focus(); window.isSequentialInput = true; }
+        }
 
-            if (window.isSequentialInput) {
-                let dx = (dir === 'h' || dir === '-h') ? -1 : 0;
-                let dy = (dir === 'v' || dir === '-v') ? -1 : 0;
-                let prevInput = document.querySelector(`.cw-input[data-x="${curX+dx}"][data-y="${curY+dy}"]:not(.correct)`);
-                if (prevInput) { prevInput.focus(); }
-            } else {
-                let wordH = placedWordsInfo.find(pw => pw.isHoriz && pwContainsCell(pw, curX, curY));
-                let wordV = placedWordsInfo.find(pw => !pw.isHoriz && pwContainsCell(pw, curX, curY));
-                let hStatus = getWordStatus(wordH); let vStatus = getWordStatus(wordV);
-
-                if (wordH && wordV) {
-                    if ((hStatus === 'complete' || hStatus === 'empty') && vStatus === 'partial') { dir = 'v'; } 
-                    else if ((vStatus === 'complete' || vStatus === 'empty') && hStatus === 'partial') { dir = 'h'; } 
-                    else { dir = window.lastKnownDomain || 'v'; }
-                } else {
-                    dir = wordH ? 'h' : 'v';
-                }
-
-                let dx = (dir === 'h' || dir === '-h') ? -1 : 0;
-                let dy = (dir === 'v' || dir === '-v') ? -1 : 0;
-                let currX = curX + dx; let currY = curY + dy;
-                let found = false;
-                
-                while(true) {
-                    let inp = document.querySelector(`.cw-input[data-x="${currX}"][data-y="${currY}"]`);
-                    if (!inp) break;
-                    let word = (dir === 'h' || dir === '-h') ? wordH : wordV;
-                    if (word && !pwContainsCell(word, currX, currY)) break;
-
-                    if (!inp.classList.contains('correct') && inp.value !== '') {
-                        inp.focus(); found = true; break;
-                    }
-                    currX += dx; currY += dy;
-                }
-
-                if (!found) {
-                    let prev = document.querySelector(`.cw-input[data-x="${curX+dx}"][data-y="${curY+dy}"]:not(.correct)`);
-                    if(prev) prev.focus();
-                }
-                
-                window.isSequentialInput = true; window.typingDirection = dir; window.lastKnownDomain = dir;
+        if (e.key === 'Backspace') {
+            let dir = window.typingDirection;
+            if (!dir) {
+                dir = determineDirection(curX, curY, window.typingDirection);
+                window.typingDirection = dir;
             }
+
+            if (inputEl.value === '') {
+                e.preventDefault(); 
+                let prevInput = getPrevInputJumping(curX, curY, dir);
+                if (prevInput) {
+                    prevInput.focus();
+                }
+            } 
             setTimeout(() => checkWordsCompletion(), 10);
         }
+
         setTimeout(() => highlightActiveWord(curX, curY), 10);
     }
 
     function onCellInput(e, inputEl) {
         let val = inputEl.value.toLowerCase(); let curX = parseInt(inputEl.dataset.x); let curY = parseInt(inputEl.dataset.y);
         if(val.match(/[a-z]/i)) {
-            let dir = determineDirection(curX, curY, window.typingDirection);
-            window.typingDirection = dir; window.lastKnownDomain = (dir === 'v' || dir === '-v') ? 'v' : 'h';
+            let dir = window.typingDirection;
             
-            let dx = 0, dy = 0;
-            if(dir === 'h') dx = 1; else if(dir === '-h') dx = -1;
-            else if(dir === 'v') dy = 1; else if(dir === '-v') dy = -1;
-
-            let nextInput = document.querySelector(`.cw-input[data-x="${curX+dx}"][data-y="${curY+dy}"]:not(.correct)`);
+            // تحديث الاتجاه فقط في حال الإدخال اليدوي الأول
+            if (!window.isSequentialInput || !dir) {
+                dir = determineDirection(curX, curY, window.typingDirection);
+            }
             
+            window.typingDirection = dir; 
+            window.lastKnownDomain = (dir === 'v' || dir === '-v') ? 'v' : 'h';
+            window.isSequentialInput = true;
+            
+            let nextInput = getNextInputJumping(curX, curY, dir);
             if(nextInput) {
-                nextInput.focus(); window.isSequentialInput = true;
+                nextInput.focus();
             } else {
                 highlightActiveWord(curX, curY);
             }
-        } else { inputEl.value = ''; }
+        } else { 
+            inputEl.value = ''; 
+        }
         checkWordsCompletion();
     }
 
