@@ -763,7 +763,7 @@
                 if (!prog[lvl]) prog[lvl] = {};
                 for (let s = start; s <= end; s++) {
                     let existing = prog[lvl][s] || { time: 0 };
-                    prog[lvl][s] = { unlocked: true, stars: Math.max(existing.stars||0, stars), time: existing.time || 0, timestamp: Date.now() };
+                    prog[lvl][s] = { unlocked: true, stars: stars, time: existing.time || 0, timestamp: Date.now() };
                 }
             });
             localStorage.setItem(storageKeys[game], JSON.stringify(prog));
