@@ -339,12 +339,18 @@
             crossword: JSON.parse(localStorage.getItem('crosswordGameProgress')) || {}
         };
 
-        function getStars(game, s) { return p[game][s.level]?.[s.localStage]?.stars || 0; }
+        function getStars(game, s) { return p[game]?.[s.level]?.[s.localStage]?.stars || 0; }
+        function isManuallyUnlocked(game, s) { return p[game]?.[s.level]?.[s.localStage]?.unlocked || false; }
+
+        let thisStageObj = globalStagesList.find(x => x.id === stageId);
+        if (!thisStageObj) return true;
+        
+        if (isManuallyUnlocked(myGame, thisStageObj) || getStars(myGame, thisStageObj) > 0) return true;
 
         if (mode === 'sequential') {
             for (let s of globalStagesList) {
                 for (let g of GAME_ORDER) {
-                    if (getStars(g, s) < 5) {
+                    if (getStars(g, s) < 5 && !isManuallyUnlocked(g, s)) {
                         if (stageId === s.id && myGame === g) return true;
                         let mySIndex = globalStagesList.findIndex(x => x.id === stageId);
                         let fSIndex = globalStagesList.findIndex(x => x.id === s.id);
@@ -363,13 +369,13 @@
             
             if (activeRandStage) {
                 let all5 = true;
-                for(let g of GAME_ORDER) { if(getStars(g, activeRandStage) < 5) { all5 = false; break; } }
+                for(let g of GAME_ORDER) { if(getStars(g, activeRandStage) < 5 && !isManuallyUnlocked(g, activeRandStage)) { all5 = false; break; } }
                 if(all5) { activeRandId = null; localStorage.removeItem('activeRandomParallelStage'); activeRandStage = null; }
             }
 
             if (!activeRandId) {
                 let incomplete = globalStagesList.filter(s => {
-                    for(let g of GAME_ORDER) { if(getStars(g, s) < 5) return true; }
+                    for(let g of GAME_ORDER) { if(getStars(g, s) < 5 && !isManuallyUnlocked(g, s)) return true; }
                     return false;
                 });
                 if (incomplete.length > 0) {
@@ -380,12 +386,9 @@
                 }
             }
 
-            let sObj = globalStagesList.find(x => x.id === stageId);
-            if(sObj && getStars(myGame, sObj) >= 5) return true; 
-
             if (stageId == activeRandId) {
                 for(let g of GAME_ORDER) {
-                    if(getStars(g, activeRandStage) < 5) {
+                    if(getStars(g, activeRandStage) < 5 && !isManuallyUnlocked(g, activeRandStage)) {
                         if(myGame === g) return true;
                         if(GAME_ORDER.indexOf(myGame) < GAME_ORDER.indexOf(g)) return true;
                         return false;
@@ -408,19 +411,22 @@
         let isParent = localStorage.getItem('isParentMode') === 'true';
         let banner = document.getElementById('parent-mode-banner'); if(banner) banner.style.display = isParent ? 'block' : 'none';
         document.querySelectorAll('.parent-only-inputs').forEach(el => el.disabled = !isParent);
-        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? (btn.tagName === 'DIV' ? 'flex' : 'inline-block') : 'none');
+        document.querySelectorAll('.parent-only-btn').forEach(btn => btn.style.display = isParent ? 'inline-block' : 'none');
     }
+
     function handleGlobalBack() {
         const modal = document.getElementById('settings-modal'); const gameScreen = document.getElementById('game-screen');
         if(modal.style.display === 'flex') { 
             modal.style.display = 'none'; 
         } else if (gameScreen.style.display === 'block') { 
+            // سد ثغرة التحايل
             localStorage.setItem('consecutive5_crossword', 0);
             showStagesScreen(); 
         } else { 
             window.location.href = 'game.html'; 
         }
     }
+
     function toggleModal(id) {
         const modal = document.getElementById(id);
         if(modal.style.display === 'flex') { modal.style.display = 'none'; } else { modal.style.display = 'flex'; }
@@ -536,6 +542,17 @@
             }
             assignedCards.friday = savedFri.stages || [];
         }
+        
+        // ربط المراحل المشمولة بالبطاقات لفتحها بشكل موازي
+        let perm = JSON.parse(localStorage.getItem('permUnlockedStages')) || [];
+        let updated = false;
+        let allMyCards = [...assignedCards.last5, ...assignedCards.random5, ...assignedCards.friday];
+        for(let key in assignedCards.chests) allMyCards.push(...assignedCards.chests[key].stages);
+        
+        allMyCards.forEach(id => {
+            if(!perm.includes(id)) { perm.push(id); updated = true; }
+        });
+        if(updated) localStorage.setItem('permUnlockedStages', JSON.stringify(perm));
     }
 
     function getStageActiveCard(stageId) {
@@ -580,6 +597,7 @@
                 } else {
                     btn.innerHTML = `${displayName} <br><span class="stage-stars">${starsHTML} <span style="color:#fff; font-size:12px;">${timeSpent}</span></span>`;
                 }
+                
                 btn.onclick = () => { window.currentActiveCard = activeCard; startGame(stage); };
             }
             container.appendChild(btn);
@@ -589,9 +607,8 @@
 
     function startGame(stageObj) {
         activeStage = stageObj;
-        window.hintUses = 0; window.hintPenalty = 0; window.currentActiveWord = null; window.isHintActive = false;
         
-        // استهلاك البطاقات المحدودة فوراً لحمايتها من التحايل وحفظ المضاعف المؤقت
+        // استهلاك البطاقات المحدودة فوراً لحمايتها من التحايل
         if (window.currentActiveCard && ['hareef', 'longBreath'].includes(window.currentActiveCard.id)) {
             let activeData = window.currentActiveCard.dynamicData;
             activeData.stages = activeData.stages.filter(id => id !== activeStage.id);
@@ -606,6 +623,8 @@
             (window.currentActiveCard.dynamicData ? window.currentActiveCard.dynamicData.mult : 
             (window.currentActiveCard.config.mult.type === 'fixed' ? window.currentActiveCard.config.mult.val : window.currentActiveCard.config.mult.max)) : 1;
 
+        window.hintUses = 0; window.hintPenalty = 0; window.currentActiveWord = null; window.isHintActive = false;
+        
         let t = getLevelTimes(activeStage.level);
         window.currentHintCost = t.hintCost || 1;
         document.getElementById('hint-bulb-btn').style.display = (t.hintEnabled !== false) ? 'flex' : 'none';
@@ -745,9 +764,8 @@
     }
 
     function onCellKeydown(e, inputEl) {
-        // تصحيح اتجاهات الأسهم بناءً على ملاحظات المستخدم لتتوافق بشكل سليم
-        if(e.key === 'ArrowRight') { window.typingDirection = 'h'; } 
-        else if(e.key === 'ArrowLeft') { window.typingDirection = '-h'; } 
+        if(e.key === 'ArrowRight') { window.typingDirection = '-h'; } 
+        else if(e.key === 'ArrowLeft') { window.typingDirection = 'h'; } 
         else if(e.key === 'ArrowDown') { window.typingDirection = 'v'; } 
         else if(e.key === 'ArrowUp') { window.typingDirection = '-v'; }
         
@@ -940,12 +958,20 @@
         gameProgress[activeStage.level] = levelData;
         localStorage.setItem('crosswordGameProgress', JSON.stringify(gameProgress));
 
+        // خصم المرحلة الملعوبة من الصناديق النشطة لتختفي البطاقة
+        if(window.currentActiveCard && ['hareef', 'longBreath'].includes(window.currentActiveCard.id)) {
+            let activeData = window.currentActiveCard.dynamicData;
+            activeData.stages = activeData.stages.filter(id => id !== activeStage.id);
+            if(activeData.stages.length === 0) localStorage.removeItem(`activeChest_${window.currentActiveCard.id}_crossword`);
+            else localStorage.setItem(`activeChest_${window.currentActiveCard.id}_crossword`, JSON.stringify(activeData));
+        }
+
         // معالجة السلاسل (الحريف)
         let hareefTriggered = false;
         let cHareef = cardsConfig.hareef;
         if(cHareef && cHareef.games.includes('crossword')) {
             if(previousStars === 5) {
-                // التجاهل الكامل
+                // التجاهل الكامل للمرحلة المختومة مسبقاً (لا تكسر السلسلة ولا تزيدها)
             } else {
                 if(stars === 5) {
                     let cons = parseInt(localStorage.getItem('consecutive5_crossword')) || 0; cons++; localStorage.setItem('consecutive5_crossword', cons);
@@ -982,23 +1008,20 @@
     window.addEventListener('DOMContentLoaded', () => {
         let bgMusic = document.getElementById('bg-music');
         if (bgMusic) {
-            // قراءة مستوى الصوت المحفوظ من الصفحة الرئيسية
             let savedVol = localStorage.getItem('bgMusicVolume');
             let vol = (savedVol !== null && savedVol !== '') ? parseFloat(savedVol) : 0.5;
             if (isNaN(vol)) vol = 0.5;
             
-            // قراءة حالة الكتم
             let isMuted = localStorage.getItem('bgMusicMuted') === 'true';
             let finalVol = isMuted ? 0 : vol;
             
-            // التطبيق الفوري والإجباري على المتصفح
             bgMusic.volume = finalVol;
             bgMusic.onplay = () => { bgMusic.volume = finalVol; };
             bgMusic.oncanplay = () => { bgMusic.volume = finalVol; };
         }
     });
 
-    // --- إضافة سد ثغرة التحايل بواسطة سهم الجوال أو تحديث الصفحة أثناء اللعب ---
+    // --- سد ثغرة التحايل بواسطة سهم الجوال أو تحديث الصفحة أثناء اللعب ---
     window.addEventListener('beforeunload', function() {
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen && gameScreen.style.display === 'block') {
@@ -1013,7 +1036,6 @@
     });
 </script>
 <script>
-    // تفعيل الـ Service Worker لعمل التطبيق بدون إنترنت (Offline Mode)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js')
