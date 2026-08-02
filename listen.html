@@ -659,15 +659,17 @@
     function handleLongBreathHistory(isNewFiveStarWin) {
         let lbConfig = cardsConfig.longBreath;
         if(lbConfig && lbConfig.games.includes('listen')) {
-            let history = JSON.parse(localStorage.getItem('longBreathHistory_listen')) || []; 
+            let mode = localStorage.getItem('gameProgressionMode') || 'classic';
+            let historyKey = (mode === 'classic') ? 'longBreathHistory_listen' : 'longBreathHistory_global';
+            let history = JSON.parse(localStorage.getItem(historyKey)) || []; 
             if(isNewFiveStarWin) {
                 history.push(Date.now());
             }
             let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); 
             history = history.filter(t => t >= cutoff);
-            localStorage.setItem('longBreathHistory_listen', JSON.stringify(history));
+            localStorage.setItem(historyKey, JSON.stringify(history));
             if(isNewFiveStarWin && history.length >= lbConfig.trigger.reqGames) { 
-                localStorage.setItem('longBreathHistory_listen', '[]'); 
+                localStorage.setItem(historyKey, '[]'); 
                 triggerDynamicChest('longBreath', lbConfig); 
                 return true; 
             }

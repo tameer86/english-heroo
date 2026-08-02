@@ -303,6 +303,7 @@
                     <div style="display:flex; gap:10px;">
                         <div class="admin-row" style="flex:1;"><label>من مرحلة:</label><input type="number" id="grant-start" value="1" class="parent-only-inputs"></div>
                         <div class="admin-row" style="flex:1;"><label>إلى مرحلة:</label><input type="number" id="grant-end" value="3" class="parent-only-inputs"></div>
+                        <!-- حقل عدد النجوم المطلوب -->
                         <div class="admin-row" style="flex:1;"><label>النجوم:</label><input type="number" id="grant-stars" min="0" max="5" value="5" class="parent-only-inputs"></div>
                     </div>
                     <div class="admin-row" style="background:#f1f1f1; padding:10px; border-radius:5px;">
@@ -534,12 +535,13 @@
         }
     }
 
+    // تم تعديل النسب المئوية الافتراضية هنا لتكون (25، 20، 25، 20، 10)
     const DEFAULT_WHEEL_CONFIG = {
         name: "عجلة الحظ", count: 5,
         slices: [
-            { type: "money", val: "1", prob: 30, color: "#e74a3b" }, { type: "money", val: "2", prob: 25, color: "#f1c40f" },
+            { type: "money", val: "1", prob: 25, color: "#e74a3b" }, { type: "money", val: "2", prob: 20, color: "#f1c40f" },
             { type: "money", val: "3", prob: 25, color: "#1cc88a" }, { type: "points", val: "1000", prob: 20, color: "#3498db" },
-            { type: "money", val: "5", prob: 0, color: "#9b59b6" }
+            { type: "money", val: "5", prob: 10, color: "#9b59b6" }
         ]
     };
     const EXTRA_WHEEL_COLORS = ["#e67e22", "#8e44ad", "#2ecc71"];
@@ -702,7 +704,7 @@
 
     function populateGrantLevelDropdown() {
         let select = document.getElementById('grant-level');
-        select.innerHTML = '<option value="ALL">جميع المستويات</option>';
+        select.innerHTML = ''; // تم إزالة خيار جميع المستويات حسب الطلب لتظهر الصفوف فقط
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {levels:{}};
         let availableLevels = Object.keys(appProg.levels).sort((a, b) => { let idxA = LEVEL_ORDER.indexOf(a); let idxB = LEVEL_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
         availableLevels.forEach(lvl => {
@@ -719,6 +721,8 @@
     function grantStarsToStages() {
         let targetGame = document.getElementById('grant-game').value;
         let targetLevel = document.getElementById('grant-level').value; 
+        if(!targetLevel) { alert("يجب اختيار مستوى أو صف أولاً."); return; }
+        
         let start = parseInt(document.getElementById('grant-start').value) || 1;
         let end = parseInt(document.getElementById('grant-end').value) || 1;
         let stars = parseInt(document.getElementById('grant-stars').value) || 0;
@@ -726,7 +730,7 @@
         
         let gamesToUpdate = applyAll ? ['matchg', 'listen', 'missing', 'scramble', 'crossword'] : [targetGame];
         let appProg = JSON.parse(localStorage.getItem('appProgress')) || {levels:{}};
-        let levelsToProcess = targetLevel === 'ALL' ? Object.keys(appProg.levels) : [targetLevel];
+        let levelsToProcess = [targetLevel];
         
         let storageKeys = {
             'matchg': 'matchGameProgress',
@@ -1211,13 +1215,21 @@
         
         let wCount = parseInt(document.getElementById('cfg-wheel-count').value);
         let newWheelConf = { name: document.getElementById('cfg-wheel-name').value, count: wCount, slices: [] };
+        let totalProb = 0;
         for(let i=0; i<wCount; i++) {
             let t = document.getElementById(`w-type-${i}`).value;
             let v = document.getElementById(`w-val-${i}`).value;
             let p = parseInt(document.getElementById(`w-prob-${i}`).value) || 0;
             let c = document.getElementById(`w-color-${i}`).value;
             newWheelConf.slices.push({type: t, val: v, prob: p, color: c});
+            totalProb += p;
         }
+        
+        if(totalProb !== 100) {
+            alert("تحذير ⚠️: مجموع نسب عجلة الحظ يجب أن يكون 100% بالضبط لتعمل العجلة بشكل صحيح. المجموع الحالي هو " + totalProb + "%");
+            return; 
+        }
+
         localStorage.setItem('advancedWheelConfig', JSON.stringify(newWheelConf));
         
         updateBankUI(); 

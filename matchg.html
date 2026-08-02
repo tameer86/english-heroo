@@ -404,7 +404,9 @@
         if(modal.style.display === 'flex') { 
             modal.style.display = 'none'; 
         } else if (gameScreen.style.display === 'block') { 
+            // سد ثغرة التحايل في حال النقر على السهم أثناء اللعب
             localStorage.setItem('consecutive5_matchg', 0);
+            // وإلغاء الاستفادة العشوائية إذا تم الهروب
             showStagesScreen(); 
         } else { 
             window.location.href = 'game.html'; 
@@ -657,15 +659,17 @@
     function handleLongBreathHistory(isNewFiveStarWin) {
         let lbConfig = cardsConfig.longBreath;
         if(lbConfig && lbConfig.games.includes('matchg')) {
-            let history = JSON.parse(localStorage.getItem('longBreathHistory_matchg')) || []; 
+            let mode = localStorage.getItem('gameProgressionMode') || 'classic';
+            let historyKey = (mode === 'classic') ? 'longBreathHistory_matchg' : 'longBreathHistory_global';
+            let history = JSON.parse(localStorage.getItem(historyKey)) || []; 
             if(isNewFiveStarWin) {
                 history.push(Date.now());
             }
             let cutoff = Date.now() - (lbConfig.trigger.reqHours * 3600000); 
             history = history.filter(t => t >= cutoff);
-            localStorage.setItem('longBreathHistory_matchg', JSON.stringify(history));
+            localStorage.setItem(historyKey, JSON.stringify(history));
             if(isNewFiveStarWin && history.length >= lbConfig.trigger.reqGames) { 
-                localStorage.setItem('longBreathHistory_matchg', '[]'); 
+                localStorage.setItem(historyKey, '[]'); 
                 triggerDynamicChest('longBreath', lbConfig); 
                 return true; 
             }
