@@ -299,18 +299,12 @@
             crossword: JSON.parse(localStorage.getItem('crosswordGameProgress')) || {}
         };
 
-        function getStars(game, s) { return p[game]?.[s.level]?.[s.localStage]?.stars || 0; }
-        function isManuallyUnlocked(game, s) { return p[game]?.[s.level]?.[s.localStage]?.unlocked || false; }
-
-        let thisStageObj = globalStagesList.find(x => x.id === stageId);
-        if (!thisStageObj) return true;
-        
-        if (isManuallyUnlocked(myGame, thisStageObj) || getStars(myGame, thisStageObj) > 0) return true;
+        function getStars(game, s) { return p[game][s.level]?.[s.localStage]?.stars || 0; }
 
         if (mode === 'sequential') {
             for (let s of globalStagesList) {
                 for (let g of GAME_ORDER) {
-                    if (getStars(g, s) < 5 && !isManuallyUnlocked(g, s)) {
+                    if (getStars(g, s) < 5) {
                         if (stageId === s.id && myGame === g) return true;
                         let mySIndex = globalStagesList.findIndex(x => x.id === stageId);
                         let fSIndex = globalStagesList.findIndex(x => x.id === s.id);
@@ -329,13 +323,13 @@
             
             if (activeRandStage) {
                 let all5 = true;
-                for(let g of GAME_ORDER) { if(getStars(g, activeRandStage) < 5 && !isManuallyUnlocked(g, activeRandStage)) { all5 = false; break; } }
+                for(let g of GAME_ORDER) { if(getStars(g, activeRandStage) < 5) { all5 = false; break; } }
                 if(all5) { activeRandId = null; localStorage.removeItem('activeRandomParallelStage'); activeRandStage = null; }
             }
 
             if (!activeRandId) {
                 let incomplete = globalStagesList.filter(s => {
-                    for(let g of GAME_ORDER) { if(getStars(g, s) < 5 && !isManuallyUnlocked(g, s)) return true; }
+                    for(let g of GAME_ORDER) { if(getStars(g, s) < 5) return true; }
                     return false;
                 });
                 if (incomplete.length > 0) {
@@ -346,9 +340,12 @@
                 }
             }
 
+            let sObj = globalStagesList.find(x => x.id === stageId);
+            if(sObj && getStars(myGame, sObj) >= 5) return true; 
+
             if (stageId == activeRandId) {
                 for(let g of GAME_ORDER) {
-                    if(getStars(g, activeRandStage) < 5 && !isManuallyUnlocked(g, activeRandStage)) {
+                    if(getStars(g, activeRandStage) < 5) {
                         if(myGame === g) return true;
                         if(GAME_ORDER.indexOf(myGame) < GAME_ORDER.indexOf(g)) return true;
                         return false;
@@ -525,17 +522,6 @@
             }
             assignedCards.friday = savedFri.stages || [];
         }
-        
-        // ربط المراحل المشمولة بالبطاقات لفتحها بشكل موازي في جميع الألعاب
-        let perm = JSON.parse(localStorage.getItem('permUnlockedStages')) || [];
-        let updated = false;
-        let allMyCards = [...assignedCards.last5, ...assignedCards.random5, ...assignedCards.friday];
-        for(let key in assignedCards.chests) allMyCards.push(...assignedCards.chests[key].stages);
-        
-        allMyCards.forEach(id => {
-            if(!perm.includes(id)) { perm.push(id); updated = true; }
-        });
-        if(updated) localStorage.setItem('permUnlockedStages', JSON.stringify(perm));
     }
 
     function getStageActiveCard(stageId) {
